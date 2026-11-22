@@ -68,7 +68,7 @@ parameter (`info["convergence"]`):
 
 | control | used for | estimate |
 |---|---|---|
-| `subdivisions` (elements per member) | second order | `\|fine − coarse\| / (ratio² − 1)` (error ∝ 1/n², measured for OpenSees; PyNite converges faster, so this is conservative there) |
+| `subdivisions` (elements per member) | second order | OpenSees: `\|fine − coarse\| / (ratio² − 1)` (error ∝ 1/n², measured). PyNite: `\|fine − coarse\|` (first-order law: displacements converge much faster, but the reactions and end forces that PyNite post-processes with recomputed axial forces only like 1/n — measured) |
 | `penalty` (OpenSees), `stiffness` (PyNite) | penalty springs, stiff emulation members | `2 × \|fine − coarse\|` with ratio 10 — no error law is assumed because round-off grows with the stiffness (measured) |
 
 ### Tier-C decision (`cross_check`)
@@ -213,7 +213,7 @@ and raises `OracleError`.
 | effect | OpenSees route | PyNite route |
 |---|---|---|
 | P-Δ (chord rotation) | exact per element | included |
-| P-δ within a member | only through subdivision (error ∝ 1/n²; 16 elements: about 10⁻³ at half the buckling load) | consistent Kg: one element already within about 0.5 %, converges ∝ 1/n⁴ |
+| P-δ within a member | only through subdivision (error ∝ 1/n²; 16 elements: about 10⁻³ at half the buckling load) | consistent Kg: one element already within about 0.5 %; from two sub-members on the displacement error falls by more than 8 per halving (measured on a cantilever) |
 | axial forces | iterated | first order |
 | axial stiffness | EA/L | (EA + N)/L |
 | released members | flag in the basic system | Kg condensed separately from Ke (vanishes with subdivision) |

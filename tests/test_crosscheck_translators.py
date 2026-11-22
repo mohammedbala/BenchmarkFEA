@@ -469,15 +469,22 @@ def test_opensees_subdivision_convergence_is_second_order():
 
 
 @pytest.mark.skipif(not __import__("crosscheck_helpers").HAVE["pynite"], reason="PyNiteFEA is not installed")
-def test_pynite_subdivision_converges_faster_than_second_order():
-    """Consistent geometric stiffness: the differences to a fine solution fall by more than 8 per
-    halving of the sub-member length, so the 1/n^2 law used for the estimate is conservative."""
-    from benchfea.crosscheck import convergence_study
-
+def test_pynite_subdivision_convergence_rates():
+    """Measured rates behind the error law of the PyNite route: with the consistent geometric stiffness
+    the displacements gain more than a factor 8 per halving of the sub-member length (from two
+    sub-members on), but the horizontal reaction, which PyNite post-processes with axial forces
+    recomputed from the final displacements, only about a factor 2.  The estimate therefore uses a
+    first-order law (|fine - coarse|), which bounds the error of every quantity."""
     model, s, Lm, P, H = _beam_column()
-    study = convergence_study("pynite", model, "L", "subdivisions", [1, 2, 4, 16], in_process=True)
-    d = [row["difference"] for row in study]
-    assert d[0] / d[1] > 8.0 and d[1] / d[2] > 8.0 and d[2] > 0.0
+    W = H + 0.5 * (1.0 + 3.0) * Lm
+    runs = {n: solve("pynite", model, "L", subdivisions=n, estimate_errors=False) for n in (2, 4, 8)}
+    tip = [abs(runs[n].displacements[1, 0] / s.v(Lm) - 1.0) for n in (2, 4, 8)]
+    shear = [abs(runs[n].reactions[0, 0] + W) for n in (2, 4, 8)]
+    assert tip[0] / tip[1] > 8.0 and tip[1] / tip[2] > 8.0
+    assert 1.5 < shear[0] / shear[1] < 3.0 and 1.5 < shear[1] / shear[2] < 3.0
+    r = solve("pynite", model, "L")
+    ctl = r.info["convergence"]["subdivisions"]
+    assert ctl["order"] == 1 and ctl["estimatedError"] == pytest.approx(ctl["difference"])
 
 
 @needs_both

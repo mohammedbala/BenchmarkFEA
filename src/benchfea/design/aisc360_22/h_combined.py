@@ -16,8 +16,13 @@ Implemented
   Policy (the Specification does not say at which section the required
   strengths are taken, nor which Mc pairs with which section):
 
-  - the interaction is evaluated AT EVERY STATION with the concurrent demands
-    Pr(x), Mrx(x), Mry(x) of the combination, and the largest value governs;
+  - the interaction is evaluated AT EVERY STATION and at the stationary points
+    of the interaction BETWEEN stations (``_between_stations``: moments by the
+    cubic interpolation of f_flexure, axial force linear) with the concurrent
+    demands Pr(x), Mrx(x), Mry(x) of the combination, and the largest value
+    governs; whether the member has a moment at all is decided with the member
+    maxima of Chapter F, so a moment that peaks between two stations is never
+    missed;
   - against the member's GOVERNING available strengths of that combination:
     Pc = the smallest available strength of all Chapter E limit states
     (flexural buckling about both axes and torsional buckling; Commentary H1:
@@ -61,9 +66,10 @@ Implemented
 
   tau_t (derived here, uniform torsion of thin-walled sections):
   - open section (I-shape): for a narrow rectangle b x t under twist rate
-    theta', Prandtl's stress function phi = G theta' (t^2/4 - n^2) (n across
-    the thickness) satisfies laplace(phi) = -2 G theta' and phi = 0 on the long
-    edges; tau = |d phi/dn| = 2 G theta' |n|, largest G theta' t at the faces;
+    theta', the stress function phi = G theta' (t^2/4 - n^2) (n across the
+    thickness; shear stresses = derivatives of phi, which makes them satisfy
+    equilibrium) satisfies the compatibility condition laplace(phi) =
+    -2 G theta' and phi = 0 on the long edges; tau = |d phi/dn| = 2 G theta' |n|, largest G theta' t at the faces;
     T = 2 integral(phi dA) = G theta' b t^3 / 3.  For several rectangles with a
     common theta': T = G J theta', J = sum(b t^3)/3, so in each rectangle
     tau_max = T t / J, largest in the thickest element:
@@ -71,7 +77,7 @@ Implemented
   - closed single cell (rectangular, round): the shear flow q = tau t is
     constant along the wall (longitudinal equilibrium of a wall element) and
     T = closed integral(q r ds) = 2 A0 q, A0 = area enclosed by the wall
-    mid-line (Bredt): tau_t = T / (2 A0 t) with A0 = (H - t)(B - t) or
+    mid-line: tau_t = T / (2 A0 t) with A0 = (H - t)(B - t) or
     pi (D - t)^2 / 4.
   Tests check both formulas by numerical integration.
 """
@@ -173,27 +179,41 @@ def interaction(ctx: DesignContext, demand: Demand) -> list:
         f = np.asarray(demand.extra["forces"], float)
         x0 = float(mo.x[0])
         xs, N = mo.x - x0, f[:, 0]
-        Mx, My = (np.hypot(f[:, 5], f[:, 4]), np.zeros(len(xs))) if round_ else (np.abs(f[:, 5]), np.abs(f[:, 4]))
+        mx, my = f[:, 5], f[:, 4]                                   # signed station moments
     else:                                                           # numbers: the maxima taken as concurrent
         xs = np.array([np.nan, np.nan])
         N = np.array([demand.Pt, -demand.Pc])
-        Mx, My = (np.full(2, mo.Mr), np.zeros(2)) if round_ else (np.full(2, mo.Mrx), np.full(2, mo.Mry))
-    has_m = bool(np.any(Mx > 0.0) or np.any(My > 0.0))
+        mx, my = (np.full(2, mo.Mr), np.zeros(2)) if round_ else (np.full(2, mo.Mrx), np.full(2, mo.Mry))
+    # whether there is a moment is decided with the member maxima of Chapter F (which include the maxima
+    # BETWEEN stations), not with the station values alone
+    has_mx = (mo.Mr if round_ else mo.Mrx) > 0.0
+    has_my = (not round_) and mo.Mry > 0.0
     has_n = bool(np.any(N != 0.0))
-    if not has_m or not (has_n or (np.any(Mx > 0.0) and np.any(My > 0.0))):
+    if not (has_mx or has_my) or not (has_n or (has_mx and has_my)):
         return []
     # --- available flexural strengths (Chapter F), governing over limit states and unbraced segments
     need = {}
     if round_:
         need["x"] = f_flexure.axis_strength(ctx, demand, "r")
     else:
-        if np.any(Mx > 0.0):
+        if has_mx:
             need["x"] = f_flexure.axis_strength(ctx, demand, "x")
-        if np.any(My > 0.0):
+        if has_my:
             need["y"] = f_flexure.axis_strength(ctx, demand, "y")
     Mcx = need["x"].Mc if "x" in need else math.inf
     Mcy = need["y"].Mc if "y" in need else math.inf
     flex_blocked = [f"{_axis_name(a, round_)}: {r.blocked}" for a, r in need.items() if r.Mc is None]
+    # --- available axial strengths (Chapter E / D) of the kinds of axial force present
+    axial = {kind: _axial_strength(ctx, demand, kind)
+             for kind, present in (("c", np.any(N < 0.0)), ("t", np.any(N > 0.0))) if present}
+    # --- evaluation points between the stations (the interaction can peak there)
+    if mo.x is not None and not flex_blocked:
+        extra = _between_stations(mo, N, round_, Mcx, Mcy, [s[0] for s in axial.values() if s[0]])
+        if extra:
+            ex, en, emx, emy = (np.array(v, float) for v in zip(*extra))
+            xs, N = np.concatenate([xs, ex - x0]), np.concatenate([N, en])
+            mx, my = np.concatenate([mx, emx]), np.concatenate([my, emy])
+    Mx, My = (np.hypot(mx, my), np.zeros(len(xs))) if round_ else (np.abs(mx), np.abs(my))
     first_order = (demand.extra or {}).get("analysisType") == "firstOrder"
     out = []
     groups = [("c", N < 0.0), ("t", N > 0.0)]
@@ -211,7 +231,7 @@ def interaction(ctx: DesignContext, demand: Demand) -> list:
         Pr_all = np.abs(N[idx])
         if not (np.any(Mx[idx] > 0.0) or np.any(My[idx] > 0.0)):
             continue                                                # axial force only in this group: Chapter D / E
-        Pc, p_name, p_blocked = (math.inf, "", "") if not np.any(Pr_all > 0.0) else _axial_strength(ctx, demand, kind)
+        Pc, p_name, p_blocked = axial[kind] if np.any(Pr_all > 0.0) and kind in axial else (math.inf, "", "")
         blocked = flex_blocked + ([f"available axial strength: {p_blocked}"] if p_blocked else [])
         if blocked:
             out.append(not_checked(name, base, "a strength needed by the interaction is not available -- "
@@ -225,8 +245,10 @@ def interaction(ctx: DesignContext, demand: Demand) -> list:
                 best = (value, eq, int(k))
         value, eq, k = best
         Pr = float(abs(N[k]))
-        notes = ["evaluated at every station with the concurrent Pr, Mrx, Mry against the member's governing "
-                 "available strengths (engine policy; the Specification does not prescribe the location)"]
+        notes = ["evaluated at every station and at the stationary points of the interaction between stations "
+                 "(moments: cubic through the station values and slopes; axial force: linear) with the "
+                 "concurrent Pr, Mrx, Mry against the member's governing available strengths (engine policy; "
+                 "the Specification does not prescribe the location)"]
         if mo.x is None:
             notes[0] = "the given maxima of Pr, Mrx, Mry are taken as concurrent"
         if kind == "c" and first_order and Pr > 0.0:
@@ -255,6 +277,51 @@ def interaction(ctx: DesignContext, demand: Demand) -> list:
             passed=bool(value <= 1.0), combination=demand.combination,
             x=None if math.isnan(xs[k]) else float(xs[k]), dimension=NONE, details=details, notes=notes,
             status=OK, method=ctx.method, inputs={**ctx.inputs("method"), **inputs}))
+    return out
+
+
+def _between_stations(mo, N, round_: bool, Mcx: float, Mcy: float, Pcs: list) -> list:
+    """Points between the stations where the interaction value can exceed its station values ->
+    [(x, N, Mx, My)] (x as the stations, signed values).
+
+    Derivation (no reference used).  Between two stations the moments are the cubics of
+    :class:`f_flexure.Diagram` and the axial force is taken as linear, so with fixed signs every form of the
+    interaction, a |N| + b |Mx| + c |My| with (a, b, c) = (1/Pc, 8/(9 Mcx), 8/(9 Mcy)) (Eq. H1-1a) or
+    (1/(2 Pc), 1/Mcx, 1/Mcy) (Eq. H1-1b), is a cubic g(s); a maximum of the interaction inside the piece is a
+    root of the quadratic g'(s) = 0 for one of the sign combinations (a kink where a term changes sign is a
+    minimum of that term, never a maximum).  All such roots are returned as evaluation points; a superfluous
+    point is harmless because the interaction itself is evaluated there.
+
+    Round sections (one flexural term, the resultant): the stationary points of Mx^2 + My^2
+    (:func:`f_flexure.resultant_roots`); when the axial force also varies inside the piece this is the point
+    of the largest resultant moment, not exactly of the largest interaction (stated in LIMITS).
+    """
+    out = []
+    cx = 0.0 if math.isinf(Mcx) else 1.0 / Mcx
+    cy = 0.0 if math.isinf(Mcy) else 1.0 / Mcy
+    weights = [(0.0, 1.0)]                                          # (axial weight, moment weight)
+    for Pc in Pcs:
+        weights += [(1.0 / Pc, 8.0 / 9.0), (0.5 / Pc, 1.0)]         # Eq. H1-1a, Eq. H1-1b
+    for (k, xk, h, ax), (_, _, _, ay) in zip(mo.Mx.cubics(), mo.My.cubics()):
+        dN = float(N[k + 1] - N[k])
+        if round_:
+            roots = set(f_flexure.resultant_roots(ax, ay))
+        else:
+            roots = set()
+            dx = (3.0 * ax[0], 2.0 * ax[1], ax[2])                  # d/ds of the cubic
+            dy = (3.0 * ay[0], 2.0 * ay[1], ay[2])
+            for wa, wm in weights:
+                for sn in ((1.0, -1.0) if wa != 0.0 and dN != 0.0 else (0.0,)):
+                    for sy in (1.0, -1.0):
+                        q = [wm * (cx * dx[i] + sy * cy * dy[i]) for i in range(3)]
+                        q[2] += sn * wa * dN
+                        roots.update(s for s in f_flexure._quadratic_roots(*q) if 0.0 < s < 1.0)
+        if dN != 0.0:                                               # where Pr/Pc = 0.2 (H1-1a takes over from H1-1b)
+            for Pc in Pcs:
+                roots.update(s for s in ((sign * 0.2 * Pc - float(N[k])) / dN for sign in (1.0, -1.0))
+                             if 0.0 < s < 1.0)
+        for s in sorted(roots):
+            out.append((xk + s * h, float(N[k]) + s * dN, float(np.polyval(ax, s)), float(np.polyval(ay, s))))
     return out
 
 

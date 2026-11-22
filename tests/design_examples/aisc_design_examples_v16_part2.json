@@ -387,6 +387,24 @@
         "Pc is a Manual Table 6-1 value (the area is not listed) and Lp, Lr are Manual Table 3-2 values: they are inputs of the test.",
         "The first-order moments (Mx1, My1) are amplified by B1 with Cm = 1.0 and the unreduced EI; the example multiplies with the rounded B1 (1.02, 1.09)."
       ]
+    },
+    "F.8A": {
+      "title": "HSS8x8x3/16: live load deflection of a simply supported beam against L/240",
+      "pages": "F-37 to F-38 (PDF 199-200)",
+      "inputs": {
+        "E": 29000,
+        "I": 54.4,
+        "wL_kip_per_ft": 0.375,
+        "span_ft": 21.0,
+        "spanRatio": 240
+      },
+      "printed": {
+        "delta_max": 1.05,
+        "delta": 1.04
+      },
+      "notes": [
+        "Deflection by 5 w L^4/(384 E I) (no shear deformation)."
+      ]
     }
   }
 }

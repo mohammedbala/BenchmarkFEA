@@ -189,9 +189,11 @@ def translate(model, combination: str, *, subdivisions: int | None = None, stiff
         if p.second_order and not m.truss:
             fid.add("secondOrder", APPROXIMATE,
                     "analyze_PDelta: consistent geometric stiffness, one solve with first-order axial forces; "
-                    "discretisation error estimated from two subdivision levels", control="subdivisions")
+                    "discretisation error estimated from two subdivision levels (first-order law: the end "
+                    "forces and reactions, post-processed with recomputed axial forces, converge like 1/n)",
+                    control="subdivisions")
             controls["subdivisions"] = {"coarse": DEFAULT_SUBDIVISIONS[0] if subdivisions is None
-                                        else max(1, n_sub // 2), "fine": n_sub, "order": 2}
+                                        else max(1, n_sub // 2), "fine": n_sub, "order": 1}
             if any(k != math.inf for k in k_i + k_j):
                 fid.add("releases.full", APPROXIMATE, "second order: PyNite condenses the geometric stiffness of a "
                         "released member separately from the elastic stiffness (difference vanishes with "
@@ -200,7 +202,7 @@ def translate(model, combination: str, *, subdivisions: int | None = None, stiff
             fid.add("secondOrder", APPROXIMATE, "truss-type member in analyze_PDelta (first-order axial force)",
                     control="subdivisions")
             controls.setdefault("subdivisions", {"coarse": DEFAULT_SUBDIVISIONS[0] if subdivisions is None
-                                                 else max(1, n_sub // 2), "fine": n_sub, "order": 2})
+                                                 else max(1, n_sub // 2), "fine": n_sub, "order": 1})
         chain = [ends[0]] + [new_node(m.start + (m.end - m.start) * (s / nsub)) for s in range(1, nsub)] + [ends[1]]
         Ls = m.L / nsub
         Iy, Iz = m.EIy / m.E, m.EIz / m.E

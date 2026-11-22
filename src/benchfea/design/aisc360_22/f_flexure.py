@@ -192,6 +192,36 @@ class Diagram:
         x_abs, m_abs = max(pts, key=lambda p: abs(p[1]))
         return abs(m_abs), x_abs, min(p[1] for p in pts), max(p[1] for p in pts)
 
+    def cubics(self):
+        """(k, x_k, h, (a3, a2, a1, a0)) of every piece between two stations with h > 0:
+        M(x_k + s h) = ((a3 s + a2) s + a1) s + a0, s in [0, 1]."""
+        for k, h in self._pieces():
+            yield k, float(self.x[k]), float(h), self._coefficients(self.m[k], self.dm[k], self.m[k + 1],
+                                                                    self.dm[k + 1], h)
+
+
+def resultant_stationary_points(Mx: "Diagram", My: "Diagram") -> list:
+    """Points BETWEEN the stations where the resultant moment sqrt(Mx^2 + My^2) is stationary ->
+    [(x, Mx, My)].  On a piece both moments are cubics in s, so q(s) = Mx(s)^2 + My(s)^2 is a polynomial of
+    degree 6 and q'(s) one of degree 5; its real roots in (0, 1) are found numerically (companion matrix,
+    ``numpy.roots``).  The two diagrams have the same stations."""
+    out = []
+    for (_, x0, h, cx), (_, _, _, cy) in zip(Mx.cubics(), My.cubics()):
+        for s in resultant_roots(cx, cy):
+            out.append((x0 + s * h, float(np.polyval(cx, s)), float(np.polyval(cy, s))))
+    return out
+
+
+def resultant_roots(cx, cy) -> list:
+    """Real roots s in (0, 1) of d/ds [px(s)^2 + py(s)^2] for two cubics given by their coefficients
+    (highest power first)."""
+    px, py = np.poly1d(cx), np.poly1d(cy)
+    dq = (px * px + py * py).deriv()
+    if not np.any(dq.coeffs != 0.0):
+        return []
+    return [float(r.real) for r in np.roots(dq.coeffs)
+            if abs(r.imag) <= 1.0e-9 * max(1.0, abs(r.real)) and 0.0 < r.real < 1.0]
+
 
 def _quadratic_roots(a: float, b: float, c: float) -> list:
     if a == 0.0:
@@ -211,7 +241,7 @@ class Moments:
     x_Mrx: float | None
     Mry: float
     x_Mry: float | None
-    Mr: float                         # largest resultant sqrt(Mx^2 + My^2) at a station
+    Mr: float                         # largest resultant sqrt(Mx^2 + My^2) (stations and between them)
     x_Mr: float | None
     Tr: float
     x_Tr: float | None
@@ -235,8 +265,13 @@ def moments(demand: Demand) -> Moments | None:
         res = np.hypot(f[:, 5], f[:, 4])
         kr, kt = int(np.argmax(res)), int(np.argmax(np.abs(f[:, 3])))
         Tr = float(abs(f[kt, 3]))
-        return Moments(mx, x_mx if mx > 0.0 else None, my, x_my if my > 0.0 else None, float(res[kr]),
-                       float(x[kr]) if res[kr] > 0.0 else None, Tr, float(x[kt]) if Tr > 0.0 else None,
+        mr, x_mr = float(res[kr]), float(x[kr])
+        # the largest resultant may lie between two stations (same interpolation as for Mrx, Mry)
+        for xs, vx, vy in resultant_stationary_points(Mx, My):
+            if math.hypot(vx, vy) > mr:
+                mr, x_mr = math.hypot(vx, vy), xs
+        return Moments(mx, x_mx if mx > 0.0 else None, my, x_my if my > 0.0 else None, mr,
+                       x_mr if mr > 0.0 else None, Tr, float(x[kt]) if Tr > 0.0 else None,
                        Mx, My, x, f[:, 0], f[:, 3])
     if any(k in e for k in ("Mrx", "Mry", "Tr")):
         mx, my = abs(float(e.get("Mrx", 0.0))), abs(float(e.get("Mry", 0.0)))
@@ -295,11 +330,15 @@ def ltb_segments(ctx: DesignContext, mo: Moments) -> list:
         return [Segment(None, None, Lb, mo.Mrx, None, 1.0, "Cb = 1.0: no moment diagram was given (Eq. F1-1 "
                         "cannot be evaluated)")]
     D = mo.Mx
-    x0 = float(D.x[0])
+    x0, span = float(D.x[0]), float(D.x[-1] - D.x[0])
+
+    def at(a):
+        """Station coordinate of the design-member position ``a`` (0 ... L); the stations span the member."""
+        return x0 + min(max(a / L, 0.0), 1.0) * span
 
     def make(a, b, note=""):
         """Segment [a, b] (design member coordinates) with its Cb, or blocked."""
-        Cb, Mmax, MA, MB, MC, x_max = segment_cb(D, x0 + a, x0 + b)
+        Cb, Mmax, MA, MB, MC, x_max = segment_cb(D, at(a), at(b))
         if Mmax == 0.0:
             return None
         free = (a <= 0.0 and ctx.end_free[0]) or (b >= L and ctx.end_free[1])
@@ -347,7 +386,7 @@ def ltb_segments(ctx: DesignContext, mo: Moments) -> list:
 
     for cuts, sign, name in ((top, 1.0, "top"), (bottom, -1.0, "bottom")):
         for a, b in zip(cuts, cuts[1:]):
-            _, _, lo, hi = D.extremes(x0 + a, x0 + b)
+            _, _, lo, hi = D.extremes(at(a), at(b))
             lo, hi = (lo, hi) if sign > 0.0 else (-hi, -lo)         # as seen by this flange: > 0 = compression
             if hi <= 0.0:
                 continue                                            # this flange is never in compression here
@@ -787,24 +826,40 @@ def _rect(ctx: DesignContext, mo: Moments, combination: str, axis: str) -> AxisR
                                       "about local z", ctx, inputs=inputs, details=details, **kw))
     elif major and Ix > Iy:
         ry = sec.ry
-        if not (positive(sec.J) and positive(sec.A) and positive(ry) and positive(S)):
-            checks.append(not_checked(NAME_LTB, "AISC 360-22 F7.4", f"section {sec.id!r} gives no J, Ag, ry or "
-                                      f"{sname} (Eq. F7-8 to F7-11)", ctx, inputs=inputs, details=details, **kw))
+        if not (positive(sec.J) and positive(sec.A) and positive(ry)):
+            checks.append(not_checked(NAME_LTB, "AISC 360-22 F7.4", f"section {sec.id!r} gives no J, Ag or ry "
+                                      "(Eq. F7-10)", ctx, inputs=inputs, details=details, **kw))
         else:
             ltb_inputs = {**inputs, **sec.inputs("J", "A"), "ry": (ry, LENGTH, sec.source("A"))}
+            Lp = 0.13 * E * ry * math.sqrt(sec.J * sec.A) / Mp       # Eq. F7-10 (needs no elastic modulus)
+            # Sx is needed (Eq. F7-8, F7-11) only for a segment longer than Lp; F7.4(a): no LTB when Lb <= Lp
+            segments = ltb_segments(ctx, mo)
+            beyond = [] if any(s.blocked for s in segments) else [s for s in segments if s.Lb > Lp]
 
             def capacity_of(Lb, Cb):
-                Mn, eq, Lp, Lr = ltb_rectangular(E, Fy, Mp, S, ry, sec.J, sec.A, Lb, Cb)
+                if Lb <= Lp:                                        # F7.4(a)
+                    return None, "F7.4(a)", {"Lp (Eq. F7-10)": (Lp, LENGTH)}
+                Mn, eq, _, Lr = ltb_rectangular(E, Fy, Mp, S, ry, sec.J, sec.A, Lb, Cb)
                 return Mn, eq, {"Lp (Eq. F7-10)": (Lp, LENGTH), "Lr (Eq. F7-11)": (Lr, LENGTH)}
 
             def clause_of(eq):
                 return "F7.4" + (f", Eq. {eq}, F7-10, F7-11; F7.1, Eq. F7-1" if eq else "")
 
-            c, ltb_caps, _ = _ltb_checks(ctx, mo, combination, capacity_of, clause_of, ltb_inputs, details, notes)
-            if c is not None:
-                checks.append(c)
+            if beyond and not positive(S):
+                worst = max(beyond, key=lambda s: s.Mr)
+                checks.append(not_checked(
+                    NAME_LTB, "AISC 360-22 F7.4", f"section {sec.id!r} gives no {sname}: needed by Eq. F7-8 / "
+                    f"F7-11 for an unbraced length beyond Lp = {Lp:.6g} (Eq. F7-10)", ctx, demand=worst.Mr,
+                    dimension=MOMENT, combination=combination, x=worst.x, inputs=ltb_inputs,
+                    details={**details, "Lp (Eq. F7-10)": (Lp, LENGTH)}))
             else:
-                checks[0].details.update(_no_ltb_detail(ctx, mo))
+                c, ltb_caps, _ = _ltb_checks(ctx, mo, combination, capacity_of, clause_of, ltb_inputs, details,
+                                             notes)
+                if c is not None:
+                    checks.append(c)
+                else:
+                    checks[0].details.update(_no_ltb_detail(ctx, mo))
+                    checks[0].details["Lp (Eq. F7-10)"] = (Lp, LENGTH)
     elif not major and Iy > Ix:
         if Mr > 0.0:
             checks.append(not_checked(

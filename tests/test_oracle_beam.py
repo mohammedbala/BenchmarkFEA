@@ -160,13 +160,15 @@ def test_shear_and_axial_force_needs_an_explicit_shear_model():
 
 
 def test_engesser_and_haringx_columns():
-    """Pin-ended column with shear flexibility under a sinusoidal-free check: both models must reduce
-    to the Euler-Bernoulli solution for GA -> infinity, and differ from each other for a soft GA.
-    Engesser model, simply supported, uniform w, compression P: substituting v' = (th + Q/GA)/(1 - P/GA)
-    into M' = -Q - P v' and th' = M/EI gives  EI v'''' (1 - P/GA) ... = w (1 + ...); instead of that
-    algebra the test uses the buckling limit, which follows from the same substitution with w = 0 and
-    v = sin(pi x/L):  P_cr,Engesser = Pe/(1 + Pe/GA),  Pe = pi^2 EI/L^2.  Just below P_cr the midspan
-    deflection under a small load grows without bound; just above 0.9 P_cr it is still moderate."""
+    """Pin-ended column, compression P (N = -P), no lateral load: Q = 0, so M' = -P v' and M = -P v,
+    th' = M/EI = -P v/EI.
+    Engesser: v' (1 - P/GA) = th  ->  v'' + P v / (EI (1 - P/GA)) = 0; v = sin(pi x/L) is a solution
+    when P = Pe (1 - P/GA), i.e.  P_cr = Pe / (1 + Pe/GA),  Pe = pi^2 EI/L^2.
+    Haringx:  v' = th (1 + P/GA)  ->  v'' + P (1 + P/GA) v / EI = 0  ->  P (1 + P/GA) = Pe,
+    P_cr = GA (sqrt(1 + 4 Pe/GA) - 1)/2, which is larger than the Engesser value.
+    Just below its own critical load the midspan deflection under a small lateral load is hugely
+    amplified; the other model is still moderate there.  Both reduce to the column without shear
+    deformation when GA is very large."""
     Pe = math.pi ** 2 * EI / L ** 2
     soft = 5.0 * Pe
     pcr = Pe / (1 + Pe / soft)
@@ -180,6 +182,8 @@ def test_engesser_and_haringx_columns():
     assert amp_e > 80.0                                    # close to its own critical load
     amp_h = mid(0.99 * pcr, "haringx", soft) / v0
     assert 1.0 < amp_h < 0.5 * amp_e                       # Haringx critical load is higher
+    pcr_h = soft * (math.sqrt(1.0 + 4.0 * Pe / soft) - 1.0) / 2.0
+    assert pcr_h > pcr and mid(0.99 * pcr_h, "haringx", soft) / v0 > 80.0
     # stiff in shear: both equal the Euler-Bernoulli beam-column
     eb = Beam(L, EI, N=-0.5 * Pe, second_order=True).support(0.0, v="fixed").support(L, v="fixed") \
         .dist(0.0, L, -1.0).solve().v(L / 2)

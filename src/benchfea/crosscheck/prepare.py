@@ -18,7 +18,6 @@ Nothing here imports a foreign solver or ``benchfea.solve``.
 """
 from __future__ import annotations
 
-import math
 from dataclasses import dataclass, field
 
 import numpy as np
@@ -221,7 +220,3 @@ def prepare(model: Model, combination_id: str, tau_b: dict | None = None,
     return Prepared(model, combination_id, second, alpha, bool(an.shear_deformation), ids,
                     np.array([nd.xyz for nd in model.nodes.values()], float), fixed, spring, prescribed, load,
                     inactive, members, list(model.constraints.values()), issues)
-
-
-def is_rigid(k) -> bool:
-    return math.isinf(k)
