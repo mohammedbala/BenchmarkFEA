@@ -5,6 +5,12 @@ int / float / bool / None) plus, when the document came from text, the
 line/column of every value keyed by its JSON pointer.  Nothing is validated
 here except what must be decided while parsing: syntax errors, duplicate
 object keys, non-string keys and non-JSON values (NaN, dates, ...).
+
+JSON is canonical; a YAML document must mean exactly what its JSON
+transcription means.  The YAML loader therefore also refuses numbers that
+YAML 1.1 would reinterpret (``010`` octal, ``0x10``, ``1_000``, ``1:30``
+sexagesimal) and merge keys.  A dict supplied from Python is held to the same
+rules (string keys, finite numbers, JSON value types).
 """
 from __future__ import annotations
 

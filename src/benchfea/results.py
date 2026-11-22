@@ -222,10 +222,20 @@ class DesignResults:
 
     def to_document(self, model) -> dict:
         """The design output document (format ``benchfea-design`` 1.0.0) in file units."""
+        from .designparams import DIMENSIONS
         u = model.units
 
         def conv(v, dim):
             return None if v is None else float(u.from_internal(v, dim))
+
+        def parameter(name, value):
+            """A resolved design variable in FILE units (the model holds internal units)."""
+            if name == "deflectionLimits":
+                return [{"spanRatio": lim.span_ratio, "absolute": conv(lim.absolute, "length"),
+                         "direction": lim.direction, "combinations": list(lim.combinations)} for lim in value]
+            if name in DIMENSIONS and isinstance(value, (int, float)) and not isinstance(value, bool):
+                return conv(value, DIMENSIONS[name])
+            return _plain(value)
 
         def check(c: DesignCheck) -> dict:
             return {"name": c.name, "clause": c.clause, "demand": conv(c.demand, c.dimension),
@@ -242,7 +252,8 @@ class DesignResults:
             "members": {
                 mid: {"passed": m.passed, "governing": check(m.governing) if m.governing else None,
                       "checks": [check(c) for c in m.checks], "notChecked": list(m.not_checked),
-                      "parameters": {n: {"value": _plain(r.value), "source": r.source, "path": r.path}
+                      "parameters": {n: {"value": parameter(n, r.value), "unit": u.label(DIMENSIONS.get(n, "n/a")),
+                                         "source": r.source, "path": r.path}
                                      for n, r in model.design_members[mid].values.items()},
                       "warnings": list(m.warnings)}
                 for mid, m in self.members.items()},

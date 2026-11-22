@@ -46,6 +46,15 @@ file (.json/.yaml) or dict
   impossible in data and are caught at parse time in text (code
   `id.duplicate`). Ids match `^[A-Za-z0-9_][A-Za-z0-9_.\-]*$`, ≤ 64 chars.
   Only `loadCases/<id>/loads` and `deflectionLimits` are arrays.
+* **JSON is canonical, YAML is equivalent**: a YAML file must mean exactly what
+  its JSON transcription means. The YAML loader therefore refuses, with
+  line/column, everything that has no JSON counterpart or that YAML 1.1 would
+  silently reinterpret: non-string keys (`1:`, `no:`, `~:`), duplicate keys,
+  merge keys, dates, NaN/Infinity, and numbers that are not plain decimals
+  (`010` = octal 8, `0x10`, `1_000`, `1:30` = sexagesimal 90). A dict passed
+  from Python is held to the same rules (string keys, finite numbers, JSON
+  value types; tuples and numpy numbers are accepted as lists and numbers).
+  Files are UTF-8 (a byte order mark is ignored).
 * **Discriminated variants** (`sections`, `loads`, `constraints`) use a `type`
   property with `if/then` + `unevaluatedProperties: false`, which gives one
   precise error instead of `oneOf` noise.
@@ -55,8 +64,12 @@ file (.json/.yaml) or dict
   in `members`, `sections`, …, `analysis`, and `combinations/*` (`analysisType`,
   `stiffnessReduction`, `notionalLoad`). The `design` block is design-only and
   is resolved into `Model.design_members`, which the solver must not read
-  (a test builds a model with and without a heavy `design` block and requires
-  every analysis field to be identical).
+  (tests build a model with and without a heavy `design` block — including
+  overrides of E, G, Fy, Fu — and require every analysis field to be
+  identical). Consequently the stiffness-reduction options of AISC 360-22 C2.3
+  (factor, tau_b, member list) live in `analysis.stiffnessReduction` and are
+  switched on per combination; they are not design variables, and a computed
+  tau_b always uses the material's Fy, never a design override.
 * **Prescribed displacements** are loads (`supportDisplacement`) on DOFs fixed
   by a support, so they are factored and combined like any other load.
 
@@ -117,12 +130,13 @@ deformation is used only when `analysis.shear_deformation` is true.
 
 ### Design variables (`DesignParams`)
 
-Names (`benchfea.designparams.NAMES`): `code, method, role, Lx, Ly, Lz, Lb,
-Kx, Ky, Kz, braceMajor, braceMinor, braceTorsion, braceTopFlange,
+Names (`benchfea.designparams.NAMES`): `code, method, role, E, G, Fy, Fu, Lx,
+Ly, Lz, Lb, Kx, Ky, Kz, braceMajor, braceMinor, braceTorsion, braceTopFlange,
 braceBottomFlange, Cb, Cmx, Cmy, sideswayInhibited, An, U,
 maxSlendernessCompression, maxSlendernessTension, deflectionLimits`.
 `p.Kx` is the value; `p.source("Kx")` is `"member" | "group:<id>" | "global" |
-"default" | "bracing"`.
+"default" | "bracing" | "material:<id>"`; `p.values["Kx"].path` is the JSON
+pointer where the value is (or would be) set.
 
 * Resolution order per variable: design member → groups containing it (highest
   `priority` wins; equal priority with different values is an error) →
@@ -132,9 +146,18 @@ maxSlendernessCompression, maxSlendernessTension, deflectionLimits`.
   the higher level wins; both at the same level is an error. When brace points
   win, the length is `None` with source `"bracing"` and the design module works
   on the segments between brace points (fractions of `length`, ends implied).
+* An unbraced length together with its bracing list in the same block, and
+  relative brace positions outside (0, 1), are errors wherever they appear
+  (also in a group that no design member uses).
 * `Cb`, `Cmx`, `Cmy` are a number or `"computed"`.
-* E, G, Fy, Fu come from the member's material (they are not overridable in
-  `design`, so the design can never use a stiffness the analysis did not).
+* `E`, `G`, `Fy`, `Fu` are design variables like the others. Unless overridden
+  at member, group or `design.defaults` level they are those of the first
+  member's material (source `"material:<id>"`, G derived from E and nu when
+  the material gives none; `Fy`/`Fu` are `None` when the material has none,
+  with warning `design.missing-strength`). An override is used by the design
+  checks only; the analysis keeps the material's values, and an `E` or `G`
+  override that differs from the material raises the warning
+  `design.stiffness-differs`.
 * A design member is one analysis member or an ordered chain of collinear,
   identically oriented, prismatic members; with `autoMembers` (default) every
   member not in an explicit design member is its own design member.
@@ -142,12 +165,17 @@ maxSlendernessCompression, maxSlendernessTension, deflectionLimits`.
 ### Defaults-used report
 
 `Model.defaults_used` lists every default applied because the file was silent
-(conventions, analysis options, derived G, section fallbacks, member type,
-combination settings, load `positionType`/gravity direction, diaphragm normal,
-and every design variable), as `{path, value, reason}` with `value` in file
-units. Not reported: additive zero/empty defaults (zero load components, no
-releases, no offsets, `w2 = w1`, load extents). Results documents carry it as
-`defaultsUsed`.
+(conventions, analysis options, stiffness-reduction settings and member list,
+node `z`, derived G, section fallbacks, member type, the reference vector of
+the default member orientation, offset axes, combination settings, load
+`positionType`/`kind`, self-weight factor/members/gravity direction, diaphragm
+normal, `design.autoMembers`, bracing `positionType`, and every design
+variable), as `{path, value, reason}` with `value` in file units. Design
+values taken from the material (`E, G, Fy, Fu`) are not defaults and are not
+listed. Not reported: additive zero/empty/off defaults (zero load components,
+no releases, no offsets, `roll = 0`, `w2 = w1`, load extents `start`/`end`,
+`projected = false`, group `priority = 0`, no supports/constraints). Results
+documents carry it as `defaultsUsed`.
 
 ## Contract for `benchfea.solve`
 
@@ -204,7 +232,7 @@ modes}`, `envelopes/<member>/{x,max,min,maxCombination,minCombination}`.
 
 ## Validation problem codes
 
-`parse.*`, `id.duplicate`, `id.invalid`, `version.unsupported`, `schema.*`
+`parse.{json,yaml,io,extension,encoding,key-type,value}`, `id.duplicate`, `id.invalid`, `version.unsupported`, `schema.*`
 (`required`, `unknown-property`, `enum`, `type`, `range`, `invalid`, …),
 `ref.unknown-{node,section,material,member,case,combination,design-member}`,
 `member.{same-node,zero-length,offset-zero-length,orientation-collinear,
@@ -215,8 +243,8 @@ projected-local,zero-direction,displacement-dof-not-fixed,self-weight-zero,
 empty}`, `combination.{notional-direction,reduction-first-order}`,
 `analysis.tau-b-needs-fy`, `design.{member-reused,id-collision,not-connected,
 not-collinear,orientation-differs,not-prismatic,group-conflict,
-length-and-bracing,bracing-range,missing-strength,asd-alpha}`, `node.{coincident,
-unused}`, `support.no-restraint`, `material.g-nu-inconsistent`, `case.unused`,
+length-and-bracing,bracing-range,missing-strength,stiffness-differs,asd-alpha}`,
+`node.{coincident,unused}`, `support.{none,no-restraint}`, `material.g-nu-inconsistent`, `case.unused`,
 and (solver) `stability.mechanism`.
 
 ## Known limits of this layer (for LIMITS.md)
@@ -228,6 +256,11 @@ and (solver) `stability.mechanism`.
 * No distributed moments, no thermal loads, no member loads on rigid offsets,
   no tapered members, no warping torsion in analysis, no chained constraints,
   no inclined supports.
+* Computed tau_b uses P_ns = F_y A (gross area). AISC 360-22 C2.3 defines
+  P_ns = F_y A_e for slender-element sections; the effective area is not
+  evaluated at this layer.
+* Validation refuses a structure with no support at all (`support.none`);
+  every other mechanism is found by the solver (`stability.mechanism`).
 * `type: properties` sections carry no shape dimensions (design checks that
   need them must refuse).
 * The AISC Shapes Database reader's column names and units are unverified

@@ -225,7 +225,8 @@ class DesignParams:
 
     ``values[name]`` is a :class:`Resolved` (value, source, path, reason); names are
     ``benchfea.designparams.NAMES``.  ``p.Kx`` is shorthand for ``p.values["Kx"].value``.
-    Lengths in mm, areas in mm^2; brace locations are fractions of ``length``.
+    Lengths in mm, areas in mm^2, E/G/Fy/Fu in N/mm^2; brace locations are fractions of
+    ``length``.  ``E, G, Fy, Fu`` default to the member's material (source ``"material:<id>"``).
     AISC axis names: x = major = local z, y = minor = local y, z = torsion.
     """
     id: str

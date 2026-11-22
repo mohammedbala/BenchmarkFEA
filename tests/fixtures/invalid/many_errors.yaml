@@ -1,0 +1,94 @@
+formatVersion: 1.0
+units: {force: kN, length: m}
+conventions: {verticalAxis: z}
+nodes:
+  n1: {x: 0, y: 0, z: 0}
+  n2: {x: 010, y: 1_000, z: 1:30}
+  no: {x: 5, y: 0}
+  n3: {x: .inf, y: 0}
+  n4: {x: 1e3, y: 0x10, z: +5}
+  n5: &a {x: 2, y: 0}
+  n6: *a
+  2024-01-01: {x: 1, y: 1}
+  n7: {x: 3, y: 2024-01-01}
+  ~: {x: 9, y: 9}
+  n8: {x: 4, y: 0, z: 3}
+supports:
+  n1: fixed
+  n2: {type: pinned, dofs: {ux: free, uy: yes}}
+materials:
+  s: {E: 2.1e8, nu: 0.3}
+  s: {E: 1, nu: 0.3}
+sections:
+  r: {type: rectangle, h: 0.3, b: 0.2}
+members:
+  m1: {i: n1, j: n2, section: r, material: s, type: Frame}
+  m2: {i: n2, j: no, section: r, material: s}
+  m3:
+    i: n1
+    j: n5
+    section: r
+    material: s
+    releases:
+      i: {ux: true}
+      j: {ux: on}
+  m4:
+    i: n5
+    j: n8
+    section: r
+    material: s
+constraints:
+  c1:
+    type: rigidDiaphragm
+    master: n5
+    slaves:
+      - n1
+      - n9
+    normal: [0, 0, 1]
+loadCases:
+  D:
+    loads:
+      - {type: nodal, node: n2, Fz: -1e1}
+      - type: memberDistributed
+        member: m3
+        direction: Z
+        w1: -1
+        end: 2
+      - type: memberPoint
+        member: m1
+        direction: z
+        value: 1
+        position: 0.5
+        <<: {kind: force}
+      - type: memberPoint
+        member: m4
+        direction: Z
+        value: -2
+        position: 6
+        positionType: absolute
+combinations:
+  c1: {factors: {D: 1.0, L: 1}}
+design:
+  defaults:
+    E: -1
+  groups:
+    g1:
+      members: [m3, m4]
+      Lb: 2
+      bracing:
+        topFlange: [0.5]
+        minor:
+          - 0.25
+          - 1.0
+    g2:
+      members: [chain]
+      Kx: 2
+    g3:
+      members: [chain]
+      Kx: 3
+  members:
+    m3: 5
+    chain:
+      members:
+        - m4
+        - m3

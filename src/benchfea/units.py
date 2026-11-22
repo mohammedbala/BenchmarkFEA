@@ -122,6 +122,8 @@ class UnitSystem:
         """Human-readable unit label for a dimension, e.g. 'kip/in^2'."""
         if dim == "degree":
             return "deg"
+        if dim == "n/a":
+            return ""
         if dim == POSITION:
             return f"- or {self.length}"
         f, l = parse_dimension(dim)

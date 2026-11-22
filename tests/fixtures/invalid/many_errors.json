@@ -1,0 +1,61 @@
+{
+  "formatVersion": "1.0.0",
+  "units": {"force": "kN", "length": "m"},
+  "conventions": {"verticalAxis": "Z", "handedness": "left"},
+  "nodes": {
+    "A": {"x": 0, "y": 0, "z": 0},
+    "B": {"x": 0, "y": 0, "z": 3},
+    "C": {"x": 4, "y": 0, "z": 3},
+    "D": {"x": 4, "y": 0, "z": 3.0000000001},
+    "E": {"x": "4", "y": 0}
+  },
+  "supports": {
+    "A": {"type": "fixed", "dofs": {"ux": "free", "uy": "free", "uz": "free", "rx": "free", "ry": "free", "rz": "free"}},
+    "Z": {"type": "pinned"},
+    "C": {"type": "roller", "dofs": {"rx": {"spring": -1}}}
+  },
+  "materials": {
+    "s": {"E": 210e6, "nu": 0.3, "G": 1},
+    "t": {"E": 210e6, "nu": 0.5}
+  },
+  "sections": {
+    "i": {"type": "I", "d": 0.3, "bf": 0.15, "tf": 0.2, "tw": 0.007, "r": 0.5, "overrides": {"A": 0, "Q": 1}},
+    "p": {"type": "pipe", "D": 0.1, "t": 0.05, "H": 3},
+    "q": {"type": "properties", "A": 1, "Iy": 1, "Iz": 1}
+  },
+  "members": {
+    "m1": {"i": "A", "j": "B", "section": "i", "material": "s", "releases": {"i": {"rx": true}, "j": {"rx": {"spring": 0}}}},
+    "m2": {"i": "B", "j": "C", "section": "nope", "material": "nope", "type": "truss", "releases": {"i": {"rz": true}},
+           "offsets": {"i": [1, 2], "axes": "member"}},
+    "m3": {"i": "C", "j": "D", "section": "p", "material": "s", "orientation": {"referenceVector": [0, 0, 1], "roll": "90"}},
+    "m4": {"i": "C", "j": "E", "section": "p", "material": "s"},
+    "m5": {"i": "B", "j": "C", "section": "p", "material": "s", "offsets": {"i": [2, 0, 0], "j": [-2, 0, 0]}}
+  },
+  "constraints": {
+    "c1": {"type": "rigidLink", "master": "B", "slaves": ["B", "C", "C"], "normal": "Z"},
+    "c2": {"type": "rigidDiaphragm", "master": "C", "slaves": ["A"], "normal": "W"}
+  },
+  "loadCases": {
+    "D": {"loads": [
+      {"type": "nodal", "node": "B", "Fz": -1, "Fw": 2},
+      {"type": "memberDistributed", "member": "m1", "direction": "Z", "w1": 1, "start": 0.8, "end": 0.2},
+      {"type": "memberDistributed", "member": "m1", "direction": "x", "w1": 1, "start": 2.5, "end": 4, "positionType": "absolute", "projected": true},
+      {"type": "memberPoint", "member": "m1", "direction": "Z", "value": 1, "position": -0.1},
+      {"type": "memberPoint", "member": "zz", "direction": "Z", "value": 1, "position": 3, "kind": "torque"},
+      {"type": "supportDisplacement", "node": "C", "ux": 0.01, "uz": 0.01},
+      {"type": "selfWeight", "direction": [0, 0], "members": ["m1", "m1", "zz"]}
+    ]},
+    "X": {}
+  },
+  "combinations": {
+    "c": {"factors": {"D": 1.0, "Q": 1.5}, "analysisType": "thirdOrder", "notionalLoad": {"coefficient": 0}},
+    "d": {"factors": {}}
+  },
+  "analysis": {"type": "secondOrder", "maxIterations": 0, "buckling": {"combinations": ["zz"], "modes": 0},
+               "stiffnessReduction": {"factor": 1.2, "tauB": "auto", "members": ["m9"]}},
+  "design": {
+    "defaults": {"method": "LSD", "Cb": "auto", "U": 1.5, "deflectionLimits": [{"direction": "x"}]},
+    "groups": {"g": {"members": ["m1", "m9"], "Lx": -1, "bracing": {"major": [0.5, 0.5, 1.5]}}},
+    "members": {"m1": {"Kx": 0, "members": []}, "dm": {"members": ["m3", "m4", "m1"]}}
+  }
+}

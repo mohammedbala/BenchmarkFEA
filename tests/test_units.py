@@ -159,6 +159,8 @@ def hand_convert(doc, kf: float, kl: float, force: str, length: str):
         for k in ("Lx", "Ly", "Lz", "Lb"):
             c(lv, k, 0, 1)
         c(lv, "An", 0, 2)
+        for k in ("E", "G", "Fy", "Fu"):
+            c(lv, k, 1, -2)
         for lim in lv.get("deflectionLimits", []):
             c(lim, "absolute", 0, 1)
         br = lv.get("bracing", {})

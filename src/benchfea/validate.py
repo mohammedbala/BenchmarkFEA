@@ -52,6 +52,10 @@ def _jtype(v) -> str:
     return "array" if isinstance(v, list) else "object"
 
 
+def _list(v) -> list:
+    return v if isinstance(v, list) else []
+
+
 def _deref(schema):
     root = load_schema()
     while isinstance(schema, dict) and "$ref" in schema:
@@ -285,7 +289,7 @@ class _Semantics:
         for _, c, _ in self.items("constraints"):
             if isinstance(c.get("master"), str):
                 used.add(c["master"])
-            used.update(s for s in c.get("slaves") or () if isinstance(s, str))
+            used.update(s for s in _list(c.get("slaves")) if isinstance(s, str))
         for nid in self.table("nodes"):
             if nid not in used:
                 self.add("node.unused", pointer("nodes", nid), f"node {nid!r} is not used by any member or constraint",
@@ -372,7 +376,7 @@ class _Semantics:
                              "Truss-type members are pin-ended by definition; remove `releases` or use type frame.")
                 elif mtype == "frame":
                     self.release_mechanisms(mid, rel, p)
-            if not ok or m.get("i") not in self.node_ok or m.get("j") not in self.node_ok:
+            if not ok or not all(isinstance(m.get(e), str) and m[e] in self.node_ok for e in ("i", "j")):
                 continue
             with self.guard():
                 if m["i"] == m["j"]:
@@ -432,48 +436,54 @@ class _Semantics:
         slave_of: dict[str, str] = {}
         masters = {c.get("master"): cid for cid, c, _ in self.items("constraints") if isinstance(c.get("master"), str)}
         for cid, c, p in self.items("constraints"):
-            master = c.get("master")
-            if isinstance(master, str) and master not in nodes:
-                self.add("ref.unknown-node", p + "/master", f"constraint {cid!r} refers to unknown node {master!r}",
+            with self.guard():
+                self.constraint(cid, c, p, nodes, slave_of, masters)
+
+    def constraint(self, cid, c, p, nodes, slave_of, masters):
+        master = c.get("master")
+        if isinstance(master, str) and master not in nodes:
+            self.add("ref.unknown-node", p + "/master", f"constraint {cid!r} refers to unknown node {master!r}",
+                     "Use an id from /nodes.")
+        normal = c.get("normal", self.vertical)
+        if not isinstance(normal, str):
+            normal = self.vertical              # malformed: reported by the schema layer
+        slaved = D.DOFS if c.get("type") == "rigidLink" else DIAPHRAGM_DOFS.get(normal, ())
+        for k, s in enumerate(_list(c.get("slaves"))):
+            sp = f"{p}/slaves/{k}"
+            if not isinstance(s, str) or s in c["slaves"][:k]:
+                continue                    # malformed or repeated (reported by the schema layer)
+            if s not in nodes:
+                self.add("ref.unknown-node", sp, f"constraint {cid!r} refers to unknown node {s!r}",
                          "Use an id from /nodes.")
-            normal = c.get("normal", self.vertical)
-            slaved = D.DOFS if c.get("type") == "rigidLink" else DIAPHRAGM_DOFS.get(normal, ())
-            for k, s in enumerate(c.get("slaves") or ()):
-                sp = f"{p}/slaves/{k}"
-                if not isinstance(s, str) or s in c["slaves"][:k]:
-                    continue                    # malformed or repeated (reported by the schema layer)
-                if s not in nodes:
-                    self.add("ref.unknown-node", sp, f"constraint {cid!r} refers to unknown node {s!r}",
-                             "Use an id from /nodes.")
-                    continue
-                if s == master:
-                    self.add("constraint.master-is-slave", sp, f"node {s!r} is both master and slave of "
-                             f"constraint {cid!r}", "Remove the master from `slaves`.")
-                    continue
-                if s in slave_of:
-                    self.add("constraint.slave-two-masters", sp, f"node {s!r} is already a slave in constraint "
-                             f"{slave_of[s]!r}", "A node can be the slave of only one constraint; merge the "
-                             "constraints under one master.")
-                else:
-                    slave_of[s] = cid
-                if s in masters and masters[s] != cid:
-                    self.add("constraint.chained", sp, f"node {s!r} is a slave here but the master of constraint "
-                             f"{masters[s]!r}", "Chained constraints are not supported; use one master for all.")
-                sup = self.table("supports").get(s)
-                if isinstance(sup, dict):
-                    with self.guard():
-                        hit = [d for d, v in self.support_dofs(sup).items() if d in slaved and v != "free"]
-                        if hit:
-                            self.add("constraint.slave-restrained", sp,
-                                     f"slave node {s!r} is also supported in constrained DOF(s) {', '.join(hit)}",
-                                     "A constrained DOF follows the master and cannot be restrained separately; "
-                                     "support the master instead, or free these DOFs.")
-                if c.get("type") == "rigidDiaphragm" and normal in AXIS and s in self.node_ok \
-                        and master in self.node_ok:
-                    if abs(float((self.xyz(s) - self.xyz(master)) @ AXIS[normal])) > max(self.tol, 0.0):
-                        self.add("constraint.diaphragm-out-of-plane", sp,
-                                 f"slave node {s!r} is not in the diaphragm plane of master {master!r}",
-                                 "Allowed (only the in-plane offset is used), but check the node levels.", WARNING)
+                continue
+            if s == master:
+                self.add("constraint.master-is-slave", sp, f"node {s!r} is both master and slave of "
+                         f"constraint {cid!r}", "Remove the master from `slaves`.")
+                continue
+            if s in slave_of:
+                self.add("constraint.slave-two-masters", sp, f"node {s!r} is already a slave in constraint "
+                         f"{slave_of[s]!r}", "A node can be the slave of only one constraint; merge the "
+                         "constraints under one master.")
+            else:
+                slave_of[s] = cid
+            if s in masters and masters[s] != cid:
+                self.add("constraint.chained", sp, f"node {s!r} is a slave here but the master of constraint "
+                         f"{masters[s]!r}", "Chained constraints are not supported; use one master for all.")
+            sup = self.table("supports").get(s)
+            if isinstance(sup, dict):
+                with self.guard():
+                    hit = [d for d, v in self.support_dofs(sup).items() if d in slaved and v != "free"]
+                    if hit:
+                        self.add("constraint.slave-restrained", sp,
+                                 f"slave node {s!r} is also supported in constrained DOF(s) {', '.join(hit)}",
+                                 "A constrained DOF follows the master and cannot be restrained separately; "
+                                 "support the master instead, or free these DOFs.")
+            if c.get("type") == "rigidDiaphragm" and normal in AXIS and s in self.node_ok \
+                    and master in self.node_ok:
+                if abs(float((self.xyz(s) - self.xyz(master)) @ AXIS[normal])) > max(self.tol, 0.0):
+                    self.add("constraint.diaphragm-out-of-plane", sp,
+                             f"slave node {s!r} is not in the diaphragm plane of master {master!r}",
+                             "Allowed (only the in-plane offset is used), but check the node levels.", WARNING)
 
     # ---------------------------------------------------------------- loads
     def loads(self):
@@ -626,18 +636,19 @@ class _Semantics:
         for dmid, info in res.items():
             vals = info["values"]
             lack = [k for k in ("Fy", "Fu") if vals[k].value is None]
-            mat = self.table("members").get(info["members"][0], {}).get("material")
-            if lack and isinstance(mats.get(mat), dict):
+            member = self.table("members").get(info["members"][0])
+            mat = member.get("material") if isinstance(member, dict) else None
+            if lack and isinstance(mat, str) and isinstance(mats.get(mat), dict):
                 missing.setdefault(mat, [])
                 missing[mat] += [k for k in lack if k not in missing[mat]]
             for k in ("E", "G"):
                 r = vals[k]
                 ref = designparams.material_value(self.d, info["members"][0], k)
                 if not r.source.startswith("material:") and ref is not None and isinstance(r.value, (int, float)) \
-                        and abs(r.value - ref) > 1e-9 * abs(ref):
+                        and not isinstance(r.value, bool) and r.value > 0 and abs(r.value - ref) > 1e-9 * abs(ref):
                     self.add("design.stiffness-differs", r.path,
-                             f"design {k} = {r.value:g} for design member {dmid!r} differs from {k} = {ref:g} of "
-                             "its material, which the analysis uses",
+                             f"design {k} = {r.value:g} differs from {k} = {ref:g} of the member's material, "
+                             "which the analysis uses",
                              "Design variables never change the analysis; change the material if the analysis "
                              "should use this value too.", WARNING)
         for mat, lack in missing.items():
@@ -648,7 +659,7 @@ class _Semantics:
         an = self.table("analysis")
         second = any(isinstance(c, dict) and c.get("analysisType", an.get("type", "firstOrder")) == "secondOrder"
                      for c in self.table("combinations").values())
-        methods = {info["values"]["method"].value for info in res.values()}
+        methods = {m for m in (info["values"]["method"].value for info in res.values()) if isinstance(m, str)}
         if second and "ASD" in methods and an.get("alpha", 1.0) == 1.0:
             self.add("design.asd-alpha", "/analysis/alpha" if "alpha" in an else "/analysis",
                      "design method ASD with second-order analysis but analysis.alpha = 1.0",

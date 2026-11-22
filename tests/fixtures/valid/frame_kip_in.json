@@ -84,13 +84,13 @@
   "design": {
     "defaults": {"method": "LRFD", "deflectionLimits": [{"spanRatio": 360}, {"absolute": 0.75, "direction": "y"}]},
     "groups": {
-      "columns": {"members": ["C1", "C2"], "Kx": 2.0, "role": "column"},
+      "columns": {"members": ["C1", "C2"], "Kx": 2.0, "role": "column", "Fy": 36},
       "beams": {"members": ["B1"], "Cb": 1.0,
                 "bracing": {"positionType": "absolute", "topFlange": [116.5], "minor": [58.25, 116.5]}}
     },
     "members": {
       "B1": {"members": ["B1a", "B1b"], "Lx": 226},
-      "BR1": {"An": 4.5, "U": 0.85},
+      "BR1": {"An": 4.5, "U": 0.85, "Fu": 58},
       "C1": {"Ly": 72, "bracing": {"torsion": [0.5]}}
     }
   }
