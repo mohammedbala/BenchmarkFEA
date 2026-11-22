@@ -49,6 +49,79 @@ def _validate(args) -> int:
     return 1 if errors else 0
 
 
+def _run(args) -> int:
+    """Analyse a model, write the results document, print a short summary."""
+    from pathlib import Path
+
+    from .io import dump
+    from .model import build_model
+    from .problems import ModelInvalid, ModelUnstable
+    from .solve import analyze
+
+    out_path = Path(args.output) if args.output else Path(args.file).with_suffix(".results.json")
+    try:
+        model = build_model(args.file)
+        results = analyze(model, strict=not args.allow_flagged)
+    except ModelInvalid as e:
+        diagnosis = getattr(e, "diagnosis", None)
+        if args.json:
+            payload = {"ok": False, "refusal": "unstable" if isinstance(e, ModelUnstable) else "invalid",
+                       "problems": [p.to_dict() for p in e.problems]}
+            if diagnosis is not None:
+                payload["diagnosis"] = diagnosis.to_dict()
+            json.dump(payload, sys.stdout, indent=2)
+            sys.stdout.write("\n")
+        else:
+            for p in e.problems:
+                print(p.format(args.file), file=sys.stderr)
+            what = "UNSTABLE (mechanism)" if isinstance(e, ModelUnstable) else "REFUSED"
+            print(f"{args.file}: {what}, no results written ({len(e.errors)} error(s))", file=sys.stderr)
+        # exit code 2: the input could not be read at all; 1: the model was read and refused
+        return 2 if e.problems and all(p.code == "parse.io" for p in e.problems) else 1
+    doc = results.to_document(model)
+    dump(doc, out_path)
+    u = model.units
+    flagged = [cid for cid, c in results.combinations.items() if not c.invariants.passed]
+    summary = {"ok": not flagged, "output": str(out_path), "model": model.name, "nodes": len(model.nodes),
+               "members": len(model.members), "combinations": {}, "warnings": len(results.warnings),
+               "defaultsUsed": len(results.defaults_used), "flagged": flagged}
+    for cid, c in results.combinations.items():
+        t = abs(c.displacements[:, :3])
+        k, a = divmod(int(t.argmax()), 3)
+        worst = max(c.invariants.checks, key=lambda ch: (not ch.passed, ch.value / ch.tolerance
+                                                         if ch.name != "positive definiteness" else 0.0))
+        mid, mx, mv = max(((m, float(r.x[int(abs(r.displacements).max(axis=1).argmax())]),
+                            float(abs(r.displacements).max())) for m, r in c.members.items()),
+                          key=lambda t: t[2], default=("", 0.0, 0.0))
+        summary["combinations"][cid] = {
+            "analysisType": c.analysis_type,
+            "maxDisplacement": {"node": list(model.nodes)[k], "dof": ("ux", "uy", "uz")[a],
+                                "value": float(u.from_internal(c.displacements[k, a], "length"))},
+            "maxStationDisplacement": {"member": mid, "x": float(u.from_internal(mx, "length")),
+                                       "value": float(u.from_internal(mv, "length"))},
+            "sumReactions": [float(u.from_internal(v, "force")) for v in c.reactions[:, :3].sum(axis=0)],
+            "invariantsPassed": c.invariants.passed,
+            "worstInvariant": {"name": worst.name, "value": float(worst.value), "tolerance": float(worst.tolerance)}}
+    if args.json:
+        json.dump(summary, sys.stdout, indent=2)
+        sys.stdout.write("\n")
+    else:
+        print(f"{args.file}: {len(model.nodes)} nodes, {len(model.members)} members, "
+              f"{len(results.combinations)} combination(s); units {u.force}, {u.length}")
+        for cid, c in summary["combinations"].items():
+            d, r, m = c["maxDisplacement"], c["sumReactions"], c["maxStationDisplacement"]
+            print(f"  {cid} [{c['analysisType']}]: largest node displacement {d['value']:.6g} {u.label('length')} "
+                  f"({d['dof']} at {d['node']}); largest member-axis displacement component {m['value']:.6g} "
+                  f"{u.label('length')} (member {m['member']}, x = {m['x']:.6g}); sum of reactions ({r[0]:.6g}, {r[1]:.6g}, {r[2]:.6g}) "
+                  f"{u.label('force')}; invariants {'passed' if c['invariantsPassed'] else 'FAILED'} "
+                  f"(largest: {c['worstInvariant']['name']} {c['worstInvariant']['value']:.2e})")
+        for w in results.warnings:
+            print(f"  warning: {w}")
+        print(f"  {len(results.defaults_used)} default(s) used (listed in the output under defaultsUsed)")
+        print(f"results written to {out_path}" + (" -- FLAGGED: invariants failed" if flagged else ""))
+    return 3 if flagged else 0
+
+
 def _not_implemented(args) -> int:
     print(f"benchfea {args.command}: not available in this build (module not implemented yet)", file=sys.stderr)
     return 2
@@ -69,6 +142,13 @@ def build_parser() -> argparse.ArgumentParser:
             p.add_argument("--defaults", action="store_true",
                            help="if valid, also print the defaults-used report (JSON)")
             p.set_defaults(func=_validate)
+        elif name == "run":
+            p.add_argument("file", help="input file (.json, .yaml, .yml)")
+            p.add_argument("-o", "--output", help="results file (.json or .yaml); default: <input>.results.json")
+            p.add_argument("--json", action="store_true", help="print the summary (or the refusal) as JSON")
+            p.add_argument("--allow-flagged", action="store_true",
+                           help="write results even if an invariant fails (they are flagged; exit code 3)")
+            p.set_defaults(func=_run)
         else:
             p.add_argument("args", nargs=argparse.REMAINDER, help="command arguments")
             p.set_defaults(func=_not_implemented)

@@ -82,6 +82,7 @@ class CombinationResult:
     tau_b: dict[str, float] = field(default_factory=dict)     # member id -> tau_b used (stiffness reduction)
     invariants: InvariantsReport = field(default_factory=InvariantsReport)
     warnings: list[str] = field(default_factory=list)
+    constraint_forces: np.ndarray | None = None   # (n_nodes, 6) global: forces BY the rigid constraints ON the nodes
 
 
 @dataclass
@@ -102,6 +103,15 @@ class Envelope:
 
 
 @dataclass
+class NodalEnvelope:
+    """Max/min of a nodal quantity (displacements or reactions) over all combinations."""
+    max: np.ndarray                   # (n_nodes, 6)
+    min: np.ndarray
+    max_combination: list[list[str]]  # (n_nodes, 6) governing combination ids (first one on ties)
+    min_combination: list[list[str]]
+
+
+@dataclass
 class Results:
     model_name: str
     combinations: dict[str, CombinationResult]
@@ -110,13 +120,21 @@ class Results:
     defaults_used: list = field(default_factory=list)          # list[model.DefaultUsed]
     warnings: list[str] = field(default_factory=list)
     engine_version: str = ""
+    nodal_envelopes: dict = field(default_factory=dict)        # "displacements" | "reactions" -> NodalEnvelope
 
     def compute_envelopes(self) -> None:
-        """Fill ``envelopes`` from ``combinations``."""
+        """Fill ``envelopes`` and ``nodal_envelopes`` from ``combinations``."""
         self.envelopes = {}
+        self.nodal_envelopes = {}
         combos = list(self.combinations.values())
         if not combos:
             return
+        for name in ("displacements", "reactions"):
+            stack = np.array([getattr(c, name) for c in combos])               # (n_combo, n_nodes, 6)
+            imax, imin = stack.argmax(axis=0), stack.argmin(axis=0)
+            self.nodal_envelopes[name] = NodalEnvelope(
+                stack.max(axis=0), stack.min(axis=0), [[combos[k].id for k in row] for row in imax],
+                [[combos[k].id for k in row] for row in imin])
         for mid in combos[0].members:
             stack = np.array([c.members[mid].forces for c in combos])         # (n_combo, n, 6)
             imax, imin = stack.argmax(axis=0), stack.argmin(axis=0)
@@ -171,6 +189,10 @@ class Results:
                                "checks": [vars(ch) for ch in c.invariants.checks]},
                 "warnings": list(c.warnings),
             }
+            if c.constraint_forces is not None:
+                cf = table(c.constraint_forces, NODE_FORCES, _FORCE_DIMS)
+                out["combinations"][cid]["constraintForces"] = {
+                    nid: cf[nid] for con in model.constraints.values() for nid in (con.master, *con.slaves)}
         for cid, b in self.buckling.items():
             out["buckling"][cid] = {
                 "factors": [float(f) for f in b.factors],
@@ -182,6 +204,17 @@ class Results:
                 "min": {n: [r[k] for r in cols(e.min, _STATION_DIMS)] for k, n in enumerate(STATION_FORCES)},
                 "maxCombination": {n: [r[k] for r in e.max_combination] for k, n in enumerate(STATION_FORCES)},
                 "minCombination": {n: [r[k] for r in e.min_combination] for k, n in enumerate(STATION_FORCES)}}
+        if self.nodal_envelopes:
+            out["nodalEnvelopes"] = {}
+            for name, e in self.nodal_envelopes.items():
+                names, dims = ((NODE_DISPLACEMENTS, _DISP_DIMS) if name == "displacements"
+                               else (NODE_FORCES, _FORCE_DIMS))
+                keep = [k for k, nid in enumerate(nodes) if name == "displacements" or nid in model.supports]
+                vmax, vmin = table(e.max, names, dims), table(e.min, names, dims)
+                out["nodalEnvelopes"][name] = {
+                    nodes[k]: {"max": vmax[nodes[k]], "min": vmin[nodes[k]],
+                               "maxCombination": dict(zip(names, e.max_combination[k])),
+                               "minCombination": dict(zip(names, e.min_combination[k]))} for k in keep}
         return out
 
 
@@ -201,6 +234,16 @@ class DesignCheck:
     advisory: bool = False            # True: does not affect `passed` of the member (e.g. slenderness user notes)
     details: dict = field(default_factory=dict)   # intermediate values {name: (value, dimension)}
     notes: list[str] = field(default_factory=list)
+    # --- record of the calculation (filled by benchfea.design; see docs/ARCHITECTURE.md)
+    status: str = "ok"                # "ok" | "notChecked" | "refused"; when not "ok": demand may be known,
+    reason: str = ""                  #   capacity/ratio/passed are None and `reason` says why
+    method: str = ""                  # "LRFD" | "ASD" (AISC 360-22 B3.1 / B3.2)
+    nominal: float | None = None      # nominal strength Rn (same dimension as demand/capacity)
+    factor: float | None = None       # resistance factor phi (LRFD) or safety factor Omega (ASD)
+    factor_name: str = ""             # "phi" | "Omega"
+    inputs: dict = field(default_factory=dict)    # inputs used {name: (value, dimension, source)}, source =
+    #                                   "member" | "group:<id>" | "global" | "default" | "bracing" |
+    #                                   "material:<id>" | "section:<id>" | "given" | "derived: ..."
 
 
 @dataclass
@@ -238,11 +281,20 @@ class DesignResults:
             return _plain(value)
 
         def check(c: DesignCheck) -> dict:
-            return {"name": c.name, "clause": c.clause, "demand": conv(c.demand, c.dimension),
-                    "capacity": conv(c.capacity, c.dimension), "unit": u.label(c.dimension), "ratio": float(c.ratio),
+            def number(v, d):
+                return conv(v, d) if isinstance(v, (int, float)) and not isinstance(v, bool) else v
+
+            return {"name": c.name, "clause": c.clause, "status": c.status, "reason": c.reason,
+                    "method": c.method, "demand": conv(c.demand, c.dimension),
+                    "nominal": conv(c.nominal, c.dimension),
+                    "factor": c.factor, "factorName": c.factor_name,
+                    "capacity": conv(c.capacity, c.dimension), "unit": u.label(c.dimension),
+                    "ratio": None if c.ratio is None else float(c.ratio),
                     "passed": c.passed, "advisory": c.advisory, "combination": c.combination,
                     "x": conv(c.x, "length"),
-                    "details": {k: {"value": conv(v, d) if isinstance(v, (int, float)) else v, "unit": u.label(d)}
+                    "inputs": {k: {"value": number(v, d), "unit": u.label(d), "source": src}
+                               for k, (v, d, src) in c.inputs.items()},
+                    "details": {k: {"value": number(v, d), "unit": u.label(d)}
                                 for k, (v, d) in c.details.items()},
                     "notes": list(c.notes)}
 

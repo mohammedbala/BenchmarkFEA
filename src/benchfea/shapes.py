@@ -46,6 +46,7 @@ COLUMNS: dict[str, object] = {
     "type": "Type",
     "A": "A", "d": "d", "bf": "bf", "tw": "tw", "tf": "tf",
     "Ht": "Ht", "B": "B", "tdes": "tdes", "OD": "OD",
+    "kdes": "kdes",     # design-only (web depth h = d - 2 kdes of rolled I-shapes); optional column
     "Ix": "Ix", "Zx": "Zx", "Sx": "Sx", "Iy": "Iy", "Zy": "Zy", "Sy": "Sy", "J": "J", "Cw": "Cw",
 }
 I_TYPES = ("W", "M", "S", "HP")
@@ -196,6 +197,8 @@ def lookup(name: str, length_unit: str) -> SectionProps:
     d, bf, tf, tw = g("d", 1), g("bf", 1), g("tf", 1), g("tw", 1)
     if typ in I_TYPES and None not in (d, bf, tf, tw):
         family, dims = "I", {"d": d, "bf": bf, "tf": tf, "tw": tw}
+        if g("kdes", 1) is not None:       # distance from the outer flange face to the web toe of the fillet
+            dims["k"] = g("kdes", 1)
         asy, asz = d * tw, (5.0 / 6.0) * 2.0 * bf * tf
     elif typ == "HSS" and None not in (g("Ht", 1), g("B", 1), g("tdes", 1)):
         H, B, t = g("Ht", 1), g("B", 1), g("tdes", 1)

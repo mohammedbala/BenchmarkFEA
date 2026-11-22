@@ -11,9 +11,9 @@ file (.json/.yaml) or dict
   └─ benchfea.io.load ──────────────► Document (data + line/col of every value)
        └─ benchfea.validate.validate ► list[Problem]  (schema layer + semantic layer, ALL problems)
             └─ benchfea.model.build_model ► Model  (internal units, defaults resolved, provenance)
-                 ├─ benchfea.solve.analyze(model) ───────────► Results          [to be implemented]
+                 ├─ benchfea.solve.analyze(model) ───────────► Results          [first-order core implemented]
                  │       └─ Results.to_document(model) ► "benchfea-results" 1.0.0, file units
-                 └─ benchfea.design.check(model, results) ───► DesignResults    [to be implemented]
+                 └─ benchfea.design.check(model, results) ───► DesignResults    [tension, compression, shear]
                          └─ DesignResults.to_document(model) ► "benchfea-design" 1.0.0, file units
 ```
 
@@ -34,8 +34,10 @@ file (.json/.yaml) or dict
 | `benchfea.designparams` | resolution of design variables (member > group > global > default) with provenance |
 | `benchfea.model` | dataclasses of the resolved model and `build_model(source) -> Model` |
 | `benchfea.results` | dataclasses `Results`, `CombinationResult`, `MemberResult`, `BucklingResult`, `Envelope`, `InvariantsReport`, `DesignResults`, `DesignMemberResult`, `DesignCheck` and the output-document writers |
-| `benchfea.cli` | `benchfea validate \| run \| design \| perturb \| verify \| score` (only `validate` implemented so far) |
-| `benchfea.solve`, `benchfea.design`, `benchfea.verification`, `benchfea.env` | **to be implemented** against the contracts below |
+| `benchfea.cli` | `benchfea validate \| run \| design \| perturb \| verify \| score` (`validate` and `run` implemented) |
+| `benchfea.design` | steel member checks: `check(model, results)`, `check_member`, registry of editions, `aisc360_22` chapter modules — see "Contract for `benchfea.design`" |
+| `benchfea.solve` | linear solver core (first-order): `analyze(model) -> Results`; see "Solver core" below and [THEORY.md](THEORY.md). Second-order, buckling, tension/compression-only, stiffness reduction and notional loads are refused (`analysis.not-implemented`) until their module registers |
+| `benchfea.verification`, `benchfea.env` | **to be implemented** against the contracts below |
 
 ## Input format decisions
 
@@ -206,19 +208,165 @@ def analyze(model: Model) -> Results
   reactions, joint residual, work = strain energy for linear cases) against
   `equilibrium_tolerance`; copy `model.defaults_used` into `Results`.
 
+## Solver core (`benchfea.solve`) — as implemented
+
+```python
+from benchfea.solve import analyze, ModelRefused, ModelUnstable
+results = analyze(model, strict=True)      # Results, internal units
+```
+
+| module | content |
+|---|---|
+| `solve.beam` | `SectionFlex`, `SpanLoads(points, dists)`, `integrate(L, flex, loads, s_start, y_start) -> Integration` (`.at(x, side)`): closed-form integration of the member equations, segment by segment |
+| `solve.element` | `build_element(model, member, factors=None, active=True) -> MemberElement` (`k_local`, `G`, `k_global`, `dofs`, `fixed_end(loads)`, `equivalent_nodal_loads(loads)`, `recover(u_nodes, loads, stations) -> MemberRecovery`), `StiffnessFactors(axial, flexural, torsional, shear)`, `cantilever_flexibility`, `release_stiffness`, `rigid_transfer` |
+| `solve.loads` | `LoadSet(nodal, prescribed, member)`, `case_loads`, `combine`, `combination_loads`, `applied_resultant`, `member_load_positions` |
+| `solve.system` | `Structure(model, elements)`: `T`, `retained`, `free_r`, `fixed_r`, `inactive`, `assemble(matrices=None)`, `stiffness()`, `reduce(K)`, `factorize(K) -> Factor`, `solve(factor, F, prescribed) -> Solution(u, reactions, constraint_forces, F, residual)` |
+| `solve.stability` | `diagnose(...) -> MechanismDiagnosis` |
+| `solve.invariants` | `model_checks`, `solution_checks`, `superposition_check(model)`, `reciprocity_check(model, pairs=None)` |
+| `solve.analysis` | `analyze`, `LinearAnalysis(model, elements=None)` (`factor`, `case`, `combination_loads`, `load_vector`, `solve_loads`, `recover`, `checks`, `result`), `ANALYSIS_TYPES`, `station_layout`, `unsupported_features` |
+| `solve.errors` | `ModelRefused(ModelInvalid)`, `MechanismDiagnosis`, `MechanismMode`, `NodeParticipation` |
+
+* **Dispatch**: `ANALYSIS_TYPES[combination.analysis_type](LinearAnalysis, combination) -> CombinationResult`;
+  only `"firstOrder"` is registered. A nonlinear module adds its entry and
+  removes the corresponding refusal in `unsupported_features`; it reuses
+  `Structure.assemble(matrices)` (e.g. geometric stiffness as per-member 12×12
+  matrices in nodal global DOFs), `factorize`, `solve`, `LinearAnalysis.recover`
+  and `build_element(..., factors, active)`.
+* **Refusals**: `ModelRefused` with codes `analysis.not-implemented`,
+  `member.release-mechanism`, `section.zero-stiffness`, `load.torque-on-truss`,
+  `solve.invariant-failed` (`.results` holds the flagged results);
+  `ModelUnstable` (code `stability.mechanism`) carries `.diagnosis`
+  (`MechanismDiagnosis.to_dict()`: `classification` `"mechanism"` |
+  `"ill-conditioned"`, `nMechanisms`, `modes[]` of kind `rigid-body` | `node` |
+  `distributed` with `description, motion, cause, direction, axis, through,
+  nodes[{node, share, dofs}], members`). Problem paths: `/supports` for
+  rigid-body modes, `/nodes/<id>` otherwise.
+* **Stations**: `analysis.result_stations` equally spaced stations plus the
+  ends of line loads plus two stations (left limit, right limit) at every
+  interior point load of any load case; the same list in every combination.
+  `MemberResult.x` therefore may contain an x twice.
+* **Additions to `benchfea.results`**: `CombinationResult.constraint_forces`
+  (n_nodes, 6) = forces by the rigid constraints on the nodes (document:
+  `combinations/<id>/constraintForces/<node>` for masters and slaves);
+  `Results.nodal_envelopes` = `{"displacements" | "reactions": NodalEnvelope(max,
+  min, max_combination, min_combination)}` (document: `nodalEnvelopes/<kind>/<node>`).
+* **Invariants** (names in `CombinationResult.invariants.checks`): `stiffness
+  symmetry`, `rigid-body modes`, `positive definiteness`, `linear solve
+  residual`, `global force equilibrium`, `global moment equilibrium`, `joint
+  equilibrium`, `member equilibrium`, `member compatibility`, `work = strain
+  energy` (definitions and tolerances: THEORY.md §8).
+* **CLI**: `benchfea run FILE [-o OUT] [--json] [--allow-flagged]`; exit code 0
+  ok, 1 model refused (invalid, unsupported, unstable — with the diagnosis in
+  `--json`), 2 input unreadable / usage, 3 results written but flagged.
+* **Inactive DOFs**: free DOFs of nodes without members (unless a master DOF
+  that drives slaves) and rotations of nodes with only truss-type members are
+  removed from the system and reported as 0 with a warning in `Results.warnings`.
+
 ## Contract for `benchfea.design`
 
 ```python
-def check(model: Model, results: Results) -> DesignResults
+from benchfea import design
+design.check(model, results) -> DesignResults                 # every design member, strength combinations
+design.check_member(ctx, demands, edition=None) -> DesignMemberResult     # demands given directly
+design.member_demands(model, results, design_member_id) -> {combination id: Demand}
+design.registry.get(code) -> Edition                          # unknown code: UnknownDesignCode (refusal)
 ```
 
-One `DesignMemberResult` per design member with a `DesignCheck` per limit
-state: `name`, `clause` (e.g. `"AISC 360-22 F2.2, Eq. F2-2"`), `demand`,
-`capacity`, `ratio`, `passed`, governing `combination` and location `x`,
-`details` (intermediate values with dimensions) and `notes`. Strength checks
-use combinations with `purpose == "strength"`; deflection limits use their own
-combination lists. Limit states outside the implemented scope are listed in
-`not_checked`, never silently skipped. Slenderness limits are `advisory`.
+Package layout (`src/benchfea/design/`):
+
+| module | role |
+|---|---|
+| `registry` | `Edition(code, title, limit_states)`, `register`, `get`, `registered`. Only `"AISC 360-22"` is registered; any other `code` is refused (`UnknownDesignCode`; `check_member` then returns one `refused` check). A new edition = a new package with one module per chapter, registered from its `__init__` and imported in `design/__init__.py` |
+| `base` | `DesignContext`, `Demand`, the check builders `strength_check`, `limit_check`, `not_checked`, `refused` |
+| `section` | `DesignSection`: design view of a section (shape family, rolled / built-up, plate elements with width, thickness, ratio and provenance); `DesignSection.from_model(section)` and the constructors `i_shape`, `rectangular`, `round_hss`, `unsupported` |
+| `demands` | `member_stations`, `demand_from_stations`, `member_demands`, `distance_to_zero` (L_v of G5) |
+| `aisc360_22/` | `b4_classification` (B4.1, Tables B4.1a/b), `d_tension` (D1–D3), `e_compression` (E2, E3, E4-2, E7), `g_shear` (G2.1, G4, G5, G6). To come: `f_flexure`, `h_combined`, serviceability |
+
+**Limit-state function** (the unit every chapter module is made of; each module
+lists its functions in `LIMIT_STATES`, an edition concatenates them):
+
+```python
+def limit_state(ctx: DesignContext, demand: Demand) -> list[DesignCheck]
+```
+
+* `ctx` — one design member: `member, section: DesignSection, method ("LRFD"|"ASD"),
+  E, G, Fy, Fu, L, Lx, Ly, Lz, Kx, Ky, Kz, An, U, maxSlendernessCompression,
+  maxSlendernessTension, sources {name: provenance}, code`.
+  `DesignContext.from_model(model, id)` fills it from `Model.design_members`
+  (AISC axis letters: x = major = local z, y = minor = local y; an unbraced
+  length defined by brace points becomes the longest segment between them).
+  `ctx.inputs("Fy", "Kx")` → `{name: (value, dimension, source)}`.
+* `demand` — the required strengths of ONE combination (maxima over the stations
+  of the design member's analysis members): `combination, Pt, x_Pt, Pc, x_Pc, Vy,
+  x_Vy, Lv_y, Vz, x_Vz, Lv_z, V, x_V, Lv` (magnitudes; `x_*` from the design
+  member start; `V` = resultant shear; `Lv*` = distance from maximum to zero
+  shear, `None` if the shear never vanishes) and `extra` (dict) for the demands
+  of later limit states (moments).
+* It returns at least one check for every limit state it owns and never raises
+  for something it cannot handle: outside the scope or data missing →
+  `status = "notChecked"`; contradictory input → `status = "refused"`; both with
+  `reason`. All equations used are unit-consistent (the engine calls with N, mm).
+* `check_member` evaluates every limit state for every combination and keeps,
+  per check `name`, the governing one (largest ratio; a check without a result
+  for a nonzero demand is never hidden by another combination).
+
+**`DesignCheck` record** (`benchfea.results`, internal units; `to_document`
+converts): `name` (limit state), `clause` (every section and equation used,
+e.g. `"AISC 360-22 E3, Eq. E3-2, E3-4; E2; B4.1, Table B4.1a; B3.1 Eq. B3-1"`),
+`status` (`"ok" | "notChecked" | "refused"`) and `reason`, `method`, `inputs`
+`{name: (value, dimension, source)}` with source `member | group:<id> | global |
+default | bracing… | material:<id> | section:<id> | given | derived: …`,
+`details` (intermediate values `{name: (value, dimension)}`), `nominal` (Rn),
+`factor` + `factor_name` (`phi` or `Omega`), `capacity` (available strength,
+B3-1 / B3-2), `demand`, `ratio`, `passed`, `combination`, `x`, `dimension`,
+`advisory`, `notes`. When `status != "ok"`: `capacity`, `ratio`, `passed` are
+`None` (the demand is kept).
+
+`DesignMemberResult.passed` is true only if every non-advisory check passed
+and no limit state with a nonzero demand is `notChecked`/`refused`;
+`not_checked` lists every check without a result as `"name: status: reason"`;
+`governing` = the non-advisory check with the largest ratio. Slenderness
+recommendations (D1, E2 User Notes) are `advisory`. Strength checks use the
+combinations with `purpose == "strength"`.
+
+**Section → design view** (the input format has no field for how a shape is
+made, so the mapping follows what the section data says and is reported in the
+inputs/notes of every check): database W/M/S/HP → rolled I, h = d − 2·kdes
+(optional `kdes` column of the user's database; absent → web-dependent checks
+are `notChecked`); database HSS → rectangular / round HSS with `tdes`;
+`type: I` with fillet radius r > 0 → rolled, h = d − 2tf − 2r; r = 0 →
+built-up welded, h = d − 2tf; `type: box` → built-up **box section** (clear
+widths, Table B4.1a Case 8), not an HSS; `type: pipe` → round HSS with t used
+as the design wall thickness (the 0.93 factor of B4.2 is never applied by the
+engine); everything else is out of scope (tension checks only, which need
+only A). `DesignSection` constructors accept tabulated ratios (`bf/2tf`,
+`h/tw`, `b/t`, `h/t`, `D/t`) directly; they then take precedence.
+
+### Known limits of the design checks (for LIMITS.md)
+
+* Shapes: doubly symmetric I-shapes, rectangular HSS, box sections, round HSS /
+  pipe. Channels, tees, angles, singly symmetric or unsymmetric shapes,
+  `rectangle`, `properties` sections: compression and shear `notChecked`.
+* Implemented: B3.1/B3.2; B4.1 (Table B4.1a Cases 1, 2, 5, 6, 8, 9; Table B4.1b
+  Cases 10, 11, 13, 15, 17, 19, 20, 21); D1 (advisory), D2, D3-1; E2 (advisory),
+  E3, E4-2, E7.1, E7.2; G2.1, G4, G5, G6. Not implemented: flexure (F), combined
+  forces and torsion (H), serviceability (L), D4–D6, E4-3/E4-4/E4-10..12, E5, E6,
+  G2.2/G2.3 (tension field action), G2.4, G3, G7, Table D3.1 (U is an input),
+  B4.3b net area (An is an input), block shear and all connection limit states.
+* An = Ag and U = 1.0 by default (reported as defaults).
+* Webs have no transverse stiffeners (kv = 5.34); no web openings; no holes.
+* No file field for rolled/built-up or HSS/box (see the mapping above); HSS
+  corner radius never known (flat width = outside − 3t).
+* Compression with brace points: Lc = K × longest segment, with the maximum
+  compression of the member (conservative when the force varies).
+* E3 branch by Lc/r (E4 by Fy/Fe); Table E7.1 c2 (rounded) with be ≤ b;
+  Eq. E7-7 capped at Ag; D/t ≥ 0.45E/Fy `notChecked`; torsional buckling always
+  evaluated (Cw = 0 for closed sections).
+* G5: resultant shear; Eq. G5-2a not credited when the shear never vanishes
+  along the member (L_v undefined). G6: 2 × Eq. G6-1 for the two flanges.
+  No interaction between shear directions.
+* Safety factors are the printed 1.67 / 2.00 / 1.50 (not 1.5/φ); no tolerance
+  at classification boundaries (ratio = limit is the favourable class).
 
 ## Output documents
 

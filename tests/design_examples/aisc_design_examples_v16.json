@@ -1,0 +1,567 @@
+{
+  "source": {
+    "document": "AISC, Companion to the AISC Steel Construction Manual, Volume 1: Design Examples, Version 16.0 (2023), accompanying ANSI/AISC 360-22",
+    "pages": "printed page D-n = PDF page 36+n; E-n = PDF page 64+n; G-n = PDF page 236+n; F-n = PDF page 162+n",
+    "content": "Only numbers are recorded here: the inputs each example lists and the values it prints (3 significant figures). No text, table or figure of the document is reproduced.",
+    "units": "kip, in. (ksi); lengths given in ft in the examples are converted in the tests"
+  },
+  "tolerancePolicy": {
+    "relative": 0.01,
+    "statement": "ONE policy for every comparison with a printed Design Examples value (nominal and available strengths, and the printed intermediates that are compared): the engine value, computed at full precision from the inputs the example lists, must be within 1.0 % of the printed value. The examples print 3 significant figures and carry rounded intermediates into the next step. The tolerance is never adjusted per case; a case that does not meet it is marked xfail(strict) with a diagnosis."
+  },
+  "examples": {
+    "D.1": {
+      "title": "W-shape tension member (W8x21)",
+      "pages": "D-2 to D-4 (PDF 38-40)",
+      "inputs": {
+        "Fy": 50,
+        "Fu": 65,
+        "Ag": 6.16,
+        "bf": 5.27,
+        "tf": 0.4,
+        "d": 8.28,
+        "ry": 1.26,
+        "L_ft": 25.0,
+        "An": 4.76,
+        "U": 0.908,
+        "Pu": 180,
+        "Pa": 120
+      },
+      "printed": {
+        "yield_phiPn": 277,
+        "yield_Pn_over_Omega": 184,
+        "Ae": 4.32,
+        "rupture_Pn": 281,
+        "rupture_phiPn": 211,
+        "rupture_Pn_over_Omega": 141,
+        "L_over_r": 238
+      },
+      "notes": [
+        "Yielding strengths are printed as Manual Table 5-1 values (the example does not print Fy Ag).",
+        "An = 4.76 in.^2 (Spec. B4.3b, four holes) and U = 0.908 (Table D3.1 Case 2) are computed in the example from the connection and are INPUTS of the engine.",
+        "Rounded chain: printed ASD rupture 141 = 281/2.00; full precision from the listed inputs gives 140.5."
+      ]
+    },
+    "D.4": {
+      "title": "Rectangular HSS tension member (HSS6x4x3/8)",
+      "pages": "D-11 to D-13 (PDF 47-49)",
+      "inputs": {
+        "Fy": 50,
+        "Fu": 62,
+        "Ag": 6.18,
+        "ry": 1.55,
+        "t": 0.349,
+        "L_ft": 30.0,
+        "An": 5.79,
+        "U": 0.919,
+        "Pu": 224,
+        "Pa": 150
+      },
+      "printed": {
+        "yield_phiPn": 278,
+        "yield_Pn_over_Omega": 185,
+        "Ae": 5.32,
+        "rupture_Pn": 330,
+        "rupture_phiPn": 248,
+        "rupture_Pn_over_Omega": 165,
+        "L_over_r": 232
+      },
+      "notes": [
+        "Yielding strengths are printed as Manual Table 5-4 values.",
+        "An = 5.79 in.^2 (slot with 1/16 in. gap) and U = 0.919 (Table D3.1 Case 5) are INPUTS of the engine."
+      ]
+    },
+    "D.5": {
+      "title": "Round HSS tension member (HSS6.000x0.500)",
+      "pages": "D-14 to D-16 (PDF 50-52)",
+      "inputs": {
+        "Fy": 50,
+        "Fu": 62,
+        "Ag": 8.09,
+        "r": 1.96,
+        "t": 0.465,
+        "D": 6.0,
+        "L_ft": 30.0,
+        "An": 7.57,
+        "U": 0.991,
+        "Pu": 240,
+        "Pa": 160
+      },
+      "printed": {
+        "yield_phiPn": 364,
+        "yield_Pn_over_Omega": 242,
+        "Ae": 7.5,
+        "rupture_Pn": 465,
+        "rupture_phiPn": 349,
+        "rupture_Pn_over_Omega": 233,
+        "L_over_r": 184
+      },
+      "notes": [
+        "Yielding strengths are printed as Manual Table 5-6 values."
+      ]
+    },
+    "E.1C": {
+      "title": "W-shape available compressive strength (W14x132, Lc = 30 ft)",
+      "pages": "E-8 to E-9 (PDF 72-73)",
+      "inputs": {
+        "Fy": 50,
+        "E": 29000,
+        "Ag": 38.8,
+        "rx": 6.28,
+        "ry": 3.76,
+        "bf_2tf": 7.15,
+        "h_tw": 17.7,
+        "Lcx_ft": 30.0,
+        "Lcy_ft": 30.0,
+        "Pu": 840,
+        "Pa": 560
+      },
+      "printed": {
+        "flange_lambda_r": 13.5,
+        "web_lambda_r": 35.9,
+        "Lcy_over_ry": 95.7,
+        "phiPn": 892,
+        "Pn_over_Omega": 598
+      },
+      "notes": [
+        "The example takes the available stresses (23.0 and 15.4 ksi) from Manual Table 4-14 by interpolation; Fn is not printed.",
+        "Documented printed inconsistency: Eq. E3-2 with the listed properties gives Pn/Omega = 594 kips (the value Example E.1A quotes from Manual Table 4-1a for the same member); the printed 598 follows from the interpolated 15.4 ksi. The difference (0.6 %) is inside the policy."
+      ]
+    },
+    "E.1D": {
+      "title": "W-shape available compressive strength (W14x90, Lcx = 30 ft, Lcy = Lcz = 15 ft)",
+      "pages": "E-10 to E-12 (PDF 74-76)",
+      "inputs": {
+        "Fy": 50,
+        "E": 29000,
+        "Ag": 26.5,
+        "rx": 6.14,
+        "ry": 3.7,
+        "bf_2tf": 10.2,
+        "h_tw": 25.9,
+        "Lcx_ft": 30.0,
+        "Lcy_ft": 15.0,
+        "Lcz_ft": 15.0,
+        "Pu": 840,
+        "Pa": 560
+      },
+      "printed": {
+        "flange_lambda_r": 13.5,
+        "web_lambda_r": 35.9,
+        "Lcx_over_rx": 58.6,
+        "Lcy_over_ry": 48.6,
+        "Fe": 83.3,
+        "Fn": 38.9,
+        "Pn": 1030,
+        "phiPn": 927,
+        "Pn_over_Omega": 617
+      },
+      "notes": [
+        "Torsional buckling is not evaluated in the example; J and Cw are not listed."
+      ]
+    },
+    "E.1E": {
+      "title": "W-shape compression member with slender elements (W16x31)",
+      "pages": "E-13 to E-19 (PDF 77-83)",
+      "inputs": {
+        "Fy": 50,
+        "E": 29000,
+        "Ag": 9.13,
+        "bf": 5.53,
+        "d": 15.9,
+        "tf": 0.44,
+        "tw": 0.275,
+        "rx": 6.41,
+        "ry": 1.17,
+        "kdes": 0.842,
+        "bf_2tf": 6.28,
+        "h_tw": 51.6
+      },
+      "printed": {
+        "flange_lambda_r": 13.5,
+        "web_lambda_r": 35.9,
+        "a": {
+          "Lc_ft": 5,
+          "Lc_over_r": 51.3,
+          "Fe": 109,
+          "Fn": 41.3,
+          "gate": 39.5,
+          "Fel": 41.5,
+          "he": 11.7,
+          "Ae": 8.44,
+          "Pn": 349,
+          "phiPn": 314,
+          "Pn_over_Omega": 209
+        },
+        "b": {
+          "Lc_ft": 10,
+          "Lc_over_r": 103,
+          "Fe": 27.0,
+          "Fn": 23.0,
+          "gate": 52.9,
+          "Ae": 9.13,
+          "Pn": 210,
+          "phiPn": 189,
+          "Pn_over_Omega": 126
+        },
+        "c": {
+          "Lc_ft": 15,
+          "Lc_over_r": 154,
+          "Fe": 12.1,
+          "Fn": 10.6,
+          "gate": 78.0,
+          "Ae": 9.13,
+          "Pn": 96.8,
+          "phiPn": 87.1,
+          "Pn_over_Omega": 58.0
+        }
+      },
+      "notes": [
+        "Flexural buckling only (problem statement); Lc is the same about both axes, so the minor axis governs.",
+        "Case b: the example rounds Lc/r to 103 before squaring (printed 210/189/126; Manual Table 6-1 values printed alongside: 190/127); full precision gives 211.5/190.4/126.7."
+      ]
+    },
+    "E.2": {
+      "title": "Built-up column with a slender web",
+      "pages": "E-20 to E-24 (PDF 84-88)",
+      "inputs": {
+        "Fy": 50,
+        "E": 29000,
+        "G": 11200,
+        "d": 17.0,
+        "bf": 8.0,
+        "tf": 1.0,
+        "h": 15.0,
+        "tw": 0.25,
+        "Ag": 19.8,
+        "Iy": 85.4,
+        "ry": 2.08,
+        "Ix": 1100,
+        "Cw": 5470,
+        "J": 5.41,
+        "Lc_ft": 15.0,
+        "Pu": 420,
+        "Pa": 280
+      },
+      "printed": {
+        "Lcy_over_ry": 86.5,
+        "Fe_flexural": 38.3,
+        "Fe_torsional": 91.9,
+        "Fn": 28.9,
+        "kc": 0.516,
+        "flange_lambda": 4.0,
+        "flange_lambda_r": 11.1,
+        "web_lambda": 60.0,
+        "web_lambda_r": 35.9,
+        "gate": 47.2,
+        "Fel": 30.7,
+        "he": 12.6,
+        "Ae": 19.2,
+        "Pn": 555,
+        "phiPn": 500,
+        "Pn_over_Omega": 332
+      },
+      "notes": [
+        "Section properties (Ag, Ix, Iy, ry, Cw, J) are computed in the example from the plate dimensions and listed; they are used as inputs here."
+      ]
+    },
+    "E.3": {
+      "title": "Built-up column with slender flanges",
+      "pages": "E-25 to E-29 (PDF 89-93)",
+      "inputs": {
+        "Fy": 50,
+        "E": 29000,
+        "G": 11200,
+        "d": 8.0,
+        "bf": 10.5,
+        "tf": 0.375,
+        "h": 7.25,
+        "tw": 0.25,
+        "Ag": 9.69,
+        "Iy": 72.4,
+        "ry": 2.73,
+        "Ix": 122,
+        "Cw": 1050,
+        "J": 0.407,
+        "Lc_ft": 15.0,
+        "Pu": 240,
+        "Pa": 160
+      },
+      "printed": {
+        "web_lambda": 29.0,
+        "web_lambda_r": 35.9,
+        "kc": 0.743,
+        "flange_lambda": 14.0,
+        "flange_lambda_r": 13.3,
+        "Lcy_over_ry": 65.9,
+        "Fe_flexural": 65.9,
+        "Fe_torsional": 71.2,
+        "Fn": 36.4,
+        "gate": 15.6,
+        "Pn": 353,
+        "phiPn": 318,
+        "Pn_over_Omega": 211
+      },
+      "notes": [
+        "The flange is slender by Table B4.1a but fully effective at this Fn (Eq. E7-2): Ae = Ag."
+      ]
+    },
+    "E.9": {
+      "title": "Rectangular HSS compression member without slender elements (HSS12x10x3/8)",
+      "pages": "E-59 to E-61 (PDF 123-125)",
+      "inputs": {
+        "Fy": 50,
+        "E": 29000,
+        "Ag": 14.6,
+        "rx": 4.61,
+        "ry": 4.01,
+        "b_t": 25.7,
+        "h_t": 31.4,
+        "Lc_ft": 16.0,
+        "Pu": 510,
+        "Pa": 340
+      },
+      "printed": {
+        "lambda_r": 33.7,
+        "Lcy_over_ry": 47.9,
+        "Fe": 125,
+        "Fn": 42.3,
+        "Pn": 618,
+        "phiPn": 556,
+        "Pn_over_Omega": 370
+      },
+      "notes": [
+        "Lc = 0.80 x 20 ft about both axes; the design wall thickness is not listed (only b/t and h/t)."
+      ]
+    },
+    "E.10": {
+      "title": "Rectangular HSS compression member with slender elements (HSS12x8x3/16)",
+      "pages": "E-62 to E-66 (PDF 126-130)",
+      "inputs": {
+        "Fy": 50,
+        "E": 29000,
+        "Ag": 6.76,
+        "t": 0.174,
+        "rx": 4.56,
+        "ry": 3.35,
+        "b_t": 43.0,
+        "h_t": 66.0
+      },
+      "printed": {
+        "lambda_r": 33.7,
+        "18": {
+          "Lc_ft": 18.0,
+          "Fn": 36.9,
+          "gate": 39.2,
+          "Fel_narrow": 58.5,
+          "be": 7.05,
+          "Fel_wide": 24.8,
+          "he": 7.88,
+          "Ae": 5.35,
+          "Pn": 197,
+          "phiPn": 177,
+          "Pn_over_Omega": 118
+        },
+        "24": {
+          "Lc_ft": 24.0,
+          "Lc_over_r": 86.0,
+          "Fe": 38.7,
+          "Fn": 29.1,
+          "gate": 44.2,
+          "Fel_wide": 24.8,
+          "he": 8.66,
+          "Ae": 5.77,
+          "Pn": 168,
+          "phiPn": 151,
+          "Pn_over_Omega": 101
+        },
+        "40": {
+          "Lc_ft": 40.0,
+          "Fn": 12.3,
+          "gate": 67.9,
+          "Ae": 6.76,
+          "Pn": 83.1,
+          "phiPn": 74.8,
+          "Pn_over_Omega": 49.8
+        }
+      },
+      "notes": [
+        "Flat widths are taken in the example as (ratio) x t: h = 66.0 x 0.174, b = 43.0 x 0.174.",
+        "The 18 ft and 40 ft columns are given only in the summary table of the example."
+      ]
+    },
+    "E.11": {
+      "title": "Pipe compression member (Pipe 10 Std.)",
+      "pages": "E-67 to E-69 (PDF 131-133)",
+      "inputs": {
+        "Fy": 35,
+        "E": 29000,
+        "Ag": 11.5,
+        "r": 3.68,
+        "D_t": 31.6,
+        "Lcx_ft": 30.0,
+        "Lcy_ft": 15.0,
+        "Pu": 210,
+        "Pa": 140
+      },
+      "printed": {
+        "lambda_r": 91.1,
+        "Lc_over_r": 97.8,
+        "Fe": 29.9,
+        "Fn": 21.4,
+        "Pn": 246,
+        "phiPn": 221,
+        "Pn_over_Omega": 147
+      },
+      "notes": [
+        "The hand calculation (221/147) differs from the Manual Table 4-6 values quoted in the same example (222/148) by rounding."
+      ]
+    },
+    "G.1B": {
+      "title": "W-shape in major-axis shear (W24x62)",
+      "pages": "G-4 (PDF 240)",
+      "inputs": {
+        "Fy": 50,
+        "E": 29000,
+        "d": 23.7,
+        "tw": 0.43,
+        "Vu": 290,
+        "Va": 193
+      },
+      "printed": {
+        "Vn": 306,
+        "phiVn": 306,
+        "Vn_over_Omega": 204,
+        "phi": 1.0,
+        "Omega": 1.5
+      },
+      "notes": [
+        "The example does not print h/tw: it states that Section G2.1(a) applies (Cv1 = 1.0, phi = 1.00, Omega = 1.50). The test supplies h/tw equal to the limit 2.24 sqrt(E/Fy), the largest value for which that statement holds; the result does not depend on h/tw below the limit.",
+        "Vu and Va are those of Example G.1A (G-3)."
+      ]
+    },
+    "G.4": {
+      "title": "Rectangular HSS in shear (HSS6x4x3/8, 6-in. walls vertical)",
+      "pages": "G-9 to G-10 (PDF 245-246)",
+      "inputs": {
+        "Fy": 50,
+        "E": 29000,
+        "H": 6.0,
+        "B": 4.0,
+        "t": 0.349,
+        "Vu": 66.0,
+        "Va": 44.0
+      },
+      "printed": {
+        "h": 4.95,
+        "h_t": 14.2,
+        "Aw": 3.46,
+        "Vn": 104,
+        "phiVn": 93.6,
+        "Vn_over_Omega": 62.3
+      },
+      "notes": [
+        "Rounded chain: 93.6 and 62.3 follow from Vn rounded to 104; full precision gives 103.7, 93.3, 62.1."
+      ]
+    },
+    "G.5": {
+      "title": "Round HSS in shear (HSS16.000x0.375)",
+      "pages": "G-11 to G-12 (PDF 247-248)",
+      "inputs": {
+        "Fy": 50,
+        "E": 29000,
+        "Ag": 17.2,
+        "D_t": 45.8,
+        "D": 16.0,
+        "Lv": 192,
+        "Vu": 180,
+        "Va": 120
+      },
+      "printed": {
+        "Fcr_a": 112,
+        "Fcr_b": 73.0,
+        "Fcr": 30.0,
+        "Vn": 258,
+        "phiVn": 232,
+        "Vn_over_Omega": 155
+      },
+      "notes": [
+        "Documented printed inconsistency: 258/1.67 = 154.49, which rounds to 154; the example prints 155. The difference (0.3 %) is inside the policy.",
+        "Lv = half the 32 ft span (simply supported, uniform load)."
+      ]
+    },
+    "G.6": {
+      "title": "Doubly symmetric shape in minor-axis shear (W21x48)",
+      "pages": "G-13 to G-14 (PDF 249-250)",
+      "inputs": {
+        "Fy": 50,
+        "E": 29000,
+        "bf": 8.14,
+        "tf": 0.43,
+        "Vu": 120,
+        "Va": 80.0
+      },
+      "printed": {
+        "bf_2tf": 9.47,
+        "Vn": 210,
+        "phiVn": 189,
+        "Vn_over_Omega": 126
+      },
+      "notes": []
+    },
+    "F.3B": {
+      "title": "W-shape with noncompact flanges, major-axis bending (W21x48): classification only",
+      "pages": "F-24 to F-25 (PDF 186-187)",
+      "inputs": {
+        "Fy": 50,
+        "E": 29000,
+        "bf_2tf": 9.47
+      },
+      "printed": {
+        "lambda_pf": 9.15,
+        "lambda_rf": 24.1,
+        "flange_class": "noncompact"
+      },
+      "notes": [
+        "Only the Table B4.1b classification is used here (the flexural strength belongs to Chapter F).",
+        "The web ratio is not printed in the example."
+      ]
+    },
+    "F.7B": {
+      "title": "Rectangular HSS with noncompact flanges (HSS10x6x3/16, major axis): classification only",
+      "pages": "F-34 to F-36 (PDF 196-198)",
+      "inputs": {
+        "Fy": 50,
+        "E": 29000,
+        "b_t": 31.5,
+        "h_t": 54.5
+      },
+      "printed": {
+        "flange_lambda_p": 27.0,
+        "flange_lambda_r": 33.7,
+        "flange_class": "noncompact",
+        "web_lambda_p": 58.3,
+        "web_class": "compact"
+      },
+      "notes": [
+        "Only the Table B4.1b classification is used here."
+      ]
+    },
+    "F.9B": {
+      "title": "Pipe flexural member: classification only",
+      "pages": "F-43 to F-44 (PDF 205-206)",
+      "inputs": {
+        "Fy": 35,
+        "E": 29000,
+        "D_t": 18.5
+      },
+      "printed": {
+        "lambda_p": 58.0,
+        "class": "compact"
+      },
+      "notes": [
+        "Only the Table B4.1b classification is used here."
+      ]
+    }
+  }
+}
