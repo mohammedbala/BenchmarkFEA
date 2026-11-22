@@ -1,0 +1,38 @@
+{
+  "formatVersion": "1.0",
+  "units": {"length": "cm"},
+  "conventions": {"verticalAxis": "Z", "internalForces": "sagging-positive"},
+  "nodes": {
+    "n 1": {"x": 0, "y": 0},
+    "n2": {"x": "5", "y": 0},
+    "n3": {"x": 1}
+  },
+  "supports": {
+    "n2": {"dofs": {"ux": "pinned", "rz": {"spring": -5}}},
+    "n3": {}
+  },
+  "materials": {
+    "m": {"E": -200},
+    "m2": {"E": 200, "nu": 0.3, "density": 7850}
+  },
+  "sections": {
+    "s1": {"type": "I", "d": 300, "bf": 150, "tf": 10},
+    "s2": {"type": "tube", "H": 100, "B": 50, "t": 5},
+    "s3": {"type": "pipe", "D": 100, "t": 5, "bf": 10},
+    "s4": {"A": 10}
+  },
+  "members": {
+    "b1": {"i": "n2", "j": "n3", "sction": "s1", "material": "m2", "type": "beam"},
+    "b2": {"i": "n2", "j": "n3", "section": "s3", "material": "m2", "releases": {"i": {"rz": "pinned"}}}
+  },
+  "loadCases": {
+    "D": {"loads": [
+      {"type": "nodal", "node": "n2", "Fz": "ten"},
+      {"type": "memberPoint", "member": "b2", "direction": "down", "value": 1},
+      {"type": "wind"}
+    ]}
+  },
+  "combinations": {},
+  "analysis": {"resultStations": 1, "type": "thirdOrder", "pDelta": true},
+  "design": {"defaults": {"Kx": 0, "Cb": "auto", "deflectionLimits": [{"direction": "y"}]}}
+}

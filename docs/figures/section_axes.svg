@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 300" width="880" height="300" font-family="Helvetica, Arial, sans-serif" font-size="13" role="img" aria-label="Cross-section axes seen from the member end j looking towards i">
+<title>Cross-section axes seen from the member end j looking towards i</title>
+<rect width="880" height="300" fill="#ffffff"/>
+<polygon points="100.0,75.0 200.0,75.0 200.0,87.0 154.0,87.0 154.0,213.0 200.0,213.0 200.0,225.0 100.0,225.0 100.0,213.0 146.0,213.0 146.0,87.0 100.0,87.0" fill="#e4e9ef" stroke="#1f2933" stroke-width="1.2"/>
+<line x1="150.0" y1="150.0" x2="150.0" y2="55.0" stroke="#1e8449" stroke-width="2.2"/>
+<polygon points="150.0,55.0 153.1,63.5 146.9,63.5" fill="#1e8449" stroke="#1e8449" stroke-width="0.5"/>
+<text x="144.0" y="47.0" fill="#1e8449" font-size="13" text-anchor="start" font-weight="bold" font-style="italic">y</text>
+<line x1="150.0" y1="150.0" x2="55.0" y2="150.0" stroke="#1f5fa8" stroke-width="2.2"/>
+<polygon points="55.0,150.0 63.5,146.9 63.5,153.1" fill="#1f5fa8" stroke="#1f5fa8" stroke-width="0.5"/>
+<text x="41.0" y="154.0" fill="#1f5fa8" font-size="13" text-anchor="start" font-weight="bold" font-style="italic">z</text>
+<circle cx="150.0" cy="150.0" r="4" fill="#c0392b"/>
+<text x="158.0" y="166.0" fill="#c0392b" font-size="11" text-anchor="start" font-style="italic">x (towards viewer)</text>
+<text x="110.0" y="280.0" fill="#1f2933" font-size="13" text-anchor="start" font-weight="bold">roll = 0</text>
+<polygon points="349.2,110.0 435.8,60.0 441.8,70.4 402.0,93.4 465.0,202.6 504.8,179.6 510.8,190.0 424.2,240.0 418.2,229.6 458.0,206.6 395.0,97.4 355.2,120.4" fill="#e4e9ef" stroke="#1f2933" stroke-width="1.2"/>
+<line x1="430.0" y1="150.0" x2="382.5" y2="67.7" stroke="#1e8449" stroke-width="2.2"/>
+<polygon points="382.5,67.7 389.4,73.5 384.1,76.6" fill="#1e8449" stroke="#1e8449" stroke-width="0.5"/>
+<text x="376.5" y="59.7" fill="#1e8449" font-size="13" text-anchor="start" font-weight="bold" font-style="italic">y</text>
+<line x1="430.0" y1="150.0" x2="347.7" y2="197.5" stroke="#1f5fa8" stroke-width="2.2"/>
+<polygon points="347.7,197.5 353.5,190.6 356.6,195.9" fill="#1f5fa8" stroke="#1f5fa8" stroke-width="0.5"/>
+<text x="333.7" y="201.5" fill="#1f5fa8" font-size="13" text-anchor="start" font-weight="bold" font-style="italic">z</text>
+<circle cx="430.0" cy="150.0" r="4" fill="#c0392b"/>
+<text x="438.0" y="166.0" fill="#c0392b" font-size="11" text-anchor="start" font-style="italic">x (towards viewer)</text>
+<text x="390.0" y="280.0" fill="#1f2933" font-size="13" text-anchor="start" font-weight="bold">roll = +30 deg</text>
+<path d="M430.0,88.0 A62,62 0 0 0 399.0,96.3" fill="none" stroke="#b9770e" stroke-width="2.0"/>
+<polygon points="399.0,96.3 405.5,90.0 408.0,95.7" fill="#b9770e" stroke="#b9770e" stroke-width="0.5"/>
+<text x="420.0" y="78.0" fill="#b9770e" font-size="12" text-anchor="start">roll</text>
+<text x="560.0" y="70.0" fill="#1f2933" font-size="12" text-anchor="start">y: depth direction (web), d / H / h</text>
+<text x="560.0" y="94.0" fill="#1f2933" font-size="12" text-anchor="start">z: width direction (flanges), bf / B / b</text>
+<text x="560.0" y="118.0" fill="#6b7785" font-size="12" text-anchor="start">Iz, Sz, Zz: bending about z = AISC x-x (major)</text>
+<text x="560.0" y="142.0" fill="#6b7785" font-size="12" text-anchor="start">Iy, Sy, Zy: bending about y = AISC y-y (minor)</text>
+<text x="560.0" y="166.0" fill="#6b7785" font-size="12" text-anchor="start">top flange = flange on the +y side</text>
+<text x="560.0" y="190.0" fill="#6b7785" font-size="12" text-anchor="start">Asy: shear along y (web);  Asz: shear along z</text>
+</svg>

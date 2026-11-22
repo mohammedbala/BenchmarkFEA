@@ -1,0 +1,20 @@
+formatVersion: "1.0.0"
+units: {force: kN, length: m}
+conventions: {verticalAxis: Z}
+nodes:
+  1: {x: 0, y: 0}
+  2: {x: 4, y: 0}
+  top: {x: 4, y: 0, z: 3}
+  top: {x: 4, y: 0, z: 4}
+supports:
+  "1": {type: fixed}
+materials:
+  S: {E: 2.0e+8, nu: 0.3}
+sections:
+  R: {type: rectangle, h: 0.3, b: 0.2}
+members:
+  M1: {i: "1", j: "2", section: R, material: S}
+loadCases:
+  D: {loads: []}
+combinations:
+  C1: {factors: {D: 1.0}}

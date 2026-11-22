@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 580" width="880" height="580" font-family="Helvetica, Arial, sans-serif" font-size="13" role="img" aria-label="Member end forces and internal forces">
+<title>Member end forces and internal forces</title>
+<rect width="880" height="580" fill="#ffffff"/>
+<text x="20.0" y="38.0" fill="#1f2933" font-size="14" text-anchor="start" font-weight="bold">local x-y plane (z towards the viewer)</text>
+<line x1="30.0" y1="220.0" x2="75.0" y2="220.0" stroke="#c0392b" stroke-width="1.8"/>
+<polygon points="75.0,220.0 66.5,223.1 66.5,216.9" fill="#c0392b" stroke="#c0392b" stroke-width="0.5"/>
+<text x="80.0" y="224.0" fill="#c0392b" font-size="13" text-anchor="start" font-weight="bold" font-style="italic">x</text>
+<line x1="30.0" y1="220.0" x2="30.0" y2="175.0" stroke="#1e8449" stroke-width="1.8"/>
+<polygon points="30.0,175.0 33.1,183.5 26.9,183.5" fill="#1e8449" stroke="#1e8449" stroke-width="0.5"/>
+<text x="24.0" y="168.0" fill="#1e8449" font-size="13" text-anchor="start" font-weight="bold" font-style="italic">y</text>
+<polygon points="130.0,141.0 330.0,141.0 330.0,159.0 130.0,159.0" fill="#e4e9ef" stroke="#1f2933" stroke-width="1.2"/>
+<text x="124.0" y="184.0" fill="#1f2933" font-size="13" text-anchor="start" font-weight="bold">i</text>
+<text x="332.0" y="184.0" fill="#1f2933" font-size="13" text-anchor="start" font-weight="bold">j</text>
+<line x1="76.0" y1="150.0" x2="122.0" y2="150.0" stroke="#c0392b" stroke-width="2.0"/>
+<polygon points="122.0,150.0 113.5,153.1 113.5,146.9" fill="#c0392b" stroke="#c0392b" stroke-width="0.5"/>
+<text x="60.0" y="144.0" fill="#c0392b" font-size="12" text-anchor="middle">Fx</text>
+<line x1="130.0" y1="138.0" x2="130.0" y2="88.0" stroke="#1e8449" stroke-width="2.0"/>
+<polygon points="130.0,88.0 133.1,96.5 126.9,96.5" fill="#1e8449" stroke="#1e8449" stroke-width="0.5"/>
+<text x="136.0" y="94.0" fill="#1e8449" font-size="12" text-anchor="start">Fy</text>
+<path d="M111.0,124.0 A30,30 0 0 0 111.0,176.0" fill="none" stroke="#1e8449" stroke-width="2.0"/>
+<polygon points="111.0,176.0 102.3,173.5 106.0,168.5" fill="#1e8449" stroke="#1e8449" stroke-width="0.5"/>
+<text x="80.0" y="194.0" fill="#1e8449" font-size="12" text-anchor="end">Mz</text>
+<line x1="338.0" y1="150.0" x2="384.0" y2="150.0" stroke="#c0392b" stroke-width="2.0"/>
+<polygon points="384.0,150.0 375.5,153.1 375.5,146.9" fill="#c0392b" stroke="#c0392b" stroke-width="0.5"/>
+<text x="388.0" y="154.0" fill="#c0392b" font-size="12" text-anchor="start">Fx</text>
+<line x1="330.0" y1="138.0" x2="330.0" y2="88.0" stroke="#1e8449" stroke-width="2.0"/>
+<polygon points="330.0,88.0 333.1,96.5 326.9,96.5" fill="#1e8449" stroke="#1e8449" stroke-width="0.5"/>
+<text x="336.0" y="94.0" fill="#1e8449" font-size="12" text-anchor="start">Fy</text>
+<path d="M349.0,176.0 A30,30 0 0 0 349.0,124.0" fill="none" stroke="#1e8449" stroke-width="2.0"/>
+<polygon points="349.0,124.0 357.7,126.5 354.0,131.5" fill="#1e8449" stroke="#1e8449" stroke-width="0.5"/>
+<text x="370.0" y="194.0" fill="#1e8449" font-size="12" text-anchor="start">Mz</text>
+<text x="90.0" y="228.0" fill="#6b7785" font-size="12" text-anchor="start">(a) member end forces: joint on member, +local axes at both ends</text>
+<polygon points="560.0,141.0 670.0,141.0 670.0,159.0 560.0,159.0" fill="#e4e9ef" stroke="#1f2933" stroke-width="1.2"/>
+<line x1="678.0" y1="150.0" x2="724.0" y2="150.0" stroke="#c0392b" stroke-width="2.0"/>
+<polygon points="724.0,150.0 715.5,153.1 715.5,146.9" fill="#c0392b" stroke="#c0392b" stroke-width="0.5"/>
+<text x="728.0" y="154.0" fill="#c0392b" font-size="12" text-anchor="start">N</text>
+<line x1="670.0" y1="138.0" x2="670.0" y2="88.0" stroke="#1e8449" stroke-width="2.0"/>
+<polygon points="670.0,88.0 673.1,96.5 666.9,96.5" fill="#1e8449" stroke="#1e8449" stroke-width="0.5"/>
+<text x="676.0" y="94.0" fill="#1e8449" font-size="12" text-anchor="start">Vy</text>
+<line x1="552.0" y1="150.0" x2="506.0" y2="150.0" stroke="#c0392b" stroke-width="2.0"/>
+<polygon points="506.0,150.0 514.5,146.9 514.5,153.1" fill="#c0392b" stroke="#c0392b" stroke-width="0.5"/>
+<text x="492.0" y="154.0" fill="#c0392b" font-size="12" text-anchor="start">N</text>
+<line x1="560.0" y1="162.0" x2="560.0" y2="212.0" stroke="#1e8449" stroke-width="2.0"/>
+<polygon points="560.0,212.0 556.9,203.5 563.1,203.5" fill="#1e8449" stroke="#1e8449" stroke-width="0.5"/>
+<text x="538.0" y="210.0" fill="#1e8449" font-size="12" text-anchor="start">Vy</text>
+<path d="M689.0,176.0 A30,30 0 0 0 689.0,124.0" fill="none" stroke="#1e8449" stroke-width="2.0"/>
+<polygon points="689.0,124.0 697.7,126.5 694.0,131.5" fill="#1e8449" stroke="#1e8449" stroke-width="0.5"/>
+<path d="M541.0,176.0 A30,30 0 0 1 541.0,124.0" fill="none" stroke="#1e8449" stroke-width="2.0"/>
+<polygon points="541.0,124.0 536.0,131.5 532.3,126.5" fill="#1e8449" stroke="#1e8449" stroke-width="0.5"/>
+<text x="710.0" y="194.0" fill="#1e8449" font-size="12" text-anchor="start">Mz</text>
+<text x="500.0" y="194.0" fill="#1e8449" font-size="12" text-anchor="start">Mz</text>
+<text x="658.0" y="180.0" fill="#6b7785" font-size="11" text-anchor="start">+x face</text>
+<text x="490.0" y="242.0" fill="#6b7785" font-size="12" text-anchor="start">(b) internal forces on a cut piece, positive as drawn</text>
+<text x="490.0" y="260.0" fill="#6b7785" font-size="12" text-anchor="start">Mz &gt; 0: tension on the -y side</text>
+<text x="20.0" y="308.0" fill="#1f2933" font-size="14" text-anchor="start" font-weight="bold">local x-z plane (y away from the viewer)</text>
+<line x1="30.0" y1="490.0" x2="75.0" y2="490.0" stroke="#c0392b" stroke-width="1.8"/>
+<polygon points="75.0,490.0 66.5,493.1 66.5,486.9" fill="#c0392b" stroke="#c0392b" stroke-width="0.5"/>
+<text x="80.0" y="494.0" fill="#c0392b" font-size="13" text-anchor="start" font-weight="bold" font-style="italic">x</text>
+<line x1="30.0" y1="490.0" x2="30.0" y2="445.0" stroke="#1f5fa8" stroke-width="1.8"/>
+<polygon points="30.0,445.0 33.1,453.5 26.9,453.5" fill="#1f5fa8" stroke="#1f5fa8" stroke-width="0.5"/>
+<text x="24.0" y="438.0" fill="#1f5fa8" font-size="13" text-anchor="start" font-weight="bold" font-style="italic">z</text>
+<polygon points="130.0,411.0 330.0,411.0 330.0,429.0 130.0,429.0" fill="#e4e9ef" stroke="#1f2933" stroke-width="1.2"/>
+<text x="124.0" y="454.0" fill="#1f2933" font-size="13" text-anchor="start" font-weight="bold">i</text>
+<text x="332.0" y="454.0" fill="#1f2933" font-size="13" text-anchor="start" font-weight="bold">j</text>
+<line x1="76.0" y1="420.0" x2="122.0" y2="420.0" stroke="#c0392b" stroke-width="2.0"/>
+<polygon points="122.0,420.0 113.5,423.1 113.5,416.9" fill="#c0392b" stroke="#c0392b" stroke-width="0.5"/>
+<text x="60.0" y="414.0" fill="#c0392b" font-size="12" text-anchor="middle">Fx</text>
+<line x1="130.0" y1="408.0" x2="130.0" y2="358.0" stroke="#1f5fa8" stroke-width="2.0"/>
+<polygon points="130.0,358.0 133.1,366.5 126.9,366.5" fill="#1f5fa8" stroke="#1f5fa8" stroke-width="0.5"/>
+<text x="136.0" y="364.0" fill="#1f5fa8" font-size="12" text-anchor="start">Fz</text>
+<path d="M111.0,446.0 A30,30 0 0 1 111.0,394.0" fill="none" stroke="#1f5fa8" stroke-width="2.0"/>
+<polygon points="111.0,394.0 106.0,401.5 102.3,396.5" fill="#1f5fa8" stroke="#1f5fa8" stroke-width="0.5"/>
+<text x="80.0" y="464.0" fill="#1f5fa8" font-size="12" text-anchor="end">My</text>
+<line x1="338.0" y1="420.0" x2="384.0" y2="420.0" stroke="#c0392b" stroke-width="2.0"/>
+<polygon points="384.0,420.0 375.5,423.1 375.5,416.9" fill="#c0392b" stroke="#c0392b" stroke-width="0.5"/>
+<text x="388.0" y="424.0" fill="#c0392b" font-size="12" text-anchor="start">Fx</text>
+<line x1="330.0" y1="408.0" x2="330.0" y2="358.0" stroke="#1f5fa8" stroke-width="2.0"/>
+<polygon points="330.0,358.0 333.1,366.5 326.9,366.5" fill="#1f5fa8" stroke="#1f5fa8" stroke-width="0.5"/>
+<text x="336.0" y="364.0" fill="#1f5fa8" font-size="12" text-anchor="start">Fz</text>
+<path d="M349.0,394.0 A30,30 0 0 1 349.0,446.0" fill="none" stroke="#1f5fa8" stroke-width="2.0"/>
+<polygon points="349.0,446.0 354.0,438.5 357.7,443.5" fill="#1f5fa8" stroke="#1f5fa8" stroke-width="0.5"/>
+<text x="370.0" y="464.0" fill="#1f5fa8" font-size="12" text-anchor="start">My</text>
+<text x="90.0" y="498.0" fill="#6b7785" font-size="12" text-anchor="start">(a) member end forces: joint on member, +local axes at both ends</text>
+<polygon points="560.0,411.0 670.0,411.0 670.0,429.0 560.0,429.0" fill="#e4e9ef" stroke="#1f2933" stroke-width="1.2"/>
+<line x1="678.0" y1="420.0" x2="724.0" y2="420.0" stroke="#c0392b" stroke-width="2.0"/>
+<polygon points="724.0,420.0 715.5,423.1 715.5,416.9" fill="#c0392b" stroke="#c0392b" stroke-width="0.5"/>
+<text x="728.0" y="424.0" fill="#c0392b" font-size="12" text-anchor="start">N</text>
+<line x1="670.0" y1="408.0" x2="670.0" y2="358.0" stroke="#1f5fa8" stroke-width="2.0"/>
+<polygon points="670.0,358.0 673.1,366.5 666.9,366.5" fill="#1f5fa8" stroke="#1f5fa8" stroke-width="0.5"/>
+<text x="676.0" y="364.0" fill="#1f5fa8" font-size="12" text-anchor="start">Vz</text>
+<line x1="552.0" y1="420.0" x2="506.0" y2="420.0" stroke="#c0392b" stroke-width="2.0"/>
+<polygon points="506.0,420.0 514.5,416.9 514.5,423.1" fill="#c0392b" stroke="#c0392b" stroke-width="0.5"/>
+<text x="492.0" y="424.0" fill="#c0392b" font-size="12" text-anchor="start">N</text>
+<line x1="560.0" y1="432.0" x2="560.0" y2="482.0" stroke="#1f5fa8" stroke-width="2.0"/>
+<polygon points="560.0,482.0 556.9,473.5 563.1,473.5" fill="#1f5fa8" stroke="#1f5fa8" stroke-width="0.5"/>
+<text x="538.0" y="480.0" fill="#1f5fa8" font-size="12" text-anchor="start">Vz</text>
+<path d="M689.0,394.0 A30,30 0 0 1 689.0,446.0" fill="none" stroke="#1f5fa8" stroke-width="2.0"/>
+<polygon points="689.0,446.0 694.0,438.5 697.7,443.5" fill="#1f5fa8" stroke="#1f5fa8" stroke-width="0.5"/>
+<path d="M541.0,394.0 A30,30 0 0 0 541.0,446.0" fill="none" stroke="#1f5fa8" stroke-width="2.0"/>
+<polygon points="541.0,446.0 532.3,443.5 536.0,438.5" fill="#1f5fa8" stroke="#1f5fa8" stroke-width="0.5"/>
+<text x="710.0" y="464.0" fill="#1f5fa8" font-size="12" text-anchor="start">My</text>
+<text x="500.0" y="390.0" fill="#1f5fa8" font-size="12" text-anchor="start">My</text>
+<text x="658.0" y="450.0" fill="#6b7785" font-size="11" text-anchor="start">+x face</text>
+<text x="490.0" y="512.0" fill="#6b7785" font-size="12" text-anchor="start">(b) internal forces on a cut piece, positive as drawn</text>
+<text x="490.0" y="530.0" fill="#6b7785" font-size="12" text-anchor="start">My &gt; 0: tension on the +z side</text>
+<text x="20.0" y="566.0" fill="#6b7785" font-size="12" text-anchor="start">Station forces at x = L equal the end forces at j; at x = 0 they are minus the end forces at i.  T and Mx follow the right-hand rule about +x.</text>
+</svg>

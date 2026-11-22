@@ -1,0 +1,8 @@
+__pycache__/
+*.egg-info/
+.pytest_cache/
+build/
+dist/
+# User-supplied, non-redistributable data (e.g. the AISC Shapes Database) never enters the repo.
+data/user/*
+!data/user/README.md

@@ -1,0 +1,33 @@
+{
+  "formatVersion": "1.0.0",
+  "units": {"force": "kN", "length": "m"},
+  "conventions": {"verticalAxis": "Z"},
+  "nodes": {
+    "A": {"x": 0, "y": 0, "z": 0},
+    "A2": {"x": 0, "y": 0, "z": 0},
+    "B": {"x": 4, "y": 0, "z": 0},
+    "C": {"x": 4, "y": 0, "z": 3}
+  },
+  "supports": {"A": {"type": "fixed"}, "A2": {"type": "fixed"}},
+  "materials": {"S": {"E": 2e8, "nu": 0.3}},
+  "sections": {
+    "I1": {"type": "I", "d": 0.3, "bf": 0.15, "tf": 0.16, "tw": 0.2, "r": 0.1},
+    "P1": {"type": "pipe", "D": 0.1, "t": 0.05},
+    "X1": {"type": "box", "H": 0.2, "B": 0.1, "t": 0.06},
+    "R": {"type": "rectangle", "h": 0.3, "b": 0.2}
+  },
+  "members": {
+    "zero": {"i": "A", "j": "A2", "section": "R", "material": "S"},
+    "same": {"i": "B", "j": "B", "section": "R", "material": "S"},
+    "offs": {"i": "A", "j": "B", "section": "R", "material": "S",
+             "offsets": {"i": [2, 0, 0], "j": [-2, 0, 0]}},
+    "refpar": {"i": "A", "j": "B", "section": "R", "material": "S",
+               "orientation": {"referenceVector": [-3, 0, 0]}},
+    "refzero": {"i": "B", "j": "C", "section": "R", "material": "S",
+                "orientation": {"referenceVector": [0, 0, 0]}},
+    "ok": {"i": "B", "j": "C", "section": "R", "material": "S",
+           "orientation": {"referenceVector": [0, 1, 0], "roll": 30}}
+  },
+  "loadCases": {"D": {"loads": [{"type": "nodal", "node": "C", "Fx": 1}]}},
+  "combinations": {"C1": {"factors": {"D": 1.0}}}
+}

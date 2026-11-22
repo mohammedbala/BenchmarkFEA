@@ -1,0 +1,2513 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:benchfea:schema:input:1.0",
+  "title": "BenchFEA input file, format 1.0",
+  "description": "Everything needed to analyse and design a 3D frame structure. Collections are objects keyed by id, so JSON pointers such as /members/B1/section stay valid when items are added or removed. All dimensional numbers are in the consistent units built from units.force and units.length.",
+  "type": "object",
+  "x-unit": "n/a",
+  "additionalProperties": false,
+  "required": [
+    "formatVersion",
+    "units",
+    "conventions",
+    "nodes",
+    "materials",
+    "sections",
+    "members",
+    "loadCases",
+    "combinations"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Optional pointer to this schema for editors.",
+      "x-unit": "n/a"
+    },
+    "formatVersion": {
+      "type": "string",
+      "description": "Version of the file format (semantic versioning, see docs/FORMAT_VERSIONING.md).",
+      "x-unit": "n/a",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Short model name.",
+      "x-unit": "n/a"
+    },
+    "description": {
+      "type": "string",
+      "description": "Free text.",
+      "x-unit": "n/a"
+    },
+    "units": {
+      "type": "object",
+      "description": "Units of every dimensional number in the file.",
+      "x-unit": "n/a",
+      "properties": {
+        "force": {
+          "enum": [
+            "N",
+            "kN",
+            "lbf",
+            "kip"
+          ],
+          "description": "Force unit.",
+          "x-unit": "n/a"
+        },
+        "length": {
+          "enum": [
+            "mm",
+            "m",
+            "in",
+            "ft"
+          ],
+          "description": "Length unit.",
+          "x-unit": "n/a"
+        }
+      },
+      "required": [
+        "force",
+        "length"
+      ],
+      "additionalProperties": false
+    },
+    "conventions": {
+      "type": "object",
+      "description": "Sign and axis conventions of this file. Only the listed values are supported; anything else is refused. Explained in docs/CONVENTIONS.md.",
+      "x-unit": "n/a",
+      "properties": {
+        "verticalAxis": {
+          "enum": [
+            "Y",
+            "Z"
+          ],
+          "description": "Global axis that points up. Sets the default member orientation, the default gravity direction (negative vertical) and the default diaphragm normal.",
+          "x-unit": "n/a"
+        },
+        "handedness": {
+          "enum": [
+            "right"
+          ],
+          "description": "Global and local axes are right-handed.",
+          "x-unit": "n/a",
+          "default": "right"
+        },
+        "rotations": {
+          "enum": [
+            "right-hand-rule"
+          ],
+          "description": "Rotations and moments are positive by the right-hand rule about the positive axis.",
+          "x-unit": "n/a",
+          "default": "right-hand-rule"
+        },
+        "memberLocalX": {
+          "enum": [
+            "i-to-j"
+          ],
+          "description": "Member local x runs from node i to node j.",
+          "x-unit": "n/a",
+          "default": "i-to-j"
+        },
+        "defaultOrientation": {
+          "enum": [
+            "y-toward-vertical"
+          ],
+          "description": "Default rule for local y and z (see member.orientation).",
+          "x-unit": "n/a",
+          "default": "y-toward-vertical"
+        },
+        "memberEndForces": {
+          "enum": [
+            "on-member-local"
+          ],
+          "description": "Member end forces are the forces and moments the joints exert on the member ends, in member local axes.",
+          "x-unit": "n/a",
+          "default": "on-member-local"
+        },
+        "internalForces": {
+          "enum": [
+            "positive-face"
+          ],
+          "description": "Internal forces are the stress resultants acting on the cross-section face whose outward normal is +local x, as components along the local axes (axial tension positive).",
+          "x-unit": "n/a",
+          "default": "positive-face"
+        },
+        "reactions": {
+          "enum": [
+            "on-structure-global"
+          ],
+          "description": "Reactions are the forces and moments the supports exert on the structure, in global axes.",
+          "x-unit": "n/a",
+          "default": "on-structure-global"
+        },
+        "loads": {
+          "enum": [
+            "along-positive-axes"
+          ],
+          "description": "Load values are positive along (forces) or about (moments) the positive axis of their direction.",
+          "x-unit": "n/a",
+          "default": "along-positive-axes"
+        }
+      },
+      "required": [
+        "verticalAxis"
+      ],
+      "additionalProperties": false
+    },
+    "nodes": {
+      "type": "object",
+      "description": "Nodes, keyed by node id.",
+      "x-unit": "n/a",
+      "propertyNames": {
+        "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.\\-]*$",
+        "maxLength": 64
+      },
+      "additionalProperties": {
+        "type": "object",
+        "description": "Node position in global axes.",
+        "x-unit": "n/a",
+        "properties": {
+          "x": {
+            "type": "number",
+            "description": "Global X coordinate.",
+            "x-unit": "length"
+          },
+          "y": {
+            "type": "number",
+            "description": "Global Y coordinate.",
+            "x-unit": "length"
+          },
+          "z": {
+            "type": "number",
+            "description": "Global Z coordinate.",
+            "x-unit": "length",
+            "default": 0.0
+          }
+        },
+        "required": [
+          "x",
+          "y"
+        ],
+        "additionalProperties": false
+      },
+      "minProperties": 1
+    },
+    "supports": {
+      "type": "object",
+      "description": "Supports, keyed by the id of the supported node.",
+      "x-unit": "n/a",
+      "propertyNames": {
+        "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.\\-]*$",
+        "maxLength": 64
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/support"
+      },
+      "default": {}
+    },
+    "materials": {
+      "type": "object",
+      "description": "Materials, keyed by id.",
+      "x-unit": "n/a",
+      "propertyNames": {
+        "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.\\-]*$",
+        "maxLength": 64
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/material"
+      }
+    },
+    "sections": {
+      "type": "object",
+      "description": "Sections, keyed by id.",
+      "x-unit": "n/a",
+      "propertyNames": {
+        "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.\\-]*$",
+        "maxLength": 64
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/section"
+      }
+    },
+    "members": {
+      "type": "object",
+      "description": "Members, keyed by id.",
+      "x-unit": "n/a",
+      "propertyNames": {
+        "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.\\-]*$",
+        "maxLength": 64
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/member"
+      },
+      "minProperties": 1
+    },
+    "constraints": {
+      "type": "object",
+      "description": "Rigid links and rigid diaphragms, keyed by id.",
+      "x-unit": "n/a",
+      "propertyNames": {
+        "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.\\-]*$",
+        "maxLength": 64
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/constraint"
+      },
+      "default": {}
+    },
+    "loadCases": {
+      "type": "object",
+      "description": "Load cases, keyed by id.",
+      "x-unit": "n/a",
+      "propertyNames": {
+        "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.\\-]*$",
+        "maxLength": 64
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/loadCase"
+      }
+    },
+    "combinations": {
+      "type": "object",
+      "description": "Load combinations, keyed by id. Results are produced per combination.",
+      "x-unit": "n/a",
+      "propertyNames": {
+        "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.\\-]*$",
+        "maxLength": 64
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/combination"
+      },
+      "minProperties": 1
+    },
+    "analysis": {
+      "type": "object",
+      "description": "Analysis options. Everything here AFFECTS ANALYSIS.",
+      "x-unit": "n/a",
+      "properties": {
+        "type": {
+          "enum": [
+            "firstOrder",
+            "secondOrder"
+          ],
+          "description": "Default analysis type of combinations: firstOrder = linear elastic; secondOrder = geometrically nonlinear (geometric stiffness updated iteratively, P-Delta and P-delta).",
+          "x-unit": "n/a",
+          "default": "firstOrder"
+        },
+        "shearDeformation": {
+          "type": "boolean",
+          "description": "Include shear deformation (Timoshenko beam) using the section shear areas.",
+          "x-unit": "n/a",
+          "default": true
+        },
+        "resultStations": {
+          "type": "integer",
+          "description": "Number of equally spaced result stations per member, ends included.",
+          "x-unit": "dimensionless",
+          "minimum": 2,
+          "maximum": 1001,
+          "default": 11
+        },
+        "convergenceTolerance": {
+          "type": "number",
+          "description": "Iterative analyses stop when the norm of the displacement change is below this fraction of the displacement norm.",
+          "x-unit": "dimensionless",
+          "exclusiveMinimum": 0,
+          "default": 1e-06
+        },
+        "maxIterations": {
+          "type": "integer",
+          "description": "Maximum iterations (second-order, tension/compression-only).",
+          "x-unit": "dimensionless",
+          "minimum": 1,
+          "default": 50
+        },
+        "alpha": {
+          "type": "number",
+          "description": "Second-order analyses are run at alpha times the combination loads and the results divided by alpha (AISC 360-22 C2.1(d): 1.0 for LRFD, 1.6 for ASD).",
+          "x-unit": "dimensionless",
+          "exclusiveMinimum": 0,
+          "default": 1.0
+        },
+        "equilibriumTolerance": {
+          "type": "number",
+          "description": "Largest relative out-of-balance force accepted in the invariants report.",
+          "x-unit": "dimensionless",
+          "exclusiveMinimum": 0,
+          "default": 1e-06
+        },
+        "pivotTolerance": {
+          "type": "number",
+          "description": "Relative pivot size below which the stiffness matrix is declared singular (mechanism).",
+          "x-unit": "dimensionless",
+          "exclusiveMinimum": 0,
+          "default": 1e-10
+        },
+        "geometryTolerance": {
+          "type": "number",
+          "description": "Lengths smaller than this fraction of the model size count as zero.",
+          "x-unit": "dimensionless",
+          "exclusiveMinimum": 0,
+          "default": 1e-09
+        },
+        "buckling": {
+          "type": "object",
+          "description": "Linear (eigenvalue) buckling analysis. Absent: not performed.",
+          "x-unit": "n/a",
+          "properties": {
+            "combinations": {
+              "type": "array",
+              "description": "Reference combinations: buckling factors multiply these loadings.",
+              "x-unit": "n/a",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.\\-]*$",
+                "description": "An id.",
+                "x-unit": "n/a"
+              },
+              "minItems": 1
+            },
+            "modes": {
+              "type": "integer",
+              "description": "Number of buckling modes per reference combination.",
+              "x-unit": "dimensionless",
+              "minimum": 1,
+              "default": 3
+            }
+          },
+          "required": [
+            "combinations"
+          ],
+          "additionalProperties": false
+        },
+        "stiffnessReduction": {
+          "type": "object",
+          "description": "Stiffness reduction for stability design (AISC 360-22 C2.3). Used only in combinations with stiffnessReduction = true.",
+          "x-unit": "n/a",
+          "properties": {
+            "factor": {
+              "type": "number",
+              "description": "Factor applied to all member stiffnesses (EA, EI, GJ, GAs).",
+              "x-unit": "dimensionless",
+              "exclusiveMinimum": 0,
+              "maximum": 1,
+              "default": 0.8
+            },
+            "tauB": {
+              "description": "Additional factor tau_b on flexural stiffness: \"computed\" (Eq. C2-2a/b from the member axial force, Pns = Fy*A), \"none\" (1.0), or a number.",
+              "x-unit": "dimensionless",
+              "default": "computed",
+              "x-hint": "Use \"computed\", \"none\" or a number in (0, 1].",
+              "anyOf": [
+                {
+                  "enum": [
+                    "computed",
+                    "none"
+                  ]
+                },
+                {
+                  "type": "number",
+                  "exclusiveMinimum": 0,
+                  "maximum": 1
+                }
+              ]
+            },
+            "members": {
+              "type": "array",
+              "description": "Members whose stiffness is reduced. Default: all members.",
+              "x-unit": "n/a",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.\\-]*$",
+                "description": "An id.",
+                "x-unit": "n/a"
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "design": {
+      "type": "object",
+      "x-unit": "n/a",
+      "description": "Design input. Design-only data: nothing in this block can change analysis results.",
+      "additionalProperties": false,
+      "properties": {
+        "autoMembers": {
+          "type": "boolean",
+          "description": "true: every analysis member that is not part of an explicit design member is a design member by itself, with the same id.",
+          "x-unit": "n/a",
+          "default": true
+        },
+        "defaults": {
+          "$ref": "#/$defs/designVariables",
+          "description": "Design variables applied to every design member unless overridden by a group or the member.",
+          "x-unit": "n/a",
+          "unevaluatedProperties": false
+        },
+        "groups": {
+          "type": "object",
+          "description": "Design groups: variables shared by several design members.",
+          "x-unit": "n/a",
+          "propertyNames": {
+            "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.\\-]*$",
+            "maxLength": 64
+          },
+          "additionalProperties": {
+            "type": "object",
+            "x-unit": "n/a",
+            "description": "A design group.",
+            "allOf": [
+              {
+                "$ref": "#/$defs/designVariables"
+              }
+            ],
+            "required": [
+              "members"
+            ],
+            "properties": {
+              "members": {
+                "type": "array",
+                "description": "Design member ids in this group.",
+                "x-unit": "n/a",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.\\-]*$",
+                  "description": "An id.",
+                  "x-unit": "n/a"
+                },
+                "minItems": 1
+              },
+              "priority": {
+                "type": "integer",
+                "description": "When a design member is in several groups that set the same variable, the group with the highest priority wins; equal priority with different values is an error.",
+                "x-unit": "dimensionless",
+                "default": 0
+              }
+            },
+            "unevaluatedProperties": false
+          }
+        },
+        "members": {
+          "type": "object",
+          "description": "Design members. A design member is one analysis member or a chain of collinear analysis members (a physical member split at nodes).",
+          "x-unit": "n/a",
+          "propertyNames": {
+            "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.\\-]*$",
+            "maxLength": 64
+          },
+          "additionalProperties": {
+            "type": "object",
+            "x-unit": "n/a",
+            "description": "A design member with its own variables.",
+            "allOf": [
+              {
+                "$ref": "#/$defs/designVariables"
+              }
+            ],
+            "properties": {
+              "members": {
+                "type": "array",
+                "description": "Analysis member ids forming this design member, in order from its start to its end. Default: the single analysis member whose id equals this design member's id.",
+                "x-unit": "n/a",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.\\-]*$",
+                  "description": "An id.",
+                  "x-unit": "n/a"
+                },
+                "minItems": 1
+              }
+            },
+            "unevaluatedProperties": false
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "support": {
+      "type": "object",
+      "description": "Support at a node (the key is the node id). Give `type` (shorthand), `dofs` (per-DOF), or both; entries in `dofs` override the shorthand. DOFs not mentioned are free. Imposed support displacements are loads (`supportDisplacement`) acting on fixed DOFs.",
+      "x-unit": "n/a",
+      "properties": {
+        "type": {
+          "enum": [
+            "fixed",
+            "pinned",
+            "roller"
+          ],
+          "description": "Shorthand: fixed = all six DOFs fixed; pinned = ux, uy, uz fixed; roller = only the translation along the vertical axis fixed.",
+          "x-unit": "n/a"
+        },
+        "dofs": {
+          "type": "object",
+          "description": "Per-DOF restraint in global axes.",
+          "x-unit": "n/a",
+          "properties": {
+            "ux": {
+              "description": "Restraint of this translational DOF: \"fixed\", \"free\", or {\"spring\": k} (linear elastic spring to ground).",
+              "x-unit": "n/a",
+              "x-hint": "Use \"fixed\", \"free\" or {\"spring\": <stiffness > 0>}.",
+              "anyOf": [
+                {
+                  "enum": [
+                    "fixed",
+                    "free"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "description": "Elastic spring support.",
+                  "x-unit": "n/a",
+                  "properties": {
+                    "spring": {
+                      "type": "number",
+                      "description": "Spring stiffness to ground.",
+                      "x-unit": "force/length",
+                      "exclusiveMinimum": 0
+                    }
+                  },
+                  "required": [
+                    "spring"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            },
+            "uy": {
+              "description": "Restraint of this translational DOF: \"fixed\", \"free\", or {\"spring\": k} (linear elastic spring to ground).",
+              "x-unit": "n/a",
+              "x-hint": "Use \"fixed\", \"free\" or {\"spring\": <stiffness > 0>}.",
+              "anyOf": [
+                {
+                  "enum": [
+                    "fixed",
+                    "free"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "description": "Elastic spring support.",
+                  "x-unit": "n/a",
+                  "properties": {
+                    "spring": {
+                      "type": "number",
+                      "description": "Spring stiffness to ground.",
+                      "x-unit": "force/length",
+                      "exclusiveMinimum": 0
+                    }
+                  },
+                  "required": [
+                    "spring"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            },
+            "uz": {
+              "description": "Restraint of this translational DOF: \"fixed\", \"free\", or {\"spring\": k} (linear elastic spring to ground).",
+              "x-unit": "n/a",
+              "x-hint": "Use \"fixed\", \"free\" or {\"spring\": <stiffness > 0>}.",
+              "anyOf": [
+                {
+                  "enum": [
+                    "fixed",
+                    "free"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "description": "Elastic spring support.",
+                  "x-unit": "n/a",
+                  "properties": {
+                    "spring": {
+                      "type": "number",
+                      "description": "Spring stiffness to ground.",
+                      "x-unit": "force/length",
+                      "exclusiveMinimum": 0
+                    }
+                  },
+                  "required": [
+                    "spring"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            },
+            "rx": {
+              "description": "Restraint of this rotational DOF: \"fixed\", \"free\", or {\"spring\": k} (linear elastic spring to ground).",
+              "x-unit": "n/a",
+              "x-hint": "Use \"fixed\", \"free\" or {\"spring\": <stiffness > 0>}.",
+              "anyOf": [
+                {
+                  "enum": [
+                    "fixed",
+                    "free"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "description": "Elastic spring support.",
+                  "x-unit": "n/a",
+                  "properties": {
+                    "spring": {
+                      "type": "number",
+                      "description": "Spring stiffness to ground.",
+                      "x-unit": "moment/rotation",
+                      "exclusiveMinimum": 0
+                    }
+                  },
+                  "required": [
+                    "spring"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            },
+            "ry": {
+              "description": "Restraint of this rotational DOF: \"fixed\", \"free\", or {\"spring\": k} (linear elastic spring to ground).",
+              "x-unit": "n/a",
+              "x-hint": "Use \"fixed\", \"free\" or {\"spring\": <stiffness > 0>}.",
+              "anyOf": [
+                {
+                  "enum": [
+                    "fixed",
+                    "free"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "description": "Elastic spring support.",
+                  "x-unit": "n/a",
+                  "properties": {
+                    "spring": {
+                      "type": "number",
+                      "description": "Spring stiffness to ground.",
+                      "x-unit": "moment/rotation",
+                      "exclusiveMinimum": 0
+                    }
+                  },
+                  "required": [
+                    "spring"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            },
+            "rz": {
+              "description": "Restraint of this rotational DOF: \"fixed\", \"free\", or {\"spring\": k} (linear elastic spring to ground).",
+              "x-unit": "n/a",
+              "x-hint": "Use \"fixed\", \"free\" or {\"spring\": <stiffness > 0>}.",
+              "anyOf": [
+                {
+                  "enum": [
+                    "fixed",
+                    "free"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "description": "Elastic spring support.",
+                  "x-unit": "n/a",
+                  "properties": {
+                    "spring": {
+                      "type": "number",
+                      "description": "Spring stiffness to ground.",
+                      "x-unit": "moment/rotation",
+                      "exclusiveMinimum": 0
+                    }
+                  },
+                  "required": [
+                    "spring"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "required": [
+            "type"
+          ]
+        },
+        {
+          "required": [
+            "dofs"
+          ]
+        }
+      ],
+      "x-hint": "A support needs `type` and/or `dofs`."
+    },
+    "material": {
+      "type": "object",
+      "description": "Linear elastic isotropic material. Give G or nu (or both; G is used for stiffness).",
+      "x-unit": "n/a",
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Free text, e.g. the steel grade designation.",
+          "x-unit": "n/a"
+        },
+        "E": {
+          "type": "number",
+          "description": "Modulus of elasticity.",
+          "x-unit": "force/length^2",
+          "exclusiveMinimum": 0
+        },
+        "G": {
+          "type": "number",
+          "description": "Shear modulus. Default: E / (2 (1 + nu)).",
+          "x-unit": "force/length^2",
+          "exclusiveMinimum": 0
+        },
+        "nu": {
+          "type": "number",
+          "description": "Poisson's ratio, used only to derive G when G is absent.",
+          "x-unit": "dimensionless",
+          "minimum": 0,
+          "exclusiveMaximum": 0.5
+        },
+        "unitWeight": {
+          "type": "number",
+          "description": "Weight per unit volume, used by selfWeight loads.",
+          "x-unit": "force/length^3",
+          "minimum": 0,
+          "default": 0.0
+        },
+        "Fy": {
+          "type": "number",
+          "description": "Specified minimum yield stress. Required for design checks and for computed tau_b.",
+          "x-unit": "force/length^2",
+          "exclusiveMinimum": 0
+        },
+        "Fu": {
+          "type": "number",
+          "description": "Specified minimum tensile strength. Required for design checks.",
+          "x-unit": "force/length^2",
+          "exclusiveMinimum": 0
+        }
+      },
+      "required": [
+        "E"
+      ],
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "required": [
+            "G"
+          ]
+        },
+        {
+          "required": [
+            "nu"
+          ]
+        }
+      ],
+      "x-hint": "A material needs `G` or `nu` in addition to `E`."
+    },
+    "section": {
+      "type": "object",
+      "x-unit": "n/a",
+      "description": "Prismatic cross-section. `type` selects how it is defined: by standard shape name (user-supplied AISC Shapes Database), by properties, or by parametric dimensions from which the engine computes the properties. Section axes: y = depth direction (web of an I-shape), z = width direction (parallel to the flanges); AISC x-x (major) axis = local z, AISC y-y (minor) axis = local y.",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "standard",
+            "properties",
+            "I",
+            "box",
+            "pipe",
+            "rectangle"
+          ],
+          "description": "Kind of definition.",
+          "x-unit": "n/a"
+        },
+        "description": {
+          "type": "string",
+          "description": "Free text.",
+          "x-unit": "n/a"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "standard"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "shape": {
+                "type": "string",
+                "description": "Shape designation exactly as in the AISC Shapes Database v16.0 (e.g. \"W14X90\"). Needs the user-supplied database file.",
+                "x-unit": "n/a",
+                "minLength": 1
+              },
+              "overrides": {
+                "type": "object",
+                "description": "Explicit values that replace the computed/looked-up section properties (e.g. a tabulated J or a shear area from a refined theory).",
+                "x-unit": "n/a",
+                "properties": {
+                  "A": {
+                    "type": "number",
+                    "description": "Cross-sectional area.",
+                    "x-unit": "length^2",
+                    "exclusiveMinimum": 0
+                  },
+                  "Iy": {
+                    "type": "number",
+                    "description": "Second moment of area about local y.",
+                    "x-unit": "length^4",
+                    "exclusiveMinimum": 0
+                  },
+                  "Iz": {
+                    "type": "number",
+                    "description": "Second moment of area about local z.",
+                    "x-unit": "length^4",
+                    "exclusiveMinimum": 0
+                  },
+                  "J": {
+                    "type": "number",
+                    "description": "Saint-Venant torsion constant.",
+                    "x-unit": "length^4",
+                    "exclusiveMinimum": 0
+                  },
+                  "Asy": {
+                    "type": "number",
+                    "description": "Shear area for shear force along local y.",
+                    "x-unit": "length^2",
+                    "exclusiveMinimum": 0
+                  },
+                  "Asz": {
+                    "type": "number",
+                    "description": "Shear area for shear force along local z.",
+                    "x-unit": "length^2",
+                    "exclusiveMinimum": 0
+                  },
+                  "Cw": {
+                    "type": "number",
+                    "description": "Warping constant.",
+                    "x-unit": "length^6",
+                    "minimum": 0
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "shape"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "properties"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "A": {
+                "type": "number",
+                "description": "Cross-sectional area.",
+                "x-unit": "length^2",
+                "exclusiveMinimum": 0
+              },
+              "Iy": {
+                "type": "number",
+                "description": "Second moment of area about local y (AISC minor axis for an I-shape).",
+                "x-unit": "length^4",
+                "exclusiveMinimum": 0
+              },
+              "Iz": {
+                "type": "number",
+                "description": "Second moment of area about local z (AISC major axis for an I-shape).",
+                "x-unit": "length^4",
+                "exclusiveMinimum": 0
+              },
+              "J": {
+                "type": "number",
+                "description": "Saint-Venant torsion constant.",
+                "x-unit": "length^4",
+                "exclusiveMinimum": 0
+              },
+              "Asy": {
+                "type": "number",
+                "description": "Shear area for shear along local y. Absent: no shear deformation in that direction.",
+                "x-unit": "length^2",
+                "exclusiveMinimum": 0
+              },
+              "Asz": {
+                "type": "number",
+                "description": "Shear area for shear along local z. Absent: no shear deformation in that direction.",
+                "x-unit": "length^2",
+                "exclusiveMinimum": 0
+              },
+              "Cw": {
+                "type": "number",
+                "description": "Warping constant (design only; warping torsion is not analysed).",
+                "x-unit": "length^6",
+                "minimum": 0,
+                "default": 0.0
+              },
+              "Sy": {
+                "type": "number",
+                "description": "Elastic section modulus about local y (design only).",
+                "x-unit": "length^3",
+                "exclusiveMinimum": 0
+              },
+              "Sz": {
+                "type": "number",
+                "description": "Elastic section modulus about local z (design only).",
+                "x-unit": "length^3",
+                "exclusiveMinimum": 0
+              },
+              "Zy": {
+                "type": "number",
+                "description": "Plastic section modulus about local y (design only).",
+                "x-unit": "length^3",
+                "exclusiveMinimum": 0
+              },
+              "Zz": {
+                "type": "number",
+                "description": "Plastic section modulus about local z (design only).",
+                "x-unit": "length^3",
+                "exclusiveMinimum": 0
+              }
+            },
+            "required": [
+              "A",
+              "Iy",
+              "Iz",
+              "J"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "I"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "d": {
+                "type": "number",
+                "description": "Overall depth (along local y).",
+                "x-unit": "length",
+                "exclusiveMinimum": 0
+              },
+              "bf": {
+                "type": "number",
+                "description": "Flange width (along local z); both flanges equal.",
+                "x-unit": "length",
+                "exclusiveMinimum": 0
+              },
+              "tf": {
+                "type": "number",
+                "description": "Flange thickness.",
+                "x-unit": "length",
+                "exclusiveMinimum": 0
+              },
+              "tw": {
+                "type": "number",
+                "description": "Web thickness.",
+                "x-unit": "length",
+                "exclusiveMinimum": 0
+              },
+              "r": {
+                "type": "number",
+                "description": "Web-to-flange fillet radius.",
+                "x-unit": "length",
+                "minimum": 0,
+                "default": 0.0
+              },
+              "overrides": {
+                "type": "object",
+                "description": "Explicit values that replace the computed/looked-up section properties (e.g. a tabulated J or a shear area from a refined theory).",
+                "x-unit": "n/a",
+                "properties": {
+                  "A": {
+                    "type": "number",
+                    "description": "Cross-sectional area.",
+                    "x-unit": "length^2",
+                    "exclusiveMinimum": 0
+                  },
+                  "Iy": {
+                    "type": "number",
+                    "description": "Second moment of area about local y.",
+                    "x-unit": "length^4",
+                    "exclusiveMinimum": 0
+                  },
+                  "Iz": {
+                    "type": "number",
+                    "description": "Second moment of area about local z.",
+                    "x-unit": "length^4",
+                    "exclusiveMinimum": 0
+                  },
+                  "J": {
+                    "type": "number",
+                    "description": "Saint-Venant torsion constant.",
+                    "x-unit": "length^4",
+                    "exclusiveMinimum": 0
+                  },
+                  "Asy": {
+                    "type": "number",
+                    "description": "Shear area for shear force along local y.",
+                    "x-unit": "length^2",
+                    "exclusiveMinimum": 0
+                  },
+                  "Asz": {
+                    "type": "number",
+                    "description": "Shear area for shear force along local z.",
+                    "x-unit": "length^2",
+                    "exclusiveMinimum": 0
+                  },
+                  "Cw": {
+                    "type": "number",
+                    "description": "Warping constant.",
+                    "x-unit": "length^6",
+                    "minimum": 0
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "d",
+              "bf",
+              "tf",
+              "tw"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "box"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "H": {
+                "type": "number",
+                "description": "Overall depth (along local y).",
+                "x-unit": "length",
+                "exclusiveMinimum": 0
+              },
+              "B": {
+                "type": "number",
+                "description": "Overall width (along local z).",
+                "x-unit": "length",
+                "exclusiveMinimum": 0
+              },
+              "t": {
+                "type": "number",
+                "description": "Wall thickness (uniform, sharp corners).",
+                "x-unit": "length",
+                "exclusiveMinimum": 0
+              },
+              "overrides": {
+                "type": "object",
+                "description": "Explicit values that replace the computed/looked-up section properties (e.g. a tabulated J or a shear area from a refined theory).",
+                "x-unit": "n/a",
+                "properties": {
+                  "A": {
+                    "type": "number",
+                    "description": "Cross-sectional area.",
+                    "x-unit": "length^2",
+                    "exclusiveMinimum": 0
+                  },
+                  "Iy": {
+                    "type": "number",
+                    "description": "Second moment of area about local y.",
+                    "x-unit": "length^4",
+                    "exclusiveMinimum": 0
+                  },
+                  "Iz": {
+                    "type": "number",
+                    "description": "Second moment of area about local z.",
+                    "x-unit": "length^4",
+                    "exclusiveMinimum": 0
+                  },
+                  "J": {
+                    "type": "number",
+                    "description": "Saint-Venant torsion constant.",
+                    "x-unit": "length^4",
+                    "exclusiveMinimum": 0
+                  },
+                  "Asy": {
+                    "type": "number",
+                    "description": "Shear area for shear force along local y.",
+                    "x-unit": "length^2",
+                    "exclusiveMinimum": 0
+                  },
+                  "Asz": {
+                    "type": "number",
+                    "description": "Shear area for shear force along local z.",
+                    "x-unit": "length^2",
+                    "exclusiveMinimum": 0
+                  },
+                  "Cw": {
+                    "type": "number",
+                    "description": "Warping constant.",
+                    "x-unit": "length^6",
+                    "minimum": 0
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "H",
+              "B",
+              "t"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "pipe"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "D": {
+                "type": "number",
+                "description": "Outside diameter.",
+                "x-unit": "length",
+                "exclusiveMinimum": 0
+              },
+              "t": {
+                "type": "number",
+                "description": "Wall thickness.",
+                "x-unit": "length",
+                "exclusiveMinimum": 0
+              },
+              "overrides": {
+                "type": "object",
+                "description": "Explicit values that replace the computed/looked-up section properties (e.g. a tabulated J or a shear area from a refined theory).",
+                "x-unit": "n/a",
+                "properties": {
+                  "A": {
+                    "type": "number",
+                    "description": "Cross-sectional area.",
+                    "x-unit": "length^2",
+                    "exclusiveMinimum": 0
+                  },
+                  "Iy": {
+                    "type": "number",
+                    "description": "Second moment of area about local y.",
+                    "x-unit": "length^4",
+                    "exclusiveMinimum": 0
+                  },
+                  "Iz": {
+                    "type": "number",
+                    "description": "Second moment of area about local z.",
+                    "x-unit": "length^4",
+                    "exclusiveMinimum": 0
+                  },
+                  "J": {
+                    "type": "number",
+                    "description": "Saint-Venant torsion constant.",
+                    "x-unit": "length^4",
+                    "exclusiveMinimum": 0
+                  },
+                  "Asy": {
+                    "type": "number",
+                    "description": "Shear area for shear force along local y.",
+                    "x-unit": "length^2",
+                    "exclusiveMinimum": 0
+                  },
+                  "Asz": {
+                    "type": "number",
+                    "description": "Shear area for shear force along local z.",
+                    "x-unit": "length^2",
+                    "exclusiveMinimum": 0
+                  },
+                  "Cw": {
+                    "type": "number",
+                    "description": "Warping constant.",
+                    "x-unit": "length^6",
+                    "minimum": 0
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "D",
+              "t"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "rectangle"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "h": {
+                "type": "number",
+                "description": "Depth (along local y).",
+                "x-unit": "length",
+                "exclusiveMinimum": 0
+              },
+              "b": {
+                "type": "number",
+                "description": "Width (along local z).",
+                "x-unit": "length",
+                "exclusiveMinimum": 0
+              },
+              "overrides": {
+                "type": "object",
+                "description": "Explicit values that replace the computed/looked-up section properties (e.g. a tabulated J or a shear area from a refined theory).",
+                "x-unit": "n/a",
+                "properties": {
+                  "A": {
+                    "type": "number",
+                    "description": "Cross-sectional area.",
+                    "x-unit": "length^2",
+                    "exclusiveMinimum": 0
+                  },
+                  "Iy": {
+                    "type": "number",
+                    "description": "Second moment of area about local y.",
+                    "x-unit": "length^4",
+                    "exclusiveMinimum": 0
+                  },
+                  "Iz": {
+                    "type": "number",
+                    "description": "Second moment of area about local z.",
+                    "x-unit": "length^4",
+                    "exclusiveMinimum": 0
+                  },
+                  "J": {
+                    "type": "number",
+                    "description": "Saint-Venant torsion constant.",
+                    "x-unit": "length^4",
+                    "exclusiveMinimum": 0
+                  },
+                  "Asy": {
+                    "type": "number",
+                    "description": "Shear area for shear force along local y.",
+                    "x-unit": "length^2",
+                    "exclusiveMinimum": 0
+                  },
+                  "Asz": {
+                    "type": "number",
+                    "description": "Shear area for shear force along local z.",
+                    "x-unit": "length^2",
+                    "exclusiveMinimum": 0
+                  },
+                  "Cw": {
+                    "type": "number",
+                    "description": "Warping constant.",
+                    "x-unit": "length^6",
+                    "minimum": 0
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "h",
+              "b"
+            ]
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "endRelease": {
+      "type": "object",
+      "description": "Releases at one member end. DOFs not mentioned are rigidly connected.",
+      "x-unit": "n/a",
+      "properties": {
+        "ux": {
+          "description": "Release of this translational DOF between the member end and the node (member local axes): false = rigidly connected, true = fully released, {\"spring\": k} = partial release through a linear spring.",
+          "x-unit": "n/a",
+          "default": false,
+          "x-hint": "Use true, false or {\"spring\": <stiffness >= 0>}.",
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "object",
+              "description": "Partial release.",
+              "x-unit": "n/a",
+              "properties": {
+                "spring": {
+                  "type": "number",
+                  "description": "Connection spring stiffness (0 = fully released).",
+                  "x-unit": "force/length",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "spring"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "uy": {
+          "description": "Release of this translational DOF between the member end and the node (member local axes): false = rigidly connected, true = fully released, {\"spring\": k} = partial release through a linear spring.",
+          "x-unit": "n/a",
+          "default": false,
+          "x-hint": "Use true, false or {\"spring\": <stiffness >= 0>}.",
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "object",
+              "description": "Partial release.",
+              "x-unit": "n/a",
+              "properties": {
+                "spring": {
+                  "type": "number",
+                  "description": "Connection spring stiffness (0 = fully released).",
+                  "x-unit": "force/length",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "spring"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "uz": {
+          "description": "Release of this translational DOF between the member end and the node (member local axes): false = rigidly connected, true = fully released, {\"spring\": k} = partial release through a linear spring.",
+          "x-unit": "n/a",
+          "default": false,
+          "x-hint": "Use true, false or {\"spring\": <stiffness >= 0>}.",
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "object",
+              "description": "Partial release.",
+              "x-unit": "n/a",
+              "properties": {
+                "spring": {
+                  "type": "number",
+                  "description": "Connection spring stiffness (0 = fully released).",
+                  "x-unit": "force/length",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "spring"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "rx": {
+          "description": "Release of this rotational DOF between the member end and the node (member local axes): false = rigidly connected, true = fully released, {\"spring\": k} = partial release through a linear spring.",
+          "x-unit": "n/a",
+          "default": false,
+          "x-hint": "Use true, false or {\"spring\": <stiffness >= 0>}.",
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "object",
+              "description": "Partial release.",
+              "x-unit": "n/a",
+              "properties": {
+                "spring": {
+                  "type": "number",
+                  "description": "Connection spring stiffness (0 = fully released).",
+                  "x-unit": "moment/rotation",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "spring"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ry": {
+          "description": "Release of this rotational DOF between the member end and the node (member local axes): false = rigidly connected, true = fully released, {\"spring\": k} = partial release through a linear spring.",
+          "x-unit": "n/a",
+          "default": false,
+          "x-hint": "Use true, false or {\"spring\": <stiffness >= 0>}.",
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "object",
+              "description": "Partial release.",
+              "x-unit": "n/a",
+              "properties": {
+                "spring": {
+                  "type": "number",
+                  "description": "Connection spring stiffness (0 = fully released).",
+                  "x-unit": "moment/rotation",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "spring"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "rz": {
+          "description": "Release of this rotational DOF between the member end and the node (member local axes): false = rigidly connected, true = fully released, {\"spring\": k} = partial release through a linear spring.",
+          "x-unit": "n/a",
+          "default": false,
+          "x-hint": "Use true, false or {\"spring\": <stiffness >= 0>}.",
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "object",
+              "description": "Partial release.",
+              "x-unit": "n/a",
+              "properties": {
+                "spring": {
+                  "type": "number",
+                  "description": "Connection spring stiffness (0 = fully released).",
+                  "x-unit": "moment/rotation",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "spring"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "member": {
+      "type": "object",
+      "description": "Straight prismatic member between two nodes.",
+      "x-unit": "n/a",
+      "properties": {
+        "type": {
+          "enum": [
+            "frame",
+            "truss",
+            "tensionOnly",
+            "compressionOnly"
+          ],
+          "description": "frame = axial, shear, bending, torsion; truss = axial force only (pin-ended); tensionOnly / compressionOnly = truss that is removed when it would carry the other sign (iterative analysis).",
+          "x-unit": "n/a",
+          "default": "frame"
+        },
+        "i": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.\\-]*$",
+          "description": "Start node id (local x runs from i to j).",
+          "x-unit": "n/a"
+        },
+        "j": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.\\-]*$",
+          "description": "End node id.",
+          "x-unit": "n/a"
+        },
+        "section": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.\\-]*$",
+          "description": "Section id.",
+          "x-unit": "n/a"
+        },
+        "material": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.\\-]*$",
+          "description": "Material id.",
+          "x-unit": "n/a"
+        },
+        "orientation": {
+          "type": "object",
+          "description": "Orientation of the local y and z axes about local x. Default rule: local y lies in the plane of local x and the global vertical axis and points to the +vertical side; for a vertical member local y = global +X. See docs/CONVENTIONS.md.",
+          "x-unit": "n/a",
+          "properties": {
+            "referenceVector": {
+              "type": "array",
+              "description": "Global vector replacing the vertical axis in the default rule: local y lies in the plane of local x and this vector, on the vector's side. Must not be parallel to the member.",
+              "x-unit": "dimensionless",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "number",
+                "description": "Vector component (X, Y, Z order).",
+                "x-unit": "dimensionless"
+              }
+            },
+            "roll": {
+              "type": "number",
+              "description": "Rotation of local y and z about +local x (right-hand rule), applied after the default rule or the reference vector.",
+              "x-unit": "degree",
+              "default": 0.0
+            }
+          },
+          "additionalProperties": false
+        },
+        "releases": {
+          "type": "object",
+          "description": "End releases in member local axes.",
+          "x-unit": "n/a",
+          "properties": {
+            "i": {
+              "$ref": "#/$defs/endRelease",
+              "description": "Releases at end i.",
+              "x-unit": "n/a"
+            },
+            "j": {
+              "$ref": "#/$defs/endRelease",
+              "description": "Releases at end j.",
+              "x-unit": "n/a"
+            }
+          },
+          "additionalProperties": false
+        },
+        "offsets": {
+          "type": "object",
+          "description": "Rigid end offsets: vectors from each node to the corresponding end of the flexible length.",
+          "x-unit": "n/a",
+          "properties": {
+            "axes": {
+              "enum": [
+                "global",
+                "local"
+              ],
+              "description": "Axes of the offset vectors: global, or local = the triad of the node-to-node line (same orientation rule).",
+              "x-unit": "n/a",
+              "default": "global"
+            },
+            "i": {
+              "type": "array",
+              "description": "Offset from node i to the flexible start.",
+              "x-unit": "length",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "number",
+                "description": "Vector component (X, Y, Z order).",
+                "x-unit": "length"
+              },
+              "default": [
+                0,
+                0,
+                0
+              ]
+            },
+            "j": {
+              "type": "array",
+              "description": "Offset from node j to the flexible end.",
+              "x-unit": "length",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "number",
+                "description": "Vector component (X, Y, Z order).",
+                "x-unit": "length"
+              },
+              "default": [
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "i",
+        "j",
+        "section",
+        "material"
+      ],
+      "additionalProperties": false
+    },
+    "constraint": {
+      "type": "object",
+      "x-unit": "n/a",
+      "description": "Exact kinematic constraint (small-displacement rigid-body relation between a master node and slave nodes).",
+      "required": [
+        "type",
+        "master",
+        "slaves"
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "rigidLink",
+            "rigidDiaphragm"
+          ],
+          "description": "rigidLink = all six DOFs of every slave follow the master as a rigid body; rigidDiaphragm = the two in-plane translations and the rotation about the normal follow the master, other DOFs stay independent.",
+          "x-unit": "n/a"
+        },
+        "master": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.\\-]*$",
+          "description": "Master node id.",
+          "x-unit": "n/a"
+        },
+        "slaves": {
+          "type": "array",
+          "description": "Slave node ids.",
+          "x-unit": "n/a",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.\\-]*$",
+            "description": "An id.",
+            "x-unit": "n/a"
+          },
+          "minItems": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "rigidDiaphragm"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "normal": {
+                "enum": [
+                  "X",
+                  "Y",
+                  "Z"
+                ],
+                "description": "Global axis normal to the diaphragm plane. Default: the vertical axis.",
+                "x-unit": "n/a"
+              }
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "load": {
+      "type": "object",
+      "x-unit": "n/a",
+      "description": "One load. `type` selects the kind.",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "nodal",
+            "memberPoint",
+            "memberDistributed",
+            "selfWeight",
+            "supportDisplacement"
+          ],
+          "description": "Kind of load.",
+          "x-unit": "n/a"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "nodal"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "node": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.\\-]*$",
+                "description": "Loaded node id.",
+                "x-unit": "n/a"
+              },
+              "Fx": {
+                "type": "number",
+                "description": "Force along global x.",
+                "x-unit": "force",
+                "default": 0.0
+              },
+              "Fy": {
+                "type": "number",
+                "description": "Force along global y.",
+                "x-unit": "force",
+                "default": 0.0
+              },
+              "Fz": {
+                "type": "number",
+                "description": "Force along global z.",
+                "x-unit": "force",
+                "default": 0.0
+              },
+              "Mx": {
+                "type": "number",
+                "description": "Moment about global x (right-hand rule).",
+                "x-unit": "moment",
+                "default": 0.0
+              },
+              "My": {
+                "type": "number",
+                "description": "Moment about global y (right-hand rule).",
+                "x-unit": "moment",
+                "default": 0.0
+              },
+              "Mz": {
+                "type": "number",
+                "description": "Moment about global z (right-hand rule).",
+                "x-unit": "moment",
+                "default": 0.0
+              }
+            },
+            "required": [
+              "node"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "memberPoint"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "member": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.\\-]*$",
+                "description": "Loaded member id.",
+                "x-unit": "n/a"
+              },
+              "direction": {
+                "enum": [
+                  "X",
+                  "Y",
+                  "Z",
+                  "x",
+                  "y",
+                  "z"
+                ],
+                "description": "Load direction: X, Y, Z = global axes; x, y, z = member local axes. Positive values act along the positive axis.",
+                "x-unit": "n/a"
+              },
+              "kind": {
+                "enum": [
+                  "force",
+                  "moment"
+                ],
+                "description": "force = concentrated force along `direction`; moment = concentrated moment about `direction`.",
+                "x-unit": "n/a",
+                "default": "force"
+              },
+              "value": {
+                "type": "number",
+                "x-unit": "force",
+                "description": "Magnitude: a force, or a moment (force*length) when kind = moment."
+              },
+              "position": {
+                "type": "number",
+                "description": "Location of the load along the member.",
+                "x-unit": "position",
+                "minimum": 0
+              },
+              "positionType": {
+                "enum": [
+                  "relative",
+                  "absolute"
+                ],
+                "description": "How positions along the member are given: relative = fraction of the flexible length (0 at end i, 1 at end j); absolute = distance from the flexible start.",
+                "x-unit": "n/a",
+                "default": "relative"
+              }
+            },
+            "required": [
+              "member",
+              "direction",
+              "value",
+              "position"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "memberDistributed"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "member": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.\\-]*$",
+                "description": "Loaded member id.",
+                "x-unit": "n/a"
+              },
+              "direction": {
+                "enum": [
+                  "X",
+                  "Y",
+                  "Z",
+                  "x",
+                  "y",
+                  "z"
+                ],
+                "description": "Load direction: X, Y, Z = global axes; x, y, z = member local axes. Positive values act along the positive axis.",
+                "x-unit": "n/a"
+              },
+              "w1": {
+                "type": "number",
+                "description": "Intensity at `start` (force per unit length of member, or per unit projected length when projected = true).",
+                "x-unit": "force/length"
+              },
+              "w2": {
+                "type": "number",
+                "description": "Intensity at `end`; linear variation between. Default: w1 (uniform).",
+                "x-unit": "force/length"
+              },
+              "start": {
+                "type": "number",
+                "description": "Start of the loaded length.",
+                "x-unit": "position",
+                "minimum": 0,
+                "default": 0.0
+              },
+              "end": {
+                "type": "number",
+                "description": "End of the loaded length. Default: the member end.",
+                "x-unit": "position",
+                "minimum": 0
+              },
+              "positionType": {
+                "enum": [
+                  "relative",
+                  "absolute"
+                ],
+                "description": "How positions along the member are given: relative = fraction of the flexible length (0 at end i, 1 at end j); absolute = distance from the flexible start.",
+                "x-unit": "n/a",
+                "default": "relative"
+              },
+              "projected": {
+                "type": "boolean",
+                "description": "Global directions only: intensities are per unit length of the member's projection on the plane normal to the load direction (e.g. snow on a sloping rafter).",
+                "x-unit": "n/a",
+                "default": false
+              }
+            },
+            "required": [
+              "member",
+              "direction",
+              "w1"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "selfWeight"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "factor": {
+                "type": "number",
+                "description": "Multiplier on the weight (unitWeight * A per unit length of flexible member).",
+                "x-unit": "dimensionless",
+                "default": 1.0
+              },
+              "direction": {
+                "type": "array",
+                "description": "Global direction of gravity (normalised by the engine). Default: the negative vertical axis.",
+                "x-unit": "dimensionless",
+                "minItems": 3,
+                "maxItems": 3,
+                "items": {
+                  "type": "number",
+                  "description": "Vector component (X, Y, Z order).",
+                  "x-unit": "dimensionless"
+                }
+              },
+              "members": {
+                "type": "array",
+                "description": "Members that receive self weight. Default: all members.",
+                "x-unit": "n/a",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.\\-]*$",
+                  "description": "An id.",
+                  "x-unit": "n/a"
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "supportDisplacement"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "node": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.\\-]*$",
+                "description": "Supported node id; every DOF given here must be \"fixed\" at that support.",
+                "x-unit": "n/a"
+              },
+              "ux": {
+                "type": "number",
+                "description": "Imposed translation along global X.",
+                "x-unit": "length"
+              },
+              "uy": {
+                "type": "number",
+                "description": "Imposed translation along global Y.",
+                "x-unit": "length"
+              },
+              "uz": {
+                "type": "number",
+                "description": "Imposed translation along global Z.",
+                "x-unit": "length"
+              },
+              "rx": {
+                "type": "number",
+                "description": "Imposed rotation about global X.",
+                "x-unit": "rotation"
+              },
+              "ry": {
+                "type": "number",
+                "description": "Imposed rotation about global Y.",
+                "x-unit": "rotation"
+              },
+              "rz": {
+                "type": "number",
+                "description": "Imposed rotation about global Z.",
+                "x-unit": "rotation"
+              }
+            },
+            "required": [
+              "node"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "memberPoint"
+              },
+              "kind": {
+                "const": "moment"
+              }
+            },
+            "required": [
+              "type",
+              "kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "x-unit": "moment"
+              }
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "loadCase": {
+      "type": "object",
+      "description": "A named set of loads that act together.",
+      "x-unit": "n/a",
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Free text.",
+          "x-unit": "n/a"
+        },
+        "loads": {
+          "type": "array",
+          "description": "The loads of this case.",
+          "x-unit": "n/a",
+          "items": {
+            "$ref": "#/$defs/load"
+          },
+          "default": []
+        }
+      },
+      "additionalProperties": false
+    },
+    "combination": {
+      "type": "object",
+      "description": "Factored sum of load cases, analysed as one loading.",
+      "x-unit": "n/a",
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Free text.",
+          "x-unit": "n/a"
+        },
+        "factors": {
+          "type": "object",
+          "x-unit": "n/a",
+          "minProperties": 1,
+          "description": "Load factor per load case id.",
+          "propertyNames": {
+            "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.\\-]*$"
+          },
+          "additionalProperties": {
+            "type": "number",
+            "description": "Load factor.",
+            "x-unit": "dimensionless"
+          }
+        },
+        "analysisType": {
+          "enum": [
+            "firstOrder",
+            "secondOrder"
+          ],
+          "description": "Analysis type for this combination. Default: analysis.type.",
+          "x-unit": "n/a"
+        },
+        "purpose": {
+          "enum": [
+            "strength",
+            "serviceability"
+          ],
+          "description": "strength = used for strength design checks; serviceability = used for deflection checks.",
+          "x-unit": "n/a",
+          "default": "strength"
+        },
+        "stiffnessReduction": {
+          "type": "boolean",
+          "description": "Apply analysis.stiffnessReduction (AISC 360-22 C2.3) in this combination. AFFECTS ANALYSIS.",
+          "x-unit": "n/a",
+          "default": false
+        },
+        "notionalLoad": {
+          "type": "object",
+          "description": "Notional lateral loads added in this combination (AISC 360-22 C2.2b): at every node, coefficient * (factored gravity load applied at that node, including member loads lumped statically to the member ends), acting along `direction`. AFFECTS ANALYSIS. Absent: none.",
+          "x-unit": "n/a",
+          "properties": {
+            "coefficient": {
+              "type": "number",
+              "description": "Notional load coefficient.",
+              "x-unit": "dimensionless",
+              "exclusiveMinimum": 0,
+              "default": 0.002
+            },
+            "direction": {
+              "type": "array",
+              "description": "Global horizontal direction of the notional loads (normalised by the engine; must be perpendicular to the vertical axis).",
+              "x-unit": "dimensionless",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "number",
+                "description": "Vector component (X, Y, Z order).",
+                "x-unit": "dimensionless"
+              }
+            }
+          },
+          "required": [
+            "direction"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "factors"
+      ],
+      "additionalProperties": false
+    },
+    "designVariables": {
+      "type": "object",
+      "x-unit": "n/a",
+      "description": "Design variables (DESIGN ONLY: none of these can influence the analysis). Axis names follow AISC: x = major axis (= member local z), y = minor axis (= member local y), z = longitudinal axis (torsion). Each variable is resolved in the order: design member > group(s) > design.defaults > built-in default.",
+      "properties": {
+        "code": {
+          "enum": [
+            "AISC 360-22"
+          ],
+          "description": "Design code and edition.",
+          "x-unit": "n/a",
+          "default": "AISC 360-22"
+        },
+        "method": {
+          "enum": [
+            "LRFD",
+            "ASD"
+          ],
+          "description": "Design method.",
+          "x-unit": "n/a",
+          "default": "LRFD"
+        },
+        "role": {
+          "enum": [
+            "beam",
+            "column",
+            "brace"
+          ],
+          "description": "Member role. Default: truss-type members = brace; frame members parallel to the vertical axis = column; other frame members = beam.",
+          "x-unit": "n/a"
+        },
+        "Lx": {
+          "type": "number",
+          "description": "Unbraced length for flexural buckling about the major (x) axis. Default: from bracing.major, else the design member length.",
+          "x-unit": "length",
+          "exclusiveMinimum": 0
+        },
+        "Ly": {
+          "type": "number",
+          "description": "Unbraced length for flexural buckling about the minor (y) axis. Default: from bracing.minor, else the design member length.",
+          "x-unit": "length",
+          "exclusiveMinimum": 0
+        },
+        "Lz": {
+          "type": "number",
+          "description": "Unbraced length for torsional buckling. Default: from bracing.torsion, else the design member length.",
+          "x-unit": "length",
+          "exclusiveMinimum": 0
+        },
+        "Lb": {
+          "type": "number",
+          "description": "Unbraced length for lateral-torsional buckling. Default: from bracing.topFlange / bracing.bottomFlange, else the design member length.",
+          "x-unit": "length",
+          "exclusiveMinimum": 0
+        },
+        "Kx": {
+          "type": "number",
+          "description": "Effective length factor, major axis flexural buckling.",
+          "x-unit": "dimensionless",
+          "exclusiveMinimum": 0,
+          "default": 1.0
+        },
+        "Ky": {
+          "type": "number",
+          "description": "Effective length factor, minor axis flexural buckling.",
+          "x-unit": "dimensionless",
+          "exclusiveMinimum": 0,
+          "default": 1.0
+        },
+        "Kz": {
+          "type": "number",
+          "description": "Effective length factor, torsional buckling.",
+          "x-unit": "dimensionless",
+          "exclusiveMinimum": 0,
+          "default": 1.0
+        },
+        "bracing": {
+          "type": "object",
+          "description": "Intermediate bracing points along the design member. Within one level (member, group or defaults) an unbraced length and the matching bracing list must not both be given.",
+          "x-unit": "n/a",
+          "properties": {
+            "positionType": {
+              "enum": [
+                "relative",
+                "absolute"
+              ],
+              "description": "relative = fractions of the design member length; absolute = distances from its start.",
+              "x-unit": "n/a",
+              "default": "relative"
+            },
+            "major": {
+              "type": "array",
+              "x-unit": "position",
+              "uniqueItems": true,
+              "description": "Locations of intermediate points braced against major-axis (x) flexural buckling, measured from the start of the design member (its ends are always braced points).",
+              "items": {
+                "type": "number",
+                "minimum": 0,
+                "x-unit": "position",
+                "description": "Brace location."
+              }
+            },
+            "minor": {
+              "type": "array",
+              "x-unit": "position",
+              "uniqueItems": true,
+              "description": "Locations of intermediate points braced against minor-axis (y) flexural buckling, measured from the start of the design member (its ends are always braced points).",
+              "items": {
+                "type": "number",
+                "minimum": 0,
+                "x-unit": "position",
+                "description": "Brace location."
+              }
+            },
+            "torsion": {
+              "type": "array",
+              "x-unit": "position",
+              "uniqueItems": true,
+              "description": "Locations of intermediate points braced against twist (torsional buckling), measured from the start of the design member (its ends are always braced points).",
+              "items": {
+                "type": "number",
+                "minimum": 0,
+                "x-unit": "position",
+                "description": "Brace location."
+              }
+            },
+            "topFlange": {
+              "type": "array",
+              "x-unit": "position",
+              "uniqueItems": true,
+              "description": "Locations of intermediate points braced against lateral movement of the top flange (the flange on the +local y side), for lateral-torsional buckling, measured from the start of the design member (its ends are always braced points).",
+              "items": {
+                "type": "number",
+                "minimum": 0,
+                "x-unit": "position",
+                "description": "Brace location."
+              }
+            },
+            "bottomFlange": {
+              "type": "array",
+              "x-unit": "position",
+              "uniqueItems": true,
+              "description": "Locations of intermediate points braced against lateral movement of the bottom flange (the flange on the -local y side), for lateral-torsional buckling, measured from the start of the design member (its ends are always braced points).",
+              "items": {
+                "type": "number",
+                "minimum": 0,
+                "x-unit": "position",
+                "description": "Brace location."
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "Cb": {
+          "description": "Lateral-torsional buckling modification factor: a number, or \"computed\" from the moment diagram of each unbraced segment (AISC 360-22 Eq. F1-1).",
+          "x-unit": "dimensionless",
+          "default": "computed",
+          "x-hint": "Give a positive number or the string \"computed\".",
+          "anyOf": [
+            {
+              "const": "computed"
+            },
+            {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          ]
+        },
+        "Cmx": {
+          "description": "Equivalent uniform moment factor Cm for major-axis bending (AISC 360-22 App. 8.1.2), a number or \"computed\".",
+          "x-unit": "dimensionless",
+          "default": "computed",
+          "x-hint": "Give a positive number or the string \"computed\".",
+          "anyOf": [
+            {
+              "const": "computed"
+            },
+            {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          ]
+        },
+        "Cmy": {
+          "description": "Equivalent uniform moment factor Cm for minor-axis bending (AISC 360-22 App. 8.1.2), a number or \"computed\".",
+          "x-unit": "dimensionless",
+          "default": "computed",
+          "x-hint": "Give a positive number or the string \"computed\".",
+          "anyOf": [
+            {
+              "const": "computed"
+            },
+            {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          ]
+        },
+        "sideswayInhibited": {
+          "type": "boolean",
+          "description": "Sidesway flag: true when relative lateral translation of the member ends is prevented (braced frame).",
+          "x-unit": "n/a",
+          "default": false
+        },
+        "An": {
+          "type": "number",
+          "description": "Net area for tension rupture. Default: the gross area (no holes).",
+          "x-unit": "length^2",
+          "exclusiveMinimum": 0
+        },
+        "U": {
+          "type": "number",
+          "description": "Shear lag factor for tension rupture.",
+          "x-unit": "dimensionless",
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "default": 1.0
+        },
+        "maxSlendernessCompression": {
+          "type": "number",
+          "description": "Limit on Lc/r for members in compression (advisory check).",
+          "x-unit": "dimensionless",
+          "exclusiveMinimum": 0,
+          "default": 200.0
+        },
+        "maxSlendernessTension": {
+          "type": "number",
+          "description": "Limit on L/r for members in tension (advisory check).",
+          "x-unit": "dimensionless",
+          "exclusiveMinimum": 0,
+          "default": 300.0
+        },
+        "deflectionLimits": {
+          "type": "array",
+          "x-unit": "n/a",
+          "default": [],
+          "description": "Deflection limits to check. Default: none.",
+          "items": {
+            "type": "object",
+            "description": "One deflection limit; give spanRatio and/or absolute.",
+            "x-unit": "n/a",
+            "properties": {
+              "spanRatio": {
+                "type": "number",
+                "description": "n in the limit L/n, L = design member length.",
+                "x-unit": "dimensionless",
+                "exclusiveMinimum": 0
+              },
+              "absolute": {
+                "type": "number",
+                "description": "Limit as a length.",
+                "x-unit": "length",
+                "exclusiveMinimum": 0
+              },
+              "direction": {
+                "enum": [
+                  "y",
+                  "z",
+                  "resultant"
+                ],
+                "description": "Deflection component checked, in member local axes, measured relative to the chord through the design member ends.",
+                "x-unit": "n/a",
+                "default": "resultant"
+              },
+              "combinations": {
+                "type": "array",
+                "description": "Combination ids the limit applies to. Default: every combination with purpose = serviceability.",
+                "x-unit": "n/a",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.\\-]*$",
+                  "description": "An id.",
+                  "x-unit": "n/a"
+                }
+              }
+            },
+            "additionalProperties": false,
+            "anyOf": [
+              {
+                "required": [
+                  "spanRatio"
+                ]
+              },
+              {
+                "required": [
+                  "absolute"
+                ]
+              }
+            ],
+            "x-hint": "A deflection limit needs `spanRatio` and/or `absolute`."
+          }
+        }
+      }
+    }
+  }
+}

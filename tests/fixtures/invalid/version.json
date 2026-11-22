@@ -1,0 +1,5 @@
+{
+  "formatVersion": "2.0.0",
+  "units": {"force": "kN", "length": "m"},
+  "anything": "is not even looked at"
+}

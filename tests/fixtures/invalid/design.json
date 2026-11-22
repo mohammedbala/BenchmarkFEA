@@ -1,0 +1,49 @@
+{
+  "formatVersion": "1.0.0",
+  "units": {"force": "kN", "length": "m"},
+  "conventions": {"verticalAxis": "Z"},
+  "nodes": {
+    "A": {"x": 0, "y": 0},
+    "B": {"x": 4, "y": 0},
+    "C": {"x": 8, "y": 0},
+    "D": {"x": 8, "y": 3},
+    "E": {"x": 12, "y": 0},
+    "F": {"x": 16, "y": 0},
+    "G": {"x": 20, "y": 0},
+    "H": {"x": 24, "y": 0},
+    "I": {"x": 28, "y": 0}
+  },
+  "supports": {"A": {"type": "fixed"}, "D": {"type": "fixed"}, "I": {"type": "fixed"}},
+  "materials": {"S": {"E": 2e8, "nu": 0.3, "Fy": 355e3, "Fu": 470e3}},
+  "sections": {
+    "R": {"type": "rectangle", "h": 0.3, "b": 0.2},
+    "R2": {"type": "rectangle", "h": 0.4, "b": 0.2}
+  },
+  "members": {
+    "M1": {"i": "A", "j": "B", "section": "R", "material": "S"},
+    "M2": {"i": "B", "j": "C", "section": "R", "material": "S"},
+    "M3": {"i": "C", "j": "D", "section": "R", "material": "S"},
+    "M4": {"i": "C", "j": "E", "section": "R2", "material": "S"},
+    "M5": {"i": "E", "j": "F", "section": "R", "material": "S"},
+    "M6": {"i": "G", "j": "F", "section": "R", "material": "S"},
+    "M7": {"i": "G", "j": "H", "section": "R", "material": "S"},
+    "M8": {"i": "H", "j": "I", "section": "R", "material": "S"},
+    "M9": {"i": "E", "j": "F", "section": "R", "material": "S"}
+  },
+  "loadCases": {"D": {"loads": []}},
+  "combinations": {"C1": {"factors": {"D": 1.0}}},
+  "design": {
+    "groups": {
+      "g1": {"members": ["M1"], "Kx": 1.2, "Lb": 2.0, "bracing": {"topFlange": [0.5]}},
+      "g2": {"members": ["M1"], "Kx": 1.5},
+      "g3": {"members": ["M1"], "Kx": 2.0, "priority": -1}
+    },
+    "members": {
+      "bent": {"members": ["M2", "M3"]},
+      "stepped": {"members": ["M4", "M5"]},
+      "reversed": {"members": ["M6", "M9"]},
+      "M7": {"members": ["M7", "M8"]},
+      "M1": {"Ly": 3.0, "bracing": {"minor": [0.5], "torsion": [0, 0.5, 1.2]}}
+    }
+  }
+}

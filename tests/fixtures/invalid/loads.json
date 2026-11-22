@@ -1,0 +1,39 @@
+{
+  "formatVersion": "1.0.0",
+  "units": {"force": "kN", "length": "m"},
+  "conventions": {"verticalAxis": "Z"},
+  "nodes": {
+    "A": {"x": 0, "y": 0},
+    "B": {"x": 4, "y": 0}
+  },
+  "supports": {
+    "A": {"type": "pinned"},
+    "B": {"dofs": {"uz": {"spring": 1000}}}
+  },
+  "materials": {"S": {"E": 2e8, "nu": 0.3}},
+  "sections": {"R": {"type": "rectangle", "h": 0.3, "b": 0.2}},
+  "members": {
+    "M1": {"i": "A", "j": "B", "section": "R", "material": "S"}
+  },
+  "loadCases": {
+    "D": {"loads": [
+      {"type": "memberPoint", "member": "M1", "direction": "Z", "value": -1, "position": 1.5},
+      {"type": "memberPoint", "member": "M1", "direction": "Z", "value": -1, "position": 4.5,
+       "positionType": "absolute"},
+      {"type": "memberDistributed", "member": "M1", "direction": "Z", "w1": -1, "start": 0.6, "end": 0.4},
+      {"type": "memberDistributed", "member": "M1", "direction": "y", "w1": -1, "projected": true},
+      {"type": "selfWeight", "direction": [0, 0, 0]},
+      {"type": "supportDisplacement", "node": "A", "uz": -0.01, "ry": 0.002},
+      {"type": "supportDisplacement", "node": "B", "uz": -0.01},
+      {"type": "memberDistributed", "member": "M1", "direction": "Z", "w1": -1, "start": 3.5,
+       "positionType": "absolute"}
+    ]}
+  },
+  "combinations": {
+    "C1": {"factors": {"D": 1.0}, "notionalLoad": {"direction": [1, 0, 0.5]}},
+    "C2": {"factors": {"D": 1.0}, "notionalLoad": {"direction": [0, 0, 0]}}
+  },
+  "analysis": {
+    "stiffnessReduction": {"tauB": "computed"}
+  }
+}

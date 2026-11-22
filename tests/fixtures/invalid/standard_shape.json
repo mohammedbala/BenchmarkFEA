@@ -1,0 +1,19 @@
+{
+  "formatVersion": "1.0.0",
+  "units": {"force": "kip", "length": "in"},
+  "conventions": {"verticalAxis": "Z"},
+  "nodes": {
+    "A": {"x": 0, "y": 0},
+    "B": {"x": 120, "y": 0}
+  },
+  "supports": {"A": {"type": "fixed"}},
+  "materials": {"S": {"E": 29000, "nu": 0.3}},
+  "sections": {
+    "W": {"type": "standard", "shape": "TESTW10"}
+  },
+  "members": {
+    "M1": {"i": "A", "j": "B", "section": "W", "material": "S"}
+  },
+  "loadCases": {"D": {"loads": []}},
+  "combinations": {"C1": {"factors": {"D": 1.0}}}
+}

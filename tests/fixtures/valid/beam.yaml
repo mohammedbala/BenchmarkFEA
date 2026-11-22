@@ -1,0 +1,28 @@
+# The same model as beam.json, written by hand in YAML.
+formatVersion: "1.0.0"
+units: {force: kN, length: m}
+conventions:
+  verticalAxis: Y
+nodes:
+  a: {x: 0, y: 0}
+  b: {x: 6.0, y: 0}
+supports:
+  a:
+    type: pinned
+    dofs: {rx: fixed}
+  b:
+    type: roller
+    dofs: {uz: fixed}
+materials:
+  S355: {E: 2.1e8, nu: 0.3, Fy: 355e3, Fu: 470e3}
+sections:
+  R: {type: rectangle, h: 0.3, b: 0.15}
+members:
+  m1: {i: a, j: b, section: R, material: S355}
+loadCases:
+  G:
+    loads:
+      - {type: memberDistributed, member: m1, direction: Y, w1: -12.5}
+combinations:
+  ULS:
+    factors: {G: 1.35}

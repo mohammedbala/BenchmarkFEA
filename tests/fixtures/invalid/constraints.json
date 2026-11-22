@@ -1,0 +1,32 @@
+{
+  "formatVersion": "1.0.0",
+  "units": {"force": "kN", "length": "m"},
+  "conventions": {"verticalAxis": "Z"},
+  "nodes": {
+    "A": {"x": 0, "y": 0, "z": 3},
+    "B": {"x": 4, "y": 0, "z": 3},
+    "C": {"x": 4, "y": 4, "z": 3},
+    "D": {"x": 0, "y": 4, "z": 3},
+    "E": {"x": 2, "y": 2, "z": 3},
+    "F": {"x": 2, "y": 2, "z": 0}
+  },
+  "supports": {
+    "F": {"type": "fixed"},
+    "B": {"dofs": {"uz": "fixed", "rz": {"spring": 5}}},
+    "C": {"dofs": {"uz": "fixed"}}
+  },
+  "materials": {"S": {"E": 2e8, "nu": 0.3}},
+  "sections": {"R": {"type": "rectangle", "h": 0.3, "b": 0.2}},
+  "members": {
+    "M1": {"i": "F", "j": "E", "section": "R", "material": "S"},
+    "M2": {"i": "A", "j": "B", "section": "R", "material": "S"},
+    "M3": {"i": "C", "j": "D", "section": "R", "material": "S"}
+  },
+  "constraints": {
+    "d1": {"type": "rigidDiaphragm", "master": "E", "slaves": ["A", "B", "C", "E"]},
+    "d2": {"type": "rigidLink", "master": "D", "slaves": ["A"]},
+    "d3": {"type": "rigidDiaphragm", "master": "F", "slaves": ["D"], "normal": "X"}
+  },
+  "loadCases": {"D": {"loads": []}},
+  "combinations": {"C1": {"factors": {"D": 1.0}}}
+}
