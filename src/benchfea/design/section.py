@@ -75,6 +75,11 @@ class DesignSection:
     elements: dict = field(default_factory=dict)      # key -> PlateElement
     sources: dict = field(default_factory=dict)       # name -> provenance
     notes: tuple = ()
+    # --- flexure (Chapter F): elastic / plastic section moduli; None = not available
+    Sx: float | None = None           # major axis (= Sz of the engine)
+    Zx: float | None = None
+    Sy: float | None = None           # minor axis
+    Zy: float | None = None
 
     # ------------------------------------------------------------------ reporting
     def source(self, name: str) -> str:
@@ -83,7 +88,8 @@ class DesignSection:
     def inputs(self, *names: str) -> dict:
         """{name: (value, dimension, source)} for section values / dimensions."""
         dim = {"A": "length^2", "Ix": "length^4", "Iy": "length^4", "J": "length^4", "Cw": "length^6",
-               "fabrication": "n/a", "shape": "n/a"}
+               "fabrication": "n/a", "shape": "n/a", "Sx": "length^3", "Zx": "length^3", "Sy": "length^3",
+               "Zy": "length^3"}
         out = {}
         for n in names:
             v = self.dims[n] if n in self.dims else getattr(self, n)
@@ -108,8 +114,14 @@ class DesignSection:
                 tf: float | None = None, tw: float | None = None, h: float | None = None,
                 k: float | None = None, r: float | None = None, flange_ratio: float | None = None,
                 web_ratio: float | None = None, source: str = "given", id: str = "",
-                sources: dict | None = None, notes: tuple = ()) -> "DesignSection":
+                sources: dict | None = None, notes: tuple = (), Sx: float | None = None,
+                Zx: float | None = None, Sy: float | None = None, Zy: float | None = None,
+                rts: float | None = None, ho: float | None = None) -> "DesignSection":
         """Doubly symmetric I-shape.
+
+        ``Sx, Zx, Sy, Zy``: section moduli for flexure.  ``rts`` (AISC 360-22 Eq. F2-7) and
+        ``ho`` (distance between flange centroids) may be given (tabulated values); they are
+        kept in ``dims`` and take precedence over the values derived in Chapter F.
 
         ``fabrication``: ``"rolled"`` or ``"builtUp"`` (welded; fillet welds ignored).
         Web depth ``h`` (AISC 360-22 B4.1b): given ``h``; else for a rolled shape
@@ -152,10 +164,11 @@ class DesignSection:
             w = PlateElement("web", None, h, tw, 1,
                              "web depth h not available: a rolled shape needs the fillet dimension (k or r), "
                              "h, or h/tw", "missing")
-        dims = {n: v for n, v in (("d", d), ("bf", bf), ("tf", tf), ("tw", tw), ("h", h)) if v is not None}
+        dims = {n: v for n, v in (("d", d), ("bf", bf), ("tf", tf), ("tw", tw), ("h", h), ("rts", rts),
+                                  ("ho", ho)) if v is not None}
         src.setdefault("fabrication", source)
         return DesignSection(I_SHAPE, id, "", A, Ix, Iy, rx, ry, J, Cw, fabrication, dims,
-                             {"flange": f, "web": w}, src, tuple(notes))
+                             {"flange": f, "web": w}, src, tuple(notes), Sx, Zx, Sy, Zy)
 
     @staticmethod
     def rectangular(kind: str, *, A: float, H: float | None = None, B: float | None = None,
@@ -163,7 +176,9 @@ class DesignSection:
                     rx: float | None = None, ry: float | None = None, J: float | None = None,
                     h: float | None = None, b: float | None = None, h_ratio: float | None = None,
                     b_ratio: float | None = None, source: str = "given", id: str = "",
-                    sources: dict | None = None, notes: tuple = ()) -> "DesignSection":
+                    sources: dict | None = None, notes: tuple = (), Sx: float | None = None,
+                    Zx: float | None = None, Sy: float | None = None,
+                    Zy: float | None = None) -> "DesignSection":
         """Rectangular HSS (``kind="rectHSS"``) or built-up box section (``kind="box"``).
 
         ``H`` = outside depth (along local y), ``B`` = outside width (along local z),
@@ -192,14 +207,15 @@ class DesignSection:
         dims = {k: v for k, v in (("H", H), ("B", B), ("t", t)) if v is not None}
         return DesignSection(kind, id, "", A, Ix, Iy, rx, ry, J, 0.0, None, dims,
                              {"wall_y": wall("wall_y", h, H, h_ratio, "h"),
-                              "wall_z": wall("wall_z", b, B, b_ratio, "b")}, src, tuple(notes))
+                              "wall_z": wall("wall_z", b, B, b_ratio, "b")}, src, tuple(notes), Sx, Zx, Sy, Zy)
 
     @staticmethod
     def round_hss(*, A: float, D: float | None = None, t: float | None = None, I: float | None = None,
                   r: float | None = None, J: float | None = None, ratio: float | None = None,
                   source: str = "given", id: str = "", sources: dict | None = None,
-                  notes: tuple = ()) -> "DesignSection":
-        """Round HSS / pipe. ``t`` = DESIGN wall thickness (B4.2, an input); ``ratio`` = D/t as given."""
+                  notes: tuple = (), S: float | None = None, Z: float | None = None) -> "DesignSection":
+        """Round HSS / pipe. ``t`` = DESIGN wall thickness (B4.2, an input); ``ratio`` = D/t as given;
+        ``S``, ``Z`` = elastic / plastic section modulus (any axis)."""
         src = {"*": source, **(sources or {})}
         I, r = _inertia(A, I, r), _radius(A, I, r)
         if ratio is not None:
@@ -210,7 +226,8 @@ class DesignSection:
         else:
             w = PlateElement("wall", None, D, t, 1, "D and t (or D/t) not given", "missing")
         dims = {k: v for k, v in (("D", D), ("t", t)) if v is not None}
-        return DesignSection(ROUND_HSS, id, "", A, I, I, r, r, J, 0.0, None, dims, {"wall": w}, src, tuple(notes))
+        return DesignSection(ROUND_HSS, id, "", A, I, I, r, r, J, 0.0, None, dims, {"wall": w}, src, tuple(notes),
+                             S, Z, S, Z)
 
     # ------------------------------------------------------------------ from the model
     @staticmethod
@@ -219,6 +236,7 @@ class DesignSection:
         sid, kind, fam, dm = section.id, section.kind, section.props.family, dict(section.props.dims)
         src = f"section:{sid}"
         common = dict(A=section.A, Ix=section.Iz, Iy=section.Iy, J=section.J, source=src, id=sid)
+        moduli = dict(Sx=section.Sz, Zx=section.Zz, Sy=section.Sy, Zy=section.Zy)      # x = major = local z
         if kind == "I" or (kind == "standard" and fam == "I"):
             if kind == "standard":
                 fab, why = ROLLED, f"derived: shapes database type of {section.shape} (rolled shape)"
@@ -236,19 +254,21 @@ class DesignSection:
                         "(AISC 360-22 Table B4.1a Case 2, G2.1(b)); give r > 0 for a rolled shape",)
                 extra = {}
             return DesignSection.i_shape(fab, Cw=section.Cw, d=dm["d"], bf=dm["bf"], tf=dm["tf"], tw=dm["tw"],
-                                         sources={"fabrication": why}, notes=note, **extra, **common)
+                                         sources={"fabrication": why}, notes=note, **extra, **common, **moduli)
         if kind == "box":
             note = (f"section {sid!r} (type box, sharp corners) is checked as a built-up box section "
                     "(AISC 360-22 B4.1b(e), Table B4.1a Case 8, Table E7.1 case (a), G4 box), not as an HSS",)
-            return DesignSection.rectangular(BOX, H=dm["H"], B=dm["B"], t=dm["t"], notes=note, **common)
+            return DesignSection.rectangular(BOX, H=dm["H"], B=dm["B"], t=dm["t"], notes=note, **common, **moduli)
         if kind == "standard" and fam == "box":
             note = ("t is the design wall thickness of the shapes database (AISC 360-22 B4.2)",)
-            return DesignSection.rectangular(RECT_HSS, H=dm["H"], B=dm["B"], t=dm["t"], notes=note, **common)
+            return DesignSection.rectangular(RECT_HSS, H=dm["H"], B=dm["B"], t=dm["t"], notes=note, **common,
+                                             **moduli)
         if kind == "pipe" or (kind == "standard" and fam == "pipe"):
             note = ("t is used as the design wall thickness (AISC 360-22 B4.2): the 0.93 factor for HSS made "
                     "to standards other than ASTM A1065 / A1085 is NOT applied by the engine",)
             common.pop("Ix"), common.pop("Iy")
-            return DesignSection.round_hss(D=dm["D"], t=dm["t"], I=section.Iz, notes=note, **common)
+            return DesignSection.round_hss(D=dm["D"], t=dm["t"], I=section.Iz, notes=note, S=section.Sz,
+                                           Z=section.Zz, **common)
         what = f"database shape type {fam!r}" if kind == "standard" else f"section type {kind!r}"
         return DesignSection.unsupported(
             f"section {sid!r} ({what}) is outside the implemented scope (doubly symmetric I-shapes, "

@@ -45,21 +45,28 @@ from .prepare import Prepared, prepare
 SOLVER = "pynite"
 TINY = 1e-15
 DEFAULT_SUBDIVISIONS = (2, 4)          # coarse, fine (second order)
-DEFAULT_STIFFNESS = (1e3, 1e4)         # coarse, fine multiplier of stiff emulation members (measured optimum:
-                                       # the round-off error of PyNite's solve grows like 1e-9 x multiplier)
+DEFAULT_STIFFNESS = (1e5, 1e6)         # coarse, fine multiplier of the stiff emulation members.  Measured: the
+                                       # emulation error falls like 1/multiplier while the round-off error of
+                                       # PyNite's solve grows with it; short offset stubs are best near 1e5,
+                                       # long diaphragm links still improve at 1e7.
 DOFS = ("DX", "DY", "DZ", "RX", "RY", "RZ")
 FORCES = ("FX", "FY", "FZ", "MX", "MY", "MZ")
 LOCAL = ("Fx", "Fy", "Fz")
 LOCAL_M = ("Mx", "My", "Mz")
 
-__all__ = ["translate", "execute", "finalise", "SOLVER"]
+__all__ = ["translate", "execute", "finalise", "SOLVER", "N_ITERATION_SAFETY"]
+
+
+def _stub_inertia(r: float) -> float:
+    """Inertia factor of a stiff emulation member of relative length r = l / (shortest real member)."""
+    return max(r, r ** 3)
 
 
 def translate(model, combination: str, *, subdivisions: int | None = None, stiffness: float | None = None,
               tau_b: dict | None = None, extra_nodal_loads: dict | None = None) -> Translation:
     """Build the PyNite job of one combination.  ``subdivisions``: sub-members per frame member
     (default 1 first order, 4 second order); ``stiffness``: multiplier of the stiff members that stand
-    for rigid offsets / links / diaphragms (default 1e4)."""
+    for rigid offsets / links / diaphragms (default 1e6)."""
     p = prepare(model, combination, tau_b=tau_b, extra_nodal_loads=extra_nodal_loads)
     fid = Fidelity(SOLVER)
     for feature, level, note in p.issues:
@@ -99,8 +106,8 @@ def translate(model, combination: str, *, subdivisions: int | None = None, stiff
         length = float(np.linalg.norm(xyz[nj] - xyz[ni]))
         r = length / L_ref
         cmds.append(["add_material", name, E_ref, G_ref, 0.3, 0.0])
-        cmds.append(["add_section", name, stiff * A_ref * r, stiff * I_ref * max(r, r ** 3),
-                     stiff * I_ref * max(r, r ** 3), stiff * J_ref * r])
+        cmds.append(["add_section", name, stiff * A_ref * r, stiff * I_ref * _stub_inertia(r),
+                     stiff * I_ref * _stub_inertia(r), stiff * J_ref * r])
         cmds.append(["add_member", name, ni, nj, name, name])
         if releases:
             cmds.append(["def_releases", name, *releases])
@@ -155,8 +162,9 @@ def translate(model, combination: str, *, subdivisions: int | None = None, stiff
                 fid.add("offsets", APPROXIMATE, "stiff member from the joint to the flexible end",
                         control="stiffness")
                 if p.second_order:
-                    fid.add("offsets", APPROXIMATE, "second order: the stiff stub takes part in PyNite's geometric "
-                                                    "stiffness; not compared with a reference")
+                    fid.add("offsets.secondOrder", APPROXIMATE,
+                            "the stiff stub takes part in PyNite's geometric stiffness; no reference, no error "
+                            "estimate")
                 P = new_node(pos)
                 stiff_member(f"O{len(segments)}", N, P)
                 ends.append(P)
@@ -326,31 +334,57 @@ def _map(p: Prepared, members_out, fid, raw, options) -> ForeignResult:
         fj = sum(np.array(raw["f"][name])[6:] for name in out["last"]) + np.array(out["fef_j"])
         end_forces[mid] = np.r_[fi, fj] / p.alpha
     info = {"alpha": p.alpha, "version": raw.get("version"), "axesError": raw.get("axesError"), **options}
+    size = float(np.linalg.norm(np.ptp(p.xyz, axis=0))) or 1.0
+    if not np.all(np.isfinite(U)) or float(np.abs(U[:, :3]).max()) > 1e6 * size:
+        return ForeignResult(SOLVER, p.combination, False, fid, info=info,
+                             error="singular or ill-conditioned system (mechanism in the foreign model?)")
     if p.second_order:
         info["secondOrder"] = dict(raw.get("secondOrderInfo") or {})
         info["secondOrder"]["strain"] = max(abs(float(end_forces[mid][6])) * p.alpha / (m.E * m.A)
                                             for mid, m in p.members.items())
+        # external work F^T u of the analysed (alpha-times) loads: nodal loads plus the member loads
+        # through their equivalent end loads (fixed-end forces of the unreleased member)
+        W = float(np.sum(p.load * U))
+        for mid, m in p.members.items():
+            if m.loaded:
+                fe = fixed_end_forces(m.L, m.EIy, m.EIz, None, None, m.points, m.dists)
+                for blk, nid, off in ((0, m.i, m.offset_i), (6, m.j, m.offset_j)):
+                    un = U[p.index(nid)]
+                    u_end = un[:3] + np.cross(un[3:], off)
+                    W -= float(fe[blk:blk + 3] @ (m.R @ u_end) + fe[blk + 3:blk + 6] @ (m.R @ un[3:]))
+        info["secondOrder"]["externalWork"] = W
     return ForeignResult(SOLVER, p.combination, True, fid, U / p.alpha, reactions / p.alpha, end_forces, "", info)
+
+
+N_ITERATION_SAFETY = 3.0
 
 
 def finalise(res: ForeignResult) -> None:
     """Second-order runs: add the two formulation-error estimates that come from the run itself.
 
-    * PyNite builds Kg from the FIRST-ORDER axial forces.  With delta = largest change of a member
-      axial force between the first-order run and the P-Delta run (relative to the largest axial
-      force), kappa = relative size of the second-order increment of the displacements and the
-      amplification 1/(1 - kappa), a first-order sensitivity estimate of the effect is
-      ``delta * kappa / (1 - kappa)`` (heuristic: second-order increments scale with N).
+    * PyNite builds Kg from the FIRST-ORDER axial forces N1 and does not iterate.  With u the P-Delta
+      solution, K_T u = F and K_T symmetric, a change dKg of the geometric stiffness changes the
+      compliance by  F^T du = -u^T dKg u  (first order).  dKg is linear in the change of the axial
+      forces dN = N(final displacements) - N1, and u^T kg u of a member piece for a unit axial force is
+      (chord rotation)^2 x length in the string form, so
+          |F^T du| / |F^T u|  =  | sum dN_m (chord rotation_m)^2 L_m | / | F^T u |
+      estimates the relative effect on the load-weighted displacement.  It is multiplied by
+      ``N_ITERATION_SAFETY`` and recorded as the estimated error (an estimate of a global measure,
+      not a bound for every result).
     * PyNite's Kg has an axial term that changes the axial stiffness from EA/L to (EA + N)/L: relative
       effect at most ``max |N| / EA``.
     """
     so = res.info.get("secondOrder")
     if not so:
         return
-    kappa = min(so["kappa"], 0.9)
+    work = abs(so.get("externalWork") or 0.0)
+    if work > 0.0:
+        err = N_ITERATION_SAFETY * abs(so["geometricWorkChange"]) / work
+    else:
+        err = None
     res.fidelity.add("secondOrder.axialForceIteration", APPROXIMATE,
-                     "Kg from first-order axial forces, not iterated (estimate: delta * kappa / (1 - kappa))",
-                     error=so["delta"] * kappa / (1.0 - kappa))
+                     "Kg from first-order axial forces, not iterated (first-order sensitivity estimate of the "
+                     "compliance, x3)", error=err)
     res.fidelity.add("secondOrder.axialTermInKg", APPROXIMATE,
                      "axial stiffness (EA + N)/L in PyNite's geometric stiffness (estimate: max |N|/EA)",
                      error=so["strain"])
@@ -383,7 +417,7 @@ def execute(job: dict) -> dict:
     def collect():
         disp = {nm: [float(getattr(model.nodes[nm], d)[combo]) for d in DOFS] for nm in job["nodes"]}
         rxn = {nm: [float(getattr(model.nodes[nm], "Rxn" + d)[combo]) for d in FORCES] for nm in job["nodes"]}
-        f, axes, axial = {}, 0.0, {}
+        f, axes, axial, geom = {}, 0.0, {}, {}
         for nm in job["members"]:
             mem = model.members[nm]
             subs = list(mem.sub_members.values()) if getattr(mem, "sub_members", None) else [mem]
@@ -396,24 +430,30 @@ def execute(job: dict) -> dict:
             for s in subs:
                 axes = max(axes, float(np.abs(np.array(s.T())[1, :3] - target[nm]).max()))
                 axial[s.name] = float(np.array(s.f(combo)).ravel()[6])
-        return disp, rxn, f, axes, axial
+                # chord rotation^2 x length = u^T kg u of this piece for a unit axial force (string form)
+                T = np.array(s.T())[:3, :3]
+                du = np.array([getattr(s.j_node, d)[combo] - getattr(s.i_node, d)[combo] for d in DOFS[:3]], float)
+                perp = du - (du @ T[0]) * T[0]
+                geom[s.name] = float(perp @ perp) / float(s.L())
+        return disp, rxn, f, axes, axial, geom
 
     out = {"ok": True, "version": getattr(Pynite, "__version__", None)}
     try:
         if job["secondOrder"]:
             model.analyze_linear(check_stability=False)
-            d1, _, _, _, n1 = collect()
+            d1, _, _, _, n1, _ = collect()
             model.analyze_PDelta(check_stability=False)
-            disp, rxn, f, axes, n2 = collect()
+            disp, rxn, f, axes, n2, g2 = collect()
             u1 = np.array([v[:3] for v in d1.values()])
             u2 = np.array([v[:3] for v in disp.values()])
             nmax = max((abs(v) for v in n2.values()), default=0.0) or 1.0
             out["secondOrderInfo"] = {
                 "delta": max((abs(n2[k] - n1.get(k, 0.0)) for k in n2), default=0.0) / nmax,
-                "kappa": float(np.abs(u2 - u1).max() / (np.abs(u2).max() or 1.0))}
+                "kappa": float(np.abs(u2 - u1).max() / (np.abs(u2).max() or 1.0)),
+                "geometricWorkChange": float(sum((n2[k] - n1.get(k, 0.0)) * g2[k] for k in n2))}
         else:
             model.analyze_linear(check_stability=False)
-            disp, rxn, f, axes, _ = collect()
+            disp, rxn, f, axes, _, _ = collect()
     except Exception as e:                                   # noqa: BLE001 - library failure is a result
         return {"ok": False, "error": f"PyNite analysis failed: {type(e).__name__}: {e}"}
     if axes > 1e-9:

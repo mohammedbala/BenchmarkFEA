@@ -6,37 +6,46 @@ the calls; it is meant to run in a subprocess (``benchfea.crosscheck.runner``) b
 terminates the interpreter on some input errors.  The mapping of the raw output back to benchfea
 conventions (``Translation.results``) again needs no OpenSees.
 
-How each feature is represented (every statement about OpenSees 3.8 behaviour was measured, see
-docs/CROSSCHECK.md):
+How each feature is represented (every statement about OpenSees 3.8 behaviour was measured and is
+reproduced by tests/test_crosscheck_measured.py; see docs/CROSSCHECK.md):
 
 * members: ``elasticBeamColumn`` (Euler-Bernoulli) or, with shear deformation in a first-order
   combination, ``ElasticTimoshenkoBeam``; one ``geomTransf`` per element with ``vecxz`` = benchfea's
   local z (OpenSees: y = vecxz x x, z = x x y, which returns benchfea's y and z).
-* truss-type members: ``elasticBeamColumn`` with both bending moments released at both ends and the
-  torsion constant multiplied by 1e-12 (benchfea transmits no torque through a truss member).
-* rigid end offsets: ``-jntOffset`` of the transformation; where the end also needs a node chain (see
-  releases) an explicit node at the flexible end tied to the joint by ``rigidLink('beam')``.
-* releases: full release of My / Mz only -> element flags ``-releasey/-releasez`` (exact, any
-  orientation); anything else (partial springs, axial/shear/torsion releases, any release on a
-  Timoshenko element) -> duplicate node at the flexible end connected by ``equalDOF`` for rigid
+* truss-type members: one ``elasticBeamColumn`` whose bending and torsion stiffness is multiplied by
+  1e-15 (benchfea transmits only the axial force); never subdivided.
+* bending connections (local ry, rz: hinge or rotational spring, either end, any orientation, with or
+  without shear deformation): EXACT decomposition into elements in parallel between the same nodes --
+  a rigidly connected core plus partners carrying the ``-releasey/-releasez`` flag at one end
+  (``fef.bending_split``).  Released members never receive ``eleLoad`` (the flags condense the
+  fixed-end forces of full-span uniform loads only).
+* axial / shear / torsion connections: duplicate node at the flexible end, ``equalDOF`` for the rigid
   directions and a ``zeroLength`` spring (``-orient`` = member axes) for partial ones.  ``equalDOF``
-  works on global DOFs, so this is exact when the member axes are parallel to the global axes or the
-  whole translation / rotation triple is rigid; otherwise the rigid directions of a partly released
-  triple get a penalty spring (``penalty`` x member stiffness) and the feature is "approximate".
+  acts on global DOFs and its retained node must not itself be constrained, so this is exact when the
+  member axes are parallel to the global axes (or the whole translation / rotation triple is rigid),
+  the end has no rigid offset and the joint is not a constraint slave; otherwise the rigid directions
+  get penalty springs (``penalty`` x member stiffness) and the feature is "approximate".
+* rigid end offsets: ``-jntOffset`` on ``elasticBeamColumn``; ``ElasticTimoshenkoBeam`` mishandles
+  ``-jntOffset``, so those elements (and node chains) use a node at the flexible end tied to the joint
+  by ``rigidLink('beam')``.
 * rigid links / diaphragms: ``rigidLink('beam')`` / ``rigidDiaphragm`` with the ``Transformation``
   constraint handler (exact); a diaphragm slave outside the master's plane is "unsupported".
-* member loads: uniform (full or partial) line loads and interior point forces on Euler-Bernoulli
-  elements use ``eleLoad`` (``native_loads=True``); linearly varying loads, point moments and every
-  load on a Timoshenko element are turned into exact equivalent nodal loads with the fixed-end forces
-  of :mod:`benchfea.crosscheck.fef`, which are added back to the element end forces.
+* member loads: uniform (full or partial) line loads and interior point forces on unreleased
+  Euler-Bernoulli elements use ``eleLoad`` (``native_loads=True``); linearly varying loads, point
+  moments and every load on a Timoshenko or released element become exact equivalent nodal loads with
+  the fixed-end forces of :mod:`benchfea.crosscheck.fef`, which are added back to the element end forces.
 * second order: ``geomTransf('PDelta')`` (chord-rotation geometric stiffness only, no P-delta inside
   an element), Newton iterations on the current axial forces, every frame member divided into
   ``subdivisions`` elements; the discretisation error is O(1/n^2) and is estimated by the runner from
-  two subdivision levels.
+  two subdivision levels.  Member end forces are reported along the UNDEFORMED local axes (forces from
+  the global element forces, moments from the element ends).
+* linear solver: ``UmfPack`` (measured: far less round-off with penalty springs than the dense
+  solvers, but it does not report a singular matrix -- the self-check below does).
 * reactions are NOT read from ``nodeReaction`` (measured: zero at a fixed node that retains a
   constraint); they are computed from joint equilibrium of the element end forces returned by
-  OpenSees, the applied loads and the known constraint topology, and the residual at the free DOFs
-  is reported as a self-check together with the violation of the kinematic constraints.
+  OpenSees, the applied loads and the known constraint topology.  The residual at the free DOFs, the
+  violation of the kinematic constraints (from the displacements) and the sanity of the displacements
+  are a self-check: a run that fails it is reported as failed.
 """
 from __future__ import annotations
 
@@ -210,11 +219,11 @@ def translate(model, combination: str, *, subdivisions: int | None = None, penal
                 "elasticBeamColumn with bending and torsion stiffness x 1e-12" if m.truss else "")
         if m.offset_i.any() or m.offset_j.any():
             if p.second_order:
-                fid.add("offsets", APPROXIMATE, "second order: no geometric stiffness is attributed to the rigid "
-                                                "offset zones by this translation; not compared with a reference")
-            else:
-                fid.add("offsets", EXACT, "-jntOffset (Euler-Bernoulli elements) / rigidLink('beam') to a node at "
-                                          "the flexible end (Timoshenko elements, node chains)")
+                fid.add("offsets.secondOrder", APPROXIMATE,
+                        "the geometric stiffness of the rigid offset zones is the solver's own (-jntOffset of the "
+                        "PDelta transformation / linear rigidLink); no reference, no error estimate")
+            fid.add("offsets", EXACT, "-jntOffset (Euler-Bernoulli elements) / rigidLink('beam') to a node at the "
+                                      "flexible end (Timoshenko elements, node chains)")
 
         # ---- end connections.  Bending rotations (local ry, rz): parallel elements (below).
         #      Axial / shear / torsion connections: node chain at the flexible end.
@@ -233,7 +242,8 @@ def translate(model, combination: str, *, subdivisions: int | None = None, penal
                             "bending connection: parallel elements with release flags (exact decomposition)")
             if all(math.isinf(k) for k in k_end[:4]):
                 if timo and off.any():
-                    # measured: ElasticTimoshenkoBeam does not honour -jntOffset in OpenSees 3.8
+                    # measured: ElasticTimoshenkoBeam with -jntOffset shortens the element but drops the rigid
+                    # arms (equilibrium violated) in OpenSees 3.8
                     Pn, exact = b.offset_node(N, pos, cmds)
                     if not exact:
                         fid.add("offsets", UNSUPPORTED, f"member {mid!r}: rigid offset of a shear-deformable "
@@ -477,8 +487,12 @@ def _map(p: Prepared, b: _Builder, members_out, fid, raw, options) -> ForeignRes
                 need[r][3 + a] += v[3 + a] + np.cross(arm, v[:3])[a]
         pending = [c for c in pending if c not in leaves]
     reactions = np.zeros((n, 6))
-    fmax = max(max(float(np.abs(v[:3]).max()) for v in need.values()), 1e-300)
-    mmax = max(max(float(np.abs(v[3:]).max()) for v in need.values()), 1e-300)
+    # scales of the residual: largest element end force; largest end moment, but at least
+    # 1e-3 x force scale x model size (a model without bending has only round-off moments)
+    size = float(np.linalg.norm(np.ptp(p.xyz, axis=0))) or 1.0
+    ef = np.array([glob[tag] for tag, kind, _, _ in b.elements if kind != "support"]).reshape(-1, 12)
+    fmax = max(float(np.abs(ef[:, [0, 1, 2, 6, 7, 8]]).max()), 1e-300)
+    mmax = max(float(np.abs(ef[:, [3, 4, 5, 9, 10, 11]]).max()), 1e-3 * fmax * size)
     residual = 0.0
     for t, v in need.items():
         mask = b.fix.get(t, np.zeros(6, bool)).copy()
@@ -506,10 +520,16 @@ def _map(p: Prepared, b: _Builder, members_out, fid, raw, options) -> ForeignRes
             "constraintViolation": violation, "jointResidual": residual, "alpha": p.alpha,
             "version": raw.get("version"), **options}
     limit = max(1e-6, 1e-11 * options["penalty"]) if options.get("penalised") else 1e-6
-    ok = bool(raw.get("converged", True)) and violation < 1e-8 and residual < limit
-    error = "" if ok else (f"self-check failed: constraint violation {violation:.2e}, joint equilibrium "
+    # UmfPack does not report a singular matrix (measured): a mechanism shows as non-finite or absurd
+    # displacements and a joint residual of order one
+    sane = bool(np.all(np.isfinite(U))) and float(np.abs(U[:, :3]).max()) < 1e6 * size
+    ok = bool(raw.get("converged", True)) and sane and violation < 1e-8 and residual < limit
+    error = "" if ok else ("singular or ill-conditioned system (mechanism in the foreign model?): " * (not sane)
+                           + f"self-check failed: constraint violation {violation:.2e}, joint equilibrium "
                            f"residual {residual:.2e}, converged {raw.get('converged', True)}")
-    return ForeignResult(SOLVER, p.combination, ok, fid, U / p.alpha, reactions / p.alpha, end_forces, error, info)
+    if not ok:
+        return ForeignResult(SOLVER, p.combination, False, fid, error=error, info=info)
+    return ForeignResult(SOLVER, p.combination, True, fid, U / p.alpha, reactions / p.alpha, end_forces, "", info)
 
 
 # ====================================================================================== worker
@@ -548,4 +568,7 @@ def execute(job: dict) -> dict:
     out["disp"] = {str(t): list(ops.nodeDisp(t)) for t in job["nodes"]}
     out["eleForce"] = {str(t): list(ops.eleForce(t)) for t in job["elements"]}
     out["localForce"] = {str(t): list(ops.eleResponse(t, "localForce")) for t in job["beams"]}
+    if job.get("nodeReaction"):                             # diagnostic only: the translator never uses it
+        ops.reactions()
+        out["nodeReaction"] = {str(t): list(ops.nodeReaction(t)) for t in job["nodeReaction"]}
     return out

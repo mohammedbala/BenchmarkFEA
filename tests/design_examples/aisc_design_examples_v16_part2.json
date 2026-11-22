@@ -1,0 +1,392 @@
+{
+  "source": {
+    "document": "AISC, Companion to the AISC Steel Construction Manual, Volume 1: Design Examples, Version 16.0 (2023), accompanying ANSI/AISC 360-22",
+    "pages": "printed page F-n = PDF page 162+n; H-n = PDF page 262+n",
+    "content": "Only numbers are recorded here: the inputs each example lists and the values it prints (3 significant figures). No text, table or figure of the document is reproduced.",
+    "units": "kip, in. (ksi); moments in kip-ft and lengths in ft where the key says so (as printed); converted in the tests",
+    "tolerancePolicy": "the single policy of aisc_design_examples_v16.json (tests/design_examples/__init__.py: assert_printed) applies unchanged"
+  },
+  "examples": {
+    "F.1-1B": {
+      "title": "W18x50, major axis, continuously braced: yielding",
+      "pages": "F-8 (PDF 170)",
+      "inputs": {
+        "Fy": 50,
+        "E": 29000,
+        "Zx": 101,
+        "Mu_kipft": 266,
+        "Ma_kipft": 184
+      },
+      "printed": {
+        "Mn_kipin": 5050,
+        "Mn_kipft": 421,
+        "phiMn_kipft": 379,
+        "Mn_over_Omega_kipft": 252
+      },
+      "notes": [
+        "Compactness is asserted by the example (User Note of Spec. F2); bf/2tf and h/tw are not listed."
+      ]
+    },
+    "F.1-2B": {
+      "title": "W18x50, major axis, braced at the ends and third points: inelastic LTB with Cb",
+      "pages": "F-10 to F-11 (PDF 172-173)",
+      "inputs": {
+        "Fy": 50,
+        "E": 29000,
+        "ry": 1.65,
+        "Sx": 88.9,
+        "J": 1.24,
+        "rts": 1.98,
+        "ho": 17.4,
+        "Zx": 101,
+        "span_ft": 35,
+        "wu_kip_per_ft": 1.74,
+        "wa_kip_per_ft": 1.2,
+        "Mu_kipft": 266,
+        "Ma_kipft": 184
+      },
+      "printed": {
+        "Cb_center": 1.01,
+        "Cb_end": 1.46,
+        "Lp_in": 69.9,
+        "Lr_in": 203,
+        "Lb_ft": 11.7,
+        "Mn_kipin": 4060,
+        "Mn_kipft": 338,
+        "phiMn_kipft": 304,
+        "Mn_over_Omega_kipft": 202
+      },
+      "notes": [
+        "Zx = 101 in.^3 and the loads (wu = 1.74, wa = 1.20 kip/ft on 35 ft) are those of Examples F.1-1A/B, to which this example refers (Mp = 5,050 kip-in.).",
+        "Rounded chain: the example evaluates Eq. F2-2 with Lb = 11.7 ft, Lp = 5.83 ft, Lr = 16.9 ft, Cb = 1.01 (4,060 kip-in.); full precision from the listed properties with Lb = 35/3 ft and Cb = 1.0135 gives 4,086 kip-in. (+0.65 %), inside the policy.",
+        "Compactness asserted by the example; ratios not listed."
+      ]
+    },
+    "F.1-3B": {
+      "title": "W18x50, major axis, braced at the ends and midspan: elastic LTB with Cb",
+      "pages": "F-14 to F-15 (PDF 176-177)",
+      "inputs": {
+        "Fy": 50,
+        "E": 29000,
+        "rts": 1.98,
+        "Sx": 88.9,
+        "J": 1.24,
+        "ho": 17.4,
+        "Zx": 101,
+        "ry": 1.65,
+        "span_ft": 35,
+        "wu_kip_per_ft": 1.74,
+        "wa_kip_per_ft": 1.2
+      },
+      "printed": {
+        "Cb": 1.3,
+        "Lp_ft": 5.83,
+        "Lr_ft": 16.9,
+        "Lb_ft": 17.5,
+        "Fcr": 43.2,
+        "Mn_kipin": 3840,
+        "Mn_kipft": 320,
+        "phiMn_kipft": 288,
+        "Mn_over_Omega_kipft": 192
+      },
+      "notes": [
+        "ry = 1.65 in. is listed for the same shape in Example F.1-2B (this example takes Lp and Lr from Manual Table 3-2)."
+      ]
+    },
+    "F.3B": {
+      "title": "W21x48, major axis, continuously braced: noncompact flange local buckling",
+      "pages": "F-24 to F-25 (PDF 186-187)",
+      "inputs": {
+        "Fy": 50,
+        "E": 29000,
+        "Sx": 93.0,
+        "Zx": 107,
+        "bf_2tf": 9.47,
+        "Mu_kipft": 396,
+        "Ma_kipft": 250
+      },
+      "printed": {
+        "lambda_pf": 9.15,
+        "lambda_rf": 24.1,
+        "Mp_kipin": 5350,
+        "Mn_kipin": 5310,
+        "Mn_kipft": 442,
+        "phiMn_kipft": 398,
+        "Mn_over_Omega_kipft": 265
+      },
+      "notes": [
+        "The web is not classified in the example (h/tw not listed)."
+      ]
+    },
+    "F.5": {
+      "title": "W12x58, minor axis: yielding",
+      "pages": "F-28 to F-29 (PDF 190-191)",
+      "inputs": {
+        "Fy": 50,
+        "E": 29000,
+        "Sy": 21.4,
+        "Zy": 32.5,
+        "Mu_kipft": 113,
+        "Ma_kipft": 75.1
+      },
+      "printed": {
+        "Mn_kipin": 1630,
+        "cap_kipin": 1710,
+        "Mn_kipft": 136,
+        "phiMn_kipft": 122,
+        "Mn_over_Omega_kipft": 81.4
+      },
+      "notes": [
+        "Compact flanges asserted by the example (User Note of Spec. F6).",
+        "Rounded chain: Fy Zy = 1,625 kip-in. = 135.4 kip-ft is printed as 136 kip-ft before the factors are applied."
+      ]
+    },
+    "F.7B": {
+      "title": "HSS10x6x3/16, major axis, braced at the ends: noncompact flange, LTB capped at Mp",
+      "pages": "F-34 to F-36 (PDF 196-198)",
+      "inputs": {
+        "Fy": 50,
+        "E": 29000,
+        "Ag": 5.37,
+        "Zx": 18.0,
+        "Sx": 14.9,
+        "ry": 2.52,
+        "J": 73.8,
+        "b_t": 31.5,
+        "h_t": 54.5,
+        "Ix": 74.6,
+        "span_ft": 21,
+        "wu_kip_per_ft": 0.82
+      },
+      "printed": {
+        "Mp_kipin": 900,
+        "Mn_flb_kipin": 796,
+        "Mn_kipft": 66.3,
+        "Lp_in": 210,
+        "Lr_in": 5580,
+        "Cb": 1.14,
+        "Mn_ltb_uncapped_kipin": 1020,
+        "Mn_ltb_kipin": 900,
+        "phiMn_kipft": 59.7,
+        "Mn_over_Omega_kipft": 39.7
+      },
+      "notes": [
+        "Ix = 74.6 in.^4, the span and the load are listed in Example F.7A (F-32 to F-33, PDF 194-195).",
+        "The example cites the LTB equations as Spec. Eq. F7-10, F7-12 and F7-13; in ANSI/AISC 360-22 as supplied the same equations are numbered F7-8, F7-10 and F7-11."
+      ]
+    },
+    "F.8B": {
+      "title": "HSS8x8x3/16, slender flange: effective width and effective section modulus",
+      "pages": "F-39 to F-41 (PDF 201-203)",
+      "inputs": {
+        "Fy": 50,
+        "E": 29000,
+        "I": 54.4,
+        "Z": 15.7,
+        "S": 13.6,
+        "t": 0.174,
+        "b_t": 43.0,
+        "h_t": 43.0,
+        "B": 8.0,
+        "H": 8.0,
+        "Mu_kipft": 41.3,
+        "Ma_kipft": 27.6
+      },
+      "printed": {
+        "b": 7.48,
+        "be": 6.33,
+        "Ieff": 48.3,
+        "Se": 12.1,
+        "Mn_kipin": 605,
+        "Mn_kipft": 50.4,
+        "phiMn_kipft": 45.4,
+        "Mn_over_Omega_kipft": 30.2
+      },
+      "notes": [
+        "The example removes the ineffective width from both flanges (no neutral-axis shift), which is the method of the engine."
+      ]
+    },
+    "F.9B": {
+      "title": "Pipe 8 x-Strong: yielding",
+      "pages": "F-43 to F-44 (PDF 205-206)",
+      "inputs": {
+        "Fy": 35,
+        "E": 29000,
+        "Z": 31.0,
+        "D_t": 18.5,
+        "Mu_kipft": 61.4,
+        "Ma_kipft": 41.0
+      },
+      "printed": {
+        "limit_F8": 373,
+        "Mn_kipin": 1090,
+        "Mn_kipft": 90.4,
+        "phiMn_kipft": 81.4,
+        "Mn_over_Omega_kipft": 54.1
+      },
+      "notes": [
+        "S is not listed (not needed: compact)."
+      ]
+    },
+    "H.1B": {
+      "title": "W14x99, compression and biaxial flexure: Eq. H1-1a with tabulated available strengths",
+      "pages": "H-4 to H-5 (PDF 266-267)",
+      "inputs": {
+        "LRFD": {
+          "Pr": 400,
+          "Mrx_kipft": 250,
+          "Mry_kipft": 80.0,
+          "Pc": 1130,
+          "Mcx_kipft": 642,
+          "Mcy_kipft": 311
+        },
+        "ASD": {
+          "Pr": 267,
+          "Mrx_kipft": 167,
+          "Mry_kipft": 53.3,
+          "Pc": 750,
+          "Mcx_kipft": 427,
+          "Mcy_kipft": 207
+        }
+      },
+      "printed": {
+        "LRFD": {
+          "Pr_over_Pc": 0.354,
+          "interaction": 0.929
+        },
+        "ASD": {
+          "Pr_over_Pc": 0.356,
+          "interaction": 0.933
+        }
+      },
+      "notes": [
+        "The available strengths are Manual Table 6-1 values (no section property is listed): only the interaction equation is reproduced."
+      ]
+    },
+    "H.3": {
+      "title": "W14x82, tension and biaxial flexure: D2-1, F2-2, F6-1, H1-1b",
+      "pages": "H-8 to H-11 (PDF 270-273)",
+      "inputs": {
+        "Fy": 50,
+        "E": 29000,
+        "Ag": 24.0,
+        "Sx": 123,
+        "Zx": 139,
+        "Sy": 29.3,
+        "Zy": 44.8,
+        "Iy": 148,
+        "Lp_ft": 8.76,
+        "Lr_ft": 33.2,
+        "Lb_ft": 30,
+        "Cb_table": 1.14,
+        "Cb_used": 1.41,
+        "LRFD": {
+          "Pr": 174,
+          "Mrx_kipft": 192,
+          "Mry_kipft": 67.6
+        },
+        "ASD": {
+          "Pr": 116,
+          "Mrx_kipft": 128,
+          "Mry_kipft": 45.1
+        }
+      },
+      "printed": {
+        "Pn": 1200,
+        "Mp_kipin": 6950,
+        "Pey": 327,
+        "Cb_factor_LRFD": 1.24,
+        "Cb_factor_ASD": 1.25,
+        "Mnx_kipin": 6560,
+        "Mnx_kipft": 547,
+        "Mny_kipin": 2240,
+        "Mny_kipft": 187,
+        "LRFD": {
+          "Pc": 1080,
+          "Mcx_kipft": 492,
+          "Mcy_kipft": 168,
+          "Pr_over_Pc": 0.161,
+          "interaction": 0.873
+        },
+        "ASD": {
+          "Pc": 719,
+          "Mcx_kipft": 328,
+          "Mcy_kipft": 112,
+          "Pr_over_Pc": 0.161,
+          "interaction": 0.874
+        }
+      },
+      "notes": [
+        "Lp and Lr are Manual Table 3-2 values (rts, J, ho are not listed), so Eq. F2-2 is evaluated with them as inputs.",
+        "Cb = 1.41 = 1.24 x 1.14: the example applies the optional increase of Spec. H1.2 (Eq. H1-2), with the LRFD factor 1.24 for both methods. The engine does not apply that increase; Cb = 1.41 is an input of the test."
+      ]
+    },
+    "H.4": {
+      "title": "W10x33, compression and biaxial flexure with B1: A-8-3, A-8-5, F2-2, F6-1, H1-1b",
+      "pages": "H-12 to H-15 (PDF 274-277)",
+      "inputs": {
+        "Fy": 50,
+        "E": 29000,
+        "Sx": 35.0,
+        "Zx": 38.8,
+        "Ix": 171,
+        "Sy": 9.2,
+        "Zy": 14.0,
+        "Iy": 36.6,
+        "Lp_ft": 6.85,
+        "Lr_ft": 21.8,
+        "Lb_ft": 14,
+        "Lc1_ft": 14,
+        "Cb": 1.14,
+        "Cm": 1.0,
+        "LRFD": {
+          "alpha": 1.0,
+          "Pr": 30.0,
+          "Mx1_kipft": 90.0,
+          "My1_kipft": 12.0,
+          "Pc": 253
+        },
+        "ASD": {
+          "alpha": 1.6,
+          "Pr": 20.0,
+          "Mx1_kipft": 60.0,
+          "My1_kipft": 8.0,
+          "Pc": 168
+        }
+      },
+      "printed": {
+        "Pe1x": 1730,
+        "Pe1y": 371,
+        "Mp_kipin": 1940,
+        "Mnx_kipin": 1820,
+        "Mnx_kipft": 152,
+        "Mny_kipin": 700,
+        "Mny_kipft": 58.3,
+        "LRFD": {
+          "B1x": 1.02,
+          "B1y": 1.09,
+          "Mrx_kipft": 91.8,
+          "Mry_kipft": 13.1,
+          "Mcx_kipft": 137,
+          "Mcy_kipft": 52.5,
+          "Pr_over_Pc": 0.119,
+          "interaction": 0.979
+        },
+        "ASD": {
+          "B1x": 1.02,
+          "B1y": 1.09,
+          "Mrx_kipft": 61.2,
+          "Mry_kipft": 8.72,
+          "Mcx_kipft": 91.0,
+          "Mcy_kipft": 34.9,
+          "Pr_over_Pc": 0.119,
+          "interaction": 0.982
+        }
+      },
+      "notes": [
+        "Pc is a Manual Table 6-1 value (the area is not listed) and Lp, Lr are Manual Table 3-2 values: they are inputs of the test.",
+        "The first-order moments (Mx1, My1) are amplified by B1 with Cm = 1.0 and the unreduced EI; the example multiplies with the rounded B1 (1.02, 1.09)."
+      ]
+    }
+  }
+}

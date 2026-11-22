@@ -99,7 +99,7 @@ CAPABILITIES = {
         "localAxes": _e("exact", "vecxz = benchfea local z; y = vecxz x x, z = x x y"),
         "trussMembers": _e("exact", "elasticBeamColumn with bending and torsion stiffness x 1e-15"),
         "rigidOffsets": _e("exact", "-jntOffset on Euler-Bernoulli elements; explicit node + rigidLink('beam') for "
-                                    "ElasticTimoshenkoBeam, which does not honour -jntOffset; second order: "
+                                    "ElasticTimoshenkoBeam, which mishandles -jntOffset; second order: "
                                     "approximate without estimate"),
         "releasesFull": _e("exact", "bending: parallel elements with -releasey/-releasez; axial/shear/torsion: "
                                     "duplicate node + equalDOF (member axes parallel to global axes, no offset, "

@@ -122,6 +122,76 @@ def _run(args) -> int:
     return 3 if flagged else 0
 
 
+def _design(args) -> int:
+    """Analyse a model, run the member design checks, write the design document, print one row per
+    design member: status, governing limit state, clause, combination, ratio.
+
+    Exit code: 0 design status "pass" or "conditional"; 4 "fail" or "incomplete"; 1 model refused;
+    2 input unreadable / usage; 3 analysis flagged (invariants failed; the design is still written)."""
+    from pathlib import Path
+
+    from . import design
+    from .io import dump
+    from .model import build_model
+    from .problems import ModelInvalid, ModelUnstable
+    from .solve import analyze
+
+    out_path = Path(args.output) if args.output else Path(args.file).with_suffix(".design.json")
+    try:
+        model = build_model(args.file)
+        results = analyze(model, strict=not args.allow_flagged)
+    except ModelInvalid as e:
+        if args.json:
+            json.dump({"ok": False, "refusal": "unstable" if isinstance(e, ModelUnstable) else "invalid",
+                       "problems": [p.to_dict() for p in e.problems]}, sys.stdout, indent=2)
+            sys.stdout.write("\n")
+        else:
+            for p in e.problems:
+                print(p.format(args.file), file=sys.stderr)
+            print(f"{args.file}: REFUSED, no design written ({len(e.errors)} error(s))", file=sys.stderr)
+        return 2 if e.problems and all(p.code == "parse.io" for p in e.problems) else 1
+    out = design.check(model, results)
+    dump(out.to_document(model), out_path)
+    if args.results:
+        dump(results.to_document(model), Path(args.results))
+    flagged = [cid for cid, c in results.combinations.items() if not c.invariants.passed]
+    rows = []
+    for mid, m in out.members.items():
+        g = m.governing
+        rows.append({"member": mid, "status": m.status, "governing": g.name if g else None,
+                     "clause": g.clause if g else None, "combination": g.combination if g else None,
+                     "ratio": float(g.ratio) if g else None, "notChecked": list(m.not_checked),
+                     "warnings": list(m.warnings)})
+    summary = {"ok": out.status in (design.PASS, design.CONDITIONAL) and not flagged, "status": out.status,
+               "code": out.code, "output": str(out_path), "model": model.name, "members": rows,
+               "combinations": out.combinations, "warnings": list(out.warnings), "flagged": flagged}
+    if args.json:
+        json.dump(summary, sys.stdout, indent=2)
+        sys.stdout.write("\n")
+    else:
+        print(f"{args.file}: {len(out.members)} design member(s), code {out.code or 'n/a'}")
+        width = max([6] + [len(r["member"]) for r in rows])
+        print(f"  {'member':<{width}}  {'status':<11}  {'ratio':>7}  {'comb.':<8}  governing limit state [clause]")
+        for r in rows:
+            ratio = "   n/a " if r["ratio"] is None else f"{r['ratio'] + 0.0:7.3f}"
+            print(f"  {r['member']:<{width}}  {r['status']:<11}  {ratio}  {(r['combination'] or '-'):<8}  "
+                  f"{r['governing'] or 'no limit state could be checked'}"
+                  + (f" [{r['clause']}]" if r["clause"] else ""))
+            for text in r["notChecked"]:
+                if ": notChecked: " in text or ": refused: " in text:
+                    print(f"  {'':<{width}}    not checked -- {text}")
+        for w in out.warnings:
+            print(f"  warning: {w}")
+        n_member_warnings = sum(len(r["warnings"]) for r in rows)
+        if n_member_warnings:
+            print(f"  {n_member_warnings} member warning(s) are listed in the output under members/<id>/warnings")
+        print(f"design status: {out.status.upper()} -- written to {out_path}"
+              + (" -- analysis FLAGGED: invariants failed" if flagged else ""))
+    if flagged:
+        return 3
+    return 0 if out.status in (design.PASS, design.CONDITIONAL) else 4
+
+
 def _not_implemented(args) -> int:
     print(f"benchfea {args.command}: not available in this build (module not implemented yet)", file=sys.stderr)
     return 2
@@ -149,6 +219,14 @@ def build_parser() -> argparse.ArgumentParser:
             p.add_argument("--allow-flagged", action="store_true",
                            help="write results even if an invariant fails (they are flagged; exit code 3)")
             p.set_defaults(func=_run)
+        elif name == "design":
+            p.add_argument("file", help="input file (.json, .yaml, .yml)")
+            p.add_argument("-o", "--output", help="design file (.json or .yaml); default: <input>.design.json")
+            p.add_argument("--results", help="also write the analysis results document to this file")
+            p.add_argument("--json", action="store_true", help="print the summary (or the refusal) as JSON")
+            p.add_argument("--allow-flagged", action="store_true",
+                           help="design even if an analysis invariant fails (exit code 3)")
+            p.set_defaults(func=_design)
         else:
             p.add_argument("args", nargs=argparse.REMAINDER, help="command arguments")
             p.set_defaults(func=_not_implemented)

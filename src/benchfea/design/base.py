@@ -39,7 +39,7 @@ TEXT = "n/a"
 
 #: dimension of the context variables reported as inputs
 _DIMS = {"E": STRESS, "G": STRESS, "Fy": STRESS, "Fu": STRESS, "Lx": LENGTH, "Ly": LENGTH, "Lz": LENGTH,
-         "L": LENGTH, "An": AREA, "Kx": NONE, "Ky": NONE, "Kz": NONE, "U": NONE, "method": TEXT,
+         "L": LENGTH, "Lb": LENGTH, "An": AREA, "Kx": NONE, "Ky": NONE, "Kz": NONE, "U": NONE, "method": TEXT,
          "maxSlendernessCompression": NONE, "maxSlendernessTension": NONE}
 
 
@@ -98,6 +98,14 @@ class DesignContext:
     maxSlendernessTension: float = 300.0
     sources: dict = field(default_factory=dict)
     code: str = "AISC 360-22"
+    # --- flexure (Chapter F): lateral-torsional buckling data of the design member
+    Lb: float | None = None           # unbraced length for LTB; None: `L`, or the segments between the brace
+    #                                   points below when any are given
+    braceTop: tuple = ()              # lateral brace points of the top flange (+local y side), fractions of L
+    braceBottom: tuple = ()           # ... of the bottom flange; the member ends are brace points by definition
+    Cb: Any = "computed"              # a number, or "computed" (AISC 360-22 Eq. F1-1 per unbraced segment)
+    end_free: tuple = (False, False)  # (start, end): the end is a free end (no support, constraint or other member)
+    end_built_in: tuple = (False, False)   # (start, end): the end node has a support fixing all six DOFs
 
     def source(self, name: str) -> str:
         return self.sources.get(name, "given")
@@ -133,7 +141,24 @@ class DesignContext:
                    Lx=unbraced("Lx", "braceMajor"), Ly=unbraced("Ly", "braceMinor"),
                    Lz=unbraced("Lz", "braceTorsion"), Kx=p.Kx, Ky=p.Ky, Kz=p.Kz, An=p.An, U=p.U,
                    maxSlendernessCompression=p.maxSlendernessCompression,
-                   maxSlendernessTension=p.maxSlendernessTension, sources=src, code=p.code)
+                   maxSlendernessTension=p.maxSlendernessTension, sources=src, code=p.code,
+                   Lb=p.Lb, braceTop=tuple(p.braceTopFlange), braceBottom=tuple(p.braceBottomFlange), Cb=p.Cb,
+                   **_member_ends(model, p))
+
+
+def _member_ends(model, p) -> dict:
+    """Which ends of a design member are free ends / built-in ends (used by Chapter F: Eq. F1-1 needs both
+    ends of a segment braced; F1 gives Cb = 1.0 for cantilevers with warping prevented at the support)."""
+    own = set(p.members)
+    nodes = (model.members[p.members[0]].i, model.members[p.members[-1]].j)
+    tied = {n for c in model.constraints.values() for n in (c.master, *c.slaves)}
+    free, built_in = [], []
+    for node in nodes:
+        others = any(node in (m.i, m.j) for mid, m in model.members.items() if mid not in own)
+        sup = model.supports.get(node)
+        free.append(sup is None and node not in tied and not others)
+        built_in.append(sup is not None and all(sup.fixed))
+    return {"end_free": tuple(free), "end_built_in": tuple(built_in)}
 
 
 # ============================================================================== check builders

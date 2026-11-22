@@ -6,7 +6,6 @@ a reference.
 """
 import math
 
-import numpy as np
 import pytest
 
 from benchfea.oracle import Bar, Beam, OracleError

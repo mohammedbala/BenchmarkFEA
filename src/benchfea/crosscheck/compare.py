@@ -24,7 +24,7 @@ from dataclasses import dataclass, field
 
 import numpy as np
 
-from .fidelity import EXACT, UNSUPPORTED, Fidelity
+from .fidelity import EXACT, Fidelity
 from .foreign import ForeignResult
 from .prepare import prepare
 

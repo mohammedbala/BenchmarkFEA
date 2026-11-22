@@ -37,6 +37,8 @@ file (.json/.yaml) or dict
 | `benchfea.cli` | `benchfea validate \| run \| design \| perturb \| verify \| score` (`validate` and `run` implemented) |
 | `benchfea.design` | steel member checks: `check(model, results)`, `check_member`, registry of editions, `aisc360_22` chapter modules — see "Contract for `benchfea.design`" |
 | `benchfea.solve` | linear solver core (first-order): `analyze(model) -> Results`; see "Solver core" below and [THEORY.md](THEORY.md). Second-order, buckling, tension/compression-only, stiffness reduction and notional loads are refused (`analysis.not-implemented`) until their module registers |
+| `benchfea.oracle` | independent single-member / continuous-beam reference by direct integration of the member ODEs (`scipy.integrate.solve_bvp`): `Beam`, `Bar` — see [CROSSCHECK.md](CROSSCHECK.md) |
+| `benchfea.crosscheck` | translators to OpenSeesPy and PyNite (optional packages, run in a subprocess), `run`, `compare`, `cross_check` (tier-C decision), fidelity records, `CAPABILITIES` — see [CROSSCHECK.md](CROSSCHECK.md) |
 | `benchfea.verification`, `benchfea.env` | **to be implemented** against the contracts below |
 
 ## Input format decisions

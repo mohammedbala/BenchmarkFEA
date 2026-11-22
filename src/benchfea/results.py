@@ -254,6 +254,9 @@ class DesignMemberResult:
     governing: DesignCheck | None = None
     not_checked: list[str] = field(default_factory=list)   # limit states outside the implemented scope, with reason
     warnings: list[str] = field(default_factory=list)
+    # "pass" | "conditional" | "incomplete" | "fail" (benchfea.design, docs/ARCHITECTURE.md); "" = not set
+    status: str = ""
+    by_combination: dict = field(default_factory=dict)     # combination id -> list[DesignCheck] (every check)
 
 
 @dataclass
@@ -262,6 +265,8 @@ class DesignResults:
     members: dict[str, DesignMemberResult]
     defaults_used: list = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
+    status: str = ""                  # overall: "pass" | "conditional" | "incomplete" | "fail"; "" = not set
+    combinations: dict = field(default_factory=dict)       # combination id -> analysis basis (plain dict)
 
     def to_document(self, model) -> dict:
         """The design output document (format ``benchfea-design`` 1.0.0) in file units."""
@@ -300,10 +305,13 @@ class DesignResults:
 
         return {
             "format": DESIGN_OUTPUT_FORMAT, "formatVersion": DESIGN_OUTPUT_VERSION, "code": self.code,
-            "model": model.name, "units": u.to_dict(),
+            "model": model.name, "units": u.to_dict(), "status": self.status,
+            "combinations": {cid: dict(v) for cid, v in self.combinations.items()},
             "members": {
-                mid: {"passed": m.passed, "governing": check(m.governing) if m.governing else None,
+                mid: {"status": m.status, "passed": m.passed,
+                      "governing": check(m.governing) if m.governing else None,
                       "checks": [check(c) for c in m.checks], "notChecked": list(m.not_checked),
+                      "byCombination": {cid: [check(c) for c in cs] for cid, cs in m.by_combination.items()},
                       "parameters": {n: {"value": parameter(n, r.value), "unit": u.label(DIMENSIONS.get(n, "n/a")),
                                          "source": r.source, "path": r.path}
                                      for n, r in model.design_members[mid].values.items()},

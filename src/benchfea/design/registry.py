@@ -22,6 +22,8 @@ class Edition:
     title: str
     limit_states: tuple               # functions (ctx: DesignContext, demand: Demand) -> list[DesignCheck]
     methods: tuple = ("LRFD", "ASD")
+    #: serviceability checks: functions (model, results, design_member_id, ctx) -> list[DesignCheck]
+    service: tuple = ()
 
     def check(self, ctx, demand) -> list:
         """All checks of one design member for one combination's demand."""
