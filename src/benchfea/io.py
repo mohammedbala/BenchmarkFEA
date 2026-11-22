@@ -275,6 +275,7 @@ def _loads_yaml(text: str, source: str | None) -> Document:
     except yaml.YAMLError as e:
         raise ModelInvalid([Problem("", f"YAML error: {e}", code="parse.yaml",
                                     hint="Use only plain YAML scalars, lists and mappings.")], source) from None
+    positions.setdefault("", (1, 1))        # an empty document has no node
     return Document(data, positions, source, "yaml", problems)
 
 

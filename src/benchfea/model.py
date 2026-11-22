@@ -21,7 +21,7 @@ import numpy as np
 from . import defaults as D
 from . import designparams, sections, shapes
 from .designparams import Resolved
-from .geometry import AXIS, local_triad, member_geometry
+from .geometry import AXIS, is_vertical, local_triad, member_geometry
 from .io import Document, load
 from .problems import ERROR, ModelInvalid, Problem, pointer
 from .sections import SectionProps
@@ -321,6 +321,10 @@ def build_model(source) -> Model:
         for key, val in D.STIFFNESS_REDUCTION.items():
             if key not in sr:
                 default(f"/analysis/stiffnessReduction/{key}", val, D.STIFFNESS_REDUCTION_REASONS[key])
+        if "members" not in sr:
+            default("/analysis/stiffnessReduction/members", list(d["members"]),
+                    "stiffness reduction applied to all members (AISC 360-22 C2.3(a) permits it for all "
+                    "stiffnesses, p. 16.1-30)")
     analysis = AnalysisOptions(
         opt["type"], opt["shearDeformation"], opt["resultStations"], opt["convergenceTolerance"],
         opt["maxIterations"], opt["alpha"], opt["equilibriumTolerance"], opt["pivotTolerance"],
@@ -331,6 +335,9 @@ def build_model(source) -> Model:
     # ---- nodes, supports
     nodes = {nid: Node(nid, k, np.array([n["x"], n["y"], n.get("z", 0.0)], float))
              for k, (nid, n) in enumerate(d["nodes"].items())}
+    for nid, n in d["nodes"].items():
+        if "z" not in n:
+            default(pointer("nodes", nid, "z"), 0.0, "no z coordinate given: the node lies in the plane z = 0")
     vdof = {"X": "ux", "Y": "uy", "Z": "uz"}[vertical]
     supports = {}
     for nid, s in (d.get("supports") or {}).items():
@@ -381,6 +388,16 @@ def build_model(source) -> Model:
         g = member_geometry(m, d["nodes"], vertical, tol)
         geoms[mid] = g
         start, end, R, length, o_i, o_j = g
+        if "referenceVector" not in (m.get("orientation") or {}):
+            if is_vertical(R[0], vertical):
+                default(f"{base}/orientation/referenceVector", [1.0, 0.0, 0.0],
+                        "default orientation of a vertical member: local y = global +X (before roll)")
+            else:
+                default(f"{base}/orientation/referenceVector", [float(x) for x in AXIS[vertical]],
+                        "default orientation: local y in the plane of the member and the vertical axis, "
+                        "on the upward side (before roll)")
+        if "offsets" in m and "axes" not in m["offsets"]:
+            default(f"{base}/offsets/axes", "global", "rigid end offsets are global vectors")
         rel = m.get("releases") or {}
 
         def stiff(end_name):
@@ -427,6 +444,10 @@ def build_model(source) -> Model:
                 else:
                     g = -AXIS[vertical]
                     default(f"{base}/direction", [float(x) for x in g], "gravity acts along the negative vertical axis")
+                if "factor" not in ld:
+                    default(f"{base}/factor", 1.0, "self weight = 1.0 x unit weight x area")
+                if "members" not in ld:
+                    default(f"{base}/members", list(members), "self weight acts on all members")
                 loads.append(SelfWeight(float(ld.get("factor", 1.0)), g, tuple(ld.get("members", members))))
             else:
                 mem = members[ld["member"]]
@@ -441,6 +462,8 @@ def build_model(source) -> Model:
                     unit_local = np.eye(3)["xyz".index(direction)]
                     unit_global = None
                 if t == "memberPoint":
+                    if "kind" not in ld:
+                        default(f"{base}/kind", "force", "a concentrated force (not a moment)")
                     loads.append(MemberPointLoad(mem.id, ld.get("kind", "force"), ld["value"] * unit_local,
                                                  ld["position"] * scale))
                 else:
@@ -480,6 +503,17 @@ def build_model(source) -> Model:
     def no_problem(*args, **kw):          # all design problems were reported by validate()
         pass
 
+    design_raw = d.get("design") or {}
+    if "autoMembers" not in design_raw:
+        default("/design/autoMembers", True, "every analysis member not listed in an explicit design member "
+                                             "is a design member by itself")
+    levels = [("/design/defaults", design_raw.get("defaults") or {})]
+    levels += [(pointer("design", "groups", k), v) for k, v in (design_raw.get("groups") or {}).items()]
+    levels += [(pointer("design", "members", k), v) for k, v in (design_raw.get("members") or {}).items()]
+    for lbase, level in levels:
+        if "bracing" in level and "positionType" not in level["bracing"]:
+            default(f"{lbase}/bracing/positionType", "relative",
+                    "brace locations are fractions of the design member length")
     service = tuple(cid for cid, c in combos.items() if c.purpose == "serviceability")
     design_members = {}
     for dmid, info in designparams.resolve(d, geoms, no_problem).items():

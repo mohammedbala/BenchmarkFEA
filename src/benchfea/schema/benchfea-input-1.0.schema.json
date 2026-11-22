@@ -752,7 +752,7 @@
     },
     "material": {
       "type": "object",
-      "description": "Linear elastic isotropic material. Give G or nu (or both; G is used for stiffness).",
+      "description": "Linear elastic isotropic material. Give G or nu (or both; G is used for stiffness). The design checks use the same E, G, Fy, Fu unless a design variable of the same name overrides them.",
       "x-unit": "n/a",
       "properties": {
         "description": {
@@ -2244,6 +2244,30 @@
           ],
           "description": "Member role. Default: truss-type members = brace; frame members parallel to the vertical axis = column; other frame members = beam.",
           "x-unit": "n/a"
+        },
+        "E": {
+          "type": "number",
+          "description": "Modulus of elasticity used by the design checks. Default: E of the member's material. An override is DESIGN ONLY: the analysis always uses the material's E.",
+          "x-unit": "force/length^2",
+          "exclusiveMinimum": 0
+        },
+        "G": {
+          "type": "number",
+          "description": "Shear modulus used by the design checks. Default: G of the member's material. An override is DESIGN ONLY: the analysis always uses the material's G.",
+          "x-unit": "force/length^2",
+          "exclusiveMinimum": 0
+        },
+        "Fy": {
+          "type": "number",
+          "description": "Specified minimum yield stress used by the design checks. Default: Fy of the member's material. DESIGN ONLY: a computed tau_b (analysis.stiffnessReduction) always uses the material's Fy.",
+          "x-unit": "force/length^2",
+          "exclusiveMinimum": 0
+        },
+        "Fu": {
+          "type": "number",
+          "description": "Specified minimum tensile strength used by the design checks. Default: Fu of the member's material.",
+          "x-unit": "force/length^2",
+          "exclusiveMinimum": 0
         },
         "Lx": {
           "type": "number",

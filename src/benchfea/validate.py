@@ -19,6 +19,7 @@ Public API::
 from __future__ import annotations
 
 import difflib
+import math
 import re
 from contextlib import contextmanager
 
@@ -153,7 +154,11 @@ def _schema_error_problems(err, out: list, suppress: set):
         if path.endswith("/type"):
             suppress.add(path[:-5])
     elif kw == "type":
-        add("type", path, f"expected {schema['type']}, got {_jtype(inst)}", _describe(schema))
+        hint = _describe(schema)
+        if schema["type"] == "string" and _jtype(inst) in ("number", "boolean", "null"):
+            hint = (hint + " " if hint else "") + "Write the value as a string; in YAML put it in quotes " \
+                "(unquoted 1.0, yes, no, on, off, null are not strings)."
+        add("type", path, f"expected {schema['type']}, got {_jtype(inst)}", hint)
     elif kw in ("minimum", "exclusiveMinimum", "maximum", "exclusiveMaximum"):
         op = {"minimum": ">=", "exclusiveMinimum": ">", "maximum": "<=", "exclusiveMaximum": "<"}[kw]
         add("range", path, f"value {inst!r} must be {op} {schema[kw]}", _describe(schema))
@@ -173,6 +178,16 @@ def _schema_error_problems(err, out: list, suppress: set):
         else:
             add("invalid", path, f"value {inst!r} is not valid here" if not isinstance(inst, (dict, list))
                 else "value is not valid here", schema.get("x-hint", _describe(schema)))
+    elif kw in ("minItems", "maxItems"):
+        lo, hi = schema.get("minItems"), schema.get("maxItems")
+        want = f"exactly {lo}" if lo == hi else (f"at least {lo}" if kw == "minItems" else f"at most {hi}")
+        add(kw, path, f"list has {len(inst)} item(s), needs {want}", _describe(schema))
+    elif kw == "uniqueItems":
+        dup = sorted({repr(v) for k, v in enumerate(inst) if v in inst[:k]})
+        add(kw, path, f"list has repeated item(s): {', '.join(dup)}", "Remove the repetition. " + _describe(schema))
+    elif kw == "minProperties":
+        add(kw, path, f"needs at least {schema[kw]} entr{'y' if schema[kw] == 1 else 'ies'}, has {len(inst)}",
+            _describe(schema))
     else:
         add(kw, path, err.message, _describe(schema))
 
@@ -236,7 +251,8 @@ class _Semantics:
                 self.vertical = v
         self.node_ok = {k: n for k, n in self.table("nodes").items()
                         if isinstance(n, dict) and all(isinstance(n.get(c, 0.0), (int, float))
-                                                       and not isinstance(n.get(c, 0.0), bool) for c in "xyz")
+                                                       and not isinstance(n.get(c, 0.0), bool)
+                                                       and math.isfinite(n.get(c, 0.0)) for c in "xyz")
                         and "x" in n and "y" in n}
         self.size = model_size(self.node_ok) if self.node_ok else 0.0
         gt = D.ANALYSIS["geometryTolerance"]
@@ -279,6 +295,7 @@ class _Semantics:
     # ------------------------------------------------------------- supports
     def supports(self):
         nodes = self.table("nodes")
+        restrained = False
         for nid, s, p in self.items("supports"):
             if nid not in nodes:
                 self.add("ref.unknown-node", p, f"support refers to unknown node {nid!r}",
@@ -287,6 +304,14 @@ class _Semantics:
                 if all(v == "free" for v in self.support_dofs(s).values()):
                     self.add("support.no-restraint", p, f"support at node {nid!r} restrains nothing",
                              "Give `type` or set at least one DOF to \"fixed\" or a spring.", WARNING)
+                else:
+                    restrained = True
+        raw = self.d.get("supports", {})
+        if isinstance(raw, dict) and not restrained and all(isinstance(v, dict) for v in raw.values()):
+            self.add("support.none", "/supports" if "supports" in self.d else "",
+                     "the structure has no support: no DOF of any node is fixed or on a spring",
+                     "Add `supports` (keyed by node id), e.g. {\"N1\": {\"type\": \"fixed\"}}; an unsupported "
+                     "structure is a mechanism.")
 
     def support_dofs(self, s: dict) -> dict:
         """DOF name -> "fixed" | "free" | {"spring": k} with the shorthand expanded."""
@@ -415,8 +440,8 @@ class _Semantics:
             slaved = D.DOFS if c.get("type") == "rigidLink" else DIAPHRAGM_DOFS.get(normal, ())
             for k, s in enumerate(c.get("slaves") or ()):
                 sp = f"{p}/slaves/{k}"
-                if not isinstance(s, str):
-                    continue
+                if not isinstance(s, str) or s in c["slaves"][:k]:
+                    continue                    # malformed or repeated (reported by the schema layer)
                 if s not in nodes:
                     self.add("ref.unknown-node", sp, f"constraint {cid!r} refers to unknown node {s!r}",
                              "Use an id from /nodes.")
@@ -593,22 +618,33 @@ class _Semantics:
     def design(self):
         if not isinstance(self.d.get("design", {}), dict):
             return
-        res = designparams.resolve(self.d, self.geoms, self.add)
+        res = designparams.resolve(self.d, self.geoms, self.add, tolerant=not self.strict)
         if "design" not in self.d:
             return                      # analysis-only file: no design warnings
-        members, mats = self.table("members"), self.table("materials")
+        mats = self.table("materials")
         missing: dict[str, list] = {}
         for dmid, info in res.items():
-            for mid in info["members"]:
-                mat = members.get(mid, {}).get("material")
-                if isinstance(mats.get(mat), dict):
-                    lack = [k for k in ("Fy", "Fu") if k not in mats[mat]]
-                    if lack:
-                        missing.setdefault(mat, lack)
+            vals = info["values"]
+            lack = [k for k in ("Fy", "Fu") if vals[k].value is None]
+            mat = self.table("members").get(info["members"][0], {}).get("material")
+            if lack and isinstance(mats.get(mat), dict):
+                missing.setdefault(mat, [])
+                missing[mat] += [k for k in lack if k not in missing[mat]]
+            for k in ("E", "G"):
+                r = vals[k]
+                ref = designparams.material_value(self.d, info["members"][0], k)
+                if not r.source.startswith("material:") and ref is not None and isinstance(r.value, (int, float)) \
+                        and abs(r.value - ref) > 1e-9 * abs(ref):
+                    self.add("design.stiffness-differs", r.path,
+                             f"design {k} = {r.value:g} for design member {dmid!r} differs from {k} = {ref:g} of "
+                             "its material, which the analysis uses",
+                             "Design variables never change the analysis; change the material if the analysis "
+                             "should use this value too.", WARNING)
         for mat, lack in missing.items():
             self.add("design.missing-strength", pointer("materials", mat),
-                     f"material {mat!r} has no {' and '.join(lack)}; members of this material cannot be designed",
-                     "Add Fy and Fu to the material.", WARNING)
+                     f"material {mat!r} has no {' and '.join(sorted(lack, reverse=True))}; members of this "
+                     "material cannot be designed",
+                     "Add Fy and Fu to the material (or set the design variables Fy and Fu).", WARNING)
         an = self.table("analysis")
         second = any(isinstance(c, dict) and c.get("analysisType", an.get("type", "firstOrder")) == "secondOrder"
                      for c in self.table("combinations").values())

@@ -133,7 +133,8 @@ def build() -> dict:
 
     # ----------------------------------------------------------------- materials
     defs["material"] = obj(
-        "Linear elastic isotropic material. Give G or nu (or both; G is used for stiffness).",
+        "Linear elastic isotropic material. Give G or nu (or both; G is used for stiffness). The design "
+        "checks use the same E, G, Fy, Fu unless a design variable of the same name overrides them.",
         {
             "description": text("Free text, e.g. the steel grade designation."),
             "E": num("Modulus of elasticity.", "force/length^2", exclusiveMinimum=0),
@@ -410,6 +411,17 @@ def build() -> dict:
             "method": enum("Design method.", ["LRFD", "ASD"], dd["method"][0]),
             "role": enum("Member role. Default: truss-type members = brace; frame members parallel to the "
                          "vertical axis = column; other frame members = beam.", ["beam", "column", "brace"]),
+            "E": num("Modulus of elasticity used by the design checks. Default: E of the member's material. "
+                     "An override is DESIGN ONLY: the analysis always uses the material's E.", "force/length^2",
+                     **pos),
+            "G": num("Shear modulus used by the design checks. Default: G of the member's material. An "
+                     "override is DESIGN ONLY: the analysis always uses the material's G.", "force/length^2",
+                     **pos),
+            "Fy": num("Specified minimum yield stress used by the design checks. Default: Fy of the member's "
+                      "material. DESIGN ONLY: a computed tau_b (analysis.stiffnessReduction) always uses the "
+                      "material's Fy.", "force/length^2", **pos),
+            "Fu": num("Specified minimum tensile strength used by the design checks. Default: Fu of the "
+                      "member's material.", "force/length^2", **pos),
             "Lx": num("Unbraced length for flexural buckling about the major (x) axis. Default: from "
                       "bracing.major, else the design member length.", L, **pos),
             "Ly": num("Unbraced length for flexural buckling about the minor (y) axis. Default: from "
