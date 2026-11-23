@@ -243,6 +243,13 @@ results = analyze(model, strict=True)      # Results, internal units
   `distributed` with `description, motion, cause, direction, axis, through,
   nodes[{node, share, dofs}], members`). Problem paths: `/supports` for
   rigid-body modes, `/nodes/<id>` otherwise.
+  `cause` ∈ `no-restraint`, `negligible-springs` (rigid-body motion opposed only by
+  support springs below the tolerance), `all-member-ends-released`, `only-truss-members`,
+  `member-spin` (a member free to spin about its own axis), `no-stiffness`.
+* **Independent review** (`tests/independent/`, THEORY 17): a reference solver that shares no
+  code with the engine (`tableau.py`), direct OpenSeesPy / PyNite translations (`oracles.py`),
+  `solve_bvp` single members and cut-and-balance statics; model bank in `models.py`, unstable
+  models in `unstable.py`.
 * **Stations**: `analysis.result_stations` equally spaced stations plus the
   ends of line loads plus two stations (left limit, right limit) at every
   interior point load of any load case; the same list in every combination.

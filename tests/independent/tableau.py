@@ -30,7 +30,8 @@ numerical method from the engine:
 * Buckling: the load factor at which the determinant of the tableau (with N = factor x first-order
   axial forces) changes sign (scan + Brent) -- the transcendental problem itself, no geometric
   stiffness matrix.
-* Tension/compression-only members: plain active-set loop.
+* Tension/compression-only members: plain active-set loop; a slack member keeps 1e-13 of its axial
+  stiffness, so that it still hands its own loads to its two ends.
 
 Sign conventions of the outputs are those of docs/CONVENTIONS.md (reactions on the structure, end
 forces on the member in local axes, station forces on the +x face).
@@ -46,6 +47,7 @@ from scipy.optimize import brentq
 DOF = ("ux", "uy", "uz", "rx", "ry", "rz")
 AX = {"X": 0, "Y": 1, "Z": 2}
 GP, GW = np.polynomial.legendre.leggauss(10)
+SLACK = 1.0e-13      # axial stiffness factor of a slack one-sided member (it still hands its loads to its ends)
 
 
 def cross_matrix(v):
@@ -107,6 +109,7 @@ class Member:
         self.active = True
         self.points, self.dists = [], []        # loads of the current combination, local axes
         self.Nstart = None                      # None = first order; else axial resultant at x = 0-
+        self.nscale = 1.0                       # buckling: load factor on the whole axial-force diagram
 
     # ------------------------------------------------------------------ member ODE
     def axial(self, x):
@@ -120,12 +123,12 @@ class Member:
             if b > x1:
                 s = (w2[0] - w1[0]) / (x2 - x1)
                 n -= w1[0] * (b - x1) + s * (b - x1) ** 2 / 2
-        return n
+        return n * self.nscale
 
     def _state_matrix(self, N):
         A = np.zeros((12, 12))
         dy, dz = 1 + self.by * N, 1 + self.bz * N
-        A[0, 6] = 1 / self.EA                       # u' = N / EA
+        A[0, 6] = 1 / (self.EA if self.active else self.EA * SLACK)      # u' = N / EA
         A[1, 5], A[1, 7] = 1 / dy, self.by / dy     # v' = (tz + Vy/GAsy) / (1 + N/GAsy)
         A[2, 4], A[2, 8] = -1 / dz, self.bz / dz    # w' = (-ty + Vz/GAsz) / (1 + N/GAsz)
         A[3, 9] = 1 / self.GJ
@@ -176,7 +179,8 @@ class Member:
                 out.append((x, +1, Phi.copy(), p.copy()))
             if n + 1 < len(bs):
                 h = bs[n + 1] - x
-                N = 0.0 if self.Nstart is None else self.axial(x + h / 2)
+                # a slack one-sided member is a first-order simply supported carrier of its own loads
+                N = 0.0 if (self.Nstart is None or not self.active) else self.axial(x + h / 2)
                 seg = self._phi(h, N)
                 q = np.zeros(12)
                 if self.dists:
@@ -304,7 +308,7 @@ class Tableau:
     def assemble(self, n_scale=None):
         """Matrix and right-hand side.  ``n_scale``: buckling factor on the stored member axial forces."""
         nn = len(self.node_ids)
-        mem = [m for m in self.members.values() if m.active]
+        mem = list(self.members.values())
         nU = 6 * nn
         col_m = {m.id: nU + 18 * k for k, m in enumerate(mem)}        # d0(6) d1(6) s0(6)
         fixed = np.flatnonzero(self.fixed)
@@ -328,11 +332,11 @@ class Tableau:
             c = col_m[m.id]
             if n_scale is not None:
                 keep = m.Nstart
-                m.Nstart = (keep or 0.0) * n_scale
+                m.Nstart, m.nscale = (keep or 0.0), n_scale
             *_, (_, _, Phi, p) = m.march(nsub=self.nsub)
-            Nax = (m.axial(0.0), m.axial(m.L)) if m.Nstart is not None else (0.0, 0.0)
+            Nax = (m.axial(0.0), m.axial(m.L)) if (m.Nstart is not None and m.active) else (0.0, 0.0)
             if n_scale is not None:
-                m.Nstart = keep
+                m.Nstart, m.nscale = keep, 1.0
             self._maps[m.id] = (Phi, p)
             # 1. compatibility: d1 - Phi_dd d0 - Phi_ds s0 = p_d
             M[row:row + 6, c + 6:c + 12] = np.eye(6)
@@ -450,14 +454,13 @@ class Tableau:
                 if m.type not in ("tensionOnly", "compressionOnly"):
                     continue
                 sign = 1.0 if m.type == "tensionOnly" else -1.0
-                if m.active:
-                    if sign * x[col_m[m.id] + 12] < 0:
-                        flip.append(m)
-                else:
-                    ui = self._G(m, 0) @ U[self.idx[m.ni]]
-                    uj = self._G(m, 1) @ U[self.idx[m.nj]]
-                    if sign * (uj[0] - ui[0]) > 0:
-                        flip.append(m)
+                # rule of THEORY 13: the member works iff its elongation (from the node displacements)
+                # has the sign it can carry
+                ui = self._G(m, 0) @ U[self.idx[m.ni]]
+                uj = self._G(m, 1) @ U[self.idx[m.nj]]
+                works = sign * (uj[0] - ui[0]) > 0
+                if works != m.active:
+                    flip.append(m)
             if not flip:
                 break
             for m in flip:
@@ -469,7 +472,9 @@ class Tableau:
         R = np.zeros(nU)
         R[fixed] = x[cR:cR + len(fixed)]
         R -= self.spring * x[:nU]
-        out = {"displacements": U, "reactions": R.reshape(-1, 6), "members": {}}
+        lam = x[cR + len(fixed):cR + len(fixed) + len(self.crows)]
+        cf = sum((row * l for row, l in zip(self.crows, lam)), np.zeros(nU))     # forces by the constraints on the nodes
+        out = {"displacements": U, "reactions": R.reshape(-1, 6), "members": {}, "constraint_forces": cf.reshape(-1, 6)}
         for m in mem:
             c = col_m[m.id]
             z0 = np.concatenate([x[c:c + 6], x[c + 12:c + 18]])
@@ -484,7 +489,7 @@ class Tableau:
                                     "state": ordered}
         for m in self.members.values():
             if not m.active:
-                out["members"][m.id] = {"end_forces": np.zeros(12), "slack": True}
+                out["members"][m.id]["slack"] = True
         return out
 
     # ------------------------------------------------------------------ buckling

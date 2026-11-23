@@ -55,8 +55,10 @@ class MechanismMode:
     direction    unit vector of the translation (global) or None
     axis         unit vector of the rotation axis (global) or None
     through      a point on the rotation axis (rigid-body rotations), mm, or None
-    cause        short machine-readable reason: "no-restraint", "all-member-ends-released",
-                 "only-truss-members", "no-stiffness"
+    cause        short machine-readable reason: "no-restraint", "negligible-springs" (a rigid-body motion
+                 that only support springs oppose, negligible against the structure's stiffness),
+                 "all-member-ends-released", "only-truss-members", "member-spin" (a member free to spin
+                 about its own axis), "no-stiffness"
     nodes        participating nodes, largest share first
     members      ids of the members connected to the participating nodes
     """

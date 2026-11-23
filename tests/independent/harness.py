@@ -96,8 +96,13 @@ def compare(raw, cid, second_order=False, doc=None, nsub=1, skip_members=(), arm
     R = np.array([[c["reactions"].get(n, {}).get(f, 0.0) for f in F6] for n in ids])
     size = max(np.ptp(np.array([list(t.xyz[n]) for n in ids]), axis=0).max(), 1e-300)
     out = {}
-    out["translations"] = rel(U[:, :3], ref["displacements"][:, :3])
-    out["rotations"] = rel(U[:, 3:], ref["displacements"][:, 3:])
+    # scales: the largest translation anywhere (nodes or member axes); rotations at least translation / size
+    dscale = max(np.abs(U[:, :3]).max(), np.abs(ref["displacements"][:, :3]).max(),
+                 max((np.abs(m["displacements"]).max(initial=0.0) for m in ref["members"].values() if "displacements" in m),
+                     default=0.0))
+    rscale = max(np.abs(U[:, 3:]).max(), np.abs(ref["displacements"][:, 3:]).max(), dscale / size)
+    out["translations"] = rel(U[:, :3], ref["displacements"][:, :3], dscale)
+    out["rotations"] = rel(U[:, 3:], ref["displacements"][:, 3:], rscale)
     fs = max(np.abs(R[:, :3]).max(), np.abs(ref["reactions"][:, :3]).max(),
              max((np.abs(m["end_forces"][[0, 1, 2, 6, 7, 8]]).max() for m in ref["members"].values()), default=0.0))
     ms = max(np.abs(R[:, 3:]).max(), np.abs(ref["reactions"][:, 3:]).max(),
@@ -106,7 +111,6 @@ def compare(raw, cid, second_order=False, doc=None, nsub=1, skip_members=(), arm
     out["reaction forces"] = rel(R[:, :3], ref["reactions"][:, :3], fs)
     out["reaction moments"] = rel(R[:, 3:], ref["reactions"][:, 3:], ms)
     ef = em = sf = sm = sd = 0.0
-    dscale = max(np.abs(U[:, :3]).max(), np.abs(ref["displacements"][:, :3]).max(), 1e-300)
     for mid, m in c["members"].items():
         if mid in skip_members:
             continue
@@ -114,16 +118,19 @@ def compare(raw, cid, second_order=False, doc=None, nsub=1, skip_members=(), arm
         e = np.array([m["endForces"][end][f] for end in "ij" for f in F6])
         ef = max(ef, rel(e[[0, 1, 2, 6, 7, 8]], r["end_forces"][[0, 1, 2, 6, 7, 8]], fs))
         em = max(em, rel(e[[3, 4, 5, 9, 10, 11]], r["end_forces"][[3, 4, 5, 9, 10, 11]], ms))
-        if r.get("slack"):
-            assert m["active"] is False, f"{mid}: reference slack, benchfea active"
-            continue
-        assert m["active"] is True, f"{mid}: benchfea slack, reference active"
+        assert m["active"] is not bool(r.get("slack")), f"{mid}: active set differs from the reference"
         s = m["stations"]
         S = np.array([s[k] for k in ("N", "Vy", "Vz", "T", "My", "Mz")]).T
         D = np.array([s[k] for k in ("ux", "uy", "uz")]).T
         sf = max(sf, rel(S[:, :3], r["forces"][:, :3], fs))
         sm = max(sm, rel(S[:, 3:], r["forces"][:, 3:], ms))
-        sd = max(sd, rel(D, r["displacements"], dscale))
+        if m["active"]:               # the axis of a slack member is not tied to its end j
+            sd = max(sd, rel(D, r["displacements"], dscale))
+    if "constraintForces" in c:
+        F6c = ("Fx", "Fy", "Fz", "Mx", "My", "Mz")
+        CF = np.array([[c["constraintForces"].get(n, {}).get(f, 0.0) for f in F6c] for n in ids])
+        out["constraint forces"] = rel(CF[:, :3], ref["constraint_forces"][:, :3], fs)
+        out["constraint moments"] = rel(CF[:, 3:], ref["constraint_forces"][:, 3:], ms)
     out.update({"end forces": ef, "end moments": em, "station forces": sf, "station moments": sm,
                 "station displacements": sd})
     out["_ref"], out["_doc"], out["_tableau"] = ref, c, t

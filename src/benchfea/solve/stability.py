@@ -171,23 +171,26 @@ def diagnose(structure, lam: np.ndarray, vec: np.ndarray, d: np.ndarray, tol: fl
         rows = [Bw[live & (structure.fixed | (structure.spring > 0.0))]]
         viol = Bw - (w[:, None] * (structure.T @ B[structure.retained])) * cs    # constraint violation
         rows.append(viol[live & structure.slave])
-        Z = _null(np.vstack(rows), 6)
-        if Z.shape[1] == 0:
-            continue
-        coef = _rref((Z * cs[:, None]).T)                   # rows = (t, r) in physical units, canonical
-        for c in coef:
+        fixed_rows = [Bw[live & structure.fixed], viol[live & structure.slave]]
+        sprung = live & ~structure.fixed & (structure.spring > 0.0)
+
+        def report(c, why, cause):
+            """Describe the rigid-body motion with coefficients c = (t, r) if it is a null vector."""
             v = B @ c
             full = np.linalg.norm(w * v)
             v[structure.inactive] = 0.0
             vw = w * v
             if np.linalg.norm(vw) <= 1e-9 * full or not in_null(vw):
-                continue                 # moves only DOFs that are not part of the solution, or is not a null vector
+                return               # moves only DOFs that are not part of the solution, or is not a null vector
+            q = vw / np.linalg.norm(vw)
+            if found and np.linalg.matrix_rank(np.column_stack(found + [q]), tol=1e-6) == len(found):
+                return               # already reported
             t, r = c[:3], c[3:]
             part = "" if whole else f" of the part containing node {structure.node_ids[comp[0]]}"
             if not r.any():
                 ax = _axis_name(t)
-                desc = (f"rigid-body translation in {ax}{part}: no restraint" if ax else
-                        f"rigid-body translation along {_fmt(_unit(t))}{part}: no restraint")
+                desc = (f"rigid-body translation in {ax}{part}: {why}" if ax else
+                        f"rigid-body translation along {_fmt(_unit(t))}{part}: {why}")
                 mode = dict(motion="translation", direction=tuple(_unit(t)))
             else:
                 axis = _unit(r)
@@ -199,17 +202,45 @@ def diagnose(structure, lam: np.ndarray, vec: np.ndarray, d: np.ndarray, tol: fl
                 where = f"through node {hit}" if hit else f"through {_fmt(point)} mm"
                 line = f"an axis parallel to {ax}" if ax else f"the axis {_fmt(axis)}"
                 if abs(pitch) <= 1e-7 * Lc:
-                    desc = f"rigid-body rotation about {line} {where}{part}: no restraint"
+                    desc = f"rigid-body rotation about {line} {where}{part}: {why}"
                     mode = dict(motion="rotation", axis=tuple(axis), through=tuple(point))
                 else:
                     desc = (f"combined rigid-body rotation about {line} {where} and translation along "
-                            f"{_fmt(_unit(t))}{part}: no restraint")
+                            f"{_fmt(_unit(t))}{part}: {why}")
                     mode = dict(motion="translation+rotation", axis=tuple(axis), through=tuple(point),
                                 direction=tuple(_unit(t)))
-            q = vw / np.linalg.norm(vw)
             nodes, _ = _participation(structure, q[:, None], members=False)
-            modes.append(MechanismMode("rigid-body", desc, cause="no-restraint", nodes=nodes, **mode))
+            modes.append(MechanismMode("rigid-body", desc, cause=cause, nodes=nodes, **mode))
             found.append(q)
+
+        Z = _null(np.vstack(rows), 6)
+        if Z.shape[1]:
+            for c in _rref((Z * cs[:, None]).T):            # rows = (t, r) in physical units, canonical
+                report(c, "no restraint", "no-restraint")
+        # rigid-body motions that only support springs oppose, when those springs are so soft compared
+        # with the structure that the motion is a null vector to the tolerance
+        if sprung.any():
+            Z2 = _null(np.vstack(fixed_rows), 6)
+            if Z2.shape[1] > Z.shape[1]:
+                V2 = B @ (Z2 * cs[:, None])
+                V2[structure.inactive] = 0.0
+                W2 = w[:, None] * V2
+                norms = np.linalg.norm(W2, axis=0)
+                keep = norms > 0.0
+                W2n = W2[:, keep] / norms[keep]
+                res = W2n - Q @ (Q.T @ W2n)                 # part outside the numerical null space
+                _, sv, vt = np.linalg.svd(res, full_matrices=True)
+                sv = np.concatenate([sv, np.zeros(vt.shape[0] - len(sv))])
+                inside = vt[sv <= 1e-6].T                   # combinations of the columns of W2n in the null space
+                if inside.shape[1]:
+                    coefs = ((Z2 * cs[:, None])[:, keep] / norms[keep]) @ inside
+                    at = sorted({structure.node_ids[g // 6] for g in np.flatnonzero(sprung)})
+                    for c in _rref(coefs.T):
+                        if np.abs(Bw[sprung] @ (c / cs)).max(initial=0.0) <= 1e-9 * np.abs(Bw @ (c / cs)).max(initial=1.0):
+                            continue                         # moves no spring: a 'no restraint' motion
+                        report(c, "restrained only by support spring(s) that are negligible compared with the "
+                                  "stiffness of the structure (node(s) " + ", ".join(at[:MAX_NODES]) + ")",
+                               "negligible-springs")
 
     # ---- 2. mechanisms confined to a single node
     for k, nid in enumerate(structure.node_ids):
@@ -247,6 +278,10 @@ def diagnose(structure, lam: np.ndarray, vec: np.ndarray, d: np.ndarray, tol: fl
                                                     "the connected truss-type members do not restrain it")
             elif attached and not t.any() and _all_ends_released(structure, nid, _unit(r)):
                 cause, why = "all-member-ends-released", "all connected member ends released"
+            elif attached and not t.any() and _spinning_members(structure, nid, _unit(r)):
+                names = ", ".join(repr(x) for x in _spinning_members(structure, nid, _unit(r)))
+                cause, why = "member-spin", (f"member {names} is free to spin about its own axis (its twist is "
+                                             "held neither at this node nor at its other end)")
             else:
                 cause, why = "no-stiffness", "no member, support or constraint resists it"
             share = (w[:6] * g) ** 2
@@ -292,3 +327,16 @@ def _all_ends_released(structure, nid: str, axis: np.ndarray) -> bool:
             if any(abs(comp[a]) > 1e-9 and k[3 + a] != 0.0 for a in range(3)):
                 return False
     return True
+
+
+def _spinning_members(structure, nid: str, axis: np.ndarray) -> list[str]:
+    """Ids of the members at the node when the rotation about ``axis`` is nothing but the spin of those
+    members about their own axes: every member end at the node lies along ``axis`` (without a rigid
+    offset) and turns with the node, i.e. the twist is released or unsupported at the far end."""
+    out = []
+    for e in structure.attached[nid]:
+        m = structure.model.members[e.id]
+        if abs(float(np.asarray(m.R, float)[0] @ axis)) < 1.0 - 1e-9 or np.any(m.offset_i) or np.any(m.offset_j):
+            return []
+        out.append(e.id)
+    return out

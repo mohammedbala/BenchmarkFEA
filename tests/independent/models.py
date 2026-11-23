@@ -690,3 +690,73 @@ def S08_diaphragm_storey_with_leaning_columns():
     case(d, "U", {"type": "nodal", "node": "u4", "Fx": 40, "Fy": 25, "Mz": 30, "Fz": -300},
          *[{"type": "nodal", "node": f"u{k}", "Fz": -120.0 - 20 * k} for k in range(4)])
     return _so(d), "U"
+
+
+# ====================================================================== tension / compression only
+ONE_SIDED = {}
+
+
+def one_sided(f):
+    ONE_SIDED[f.__name__] = f
+    return f
+
+
+@one_sided
+def T01_two_storey_x_braced_frame():
+    d = start()
+    for k, z in enumerate((0, 3.5, 7.2)):
+        nodes(d, **{f"l{k}": (0, 0, z), f"r{k}": (5, 0, z)})
+    d["supports"] = {"l0": {"type": "fixed"}, "r0": {"type": "fixed"}}
+    for k in (1, 2):
+        member(d, f"cl{k}", f"l{k - 1}", f"l{k}")
+        member(d, f"cr{k}", f"r{k - 1}", f"r{k}")
+        member(d, f"g{k}", f"l{k}", f"r{k}", sec="B")
+        member(d, f"x{k}a", f"l{k - 1}", f"r{k}", type="tensionOnly")
+        member(d, f"x{k}b", f"r{k - 1}", f"l{k}", type="tensionOnly")
+        for s in "lr":
+            d["supports"][f"{s}{k}"] = {"dofs": {"uy": "fixed"}}
+    case(d, "W", {"type": "nodal", "node": "l1", "Fx": 60}, {"type": "nodal", "node": "l2", "Fx": -35},
+         {"type": "nodal", "node": "r2", "Fz": -200}, {"type": "memberDistributed", "member": "g1", "direction": "Z", "w1": -20})
+    return d, "W"
+
+
+@one_sided
+def T02_space_tower_with_cross_bracing_y_up_kip_in():
+    d = start(("kip", "in"), "Y")
+    base = [(0, 0), (120, 0), (120, 100), (0, 100)]
+    for lev, y in enumerate((0, 150, 290)):
+        for k, (x, z) in enumerate(base):
+            sx, sz = (1 - 0.08 * lev), (1 - 0.05 * lev)
+            nodes(d, **{f"n{lev}{k}": (60 + (x - 60) * sx, y, 50 + (z - 50) * sz)})
+    for k in range(4):
+        d["supports"][f"n0{k}"] = {"type": "fixed"}
+    for lev in (1, 2):
+        for k in range(4):
+            j = (k + 1) % 4
+            member(d, f"leg{lev}{k}", f"n{lev - 1}{k}", f"n{lev}{k}")
+            member(d, f"ring{lev}{k}", f"n{lev}{k}", f"n{lev}{j}")
+            member(d, f"xa{lev}{k}", f"n{lev - 1}{k}", f"n{lev}{j}", type="tensionOnly")
+            member(d, f"xb{lev}{k}", f"n{lev - 1}{j}", f"n{lev}{k}", type="tensionOnly")
+    case(d, "W", {"type": "nodal", "node": "n20", "Fx": 25, "Fz": 12, "Fy": -40}, {"type": "nodal", "node": "n22", "Fx": 10, "Fz": -18},
+         {"type": "nodal", "node": "n11", "Fz": 15, "My": 200})
+    return d, "W"
+
+
+@one_sided
+def T03_compression_only_props_and_tension_only_ties_with_settlement():
+    d = start(("kN", "mm"))
+    nodes(d, A=(0, 0, 0), B=(4000, 0, 0), C=(8000, 0, 0), D=(12000, 0, 0), P1=(4000, 0, -3000), P2=(8000, 0, -3000),
+          H1=(2000, 0, 3000), H2=(10000, 0, 3000))
+    d["supports"] = {"A": {"type": "pinned", "dofs": {"rx": "fixed"}}, "D": {"type": "roller", "dofs": {"uy": "fixed"}},
+                     "P1": {"type": "pinned"}, "P2": {"type": "pinned"}, "H1": {"type": "pinned"}, "H2": {"type": "pinned"}}
+    member(d, "s1", "A", "B")
+    member(d, "s2", "B", "C")
+    member(d, "s3", "C", "D")
+    member(d, "prop1", "P1", "B", type="compressionOnly")
+    member(d, "prop2", "P2", "C", type="compressionOnly")
+    member(d, "tie1", "H1", "B", type="tensionOnly")
+    member(d, "tie2", "H2", "C", type="tensionOnly")
+    case(d, "Q", {"type": "memberDistributed", "member": "s1", "direction": "Z", "w1": -0.03},
+         {"type": "memberDistributed", "member": "s3", "direction": "Z", "w1": 0.012},
+         {"type": "nodal", "node": "B", "Fx": 40}, {"type": "supportDisplacement", "node": "P1", "uz": -4.0})
+    return d, "Q"

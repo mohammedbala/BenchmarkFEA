@@ -690,7 +690,7 @@ def _difference(a: _State, b: _State, size: float) -> float:
 
 
 def second_order_checks(structure, K_members, factor, loads: LoadSet, solution, elems, recs) -> list[InvariantCheck]:
-    """Invariants of a second-order solution, evaluated with the terms of the theory (THEORY 13):
+    """Invariants of a second-order solution, evaluated with the terms of the theory (THEORY 15):
     forces are components in the undeformed axes; moments include, for every piece, the couple of its
     axial force acting through the transverse displacements, and the rigid-arm terms."""
     model = structure.model

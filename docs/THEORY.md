@@ -300,11 +300,19 @@ The null space is reported through basis-independent constructions:
    rigid-body motions that move no fixed or sprung DOF and violate no
    constraint — the null space of a small matrix, put in reduced row echelon
    form over (TX, TY, TZ, RX, RY, RZ) about a supported node. Each is described
-   as a translation, a rotation about an axis through a point, or both.
+   as a translation, a rotation about an axis through a point, or both
+   (cause `no-restraint`). Then the rigid-body motions that move no *fixed*
+   DOF but do stretch support springs are tested against the numerical null
+   space: those inside it are reported with the cause `negligible-springs`
+   (the springs exist but are below the tolerance relative to the stiffness of
+   the structure), instead of being left to item 3.
 2. *Single-node mechanisms*: null vectors confined to one node (eigenvalue 1
    of `Q_aᵀQ_a` for an orthonormal null basis Q restricted to the node's
    rows), again in row echelon form, with the cause: all connected member ends
-   released, only truss members, or no stiffness.
+   released, only truss members, a member free to spin about its own axis
+   (`member-spin`: every member at the node lies along the rotation axis, so
+   the null vector is the twist of those members, held at neither end), or no
+   stiffness.
 3. *The rest*: the participation of every node and DOF = diagonal of the
    orthogonal projector onto the remaining null space (independent of the
    basis), with the members attached to the participating nodes.
@@ -746,3 +754,51 @@ exactly the couples of the member axial forces.
   loads.
 * Dense matrices throughout: intended for frames of up to a few thousand
   degrees of freedom after subdivision.
+
+## 17. Independent review of the solver (`tests/independent/`)
+
+A second implementation, written without reading the engine's tests and sharing
+no code with it (own reading of the input, own local axes, own load
+resolution, file units), is kept as permanent tests:
+
+* `tableau.py` — no stiffness matrix, no fixed-end forces, no elimination of
+  slaves: node displacements, member end states, reactions and constraint
+  multipliers are the unknowns of the equilibrium, compatibility and
+  connection equations written down directly; the member is represented by
+  `exp(A L)` of its full 12-state first-order system (second order: with the
+  axial force in `A`); buckling factors are the roots of the determinant.
+* `test_indep_bvp.py` — single members as multi-interval boundary value
+  problems (`scipy.integrate.solve_bvp`); `test_indep_conventions.py` —
+  station forces of a determinate tree by cutting (direct equilibrium).
+* `oracles.py` — direct translations to OpenSeesPy and PyNite for the models
+  each can represent exactly.
+
+Largest relative differences measured (each quantity relative to the largest
+value of its kind in the model; node displacements, reactions, constraint
+forces, end forces, and forces and displacements at every station):
+
+| analysis | models | tableau | OpenSees | PyNite |
+|---|---|---|---|---|
+| first order (rolls, partial/full releases, off-axis offsets, links, diaphragms, springs 1e-9…1e18, imposed displacements, trapezoid/partial/projected loads, self weight, shear deformation, Y-up/Z-up, five unit systems) | 27 | 4e-12 (1e-10 with 20 mm stubs next to 30 m spans) | 3e-12 (18 models; 1e-10 on the stub model) | 5e-13 (9 models; 2e-10 on the stub model) |
+| second order, constant N per member | 5 (+ one-sided, edge cases) | 5e-13 | 2e-4 (32 elements/member, chord Kg) | 2e-4 (8 sub-members, one pass) |
+| second order, N varying along members | 3 | converges to the engine at the reference's O(h²): 3e-8 … 4e-4 at 32 steps | — | — |
+| linear buckling (2–3 modes, reversed loads, releases, truss members, diaphragm, offsets) | 7 | 7e-11 (1e-7 with varying N, 8 steps) | — | — |
+| tension-/compression-only (first and second order) | 3 | 4e-11 (same slack sets) | — | 4e-14 (same slack sets, first order) |
+| single member vs `solve_bvp` (first/second order, shear, spring end) | 6 | < 1e-7 (tolerance of the BVP) | | |
+
+Findings of the review that are limits rather than errors:
+
+* The invariants of section 8/15 close the member integration at x = L; a
+  wrong value at an *interior* station would not be seen by them
+  (`test_a_wrong_station_value_is_not_seen_by_the_invariants_but_by_the_reference`).
+* An injected error must exceed `equilibriumTolerance` × the largest quantity
+  of the check to be caught: 1e-4 on reactions, displacements, equivalent
+  nodal loads or end forces is caught; a 1e-4 error in one small moment next
+  to a large force × model size is not.
+* `convergenceTolerance` below about 1e-9 cannot be reached when the axial
+  force varies along members (round-off of the subdivision comparison): the
+  result is flagged not converged after a long run.
+* OpenSees `-jntOffset` with `PDelta` has no second-order term of the rigid
+  arm (25 % low at an amplification of 3); the engine's term (10.7) agrees with
+  stiff stub members in both programs.
+

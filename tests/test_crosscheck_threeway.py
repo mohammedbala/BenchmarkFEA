@@ -247,7 +247,13 @@ def test_second_order_three_way_when_the_engine_supports_it():
     doc = document({"a": (0, 0, 0), "A": (0, 0, h), "B": (b, 0, h), "b": (b, 0, 0)},
                    {"c1": ("a", "A"), "g": ("A", "B"), "c2": ("b", "B")},
                    {"a": {"type": "pinned", "dofs": {"rx": "fixed", "rz": "fixed"}},
-                    "b": {"type": "pinned", "dofs": {"rx": "fixed", "rz": "fixed"}}},
+                    "b": {"type": "pinned", "dofs": {"rx": "fixed", "rz": "fixed"}},
+                    # The frame is braced out of plane at the column tops.  Without these two
+                    # restraints the columns are out-of-plane cantilevers and the 300 kN column loads
+                    # exceed the elastic critical load (buckling factor 0.709): the engine then refuses
+                    # the combination, correctly.  See tests/independent/test_indep_second_order.py
+                    # (test_refusal_beyond_the_critical_load_reports_the_buckling_factor_of_the_reference).
+                    "A": {"dofs": {"uy": "fixed"}}, "B": {"dofs": {"uy": "fixed"}}},
                    {"L": [{"type": "nodal", "node": "A", "Fz": -3e5, "Fx": 2e4}, {"type": "nodal", "node": "B", "Fz": -3e5},
                           {"type": "memberDistributed", "member": "g", "direction": "Z", "w1": -10.0}]},
                    combos={"L": {"factors": {"L": 1.0}, "analysisType": "secondOrder"}}, analysis={"alpha": 1.0})
