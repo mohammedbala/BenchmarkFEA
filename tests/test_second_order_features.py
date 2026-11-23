@@ -15,7 +15,7 @@ from benchfea.cli import main
 from benchfea.model import build_model
 from benchfea.solve import ModelRefused, analyze
 
-from second_order_reference import HELD_ROWS, beam_column_bvp, column_shape, critical_k
+from second_order_reference import HELD_ROWS, beam_column_bvp, critical_k
 from solve_reference import E, G, make
 
 SEC = {"A": 5000.0, "Iy": 4.0e8, "Iz": 4.0e7, "J": 3.0e5, "Asy": 2500.0, "Asz": 3000.0}

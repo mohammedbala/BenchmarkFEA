@@ -14,8 +14,6 @@ Column a-b along +Z, length L; local y = X.  The section is ten times stiffer ab
 lowest modes are in the X-Z plane (local xy plane, EI = E Iz).  A unit load is applied, so the
 buckling factor is the critical load.
 """
-import math
-
 import numpy as np
 import pytest
 

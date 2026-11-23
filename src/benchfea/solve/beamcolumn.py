@@ -49,7 +49,7 @@ __all__ = ["BeamColumn", "PieceRecovery", "axial_state", "consistent_geometric_s
 SQ3 = math.sqrt(3.0)
 _T4, _W4 = np.polynomial.legendre.leggauss(4)
 GAUSS4 = tuple(zip((0.5 * (1.0 + _T4)).tolist(), (0.5 * _W4).tolist()))    # points and weights on [0, 1]
-MAGNUS_STEPS = 4          # Magnus steps inside a piece whose axial force varies along its length
+MAGNUS_STEPS = 8          # Magnus steps inside a piece whose axial force varies along its length
 STABLE_TOL = 1.0e-10      # smallest scaled eigenvalue of the condensed block below which the piece is unstable
 
 

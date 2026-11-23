@@ -456,7 +456,7 @@ and `[Â₁, Â₂] = (√3Δ/3)[Â_m, Â′_m] + O(Δ³)`, hence
 
     Ω = (Δ/2)(Â₁ + Â₂) − (√3 Δ²/12) [Â₁, Â₂],      Φ = exp(Ω) + O(Δ⁵).
 
-A piece with varying N is crossed in 4 such steps (`MAGNUS_STEPS`); the
+A piece with varying N is crossed in 8 such steps (`MAGNUS_STEPS`); the
 global error is O(Δ⁴). For constant N the formula reduces to the exact
 exponential. *Verified:*
 `test_transfer_with_a_varying_axial_force_is_fourth_order_accurate`,
