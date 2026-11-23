@@ -1,0 +1,397 @@
+{
+  "source": {
+    "document": "AISC, Companion to the AISC Steel Construction Manual, Volume 1: Design Examples, Version 16.0 (2023), accompanying ANSI/AISC 360-22",
+    "pages": "printed page D-n = PDF page 36+n; E-n = PDF 64+n; F-n = PDF 162+n; G-n = PDF 236+n; H-n = PDF 262+n; A6-n = PDF 510+n; III-n = PDF 940+n",
+    "content": "Only numbers are recorded here: the inputs each example lists and the values it prints. No text, table or figure of the document is reproduced.",
+    "units": "kip, in. (ksi); lengths given in ft and moments given in kip-ft are converted in the tests",
+    "purpose": "Independent review spot-check: worked cases that the design tests of the authors (aisc_design_examples_v16.json, ..._part2.json) do not use. Same single tolerance policy (tests/design_examples/__init__.py)."
+  },
+  "examples": {
+    "D.2": {
+      "title": "Single-angle tension member (L4x4x1/2)",
+      "pages": "D-5 to D-7 (PDF 41-43)",
+      "inputs": {
+        "Fy": 50,
+        "Fu": 65,
+        "Ag": 3.75,
+        "r_least": 0.776,
+        "An": 3.31,
+        "U": 0.869
+      },
+      "printed": {
+        "yield_Pn": 188,
+        "yield_phiPn": 169,
+        "yield_Pn_over_Omega": 113,
+        "Ae": 2.88,
+        "rupture_Pn": 187,
+        "rupture_phiPn": 140,
+        "rupture_Pn_over_Omega": 93.5,
+        "Lmax_ft_for_L_over_r_300": 19.4
+      },
+      "notes": [
+        "An (Spec. B4.3b) and U (Table D3.1) are computed in the example from the connection; they are inputs of the engine.",
+        "The example uses rz (least radius of gyration of the angle, about its minor principal axis)."
+      ]
+    },
+    "D.3": {
+      "title": "WT-shape tension member (WT6x20)",
+      "pages": "D-8 to D-10 (PDF 44-46)",
+      "inputs": {
+        "Fy": 50,
+        "Fu": 65,
+        "Ag": 5.84,
+        "r_least": 1.57,
+        "L_ft": 30.0,
+        "An": 5.84,
+        "U": 0.86
+      },
+      "printed": {
+        "yield_phiPn": 263,
+        "yield_Pn_over_Omega": 175,
+        "Ae": 5.02,
+        "rupture_Pn": 326,
+        "rupture_phiPn": 245,
+        "rupture_Pn_over_Omega": 163,
+        "L_over_r": 229
+      },
+      "notes": [
+        "Yielding strengths are printed as Manual Table 5-3 values."
+      ]
+    },
+    "D.6": {
+      "title": "Double-angle tension member (2L4x4x1/2)",
+      "pages": "D-17 to D-19 (PDF 53-55)",
+      "inputs": {
+        "Fy": 50,
+        "Fu": 65,
+        "Ag": 7.5,
+        "r_least": 1.21,
+        "L_ft": 25.0,
+        "An": 6.63,
+        "U": 0.944
+      },
+      "printed": {
+        "yield_phiPn": 338,
+        "yield_Pn_over_Omega": 225,
+        "Ae": 6.26,
+        "rupture_Pn": 407,
+        "rupture_phiPn": 305,
+        "rupture_Pn_over_Omega": 204,
+        "L_over_r": 248
+      },
+      "notes": [
+        "Yielding strengths are printed as Manual Table 5-8 values."
+      ]
+    },
+    "E.4A": {
+      "title": "W-shape compression member in a moment frame (W14x82), column fixed at the base",
+      "pages": "E-30 to E-33 (PDF 94-97)",
+      "inputs": {
+        "Fy": 50,
+        "E": 29000,
+        "Ag": 24.0,
+        "Ix": 881,
+        "rx_over_ry": 2.44,
+        "L_ft": 14.0,
+        "K_upper": 1.5,
+        "K_lower": 1.4,
+        "Lc_table_ft": 9.0
+      },
+      "printed": {
+        "Lcx_upper_ft": 21.0,
+        "Lc_equiv_upper_ft": 8.61,
+        "phiPn": 940,
+        "Pn_over_Omega": 626
+      },
+      "notes": [
+        "The example reads Manual Table 4-1a at Lc = 9 ft about the y-axis (rounded up from the equivalent length 8.61 ft and 8.03 ft); the printed strengths belong to that table entry, not to Lcx = 21.0 ft.",
+        "No width-to-thickness ratio is listed; the table value contains no slender-element reduction."
+      ]
+    },
+    "E.4B": {
+      "title": "W-shape compression member in a moment frame (W14x82), column pinned at the base",
+      "pages": "E-34 to E-35 (PDF 98-99)",
+      "inputs": {
+        "Fy": 50,
+        "E": 29000,
+        "Ag": 24.0,
+        "Ix": 881,
+        "L_ft": 14.0,
+        "K": 2.0
+      },
+      "printed": {
+        "Lcx_ft": 28.0,
+        "phiPn": 861,
+        "Pn_over_Omega": 573
+      },
+      "notes": [
+        "Strengths interpolated in Manual Table 4-1a at the equivalent length 11.5 ft."
+      ]
+    },
+    "F.14": {
+      "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)",
+      "pages": "F-65 to F-73 (PDF 227-235)",
+      "inputs": {
+        "Fy": 50,
+        "E": 29000,
+        "d": 66.0,
+        "bf": 14.0,
+        "tf": 2.0,
+        "tw": 0.5,
+        "h": 62.0,
+        "Ix": 67300,
+        "Iy": 915,
+        "Sx": 2040,
+        "Zx": 2270,
+        "J": 77.3,
+        "ho": 64.0,
+        "L_ft": 50.0,
+        "brace_fractions": [
+          0.25,
+          0.5,
+          0.75
+        ],
+        "LRFD": {
+          "P": 544,
+          "w_kip_per_ft": 0.355,
+          "Vr": 281,
+          "Mr_kipft": 6910
+        },
+        "ASD": {
+          "P": 400,
+          "w_kip_per_ft": 0.296,
+          "Vr": 207,
+          "Mr_kipft": 5090
+        }
+      },
+      "printed": {
+        "h_tw": 124,
+        "lambda_pw": 90.6,
+        "lambda_rw": 137,
+        "flange_ratio": 3.5,
+        "lambda_pf": 9.15,
+        "MA_kipft": 4350,
+        "MB_kipft": 5210,
+        "MC_kipft": 6060,
+        "Cb": 1.25,
+        "kv": 5.34,
+        "shear_limit": 61.2,
+        "Cv1": 0.494,
+        "Vn": 489,
+        "phiVn": 440,
+        "Vn_over_Omega": 293
+      },
+      "notes": [
+        "The web is noncompact: the example uses Section F4, which the engine does not implement; the flexure of this case must be reported notChecked.",
+        "Cb is printed for the unbraced segment between the quarter point and midspan with the LRFD loads."
+      ]
+    },
+    "G.8A": {
+      "title": "Built-up girder, shear strength without transverse stiffeners (first step of the example)",
+      "pages": "G-17 to G-18 (PDF 253-254)",
+      "inputs": {
+        "Fy": 50,
+        "E": 29000,
+        "d": 36.0,
+        "bf": 16.0,
+        "tf": 1.5,
+        "tw": 0.3125,
+        "h": 33.0,
+        "Vu": 210,
+        "Va": 140
+      },
+      "printed": {
+        "Aw": 11.3,
+        "h_tw": 106,
+        "shear_limit": 61.2,
+        "Cv1": 0.577,
+        "Vn": 196,
+        "phiVn": 176,
+        "Vn_over_Omega": 117
+      },
+      "notes": [
+        "Rounded chain in the example: Cv1 = 61.2/106 = 0.577; full precision gives 61.22/105.6 = 0.580 (0.5 % apart)."
+      ]
+    },
+    "H.5C": {
+      "title": "Rectangular HSS6x4x1/4: available shear (G4) and flexural (F7) strengths used in the torsion interaction",
+      "pages": "H-20 to H-23 (PDF 282-285)",
+      "inputs": {
+        "Fy": 50,
+        "E": 29000,
+        "H": 6.0,
+        "B": 4.0,
+        "t": 0.233,
+        "Ag": 4.3,
+        "b_t": 14.2,
+        "h_t": 22.8,
+        "ry": 1.61,
+        "Zx": 8.53,
+        "J": 23.6,
+        "Lb_ft": 8.0,
+        "LRFD": {
+          "Vr": 11.0
+        },
+        "ASD": {
+          "Vr": 7.36
+        }
+      },
+      "printed": {
+        "h": 5.3,
+        "Aw": 2.47,
+        "shear_limit": 59.2,
+        "Vn": 74.1,
+        "phiVn": 66.7,
+        "Vn_over_Omega": 44.4,
+        "Mp_kipin": 427,
+        "lambda_p_flange": 27.0,
+        "lambda_p_web": 58.3,
+        "Lp_in": 143,
+        "phiMn_kipin": 384,
+        "Mn_over_Omega_kipin": 256
+      },
+      "notes": [
+        "The example lists neither Sx nor Ix; it shows Lb < Lp, for which the Specification needs neither.",
+        "The example cites the Lp equation as Spec. Eq. F7-12; in ANSI/AISC 360-22 as printed it is Eq. F7-10.",
+        "The torsion part of the example (H3) is outside the engine's scope."
+      ]
+    },
+    "A-6.5": {
+      "title": "Beam with reverse curvature: Cb of the unbraced segment B-C (10 ft, uniform load w)",
+      "pages": "A6-18 to A6-21 (PDF 528-531)",
+      "inputs": {
+        "segment_ft": 10.0,
+        "M_start_over_w": -88.7,
+        "M_quarter_over_w": -41.8,
+        "M_mid_over_w": -1.2,
+        "M_three_quarter_over_w": 33.2,
+        "M_end_over_w": 61.3
+      },
+      "printed": {
+        "Cb": 2.46
+      },
+      "notes": [
+        "The moments are printed as multiples of the uniform load w (kip/ft); with dM/dx' = -w they define the quadratic moment diagram of the segment."
+      ]
+    },
+    "III.MF.DA": {
+      "title": "Part III, moment frame interior column W14x90, Method 1 (direct analysis): Pc, Eq. H1-1a",
+      "pages": "III-84 to III-86 (PDF 1024-1026)",
+      "inputs": {
+        "Fy": 50,
+        "E": 29000,
+        "Ag": 26.5,
+        "rx": 6.14,
+        "ry": 3.7,
+        "bf_2tf": 10.2,
+        "h_tw": 25.9,
+        "LRFD": {
+          "Lc_ft": 13.5,
+          "Pr": 316,
+          "Mrx_kipft": 242,
+          "Mcx_kipft": 574
+        },
+        "ASD": {
+          "Lc_ft": 13.5,
+          "Pr": 232,
+          "Mrx_kipft": 173,
+          "Mcx_kipft": 382
+        }
+      },
+      "printed": {
+        "LRFD": {
+          "Pc": 1040,
+          "Pr_over_Pc": 0.304,
+          "interaction": 0.679
+        },
+        "ASD": {
+          "Pc": 690,
+          "Pr_over_Pc": 0.336,
+          "interaction": 0.739
+        }
+      },
+      "notes": [
+        "Section properties of the W14x90 as listed in Example E.1D of the same document (Part III lists only Ag).",
+        "Pc and Mcx are printed as Manual Table 6-1 values; no flexural section property of the W14x90 is listed anywhere in the document, so Mcx is taken as printed."
+      ]
+    },
+    "III.MF.ELM": {
+      "title": "Part III, moment frame interior column W14x90, Method 2 (effective length): Pc, Eq. H1-1a",
+      "pages": "III-90 to III-91 (PDF 1030-1031)",
+      "inputs": {
+        "Fy": 50,
+        "E": 29000,
+        "Ag": 26.5,
+        "rx": 6.14,
+        "ry": 3.7,
+        "bf_2tf": 10.2,
+        "h_tw": 25.9,
+        "LRFD": {
+          "Lc_ft": 15.4,
+          "Pr": 316,
+          "Mrx_kipft": 236,
+          "Mcx_kipft": 574
+        },
+        "ASD": {
+          "Lc_ft": 15.3,
+          "Pr": 232,
+          "Mrx_kipft": 168,
+          "Mcx_kipft": 382
+        }
+      },
+      "printed": {
+        "LRFD": {
+          "Pc": 992,
+          "Pr_over_Pc": 0.319,
+          "interaction": 0.684
+        },
+        "ASD": {
+          "Pc": 663,
+          "Pr_over_Pc": 0.35,
+          "interaction": 0.741
+        }
+      },
+      "notes": [
+        "Lc is the equivalent y-axis effective length of the example (Kx L / (rx/ry) = 15.4 ft, 15.3 ft)."
+      ]
+    },
+    "III.MF.B2": {
+      "title": "Part III, moment frame interior column W14x90, simplified method (B2 from Manual Table 2-2): Eq. H1-1a",
+      "pages": "III-93 to III-94 (PDF 1033-1034)",
+      "inputs": {
+        "Fy": 50,
+        "E": 29000,
+        "Ag": 26.5,
+        "rx": 6.14,
+        "ry": 3.7,
+        "bf_2tf": 10.2,
+        "h_tw": 25.9,
+        "LRFD": {
+          "Lc_ft": 15.4,
+          "Pr": 351,
+          "Mrx_kipft": 234,
+          "Mcx_kipft": 574
+        },
+        "ASD": {
+          "Lc_ft": 15.3,
+          "Pr": 262,
+          "Mrx_kipft": 166,
+          "Mcx_kipft": 382
+        }
+      },
+      "printed": {
+        "LRFD": {
+          "Pc": 992,
+          "Pr_over_Pc": 0.354,
+          "interaction": 0.716
+        },
+        "ASD": {
+          "Pc": 663,
+          "Pr_over_Pc": 0.395,
+          "interaction": 0.781
+        }
+      },
+      "notes": []
+    }
+  }
+}

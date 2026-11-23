@@ -1,8 +1,9 @@
 """Internal subdivision of members for the second-order and buckling analyses.
 
 ``refine(model, divisions)`` returns a :class:`Mesh`: a derived model in which every member is cut
-into pieces at the load break points of all load cases (point loads, ends of line loads) and each
-part between two break points is cut into ``divisions[member]`` equal pieces.  The original nodes
+into pieces at the load break points of all load cases (point loads, ends of line loads); each part
+between two break points is cut into equal pieces so that a member without break points has
+``divisions[member]`` pieces and no piece is longer than ``length / divisions[member]``.  The original nodes
 keep their index (and DOF numbers); the internal nodes are appended.  End releases and rigid end
 offsets stay at the original member ends, internal joints are rigid.  Members listed in ``unsplit``
 (slack tension/compression-only members) stay whole.
@@ -14,6 +15,7 @@ boundaries.  Results are mapped back to the stations of the original member (:fu
 from __future__ import annotations
 
 import dataclasses
+import math
 from dataclasses import dataclass
 
 import numpy as np
@@ -54,7 +56,8 @@ def refine(model, divisions: dict | int = 1, unsplit=()) -> Mesh:
         brk = sorted({0.0, L} | {x for group in pos[mid] for x in group if 0.0 < x < L})
         b = [0.0]
         for a, c in zip(brk[:-1], brk[1:]):
-            b += [a + (c - a) * k / n for k in range(1, n)] + [c]
+            ns = max(1, int(math.ceil(n * (c - a) / L - 1.0e-9)))     # pieces of this load segment
+            b += [a + (c - a) * k / ns for k in range(1, ns)] + [c]
         b = np.array(b)
         ex = np.asarray(m.R, float)[0]
         ids = [f"{mid}{SEP}{k}" for k in range(len(b) - 1)]
@@ -70,8 +73,7 @@ def refine(model, divisions: dict | int = 1, unsplit=()) -> Mesh:
                 m.offset_i if first else zero, m.offset_j if last else zero,
                 tuple(m.k_end_i) if first else RIGID6, tuple(m.k_end_j) if last else RIGID6)
         pieces[mid], bounds[mid] = ids, b
-    refined = dataclasses.replace(model, nodes=nodes, members=members, design_members={}, defaults_used=[],
-                                  warnings=[])
+    refined = dataclasses.replace(model, nodes=nodes, members=members, defaults_used=[], warnings=[])
     return Mesh(refined, model, pieces, bounds, len(model.nodes))
 
 

@@ -209,14 +209,19 @@ def test_pivot_tolerance_is_the_threshold_and_is_reported():
     assert e.value.diagnosis.tolerance == 1e-6 and e.value.diagnosis.classification == "ill-conditioned"
 
 
-def test_unsupported_features_are_refused_listing_every_one(fixtures):
+def test_unsupported_features_are_refused_listing_every_one(fixtures, monkeypatch):
+    """Tension-only members, second order, stiffness reduction, notional loads and buckling are analysed
+    now (nonlinear.py, buckling.py): what remains refused is an analysis type without a registered solver."""
+    from benchfea.solve import ANALYSIS_TYPES
     model = build_model(fixtures / "valid" / "frame_kip_in.json")
+    res = analyze(model)
+    assert set(res.combinations) == {"LRFD1", "LRFD2", "LRFD3", "SLS"} and set(res.buckling) == {"LRFD1"}
+    assert all(c.invariants.passed and c.converged for c in res.combinations.values())
+    monkeypatch.delitem(ANALYSIS_TYPES, "secondOrder")
     with pytest.raises(ModelRefused) as e:
         analyze(model)
     assert set(e.value.codes) == {"analysis.not-implemented"}
-    paths = [p.path for p in e.value.problems]
-    assert paths == ["/members/BR1/type", "/combinations/LRFD2/analysisType", "/combinations/LRFD2/stiffnessReduction",
-                     "/combinations/LRFD2/notionalLoad", "/analysis/buckling"]
+    assert [p.path for p in e.value.problems] == ["/combinations/LRFD2/analysisType"]
     assert not isinstance(e.value, ModelUnstable)
 
 

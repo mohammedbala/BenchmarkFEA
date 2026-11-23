@@ -36,7 +36,7 @@ file (.json/.yaml) or dict
 | `benchfea.results` | dataclasses `Results`, `CombinationResult`, `MemberResult`, `BucklingResult`, `Envelope`, `InvariantsReport`, `DesignResults`, `DesignMemberResult`, `DesignCheck` and the output-document writers |
 | `benchfea.cli` | `benchfea validate \| run \| design \| perturb \| verify \| score` (`validate`, `run` and `design` implemented) |
 | `benchfea.design` | steel member checks: `check(model, results)`, `check_member`, registry of editions, `aisc360_22` chapter modules — see "Contract for `benchfea.design`" |
-| `benchfea.solve` | linear solver core (first-order): `analyze(model) -> Results`; see "Solver core" below and [THEORY.md](THEORY.md). Second-order, buckling, tension/compression-only, stiffness reduction and notional loads are refused (`analysis.not-implemented`) until their module registers |
+| `benchfea.solve` | solver: `analyze(model) -> Results`; first-order core ("Solver core" below) and the nonlinear analyses — second order, linear buckling, tension/compression-only members, stiffness reduction, notional loads ("Nonlinear analyses" below); theory in [THEORY.md](THEORY.md) |
 | `benchfea.oracle` | independent single-member / continuous-beam reference by direct integration of the member ODEs (`scipy.integrate.solve_bvp`): `Beam`, `Bar` — see [CROSSCHECK.md](CROSSCHECK.md) |
 | `benchfea.crosscheck` | translators to OpenSeesPy and PyNite (optional packages, run in a subprocess), `run`, `compare`, `cross_check` (tier-C decision), fidelity records, `CAPABILITIES` — see [CROSSCHECK.md](CROSSCHECK.md) |
 | `benchfea.verification`, `benchfea.env` | **to be implemented** against the contracts below |
@@ -229,7 +229,7 @@ results = analyze(model, strict=True)      # Results, internal units
 | `solve.errors` | `ModelRefused(ModelInvalid)`, `MechanismDiagnosis`, `MechanismMode`, `NodeParticipation` |
 
 * **Dispatch**: `ANALYSIS_TYPES[combination.analysis_type](LinearAnalysis, combination) -> CombinationResult`;
-  only `"firstOrder"` is registered. A nonlinear module adds its entry and
+  `"firstOrder"` and `"secondOrder"` are registered. A nonlinear module adds its entry and
   removes the corresponding refusal in `unsupported_features`; it reuses
   `Structure.assemble(matrices)` (e.g. geometric stiffness as per-member 12×12
   matrices in nodal global DOFs), `factorize`, `solve`, `LinearAnalysis.recover`
@@ -263,6 +263,55 @@ results = analyze(model, strict=True)      # Results, internal units
 * **Inactive DOFs**: free DOFs of nodes without members (unless a master DOF
   that drives slaves) and rotations of nodes with only truss-type members are
   removed from the system and reported as 0 with a warning in `Results.warnings`.
+
+## Nonlinear analyses (`benchfea.solve`) — as implemented
+
+Theory, rules and limits: [THEORY.md](THEORY.md) sections 10–16.
+
+| module | content |
+|---|---|
+| `solve.beamcolumn` | `BeamColumn.build(model, member, loads=None, n_start=0.0, factors=None, axial=None)`: the second-order piece (exact for a constant axial force; same attributes as `MemberElement` for assembly: `dofs, k_global, G, nodes, is_truss`; `stable`, `f_fixed`, `equivalent_nodal_loads()`, `recover(u_nodes, stations=(), checks=False) -> PieceRecovery`, `slopes(xi)`), `axial_state`, `consistent_geometric_stiffness(piece, axial)`, `expm` |
+| `solve.refine` | `refine(model, divisions, unsplit=()) -> Mesh(model, base, pieces, bounds, n_nodes)` (derived model: original nodes first, internal nodes and pieces with ids `<member>@…`), `split_loads(mesh, loads)`, `piece_stations(bounds, stations)` |
+| `solve.nonlinear` | `NonlinearSolver(la)`: `solve(combination) -> CombinationResult`, `loads`, `active_set`, `first_order`, `second_order`, `violations`; `CombinationRefused(problems, diagnosis, info)`, `notional_forces`, `tau_b`, `needs_nonlinear`, `second_order_checks` |
+| `solve.buckling` | `buckling_analysis(nonlinear_solver, combination) -> BucklingResult`, `BUCKLING_TOL` |
+
+* **Dispatch**: `ANALYSIS_TYPES = {"firstOrder", "secondOrder"}`. A first-order combination goes through
+  `NonlinearSolver` when the model has tension/compression-only members or the combination has stiffness
+  reduction or notional loads; otherwise the linear path is unchanged. Every combination is solved on its own.
+* **Refusal of one combination** (`CombinationRefused`, collected by `analyze`): codes
+  `stability.beyond-critical-load` (with `info["bucklingFactor"]`), `stability.slack-mechanism` (raised as
+  `ModelUnstable` with `.diagnosis`), `solve.active-set-cycling`, `analysis.release-second-order`,
+  `analysis.tau-b-zero`. `analyze` then raises with `.results` = the results of the other combinations and
+  `.refused` = `{what: CombinationRefused}`; with `strict=False` it returns those results and a warning
+  `NO RESULTS for …` per refused combination. A combination that does not converge is returned flagged
+  (`converged = False`; strict: `solve.not-converged`).
+* **Additions to `benchfea.results`**: `CombinationResult.solver` (plain data; document:
+  `combinations/<id>/solver`): `secondOrder {iterations, converged, tolerance, maxIterations, history[{iteration,
+  displacementChange, axialForceChange, tauBChange}], subdivisions{member: pieces}, largestPieceKh,
+  subdivisionCheck{pieces, change, tolerance}}`, `activeSet {iterations, slack[], history[], strategy}`,
+  `stiffnessReduction {clause, factor, tauB, members}`, `notionalLoads {clause, coefficient, direction, unit,
+  level, nodes{node: [Fx, Fy, Fz]}}`, `tauBIterations`. `BucklingResult.negative_factors`, `.negative_modes`,
+  `.member_shapes {member: (n_modes, n_stations, 3)}`, `.info` (document: `buckling/<id>/{factors, modes,
+  negativeFactors, negativeModes, memberShapes, info}`; mode rotations are written per file length unit).
+  `MemberResult.active` is `False` for a slack member. `CombinationResult.iterations` = second-order
+  iterations (or τ_b iterations of a first-order combination), `alpha`, `tau_b` as defined before.
+* **Station forces of a second-order result** are components along the undeformed member axes; the shear
+  normal to the deformed axis is `Vy − N v′` and `dMz/dx = −Vy + N v′` (THEORY 10.8).
+* **Invariants** of a second-order combination: the names of the linear checks plus `member equilibrium on
+  the deformed axis`; `rigid-body modes` covers translations only; `global moment equilibrium` includes the
+  couples of the member axial forces (THEORY 15).
+* **CLI `run`**: per second-order combination the iteration record (converged, iterations, last changes,
+  tolerance, alpha, pieces per member), slack members, τ_b range; per buckling combination the factors, the
+  factors under reversed loads and the estimated relative error; the same under `secondOrder`, `slackMembers`,
+  `tauB` and `buckling` in `--json`.
+
+Limits of this part (for LIMITS.md) — THEORY 16: axial-force effects on flexure only (no lateral-torsional,
+torsional or flexural-torsional buckling); small displacements (no bowing, no large rotation); Engesser shear
+form; transverse translational releases refused in second-order / buckling analyses; rigid links and
+diaphragms without geometric stiffness; truss-type members are pin-ended beam-columns (their own flexural
+buckling counts); τ_b from the largest compression of each analysis member, P_ns = F_y A; notional loads from
+the signed net downward load at each node; linear buckling on the first-order reference state with frozen
+slack set and τ_b; dense matrices.
 
 ## Contract for `benchfea.design`
 
@@ -361,7 +410,9 @@ only A). `DesignSection` constructors accept tabulated ratios (`bf/2tf`,
   `cb_f1_1`, `segment_cb`, `ltb_segments(ctx, moments)`, `axis_strength(ctx, demand, "x"|"y"|"r") ->
   AxisResult(checks, Mc, blocked, governing)`, pure functions per equation. Major axis = `Mz` (top flange =
   +y side in compression when `Mz > 0`). Round sections use the resultant moment.
-* **Chapter H** (`h_combined`): `h1_interaction`, `interaction` (Eq. H1-1a/b at every station with the
+* **Chapter H** (`h_combined`): `h1_interaction`, `interaction` (Eq. H1-1a/b at every station AND at the
+  stationary points of the interaction between stations — moments by the `Diagram` cubics, axial force
+  linear, so the result does not depend on `resultStations` for the loads of the format — with the
   concurrent demands against the member's governing available strengths), `torsion` (H3 not implemented:
   engine screening rule τ_t ≤ 1 % of 0.6 Fy, else `notChecked`), `cm_a_8_4`, `pe1_a_8_5`, `b1_a_8_3`
   (formulas only — B1/B2 are never applied automatically).

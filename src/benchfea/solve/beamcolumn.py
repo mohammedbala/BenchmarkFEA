@@ -19,8 +19,9 @@ Derivation: docs/THEORY.md section 10 (nothing is taken from a reference).  Summ
   first-order system above, augmented by two states (1, x) for a linearly varying load.  For a
   constant N this is the exact solution operator (the "stability functions" in numerical form, valid
   for compression, tension and N = 0 alike).  For N varying along the piece (axial member loads)
-  the two-term Magnus series is used (fourth-order accurate; the subdivision of the member is then
-  refined until the results stop changing, see ``nonlinear.py``).
+  the piece is crossed in MAGNUS_STEPS steps of the two-term Magnus series (fourth-order accurate;
+  the subdivision of the member is in addition doubled until the results stop changing, see
+  ``nonlinear.py``).
 * End stiffness and fixed-end forces follow from the transfer relation by solving for the start
   resultants; end connections (releases, partial springs) are springs between the node side and the
   beam side of an end DOF and are condensed exactly; rigid end offsets add the exact linear
@@ -37,7 +38,7 @@ import math
 from dataclasses import dataclass, field
 
 import numpy as np
-from scipy.linalg import eigvalsh, expm
+from scipy.linalg import eigvalsh
 
 from ..model import RIGID
 from .beam import SpanLoads
@@ -48,7 +49,24 @@ __all__ = ["BeamColumn", "PieceRecovery", "axial_state", "consistent_geometric_s
 SQ3 = math.sqrt(3.0)
 _T4, _W4 = np.polynomial.legendre.leggauss(4)
 GAUSS4 = tuple(zip((0.5 * (1.0 + _T4)).tolist(), (0.5 * _W4).tolist()))    # points and weights on [0, 1]
+MAGNUS_STEPS = 4          # Magnus steps inside a piece whose axial force varies along its length
 STABLE_TOL = 1.0e-10      # smallest scaled eigenvalue of the condensed block below which the piece is unstable
+
+
+def expm(A: np.ndarray) -> np.ndarray:
+    """Matrix exponential of a small matrix by scaling and squaring: exp(A) = (exp(A / 2^s))^(2^s) with
+    ||A / 2^s||_1 <= 1/4, where the Taylor series to order 12 has a truncation error below 1e-17."""
+    norm = float(np.abs(A).sum(axis=0).max())
+    s = max(0, int(math.ceil(math.log2(norm / 0.25)))) if norm > 0.25 else 0
+    B = A / (2.0 ** s)
+    out = np.eye(len(A))
+    term = np.eye(len(A))
+    for k in range(1, 13):
+        term = term @ B / k
+        out = out + term
+    for _ in range(s):
+        out = out @ out
+    return out
 
 
 class _Plane:
@@ -62,6 +80,7 @@ class _Plane:
         self.qa, self.qs = float(qa), float(qs)
         self.S = np.array([self.h, 1.0, self.EI / self.h, self.EI / self.h ** 2])    # z = S * scaled state
         self._phi: dict[float, np.ndarray] = {}
+        self._cum: list = []
         self.constant = self.na == 0.0 and self.ns == 0.0
         # 1 + beta N must stay positive (N > -G As): below that the member is unstable in shear
         self.bad = not all(1.0 + self.beta * self.N(x) > 0.0 for x in (0.0, 0.5, 1.0))
@@ -85,17 +104,28 @@ class _Plane:
         A[5, 4] = 1.0
         return A
 
+    def _step(self, a: float, b: float) -> np.ndarray:
+        """Transfer from a to b by the two-term Magnus series with the two Gauss points of [a, b]
+        (THEORY 10.4); local error O((b - a)^5)."""
+        d = b - a
+        a1, a2 = self._A(a + d * (0.5 - SQ3 / 6.0)), self._A(a + d * (0.5 + SQ3 / 6.0))
+        return expm(0.5 * d * (a1 + a2) - (SQ3 * d * d / 12.0) * (a1 @ a2 - a2 @ a1))
+
     def phi(self, xi: float) -> np.ndarray:
-        """Transfer matrix of the scaled, augmented state from 0 to xi (0 <= xi <= 1)."""
+        """Transfer matrix of the scaled, augmented state from 0 to xi (0 <= xi <= 1).  Constant N: the
+        matrix exponential (exact).  Varying N: MAGNUS_STEPS equal Magnus steps over the piece."""
         xi = float(xi)
         if xi not in self._phi:
             if self.constant:
-                om = xi * self._A(0.0)
+                self._phi[xi] = expm(xi * self._A(0.0))
             else:
-                # two-term Magnus series with the two Gauss points of [0, xi] (THEORY 10.4)
-                a1, a2 = self._A(xi * (0.5 - SQ3 / 6.0)), self._A(xi * (0.5 + SQ3 / 6.0))
-                om = 0.5 * xi * (a1 + a2) - (SQ3 * xi * xi / 12.0) * (a1 @ a2 - a2 @ a1)
-            self._phi[xi] = expm(om)
+                if not self._cum:
+                    self._cum = [np.eye(6)]
+                    for j in range(MAGNUS_STEPS):
+                        self._cum.append(self._step(j / MAGNUS_STEPS, (j + 1) / MAGNUS_STEPS) @ self._cum[-1])
+                j = min(int(xi * MAGNUS_STEPS), MAGNUS_STEPS)
+                a = j / MAGNUS_STEPS
+                self._phi[xi] = self._cum[j] if xi == a else self._step(a, xi) @ self._cum[j]
         return self._phi[xi]
 
     def state(self, z0: np.ndarray, xi: float) -> np.ndarray:
@@ -209,6 +239,15 @@ class BeamColumn:
         Kb[np.ix_([0, 6], [0, 6])] = ea * np.array([[1.0, -1.0], [-1.0, 1.0]])
         if not truss:
             Kb[np.ix_([3, 9], [3, 9])] = np.array([[1.0, -1.0], [-1.0, 1.0]]) / (flex.torsion * h)
+        else:
+            # A truss-type member transmits no torque, so the twist of the INTERNAL nodes of a subdivided
+            # truss-type member is not a degree of freedom of the theory: nothing can load it.  It is
+            # held (stiffness to ground about the member axis); the twist then stays exactly zero and
+            # no force flows through this term.  The original member ends keep exactly zero rows.
+            if member.k_end_i[3] == RIGID:
+                Kb[3, 3] = 1.0 / (flex.torsion * h)
+            if member.k_end_j[3] == RIGID:
+                Kb[9, 9] = 1.0 / (flex.torsion * h)
         # uniform bar with both ends held under the line load wa + ws x (THEORY 10.5)
         f0[0] = -(wa[0] * h / 2.0 + ws[0] * h * h / 6.0)
         f0[6] = -(wa[0] * h / 2.0 + ws[0] * h * h / 3.0)
@@ -221,7 +260,14 @@ class BeamColumn:
             if p.bad:
                 stable = False
                 continue
-            k4, f4 = p.stiffness()
+            try:
+                with np.errstate(all="ignore"):
+                    k4, f4 = p.stiffness()
+            except np.linalg.LinAlgError:
+                k4 = f4 = None
+            if k4 is None or not (np.isfinite(k4).all() and np.isfinite(f4).all()):
+                stable = False                               # far beyond the critical load of the piece itself
+                continue
             sg = np.array(sg)
             Kb[np.ix_(idx, idx)] = sg[:, None] * k4 * sg[None, :]
             f0[idx] = sg * f4
@@ -342,7 +388,10 @@ class BeamColumn:
         node_forces = self.G.T @ F
         node_forces[3:6] += self.arm[0] @ u_nodes[3:6]
         node_forces[9:12] += self.arm[1] @ u_nodes[9:12]
-        rec = PieceRecovery(F, np.array([x for x, _ in stations]), forces, disp, (s1 - p_j) - F[6:], y1 - ub[6:],
+        closure = y1 - ub[6:]
+        if self.is_truss:
+            closure[3] = 0.0                                 # a truss-type member has no twist of its own
+        rec = PieceRecovery(F, np.array([x for x, _ in stations]), forces, disp, (s1 - p_j) - F[6:], closure,
                             n_start=float(n0), n_min=float(min(ends)), n_max=float(max(ends)), node_forces=node_forces)
         if checks:
             # moment equilibrium of the piece written on its deformed axis, with the integral of N v'

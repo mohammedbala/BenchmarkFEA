@@ -22,6 +22,9 @@ def test_other_analysis_types_are_refused_until_a_solver_registers_for_them(monk
     d = doc()
     d["combinations"]["c"]["analysisType"] = "secondOrder"
     model = build_model(d)
+    # the second-order solver is registered now (nonlinear.py): take its entry out to see the refusal
+    # of an analysis type that no solver is registered for
+    monkeypatch.delitem(ANALYSIS_TYPES, "secondOrder")
     with pytest.raises(ModelRefused) as e:
         analyze(model)
     assert e.value.codes == ["analysis.not-implemented"] and e.value.problems[0].path == "/combinations/c/analysisType"

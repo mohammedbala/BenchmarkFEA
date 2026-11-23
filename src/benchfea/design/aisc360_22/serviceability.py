@@ -31,7 +31,9 @@ definition of the input format, not of AISC):
 Limits of this check:
 
 * the maximum is taken over the result stations (``analysis.resultStations``
-  per analysis member), not between them;
+  per analysis member), not between them; a design member with no station
+  between its ends (``resultStations`` = 2) has no measurable deflection
+  relative to its chord -> ``notChecked`` (never a vacuous pass);
 * a design member with a FREE end (cantilever, overhang): its deflection
   relative to the chord through its two ends does not measure the tip
   deflection, and Chapter L defines no reference for it -> ``notChecked``;
@@ -131,11 +133,19 @@ def deflection_checks(model, results, design_member_id: str, ctx: DesignContext 
             out.append(not_checked(name, CLAUSE, f"combination(s) {', '.join(absent)} are not in the analysis "
                                    "results", ctx, **kw))
             continue
-        rows = []
+        rows, interior = [], True
         for cid in lim.combinations:
-            value, x = deflection_value(*member_displacements(model, results.combinations[cid], design_member_id),
-                                        lim.direction)
+            xs, us = member_displacements(model, results.combinations[cid], design_member_id)
+            interior = interior and bool(np.any((xs > xs[0]) & (xs < xs[-1])))
+            value, x = deflection_value(xs, us, lim.direction)
             rows.append((value, x, cid))
+        if not interior:
+            # only the two end stations: the deflection relative to the chord through them is zero by
+            # definition, which would be a vacuous "pass"
+            out.append(not_checked(name, CLAUSE, "the design member has no result station between its ends "
+                                   "(analysis.resultStations = 2): the deflection relative to the chord through "
+                                   "the ends is measured at the stations only and cannot be evaluated", ctx, **kw))
+            continue
         value, x, cid = max(rows, key=lambda r: r[0])
         notes = ["deflection relative to the chord through the design member ends; maximum over the result "
                  "stations", "the limit is the user's: AISC 360-22 Chapter L sets no numeric limit"]

@@ -81,7 +81,11 @@ def _run(args) -> int:
     doc = results.to_document(model)
     dump(doc, out_path)
     u = model.units
-    flagged = [cid for cid, c in results.combinations.items() if not c.invariants.passed]
+    # flagged: an invariant failed or an iteration did not converge; with --allow-flagged a combination
+    # that could not be analysed at all (e.g. beyond its elastic critical load) is missing from the results
+    flagged = [cid for cid, c in results.combinations.items() if not (c.invariants.passed and c.converged)]
+    flagged += [cid for cid in model.combinations if cid not in results.combinations]
+    flagged += [f"buckling:{cid}" for cid in model.analysis.buckling_combinations if cid not in results.buckling]
     summary = {"ok": not flagged, "output": str(out_path), "model": model.name, "nodes": len(model.nodes),
                "members": len(model.members), "combinations": {}, "warnings": len(results.warnings),
                "defaultsUsed": len(results.defaults_used), "flagged": flagged}
@@ -102,6 +106,24 @@ def _run(args) -> int:
             "sumReactions": [float(u.from_internal(v, "force")) for v in c.reactions[:, :3].sum(axis=0)],
             "invariantsPassed": c.invariants.passed,
             "worstInvariant": {"name": worst.name, "value": float(worst.value), "tolerance": float(worst.tolerance)}}
+        so = c.solver.get("secondOrder")
+        if so:                                   # record of the second-order iteration (docs/THEORY.md section 10)
+            last = so["history"][-1] if so["history"] else {}
+            summary["combinations"][cid]["secondOrder"] = {
+                "converged": bool(so["converged"]), "iterations": int(so["iterations"]),
+                "tolerance": so["tolerance"], "lastDisplacementChange": last.get("displacementChange"),
+                "lastAxialForceChange": last.get("axialForceChange"), "alpha": float(c.alpha),
+                "piecesPerMember": {"min": min(so["subdivisions"].values()), "max": max(so["subdivisions"].values())}}
+        if "activeSet" in c.solver:
+            summary["combinations"][cid]["slackMembers"] = list(c.solver["activeSet"]["slack"])
+        if c.tau_b:
+            summary["combinations"][cid]["tauB"] = {"min": min(c.tau_b.values()), "max": max(c.tau_b.values())}
+    if results.buckling:
+        summary["buckling"] = {
+            cid: {"factors": [float(f) for f in b.factors], "negativeFactors": [float(f) for f in b.negative_factors],
+                  "estimatedRelativeError": list(b.info.get("estimatedRelativeError", [])),
+                  "piecesPerMember": b.info.get("piecesPerMember"), "warnings": list(b.info.get("warnings", []))}
+            for cid, b in results.buckling.items()}
     if args.json:
         json.dump(summary, sys.stdout, indent=2)
         sys.stdout.write("\n")
@@ -115,10 +137,32 @@ def _run(args) -> int:
                   f"{u.label('length')} (member {m['member']}, x = {m['x']:.6g}); sum of reactions ({r[0]:.6g}, {r[1]:.6g}, {r[2]:.6g}) "
                   f"{u.label('force')}; invariants {'passed' if c['invariantsPassed'] else 'FAILED'} "
                   f"(largest: {c['worstInvariant']['name']} {c['worstInvariant']['value']:.2e})")
+            so = c.get("secondOrder")
+            if so:
+                p = so["piecesPerMember"]
+                print(f"      second-order iteration {'converged' if so['converged'] else 'DID NOT CONVERGE'} in "
+                      f"{so['iterations']} iteration(s): last displacement change {so['lastDisplacementChange']:.2e}, "
+                      f"axial-force change {so['lastAxialForceChange']:.2e} (tolerance {so['tolerance']:.1e}); "
+                      f"alpha {so['alpha']:g}; pieces per member {p['min']}..{p['max']}")
+            if c.get("slackMembers"):
+                print(f"      slack tension/compression-only members: {', '.join(c['slackMembers'])}")
+            if "tauB" in c:
+                print(f"      stiffness reduction: tau_b {c['tauB']['min']:.4g}..{c['tauB']['max']:.4g}")
+        for cid, b in summary.get("buckling", {}).items():
+            pos = ", ".join(f"{f:.6g}" for f in b["factors"]) or "none (no member in compression)"
+            line = f"  buckling of combination {cid}: factors {pos}"
+            if b["negativeFactors"]:
+                line += "; under reversed loads " + ", ".join(f"{f:.6g}" for f in b["negativeFactors"])
+            if b["estimatedRelativeError"]:
+                line += f" (estimated relative error {max(b['estimatedRelativeError']):.1e})"
+            print(line)
+            for w in b["warnings"]:
+                print(f"      note: {w}")
         for w in results.warnings:
             print(f"  warning: {w}")
         print(f"  {len(results.defaults_used)} default(s) used (listed in the output under defaultsUsed)")
-        print(f"results written to {out_path}" + (" -- FLAGGED: invariants failed" if flagged else ""))
+        print(f"results written to {out_path}"
+              + (" -- FLAGGED (invariant failed, not converged or no results): " + ", ".join(flagged) if flagged else ""))
     return 3 if flagged else 0
 
 

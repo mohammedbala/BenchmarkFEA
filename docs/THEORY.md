@@ -12,7 +12,11 @@ is in `src/benchfea/solve/`.
 
 Sections: 1 element · 2 end releases · 3 rigid end offsets · 4 constraints ·
 5 loads, fixed-end forces and recovery · 6 supports and solution ·
-7 stability diagnosis · 8 invariants · 9 hooks for nonlinear analysis.
+7 stability diagnosis · 8 invariants · 9 hooks for nonlinear analysis ·
+10 second-order member · 11 linear buckling · 12 second-order analysis of a
+combination · 13 tension-only and compression-only members · 14 stiffness
+reduction and notional loads · 15 invariants of a second-order solution ·
+16 scope and limits of the nonlinear analyses.
 
 ## 1. Element
 
@@ -331,10 +335,414 @@ flagged. `superposition_check` and `reciprocity_check` (Maxwell–Betti:
 
 ## 9. Hooks for nonlinear analysis
 
-`ANALYSIS_TYPES[type](analysis, combination)` solves one combination; only
-`firstOrder` is registered. A second-order driver can reuse
+`ANALYSIS_TYPES[type](analysis, combination)` solves one combination;
+`firstOrder` (this core) and `secondOrder` (sections 10–15) are registered. A
+nonlinear driver reuses
 `Structure.assemble(matrices)` for the geometric stiffness (per-member 12×12
 matrices in nodal global DOFs, `Gᵀ k_g G`), `Structure.factorize` (stability
 diagnosis included), `Structure.solve`, `LinearAnalysis.recover`, and
 `build_element(model, member, factors, active)` for reduced stiffness and for
 members that are switched off.
+
+## 10. Second-order member (`beamcolumn.py`)
+
+As in sections 1–9, everything is derived here; the verification is against
+independent integrations of the same differential equations
+(`tests/second_order_reference.py`: `scipy.integrate.solve_bvp`, and the
+classical fourth-order form of the equation as a second witness).
+
+### 10.1 Assumptions
+
+Small-displacement second-order theory: displacements and rotations are small
+compared with the member length, but the equilibrium of a slice is written in
+its displaced position. Of the internal forces only the **axial force N**
+(tension positive) is allowed to act on the displacements; it is taken from the
+previous iterate (section 12), keeps the direction of the undeformed member
+axis, and may vary along the member (axial member loads). The axial and
+torsional behaviour stay first order: `u′ = N/EA`, `N′ = −w_x`, `θx′ = T/GJ`.
+
+### 10.2 Equations of one bending plane
+
+Plane xy, deflection `v`, section rotation `θ = θz`, `M = Mz`, and **V = the
+force component along the undeformed y axis** on the +x face. Slice between x
+and x + dx in its displaced position; on its +x face `(N, V, M)` at the point
+`(x + dx, v + dv)`, on its −x face `(−N, −V, −M)` at `(x, v)`, line load
+`q = w_y`:
+
+    force along y:              V′ = −q
+    moment about the −x face:   dM + V dx − N dv = 0   ⇒   M′ = −V + N v′        (4)
+
+(first order: `M′ = −V`, equation (2)). Elasticity: `θ′ = M/EI`.
+
+*Shear deformation.* The second-order work of the axial force is that of N on
+the shortening of the axis, `∫ v′²/2 dx`, so the potential energy of the plane
+problem is
+
+    Π = ∫ [ ½ EI θ′² + ½ G As (v′ − θ)² + ½ N v′² − q v ] dx .
+
+Stationarity with respect to θ gives `M′ = −G As (v′ − θ)`, with respect to v
+`(G As (v′ − θ) + N v′)′ = −q`. Comparing with (4): the shear strain is
+produced by `Q = V − N v′`, the force **normal to the deformed axis**,
+
+    v′ − θ = β (V − N v′),   β = 1/(G As)      ⇒      v′ = (θ + β V) / (1 + β N).
+
+Together:
+
+    v′ = (θ + βV)/(1 + βN)    θ′ = M/EI    M′ = (Nθ − V)/(1 + βN)    V′ = −q      (5)
+
+`1 + βN > 0` is required (`N > −G As`); otherwise the piece is unstable in
+shear and is treated as beyond its critical load. This is the classical
+Engesser form of the shear-deformable beam-column. The other consistent choice
+(shear strain produced by the force normal to the rotated *section*,
+`V − Nθ`) differs by terms of relative order `N/(G As)` times the shear
+deformation; see section 16. β = 0 gives `EI v⁗ − (N v′)′ = q`.
+
+The xz plane obeys the same equations in the variables
+`(w, −θy, −My, Vz)` with `q = w_z` (section 1.1: `w′ = −θy + …`,
+`θy′ = My/EIy`, `My′ = +Vz` map onto `v′ = θ + …`, `θ′ = M/EI`, `M′ = −V`
+under this substitution, and (4) is derived in the same way).
+*Verified:* `test_second_order_in_the_other_bending_plane_and_for_a_rolled_member`.
+
+### 10.3 Transfer matrix, stiffness, fixed-end forces
+
+(5) is a linear system `z′ = A(N) z + g(x)`, `z = (v, θ, M, V)`. A piece
+carries a line load `q = q_a + q_s x` over its whole length h and no load
+inside (section 12 puts a piece boundary at every load break). With the two
+extra states `(1, x)` the load becomes part of a homogeneous system
+`y′ = Â y`, `y = (z, 1, x)`. For constant N the solution operator is the
+matrix exponential,
+
+    y(x) = exp(Â x) y(0),
+
+which is exact for compression (trigonometric), tension (hyperbolic) and
+N = 0 (polynomial) alike — the "stability functions" in numerical form, with
+no special cases and no cancellation near N = 0. The state is scaled to
+`(v/h, θ, M h/EI, V h²/EI)`; the exponential is evaluated by scaling and
+squaring with a Taylor series (`beamcolumn.expm`, checked against SciPy).
+
+Write the transfer over the piece as `d₁ = A d₀ + B s₀ + p_d`,
+`s₁ = C d₀ + D s₀ + p_s` with `d = (v, θ)` and the work-conjugate
+`s = (V, M)`. The forces on the piece are `−s₀` at the start and `+s₁` at the
+end (CONVENTIONS §4). Solving the first relation for `s₀`:
+
+    [F₀]   [ B⁻¹A          −B⁻¹  ] [d₀]   [ B⁻¹ p_d          ]
+    [F₁] = [ C − D B⁻¹A     D B⁻¹ ] [d₁] + [ p_s − D B⁻¹ p_d  ]
+
+— the second-order stiffness and the fixed-end forces of the piece, including
+the effect of the axial force on the loads inside the piece (P-δ). `B` is
+singular only at the critical load of the clamped–clamped piece; the pieces
+are kept far shorter than that (section 12). The matrix is not symmetrised:
+its symmetry is an invariant that is checked on every solve. *Verified:* for
+N = 0 it reproduces the first-order element of sections 1–5 to round-off,
+stiffness, fixed-end forces and stations
+(`test_without_axial_force_the_piece_is_the_first_order_element`); with N,
+every station value against `solve_bvp`
+(`tests/test_second_order_beamcolumn.py`, P/Pe from 0.1 to 0.9, tension, with
+and without shear deformation, point loads, moments, partial trapezoids).
+
+### 10.4 Axial force varying along the piece
+
+With axial member loads `N(x) = N₀ − w_a x − w_s x²/2` and `Â` depends on x.
+The solution of `y′ = Â(x) y` over a step Δ is the time-ordered series
+`Φ = I + ∫Â + ∫∫_{s₂<s₁} Â(s₁)Â(s₂) + …`. Writing `Φ = exp(Ω₁ + Ω₂ + …)`
+and comparing orders: `Ω₁ = ∫Â ds` and, since `Ω₁²/2` contains the symmetric
+part of the double integral, `Ω₂ = ½ ∫∫_{s₂<s₁} [Â(s₁), Â(s₂)]`. Expanding Â
+about the midpoint, `Â(s) = Â_m + (s − m) Â′ + …`:
+
+    Ω₁ = Δ Â_m + O(Δ³),     Ω₂ = −(Δ³/12) [Â_m, Â′_m] + O(Δ⁵),     Ω₃ = O(Δ⁵).
+
+With the two Gauss points `s₁,₂ = m ∓ Δ√3/6`: `(Â₁ + Â₂)Δ/2 = ∫Â + O(Δ⁵)`
+and `[Â₁, Â₂] = (√3Δ/3)[Â_m, Â′_m] + O(Δ³)`, hence
+
+    Ω = (Δ/2)(Â₁ + Â₂) − (√3 Δ²/12) [Â₁, Â₂],      Φ = exp(Ω) + O(Δ⁵).
+
+A piece with varying N is crossed in 4 such steps (`MAGNUS_STEPS`); the
+global error is O(Δ⁴). For constant N the formula reduces to the exact
+exponential. *Verified:*
+`test_transfer_with_a_varying_axial_force_is_fourth_order_accurate`,
+`test_axial_force_varying_along_the_member` (column under its own weight,
+error below 1e-8), `test_axial_force_varying_along_the_member_self_weight_buckling`.
+
+### 10.5 Axial and torsional part
+
+Uniform bar, first order: stiffness `EA/h` (and `GJ/h`) between the ends. Bar
+with both ends held under `w_x = w_a + w_s x`: by virtual work with the two
+linear displacement fields `1 − x/h` and `x/h` (the exact homogeneous
+solutions, so the result is exact) the end forces on the bar are
+`−∫ w_x (1 − x/h) dx = −(w_a h/2 + w_s h²/6)` and
+`−∫ w_x x/h dx = −(w_a h/2 + w_s h²/3)`. Point loads at the two ends of a
+piece act on the held end DOFs directly.
+
+### 10.6 End connections
+
+A release or partial release is a spring `k` between the node side and the
+beam side of an end DOF (section 2). With `c` = the spring-connected DOFs,
+`r` the rigidly connected ones, `D = diag(k)`, `K` and `f₀` the stiffness and
+fixed-end forces at the beam-side DOFs, the beam side carries the spring force
+`D (u_n − u_b)`:
+
+    (K_cc + D) u_b = D u_n − K_cr u_r − f₀_c ,          S = (K_cc + D)⁻¹
+    K_rr ← K_rr − K_rc S K_cr        K_nr = D S K_cr        K_nn = D S K_cc
+    f_r ← f₀_r − K_rc S f₀_c         f_n = D S f₀_c
+
+(`K_nn = D − D S D = D S K_cc`: the second form has no cancellation for stiff
+springs; for `k = 0` the rows are exactly zero.) `K_cc + D` is positive
+definite as long as the piece itself has not buckled between its end
+connections (e.g. a pin-ended member below its own critical load). When it is
+not, the piece is flagged and the combination is refused (section 12): this
+instability is invisible in the condensed matrix.
+
+**Transverse translational releases** (`uy`, `uz` released or on a spring) are
+refused in second-order and buckling analyses: across such a sliding
+connection the axial force acts with an eccentricity equal to the slip, and
+the moment this produces depends on how the connection is built (which side
+carries the guide), which the model does not say.
+
+**Truss-type members** are the piece with both bending rotations released at
+the original member ends and no torsional stiffness. They are therefore
+pin-ended beam-columns: a transverse load on a compressed truss member is
+amplified, and its own flexural buckling is part of the analysis. The twist of
+the internal nodes of a subdivided truss member is not a degree of freedom of
+the theory (no torque can reach it) and is held.
+
+### 10.7 Rigid end offsets
+
+`u_end = u + θ × o` (section 3) is the first-order kinematics of the rigid
+arm. To second order in the rotation vector θ the arm end moves by
+`θ × o + ½ θ × (θ × o)`. The axial end force `f` that the arm applies to the
+member end (`f = −N e_x` at end i, `+N e_x` at end j) does the second-order
+work `f · ½ θ × (θ × o) = ½[(θ·o)(θ·f) − |θ|² (o·f)]`, i.e. the arm adds
+
+    K_arm = ½ (o fᵀ + f oᵀ) − (o·f) I
+
+to the rotational DOFs of the node (for an offset along the member in
+compression P: `−P a` on the two transverse rotations — the inverted
+pendulum). The nodal forces of the piece are `Gᵀ f_end + K_arm θ`.
+*Verified:* `test_rigid_end_offset_carrying_axial_load` (boundary condition
+`M = (H + Pθ) a` in the reference), `test_rigid_end_offset_carrying_the_load`
+(buckling), `test_rigid_offset_equals_a_very_stiff_stub_member`.
+
+### 10.8 Recovery; meaning of the reported forces
+
+With the node displacements: end displacements, beam-side displacements from
+10.6, end forces `F = K u_b + f₀`; the start state `(d₀, −F₀ − P₀)` is carried
+along the piece with the transfer matrix of 10.3/10.4, so **station moments
+and deflections are second-order accurate inside the member**. The axial
+force at the stations is `N(x)` from statics with the current end force.
+
+Reported `N, Vy, Vz` are components along the **undeformed** member axes
+(CONVENTIONS §4 holds: station forces at the ends equal the end forces, and
+end shears enter joint equilibrium directly). The shear force normal to the
+deformed axis is `Vy − N v′`; in second-order results `dMz/dx = −Vy + N v′`
+instead of `−Vy`.
+
+## 11. Linear buckling (`buckling.py`)
+
+### 11.1 Consistent geometric stiffness
+
+For a load factor λ on a reference state with axial forces `N_ref(x)`, the
+tangent stiffness of 10.3 is `K_T(λ)`. Its expansion about λ = 0,
+`K_T = K + λ K_g + O(λ²)`, defines the linear eigenproblem
+`(K + λ K_g) φ = 0`. Because the piece stiffness is the second derivative of
+the stationary value of the energy Π of 10.2, and Π depends on N only through
+`½ N v′²`, the derivative of the stationary value with respect to N is the
+derivative of Π at the unperturbed (first-order) field:
+
+    K_g[a, b] = ∫ N_ref(x) ( v_a′ v_b′ + w_a′ w_b′ ) dx  +  rigid-arm terms of 10.7,
+
+with `v_a, w_a` the first-order displacement fields of the piece for a unit
+end displacement a — the fields of the exact first-order element, releases
+and shear deformation included (cubic in x, so a 4-point Gauss rule is exact
+for `N_ref` up to quadratic). This is the *consistent* geometric stiffness; it
+is linear in the reference forces. *Verified:* it equals the numerical
+derivative of the exact stiffness
+(`test_consistent_geometric_stiffness_is_the_derivative_of_the_exact_stiffness`).
+
+### 11.2 Procedure
+
+1. Reference state: **first-order** solution of the combination's factored
+   loads (not multiplied by `analysis.alpha`), with its notional loads, its
+   stiffness reduction (τ_b from the reference axial forces) and its set of
+   slack one-sided members (section 13).
+2. Every member is cut into n pieces (load break points are piece
+   boundaries). `K` and `K_g` are assembled, constraints and supports
+   eliminated as in the static analysis, and the symmetric generalised
+   problem `(−K_g) φ = μ K φ`, `λ = 1/μ`, is solved (K positive definite).
+   `μ > 0`: buckling under λ × the loads; `μ < 0`: buckling under the reversed
+   loads, reported separately (`negative_factors`).
+3. Each eigenpair is taken to the eigenpair of the exact problem
+   `K_T(λ) φ = 0` on the same mesh by residual inverse iteration: λ from the
+   Rayleigh functional `φᵀ K_T(λ) φ = 0` (secant), then
+   `φ ← φ − K_T(σ)⁻¹ K_T(λ) φ` with σ just below the starting value. This
+   removes the discretisation error of step 2, which decreases with the fourth
+   power of the piece length (cubic fields); for a constant axial force per
+   member the factors are then exact for the theory.
+4. n = 4, 8, … (at most 32) until the positive factors change by less than
+   `BUCKLING_TOL = 1e-7` between two subdivisions; the last change is reported
+   as `estimatedRelativeError`. If an eigenpair cannot be polished, its mesh
+   value is kept and this criterion decides.
+
+**Stated accuracy:** the reported factors are converged to 1e-7 (relative)
+with respect to subdivision, otherwise a warning says how far they still
+move. *Verified:* the four classical end conditions, higher modes, spring
+supports, releases, a leaning column on a rigid diaphragm, a loaded rigid
+offset, a column under its own weight and the sway buckling of a portal frame
+agree to 3e-7 with the roots of characteristic determinants built from the
+general solution of `EI v⁗ + P v″ = 0` and the boundary conditions of each
+case, solved numerically (`tests/test_buckling_columns.py`; no
+effective-length factor is used anywhere); shear-deformable columns agree with
+the eigenvalue of (5) found by `solve_bvp`.
+
+Modes are normalised to a largest translation of 1 over all mesh nodes (so a
+mode in which only members bow has small nodal values; `member_shapes` gives
+the member axis at the result stations), with the sign that makes the first
+translation component reaching that magnitude positive. Coincident factors
+have no unique modes.
+
+## 12. Second-order analysis of a combination (`nonlinear.py`)
+
+Each combination is solved on its own from its factored loads.
+
+1. Loads × `analysis.alpha` (AISC 360-22 C2.1(d)); results are divided by
+   alpha at the end.
+2. First-order solution (this also yields the mechanism diagnosis in terms of
+   the original model). It gives the starting axial forces.
+3. **Subdivision** (`refine.py`). Members are cut at the load break points.
+   A-priori rule: no piece longer than `1.5 / k`, `k = √(2|N|/EI_min)` with
+   the first-order N — not needed for accuracy with a constant N (the piece is
+   exact) but it keeps the transfer matrices well conditioned in strong
+   tension and far from the pole of 10.3 in compression; verified after
+   convergence (`k h ≤ 3` with the final N, otherwise repeated with shorter
+   pieces). Members whose axial force **varies** along their length are
+   additionally cut into 2, 4, 8, … (at most 32) times as many pieces until
+   the results (node displacements, station forces and moments, each relative
+   to its largest value) change by less than `analysis.convergenceTolerance`
+   between two levels; the change is recorded (`subdivisionCheck`). The
+   internal nodes are ordinary DOFs of the solve, so the positive-definiteness
+   test covers buckling of a member between its joints.
+4. **Iteration.** `K_T(N⁽ᵏ⁻¹⁾) u⁽ᵏ⁾ = F(N⁽ᵏ⁻¹⁾)`: stiffness and fixed-end
+   forces with the axial forces (and τ_b) of the previous iterate, then new
+   axial forces from the end forces. Converged when the change of the
+   displacements (2-norm over the original nodes, rotations × model size,
+   relative), of the axial forces (largest change / largest force) and of τ_b
+   are all below `analysis.convergenceTolerance`; at most
+   `analysis.maxIterations`. Not converged: the result is flagged
+   (`converged = False`, code `solve.not-converged`).
+5. **Beyond the critical load.** If the tangent stiffness is not positive
+   definite (or a piece has buckled between its end connections), the
+   combination is refused (`stability.beyond-critical-load`) with a buckling
+   factor: the largest multiple ≤ 1 of the axial forces of the last iterate at
+   which the tangent stiffness is still positive definite, found by bisection
+   with the exact pieces. *Verified:* the factor equals critical load / load
+   (`test_load_beyond_the_elastic_critical_load_is_refused_with_the_buckling_factor`).
+6. Results are mapped back to the stations of the original members; the
+   iteration history, the tolerance and the number of pieces per member are
+   recorded in `CombinationResult.solver`.
+
+AISC 360-22 Commentary C2.1 benchmark problems (Cases 1 and 2), every
+tabulated value, US and SI: largest difference 0.38 % (moments) and 0.88 %
+(deflections) against the 3 % / 5 % acceptance criterion
+(`tests/test_second_order_aisc_benchmarks.py`; the section properties are not
+printed in the Commentary and are calibrated on its own P = 0 columns — see
+the test and section 16).
+
+## 13. Tension-only and compression-only members
+
+**Rule.** A one-sided member is *slack* when the axial force it carries, or
+would carry, has the wrong sign. The test quantity is its mean axial force
+`EA × elongation / L`, with the elongation from the node displacements
+(first-order kinematics, rigid offsets included) — defined whether the member
+is active or not. A slack member has zero stiffness; its member loads (e.g.
+self weight) still go to its end nodes as the reactions of a simply supported
+beam. A member keeps its state while its strain is below 1e-9 of the largest
+member strain.
+
+**Iteration** (per combination, no superposition): start with all members
+active; solve (first or second order); flip every member whose state
+contradicts its strain; repeat until nothing changes. If a set of slack
+members repeats, or a mechanism appears on the way, the iteration restarts and
+flips one member at a time (the one with the largest wrong force). A second
+cycle, or `analysis.maxIterations`, is refused (`solve.active-set-cycling`)
+naming the members that keep changing.
+
+**Slack members and stability.** If the converged set leaves a mechanism, the
+combination is refused (`stability.slack-mechanism`, with the mechanism
+diagnosis of section 7 and the slack members). The same refusal applies when
+the result is not determined: some one-sided members end with exactly zero
+force and the structure without them is a mechanism that can move without
+loading any of them (a gravity-only load on a pin-jointed frame with
+tension-only X-bracing: both diagonals shorten, and the frame can sway freely
+between the two positions in which one of them becomes taut). If either sense
+of that motion loads one of the idle members, the state is unique and
+accepted (e.g. zero load).
+
+## 14. Stiffness reduction and notional loads (AISC 360-22 C2.3, C2.2b)
+
+* **C2.3(a)**: factor 0.80 (`analysis.stiffnessReduction.factor`) on EA, EI,
+  GJ and G·As of the listed members (default: all).
+* **C2.3(b)**: τ_b additionally on the flexural stiffness only (User Note of
+  C2.3(b): `0.8 τ_b EI`, 0.8 × the other stiffnesses). `"computed"`:
+  Eq. C2-2a (`αP_r/P_ns ≤ 0.5`: τ_b = 1.0) / Eq. C2-2b
+  (`τ_b = 4 (αP_r/P_ns)(1 − αP_r/P_ns)`), `P_ns = F_y A` with the yield stress
+  of the member's material. Engine rule where the Specification is silent:
+  `αP_r` is the largest compression along the analysis member in the analysis
+  itself (which runs at α × the loads), one τ_b per analysis member, updated
+  in every iteration; tension or no axial force: 1.0; `αP_r ≥ P_ns` is refused
+  (`analysis.tau-b-zero`).
+* **C2.2b, Eq. C2-1**: `N_i = coefficient × α × Y_i` (default 0.002) at every
+  node along the given horizontal direction; `Y_i` = the downward component of
+  the loads applied at the node, member loads lumped to the two end nodes of
+  their member by the lever rule. `Y_i` is signed (a net upward load gives a
+  notional load against the direction). The notional loads are loads: the
+  reactions contain them (User Note of C2.2b(a): fictitious base shear).
+
+*Verified:* `test_stiffness_reduction_c2_3`, `test_notional_loads_c2_2b`,
+`test_alpha_multiplies_the_loads_and_divides_the_results`.
+
+## 15. Invariants of a second-order solution
+
+Evaluated on the subdivided model with the terms of the theory:
+
+| check | quantity |
+|---|---|
+| stiffness symmetry | of the assembled tangent stiffness |
+| rigid-body modes | `K_T B = 0` for the three rigid **translations** only (a rigid rotation of a member that carries an axial force does produce forces) |
+| positive definiteness | smallest scaled eigenvalue of the free-free tangent stiffness |
+| linear solve residual | of the last solve |
+| global force equilibrium | applied loads + reactions, components in the undeformed axes |
+| global moment equilibrium | applied loads + reactions about the origin at the undeformed positions **minus** the couples `∫ N v′ dx` of every piece and the rigid-arm couples (from (4): the moment of all forces on a piece taken at the undeformed positions equals `∫ N v′ dx`) |
+| joint equilibrium | nodal loads + reactions + constraint forces − second-order member end forces (arm terms included), internal nodes included |
+| member equilibrium / compatibility | resultants and displacements carried over every piece reproduce its end forces and end displacements |
+| member equilibrium on the deformed axis | end moments + end shears × length + load moments − `∫ N v′ dx` for every piece, the integral from the recovered deflection (`N (v_j − v_i)` for constant N, Gauss quadrature otherwise) |
+| work = strain energy | `uᵀ K_T u` = (equivalent nodal loads + reactions)·u |
+
+Tolerances as in section 8. *Verified:* in
+`test_invariants_of_a_second_order_solution_are_evaluated_with_the_second_order_terms`
+the moments of loads and reactions on the undeformed geometry differ by
+exactly the couples of the member axial forces.
+
+## 16. Scope and limits of the nonlinear analyses
+
+* **Included:** the effect of the member axial force on flexure in both
+  principal planes — joint translation (P-Δ) and member curvature (P-δ),
+  compression and tension, with shear deformation — and on rigid end offsets.
+* **Not included:** the effect of bending moments, shear forces and torque on
+  the stiffness, and of the axial force on torsion (no `N r₀²` term, no
+  warping). **Lateral-torsional, torsional and flexural-torsional buckling are
+  therefore not captured** by the second-order or the buckling analysis.
+* Small-displacement theory: no large rotations, no bowing (axial shortening
+  due to bending), no change of the axial stiffness with N; the elongation
+  used for one-sided members is first order.
+* Shear-deformable members follow the Engesser form (10.2). The Haringx form
+  would differ by terms of relative order `N/(G As)` × (shear deformation);
+  the choice is not prescribed by AISC 360-22.
+* Rigid links and diaphragms are linear kinematic constraints: the
+  second-order effect of the forces they transmit is not included (a warning
+  is attached to the results).
+* Rigid offsets not along the member axis: only the axial end force acts on
+  the rotating arm.
+* The buckling analysis is linear: first-order reference state, axial forces
+  proportional to the load factor, slack set and τ_b frozen at the reference
+  loads.
+* Dense matrices throughout: intended for frames of up to a few thousand
+  degrees of freedom after subdivision.

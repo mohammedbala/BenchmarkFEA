@@ -6,14 +6,12 @@ Structure of the code (and where a nonlinear driver plugs in)
                     assembly), factorises the elastic stiffness once and solves any ``LoadSet``:
                     ``solve_loads(loads) -> (Solution, {member: MemberRecovery})``.
 ``ANALYSIS_TYPES``  maps ``Combination.analysis_type`` to a function
-                    ``(LinearAnalysis, Combination) -> CombinationResult``.  Only ``"firstOrder"`` is
-                    registered here; every other type is refused with ``analysis.not-implemented``.
-                    A second-order driver registers itself and reuses ``Structure.assemble(matrices)``
-                    (geometric stiffness = one more set of per-member 12x12 matrices),
-                    ``Structure.factorize`` and ``Structure.solve`` inside its iteration, and
-                    ``build_element(model, member, factors, active)`` for reduced stiffness and for
-                    tension/compression-only members that are switched off.
-``UNSUPPORTED``     the list of model features this linear core refuses (one function each).
+                    ``(LinearAnalysis, Combination) -> CombinationResult``: ``"firstOrder"`` (here)
+                    and ``"secondOrder"`` (``nonlinear.py``); a type without an entry is refused with
+                    ``analysis.not-implemented``.  First-order combinations with tension/compression-
+                    only members, stiffness reduction or notional loads are also solved by
+                    ``nonlinear.NonlinearSolver`` (active set, tau_b iteration); linear buckling by
+                    ``buckling.py``.
 
 This module never reads the design-only data of the model.
 """
@@ -24,7 +22,7 @@ from typing import Callable
 import numpy as np
 
 from .. import __version__
-from ..problems import Problem, pointer
+from ..problems import ModelUnstable, Problem, pointer
 from ..results import CombinationResult, InvariantCheck, InvariantsReport, MemberResult, Results
 from . import invariants as inv
 from .element import MemberElement, build_element
@@ -56,26 +54,16 @@ def station_layout(length: float, n: int, point_positions=(), line_ends=()) -> l
 
 
 def unsupported_features(model) -> list[Problem]:
-    """Model features that this (linear) solver core does not analyse.  Each is refused rather than
-    ignored."""
+    """Model features that no registered solver analyses.  Each is refused rather than ignored.
+    (Second-order analysis, tension/compression-only members, stiffness reduction, notional loads
+    and linear buckling are implemented by ``nonlinear.py`` / ``buckling.py``.)"""
     out = []
-
-    def add(path, what, hint="This build analyses first-order (linear) combinations of frame and truss members."):
-        out.append(Problem(path, what + " is not implemented in this build", hint, code=NOT_IMPLEMENTED))
-
-    for mid, m in model.members.items():
-        if m.type in ("tensionOnly", "compressionOnly"):
-            add(pointer("members", mid, "type"), f"member type {m.type!r} (member {mid!r})")
     for cid, c in model.combinations.items():
         if c.analysis_type not in ANALYSIS_TYPES:
-            add(pointer("combinations", cid, "analysisType"),
-                f"analysis type {c.analysis_type!r} (combination {cid!r})")
-        if c.stiffness_reduction:
-            add(pointer("combinations", cid, "stiffnessReduction"), f"stiffness reduction (combination {cid!r})")
-        if c.notional is not None:
-            add(pointer("combinations", cid, "notionalLoad"), f"notional loads (combination {cid!r})")
-    if model.analysis.buckling_combinations:
-        add("/analysis/buckling", "linear buckling analysis")
+            out.append(Problem(pointer("combinations", cid, "analysisType"),
+                               f"analysis type {c.analysis_type!r} (combination {cid!r}) is not implemented in this build",
+                               "Registered analysis types: " + ", ".join(sorted(ANALYSIS_TYPES)) + ".",
+                               code=NOT_IMPLEMENTED))
     return out
 
 
@@ -155,44 +143,80 @@ class LinearAnalysis:
                                  constraint_forces=sol.constraint_forces.reshape(-1, 6).copy(), **kw)
 
 
+def _nonlinear(la: LinearAnalysis):
+    """The nonlinear solver of this model (one per LinearAnalysis)."""
+    if getattr(la, "_nonlinear", None) is None:
+        from .nonlinear import NonlinearSolver
+        la._nonlinear = NonlinearSolver(la)
+    return la._nonlinear
+
+
 def _first_order(la: LinearAnalysis, combination) -> CombinationResult:
     """Linear elastic analysis of one combination: the factored loads are solved directly on the
     (once) factorised stiffness, which is the same as superposing the cases (checked by
-    ``invariants.superposition_check``)."""
+    ``invariants.superposition_check``).  With tension/compression-only members, stiffness reduction
+    or notional loads the combination goes through ``nonlinear.NonlinearSolver`` instead."""
+    from .nonlinear import needs_nonlinear
+    if needs_nonlinear(la.model, combination):
+        return _nonlinear(la).solve(combination)
     loads = la.combination_loads(combination)
     sol, rec = la.solve_loads(loads)
     return la.result(combination, loads, sol, rec)
 
 
+def _second_order(la: LinearAnalysis, combination) -> CombinationResult:
+    """Second-order analysis of one combination (``nonlinear.NonlinearSolver``)."""
+    return _nonlinear(la).solve(combination)
+
+
 #: analysis type -> solver of one combination.  Other modules add their types here.
-ANALYSIS_TYPES: dict[str, Callable[[LinearAnalysis, object], CombinationResult]] = {"firstOrder": _first_order}
+ANALYSIS_TYPES: dict[str, Callable[[LinearAnalysis, object], CombinationResult]] = {
+    "firstOrder": _first_order, "secondOrder": _second_order}
 
 
 def analyze(model, strict: bool = True) -> Results:
-    """Analyse every combination of ``model``.
+    """Analyse every combination of ``model`` (each one on its own), then the linear buckling
+    analyses listed in ``analysis.buckling``.
 
     Raises
     ------
     ModelRefused    unsupported feature (code ``analysis.not-implemented``), member-level mechanism,
-                    or -- with ``strict`` (default) -- a failed invariant (code
-                    ``solve.invariant-failed``; the flagged results are attached as ``.results``).
-    ModelUnstable   mechanism / singular stiffness, with ``.diagnosis`` (MechanismDiagnosis).
+                    a combination that cannot be analysed (``stability.beyond-critical-load``,
+                    ``solve.active-set-cycling``, ``analysis.release-second-order``,
+                    ``analysis.tau-b-zero``), or -- with ``strict`` (default) -- a failed invariant
+                    (``solve.invariant-failed``) or an iteration that did not converge
+                    (``solve.not-converged``).  The results of the other combinations (and the flagged
+                    ones) are attached as ``.results``.
+    ModelUnstable   mechanism / singular stiffness, with ``.diagnosis`` (MechanismDiagnosis); also when
+                    slack tension/compression-only members leave a mechanism in a combination
+                    (``stability.slack-mechanism``; ``.results`` then holds the other combinations).
 
-    With ``strict=False`` results whose invariants failed are returned, flagged
-    (``CombinationResult.invariants.passed`` is False and a warning is added); they are never
+    With ``strict=False`` flagged results (failed invariant, not converged) are returned with a
+    warning, and a refused combination is left out of the results with a warning; they are never
     returned unflagged.
     """
+    from .nonlinear import CombinationRefused
     problems = unsupported_features(model)
     if problems:
         raise ModelRefused(problems, model.source)
     la = LinearAnalysis(model)
-    combos = {}
+    combos, refused = {}, {}
     for cid, combination in model.combinations.items():
-        combos[cid] = ANALYSIS_TYPES[combination.analysis_type](la, combination)
+        try:
+            combos[cid] = ANALYSIS_TYPES[combination.analysis_type](la, combination)
+        except CombinationRefused as r:
+            refused[f"combination {cid!r}"] = r
     warnings = [f"[{p.code}] {p.path}: {p.message}" for p in model.warnings] + list(la.structure.warnings)
     res = Results(model.name, combos, defaults_used=list(model.defaults_used), warnings=warnings,
                   engine_version=__version__)
     res.compute_envelopes()
+    if model.analysis.buckling_combinations:
+        from .buckling import buckling_analysis
+        for cid in model.analysis.buckling_combinations:
+            try:
+                res.buckling[cid] = buckling_analysis(_nonlinear(la), model.combinations[cid])
+            except CombinationRefused as r:
+                refused[f"buckling analysis of combination {cid!r}"] = r
     failed = []
     for cid, c in combos.items():
         for ch in c.invariants.checks:
@@ -202,12 +226,31 @@ def analyze(model, strict: bool = True) -> Results:
                 c.warnings.append(msg)
                 failed.append(Problem(pointer("combinations", cid), msg, _hint(model, ch),
                                       code="solve.invariant-failed"))
+        if not c.converged:
+            failed.append(Problem(pointer("combinations", cid),
+                                  f"combination {cid!r} did not converge: " + "; ".join(c.warnings[:1]),
+                                  "Increase analysis.maxIterations or check whether the structure is close to "
+                                  "its elastic critical load.", code="solve.not-converged"))
     if failed:
-        res.warnings.append("results are FLAGGED: at least one invariant failed (see the combinations)")
+        res.warnings.append("results are FLAGGED: at least one invariant failed or an iteration did not converge "
+                            "(see the combinations)")
+    if refused:
+        for what, r in refused.items():
+            res.warnings.append(f"NO RESULTS for {what}: " + "; ".join(p.message for p in r.problems))
+        diagnosis = next((r.diagnosis for r in refused.values() if r.diagnosis is not None), None)
+        allp = [p for r in refused.values() for p in r.problems] + failed
+        e = (ModelUnstable if diagnosis is not None else ModelRefused)(allp, model.source)
+        if diagnosis is not None:
+            e.diagnosis = diagnosis
+        e.results = res
+        e.refused = {what: r for what, r in refused.items()}
         if strict:
-            e = ModelRefused(failed, model.source)
-            e.results = res
             raise e
+        return res
+    if failed and strict:
+        e = ModelRefused(failed, model.source)
+        e.results = res
+        raise e
     return res
 
 

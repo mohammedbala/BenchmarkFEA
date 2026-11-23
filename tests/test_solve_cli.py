@@ -64,11 +64,14 @@ def test_run_refuses_a_mechanism_with_the_diagnosis_and_writes_nothing(tmp_path,
     assert payload["diagnosis"]["nMechanisms"] == 3 and payload["diagnosis"]["modes"][0]["kind"] == "rigid-body"
 
 
-def test_run_refuses_invalid_and_unsupported_models(tmp_path, capsys, fixtures):
+def test_run_refuses_invalid_and_unsupported_models(tmp_path, capsys, fixtures, monkeypatch):
     doc = cantilever()
     doc["members"]["m"]["section"] = "nope"
     assert main(["run", str(write(tmp_path, doc))]) == 1
     assert "ref.unknown-section" in capsys.readouterr().err
+    # second-order analysis is implemented now; an analysis type without a registered solver is refused
+    from benchfea.solve import ANALYSIS_TYPES
+    monkeypatch.delitem(ANALYSIS_TYPES, "secondOrder")
     assert main(["run", str(fixtures / "valid" / "frame_kip_in.json"), "-o", str(tmp_path / "x.json")]) == 1
     err = capsys.readouterr().err
     assert "analysis.not-implemented" in err and "REFUSED" in err and not (tmp_path / "x.json").exists()

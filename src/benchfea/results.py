@@ -83,6 +83,10 @@ class CombinationResult:
     invariants: InvariantsReport = field(default_factory=InvariantsReport)
     warnings: list[str] = field(default_factory=list)
     constraint_forces: np.ndarray | None = None   # (n_nodes, 6) global: forces BY the rigid constraints ON the nodes
+    # record of the nonlinear solution (plain JSON data, dimensionless unless a unit is stated inside):
+    # "secondOrder" {iterations, converged, tolerance, history[], subdivisions{member: pieces}, ...},
+    # "activeSet" {iterations, slack[], history[]}, "stiffnessReduction", "notionalLoads"
+    solver: dict = field(default_factory=dict)
 
 
 @dataclass
@@ -90,6 +94,14 @@ class BucklingResult:
     combination: str
     factors: np.ndarray               # (n_modes,) load multipliers, ascending, positive
     modes: np.ndarray                 # (n_modes, n_nodes, 6) mode shapes, max |translation| = 1
+    #                                   (maximum over the nodes AND the member axes: a mode in which only
+    #                                   members bow between their nodes has small nodal values)
+    negative_factors: np.ndarray = field(default_factory=lambda: np.zeros(0))   # closest to zero first (< 0):
+    #                                   buckling under the REVERSED loading
+    negative_modes: np.ndarray | None = None      # (n_negative, n_nodes, 6)
+    member_shapes: dict = field(default_factory=dict)   # member id -> (n_modes, n_stations, 3) local ux, uy, uz
+    #                                   of the member axis at the result stations, same normalisation
+    info: dict = field(default_factory=dict)      # subdivisions, estimated accuracy, basis, warnings (plain data)
 
 
 @dataclass
@@ -189,14 +201,30 @@ class Results:
                                "checks": [vars(ch) for ch in c.invariants.checks]},
                 "warnings": list(c.warnings),
             }
+            if c.solver:
+                out["combinations"][cid]["solver"] = c.solver
             if c.constraint_forces is not None:
                 cf = table(c.constraint_forces, NODE_FORCES, _FORCE_DIMS)
                 out["combinations"][cid]["constraintForces"] = {
                     nid: cf[nid] for con in model.constraints.values() for nid in (con.master, *con.slaves)}
         for cid, b in self.buckling.items():
+            # a mode is a shape: translations are pure numbers (largest = 1), so rotations are per unit
+            # length and are converted to the file's length unit
+            per_length = np.array([1.0] * 3 + [float(u.to_internal(1.0, "length"))] * 3)
             out["buckling"][cid] = {
                 "factors": [float(f) for f in b.factors],
-                "modes": [table(mode, NODE_DISPLACEMENTS, ("dimensionless",) * 6) for mode in b.modes]}
+                "modes": [table(mode * per_length, NODE_DISPLACEMENTS, ("dimensionless",) * 6) for mode in b.modes]}
+            if len(b.negative_factors):
+                out["buckling"][cid]["negativeFactors"] = [float(f) for f in b.negative_factors]
+                if b.negative_modes is not None:
+                    out["buckling"][cid]["negativeModes"] = [
+                        table(mode * per_length, NODE_DISPLACEMENTS, ("dimensionless",) * 6) for mode in b.negative_modes]
+            if b.member_shapes:
+                out["buckling"][cid]["memberShapes"] = {
+                    mid: [{n: [float(v) for v in shape[:, k]] for k, n in enumerate(("ux", "uy", "uz"))}
+                          for shape in shapes] for mid, shapes in b.member_shapes.items()}
+            if b.info:
+                out["buckling"][cid]["info"] = b.info
         for mid, e in self.envelopes.items():
             out["envelopes"][mid] = {
                 "x": [float(u.from_internal(v, "length")) for v in e.x],

@@ -31,9 +31,10 @@ Implemented
     strength of all Chapter F limit states of the axis, including the lowest
     LTB strength of all unbraced segments checked in the combination;
   - a station in compression uses H1.1, a station in tension H1.2 (each is
-    reported as its own check); stations without axial force are evaluated
-    with Pr = 0 in the check that exists (Eq. H1-1b; Commentary H1: H1-1 may be
-    used for biaxial flexure without axial force);
+    reported as its own check); points without axial force (also the point
+    where the axial force changes sign between two stations) are evaluated
+    with Pr = 0 in every check that exists (Eq. H1-1b; Commentary H1: H1-1 may
+    be used for biaxial flexure without axial force);
   - with numbers only (no stations) the given maxima are taken as concurrent;
   - round sections: one flexural term, resultant moment / Mc (see f_flexure);
   - when a strength that the interaction needs is not available, the
@@ -100,6 +101,7 @@ NAME_TORSION = "torsion"
 NAME_TORSION_SCREEN = "torsion: screening of the St. Venant shear stress (engine rule)"
 CLAUSE_TORSION = "AISC 360-22 H3 (not implemented)"
 TORSION_NEGLIGIBLE = 0.01               # engine rule: tau_t <= 1 % of 0.6 Fy
+_EPS = 1.0e-9                           # relative offset to both sides of the point where Pr/Pc = 0.2
 
 
 # ============================================================================== pure functions
@@ -170,7 +172,7 @@ def _axial_strength(ctx: DesignContext, demand: Demand, kind: str):
 
 
 def interaction(ctx: DesignContext, demand: Demand) -> list:
-    """H1.1 / H1.2: Eq. H1-1a / H1-1b at every station (policy in the module docstring)."""
+    """H1.1 / H1.2: Eq. H1-1a / H1-1b at every station and between stations (policy in the module docstring)."""
     mo = f_flexure.moments(demand)
     if mo is None or ctx.section.shape is None:
         return []
@@ -220,9 +222,8 @@ def interaction(ctx: DesignContext, demand: Demand) -> list:
     zero = N == 0.0
     if not np.any(N < 0.0) and not np.any(N > 0.0):
         groups = [("c", zero)]                                      # biaxial flexure without axial force
-    else:
-        k0 = 0 if np.any(N < 0.0) else 1
-        groups[k0] = (groups[k0][0], groups[k0][1] | zero)
+    else:                                                           # a point without axial force belongs to both
+        groups = [(kind, mask | zero) if np.any(mask) else (kind, mask) for kind, mask in groups]
     for kind, mask in groups:
         if not np.any(mask):
             continue
@@ -292,9 +293,12 @@ def _between_stations(mo, N, round_: bool, Mcx: float, Mcy: float, Pcs: list) ->
     minimum of that term, never a maximum).  All such roots are returned as evaluation points; a superfluous
     point is harmless because the interaction itself is evaluated there.
 
-    Round sections (one flexural term, the resultant): the stationary points of Mx^2 + My^2
-    (:func:`f_flexure.resultant_roots`); when the axial force also varies inside the piece this is the point
-    of the largest resultant moment, not exactly of the largest interaction (stated in LIMITS).
+    Round sections (one flexural term, the resultant sqrt(q), q = Mx^2 + My^2): the stationary points of q
+    (:func:`f_flexure.resultant_roots`) and, when the axial force varies inside the piece, the real roots of
+    the polynomial obtained by squaring g'(s) = 0 (see the code).
+
+    Also returned: both sides of the point where Pr/Pc = 0.2 (the two equations differ there) and the point
+    where the axial force changes sign (the end of the compression and of the tension part).
     """
     out = []
     cx = 0.0 if math.isinf(Mcx) else 1.0 / Mcx
@@ -306,6 +310,16 @@ def _between_stations(mo, N, round_: bool, Mcx: float, Mcy: float, Pcs: list) ->
         dN = float(N[k + 1] - N[k])
         if round_:
             roots = set(f_flexure.resultant_roots(ax, ay))
+            if dN != 0.0 and cx > 0.0:
+                # g(s) = +-a N(s) + b sqrt(q(s)), q = Mx^2 + My^2:  g' = 0  <=>  b q' = -+ 2 a N' sqrt(q);
+                # squared: b^2 q'^2 - 4 a^2 N'^2 q = 0, a polynomial of degree 10 (both signs at once)
+                px, py = np.poly1d(ax), np.poly1d(ay)
+                q = px * px + py * py
+                for wa, wm in weights:
+                    if wa != 0.0:
+                        poly = (wm * cx) ** 2 * q.deriv() * q.deriv() - 4.0 * (wa * dN) ** 2 * q
+                        roots.update(float(r.real) for r in np.roots(poly.coeffs)
+                                     if abs(r.imag) <= 1.0e-9 * max(1.0, abs(r.real)) and 0.0 < r.real < 1.0)
         else:
             roots = set()
             dx = (3.0 * ax[0], 2.0 * ax[1], ax[2])                  # d/ds of the cubic
@@ -316,12 +330,20 @@ def _between_stations(mo, N, round_: bool, Mcx: float, Mcy: float, Pcs: list) ->
                         q = [wm * (cx * dx[i] + sy * cy * dy[i]) for i in range(3)]
                         q[2] += sn * wa * dN
                         roots.update(s for s in f_flexure._quadratic_roots(*q) if 0.0 < s < 1.0)
-        if dN != 0.0:                                               # where Pr/Pc = 0.2 (H1-1a takes over from H1-1b)
+        s_zero = None
+        if dN != 0.0:
+            # where Pr/Pc = 0.2: Eq. H1-1b (below) and H1-1a (from 0.2) give different values there, so the
+            # interaction is discontinuous; both sides of the point are evaluated (relative offset _EPS)
             for Pc in Pcs:
-                roots.update(s for s in ((sign * 0.2 * Pc - float(N[k])) / dN for sign in (1.0, -1.0))
-                             if 0.0 < s < 1.0)
+                for sign in (1.0, -1.0):
+                    s02 = (sign * 0.2 * Pc - float(N[k])) / dN
+                    roots.update(s for s in (s02 - _EPS, s02, s02 + _EPS) if 0.0 < s < 1.0)
+            if float(N[k]) * float(N[k + 1]) < 0.0:                 # the axial force changes sign inside the piece:
+                s_zero = -float(N[k]) / dN                          # the end of the compression / tension parts
+                roots.add(s_zero)
         for s in sorted(roots):
-            out.append((xk + s * h, float(N[k]) + s * dN, float(np.polyval(ax, s)), float(np.polyval(ay, s))))
+            out.append((xk + s * h, 0.0 if s == s_zero else float(N[k]) + s * dN, float(np.polyval(ax, s)),
+                        float(np.polyval(ay, s))))
     return out
 
 
