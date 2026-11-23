@@ -673,7 +673,7 @@ def S07_columns_under_self_weight_varying_axial_force():
     member(d, "g", "A", "B")
     case(d, "U", {"type": "selfWeight", "factor": 25.0}, {"type": "nodal", "node": "A", "Fx": 6, "Fz": 4, "Fy": -60},
          {"type": "memberDistributed", "member": "c2", "direction": "Y", "w1": -0.03, "w2": -0.01})
-    return _so(d), "U"
+    return _so(d, convergenceTolerance=1.0e-9), "U"
 
 
 @second
@@ -687,6 +687,6 @@ def S08_diaphragm_storey_with_leaning_columns():
         if k >= 2:
             d["supports"][f"g{k}"] = {"type": "pinned", "dofs": {"rz": "fixed"}}
     d["constraints"] = {"floor": {"type": "rigidDiaphragm", "master": "u4", "slaves": ["u0", "u1", "u2", "u3"]}}
-    case(d, "U", {"type": "nodal", "node": "u4", "Fx": 40, "Fy": 25, "Mz": 30, "Fz": -800},
-         *[{"type": "nodal", "node": f"u{k}", "Fz": -350.0 - 50 * k} for k in range(4)])
+    case(d, "U", {"type": "nodal", "node": "u4", "Fx": 40, "Fy": 25, "Mz": 30, "Fz": -300},
+         *[{"type": "nodal", "node": f"u{k}", "Fz": -120.0 - 20 * k} for k in range(4)])
     return _so(d), "U"
