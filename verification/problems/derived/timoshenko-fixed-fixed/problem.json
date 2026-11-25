@@ -1,0 +1,88 @@
+{
+ "id": "timoshenko-fixed-fixed",
+ "title": "Deep fixed-fixed beam with shear deformation: uniform and point load",
+ "tier": "A",
+ "source": {
+  "work": "derived here (no publication): benchfea.oracle direct integration of the member equations / numerically solved characteristic equation",
+  "edition": "",
+  "location": "verification/derive/derive_problems.py, problem 'timoshenko-fixed-fixed'",
+  "pages": "",
+  "notes": "regenerate with: python3 verification/derive/derive_problems.py"
+ },
+ "basis": "derived-here",
+ "analysis": "First order WITH shear deformation (analysis.shearDeformation = true). Span 2 m, EI = 40 000 kN m^2, shear area 0.008 m^2 (G As = 615 385 kN): 12 EI / (G As L^2) = 0.195. Uniform load 40 kN/m and a point load of 60 kN at 0.3 L.",
+ "targets": [
+  {
+   "path": "/combinations/C/reactions/a/Fz",
+   "value": 86.21757322175733,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "path": "/combinations/C/reactions/a/My",
+   "value": -30.150906555090657,
+   "unit": "kN m",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "path": "/combinations/C/reactions/b/Fz",
+   "value": 53.78242677824267,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "path": "/combinations/C/reactions/b/My",
+   "value": 21.715760111576007,
+   "unit": "kN m",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "extract": "memberStation",
+   "combination": "C",
+   "member": "m",
+   "quantity": "uy",
+   "relative": 0.5,
+   "side": "left",
+   "value": -0.00014391666541079922,
+   "unit": "m",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "extract": "memberStation",
+   "combination": "C",
+   "member": "m",
+   "quantity": "uy",
+   "relative": 0.3,
+   "side": "left",
+   "value": -0.0001358453974895397,
+   "unit": "m",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "extract": "memberStation",
+   "combination": "C",
+   "member": "m",
+   "quantity": "Mz",
+   "relative": 0.5,
+   "side": "left",
+   "value": 12.066666666666665,
+   "unit": "kN m",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  }
+ ],
+ "status": "active"
+}

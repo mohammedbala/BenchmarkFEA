@@ -1,0 +1,67 @@
+{
+ "id": "ex-2-1-truss-two-bar",
+ "title": "Two-bar plane truss: joint displacement under a horizontal load",
+ "tier": "B",
+ "source": {
+  "work": "McGuire, W., Gallagher, R. H., Ziemian, R. D., Matrix Structural Analysis",
+  "edition": "2nd edition (copyright 2014 R. D. Ziemian)",
+  "location": "Example 2.1",
+  "pages": "pp. 21-22",
+  "notes": "input data and targets read on the cited pages; nothing of the source is reproduced"
+ },
+ "basis": "published",
+ "analysis": "Pin-jointed plane truss in the x-y plane (global Y vertical): members of type 'truss'; the out-of-plane translation of every joint is held by a support (it has no stiffness in a plane truss). Joints (m): b (0, 0), a (6, 4), c (9, 0) from the printed dimensions 6 m, 3 m, 4 m; b and c pinned. Bars ab A = 6000 mm^2, ac A = 8000 mm^2, E = 200,000 MPa. Load 500 kN along +x at a. First order.",
+ "targets": [
+  {
+   "extract": "nodeDisplacement",
+   "node": "a",
+   "dof": "ux",
+   "value": 2.41,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.002074688796680498
+   },
+   "precisionNote": "printed \"2.41\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "a",
+   "dof": "uy",
+   "value": 0.72,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.006944444444444445
+   },
+   "precisionNote": "printed \"0.72\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "ab",
+   "quantity": "N",
+   "relative": 0.5,
+   "value": 400.6,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.00012481278082875687
+   },
+   "precisionNote": "printed \"400.6\"; tolerance = half a unit in the last printed digit; bar force given with the problem figure (statics)",
+   "sign": "bar force: tension positive in the source and in the engine (N)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "ac",
+   "quantity": "N",
+   "relative": 0.5,
+   "value": -277.8,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.00017998560115190784
+   },
+   "precisionNote": "printed \"277.8\"; tolerance = half a unit in the last printed digit; bar force given with the problem figure (statics), printed -277.8",
+   "sign": "bar force: tension positive in the source and in the engine (N)"
+  }
+ ],
+ "status": "active"
+}

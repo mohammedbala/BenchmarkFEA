@@ -1,0 +1,77 @@
+{
+ "id": "bent-cantilever-with-prop",
+ "title": "Bent cantilever with an intermediate lateral support: support reactions",
+ "tier": "B",
+ "source": {
+  "work": "Bentley Systems, STAAD.Pro Help, Verification Examples (public documentation, docs.bentley.com)",
+  "edition": "STAAD.Pro Help v21 build (pages refer to the STAAD.Pro 2023 sample files), read 2026-11-22",
+  "location": "'V. Support Reactions for a Simple Frame' (https://docs.bentley.com/LiveContent/web/STAAD.Pro%20Help-v21/en/GUID-1A25B902-67CC-4B2C-A469-37D370E85C34.html)",
+  "pages": "web page",
+  "notes": "problem statement taken from the vendor page (text and input listing). The page cites: Timoshenko, Strength of Materials, Part I, 3rd ed. 1956, p. 346, problem 2 - NOT opened for this project; no number is taken from it. The page's 'theory' values are recorded as printed; the program's own results are not used."
+ },
+ "basis": "recomputed-from-published-statement",
+ "analysis": "Plane problem in the global X-Y plane (Y vertical); the out-of-plane DOFs (uz, rx, ry) of every node are held; in-plane bending about local z. Vertical leg from (0, 0) to (0, 20 in) with a horizontal arm to (10, 20 in); built in at the base, held horizontally at midheight (0, 10 in); 1 kip downward at the end of the arm; A = 10 in^2, I = 100 in^4, E = 3000 ksi. First-order analysis. The page's target is the horizontal reaction (1.5 kip). Reference values: computed here from this statement (verification/derive/vendor_reference.py); the textbook cited by the vendor page was not opened and no number is taken from it.",
+ "targets": [
+  {
+   "extract": "reaction",
+   "node": "n2",
+   "component": "Fx",
+   "value": -1.499999999999984,
+   "unit": "kip",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (plane frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "reaction",
+   "node": "n1",
+   "component": "Fx",
+   "value": 1.4999999999999898,
+   "unit": "kip",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (plane frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "reaction",
+   "node": "n1",
+   "component": "Mz",
+   "value": -4.999999999999965,
+   "unit": "kip in",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (plane frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n4",
+   "dof": "uy",
+   "value": -0.005944444444444422,
+   "unit": "in",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (plane frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "reaction",
+   "node": "n2",
+   "component": "Fx",
+   "value": -1.5,
+   "unit": "kip",
+   "tolerance": {
+    "rel": 0.03333333333333333
+   },
+   "precisionNote": "printed \"1.5\"; tolerance = half a unit in the last printed digit",
+   "sign": "the page prints a magnitude; sign from the reference solution, engine convention (docs/CONVENTIONS.md)"
+  }
+ ],
+ "status": "active"
+}

@@ -1,0 +1,507 @@
+{
+ "formatVersion": "1.0.0",
+ "name": "diaphragm frame model",
+ "units": {
+  "force": "kN",
+  "length": "m"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "A1.0": {
+   "x": 0,
+   "y": 0,
+   "z": 0
+  },
+  "A2.0": {
+   "x": 0,
+   "y": 0,
+   "z": -5.5
+  },
+  "B1.0": {
+   "x": 6.5,
+   "y": 0,
+   "z": 0
+  },
+  "B2.0": {
+   "x": 6.5,
+   "y": 0,
+   "z": -5.5
+  },
+  "A1.1": {
+   "x": 0,
+   "y": 3.5,
+   "z": 0
+  },
+  "A2.1": {
+   "x": 0,
+   "y": 3.5,
+   "z": -5.5
+  },
+  "B1.1": {
+   "x": 6.5,
+   "y": 3.5,
+   "z": 0
+  },
+  "B2.1": {
+   "x": 6.5,
+   "y": 3.5,
+   "z": -5.5
+  },
+  "A1.2": {
+   "x": 0,
+   "y": 7.5,
+   "z": 0
+  },
+  "A2.2": {
+   "x": 0,
+   "y": 7.5,
+   "z": -5.5
+  },
+  "B1.2": {
+   "x": 6.5,
+   "y": 7.5,
+   "z": 0
+  },
+  "B2.2": {
+   "x": 6.5,
+   "y": 7.5,
+   "z": -5.5
+  },
+  "CM1": {
+   "x": 3.9,
+   "y": 3.5,
+   "z": -3.575
+  },
+  "CM2": {
+   "x": 3.9,
+   "y": 7.5,
+   "z": -3.575
+  }
+ },
+ "supports": {
+  "A1.0": {
+   "type": "fixed"
+  },
+  "A2.0": {
+   "type": "fixed"
+  },
+  "B1.0": {
+   "type": "fixed"
+  },
+  "B2.0": {
+   "type": "fixed"
+  }
+ },
+ "materials": {
+  "steel": {
+   "description": "structural steel (nominal properties)",
+   "E": 200000000,
+   "G": 77000000,
+   "Fy": 345000,
+   "Fu": 450000,
+   "unitWeight": 77
+  }
+ },
+ "sections": {
+  "I-200x200x12x8": {
+   "type": "I",
+   "d": 0.2,
+   "bf": 0.2,
+   "tf": 0.012,
+   "tw": 0.008,
+   "r": 0.012
+  },
+  "I-300x150x10x7": {
+   "type": "I",
+   "d": 0.3,
+   "bf": 0.15,
+   "tf": 0.01,
+   "tw": 0.007,
+   "r": 0.012
+  },
+  "I-200x100x8x5": {
+   "type": "I",
+   "d": 0.2,
+   "bf": 0.1,
+   "tf": 0.008,
+   "tw": 0.005,
+   "r": 0.008
+  },
+  "I-250x125x9x6": {
+   "type": "I",
+   "d": 0.25,
+   "bf": 0.125,
+   "tf": 0.009,
+   "tw": 0.006,
+   "r": 0.01
+  }
+ },
+ "members": {
+  "CA1.1": {
+   "i": "A1.0",
+   "j": "A1.1",
+   "section": "I-200x200x12x8",
+   "material": "steel"
+  },
+  "CA1.2": {
+   "i": "A1.1",
+   "j": "A1.2",
+   "section": "I-200x200x12x8",
+   "material": "steel"
+  },
+  "CA2.1": {
+   "i": "A2.0",
+   "j": "A2.1",
+   "section": "I-200x200x12x8",
+   "material": "steel"
+  },
+  "CA2.2": {
+   "i": "A2.1",
+   "j": "A2.2",
+   "section": "I-200x200x12x8",
+   "material": "steel"
+  },
+  "CB1.1": {
+   "i": "B1.0",
+   "j": "B1.1",
+   "section": "I-200x200x12x8",
+   "material": "steel",
+   "orientation": {
+    "roll": 90
+   }
+  },
+  "CB1.2": {
+   "i": "B1.1",
+   "j": "B1.2",
+   "section": "I-200x200x12x8",
+   "material": "steel",
+   "orientation": {
+    "roll": 90
+   }
+  },
+  "CB2.1": {
+   "i": "B2.0",
+   "j": "B2.1",
+   "section": "I-200x200x12x8",
+   "material": "steel",
+   "orientation": {
+    "roll": 90
+   }
+  },
+  "CB2.2": {
+   "i": "B2.1",
+   "j": "B2.2",
+   "section": "I-200x200x12x8",
+   "material": "steel",
+   "orientation": {
+    "roll": 90
+   }
+  },
+  "BXA1.1": {
+   "i": "A1.1",
+   "j": "B1.1",
+   "section": "I-300x150x10x7",
+   "material": "steel"
+  },
+  "BXA2.1": {
+   "i": "A2.1",
+   "j": "B2.1",
+   "section": "I-300x150x10x7",
+   "material": "steel"
+  },
+  "BYA1.1": {
+   "i": "A1.1",
+   "j": "A2.1",
+   "section": "I-250x125x9x6",
+   "material": "steel"
+  },
+  "BYB1.1": {
+   "i": "B1.1",
+   "j": "B2.1",
+   "section": "I-250x125x9x6",
+   "material": "steel"
+  },
+  "BXA1.2": {
+   "i": "A1.2",
+   "j": "B1.2",
+   "section": "I-200x100x8x5",
+   "material": "steel"
+  },
+  "BXA2.2": {
+   "i": "A2.2",
+   "j": "B2.2",
+   "section": "I-200x100x8x5",
+   "material": "steel"
+  },
+  "BYA1.2": {
+   "i": "A1.2",
+   "j": "A2.2",
+   "section": "I-250x125x9x6",
+   "material": "steel"
+  },
+  "BYB1.2": {
+   "i": "B1.2",
+   "j": "B2.2",
+   "section": "I-250x125x9x6",
+   "material": "steel"
+  }
+ },
+ "constraints": {
+  "floor1": {
+   "type": "rigidDiaphragm",
+   "master": "CM1",
+   "slaves": [
+    "A1.1",
+    "A2.1",
+    "B1.1",
+    "B2.1"
+   ]
+  },
+  "floor2": {
+   "type": "rigidDiaphragm",
+   "master": "CM2",
+   "slaves": [
+    "A1.2"
+   ]
+  }
+ },
+ "loadCases": {
+  "D": {
+   "description": "dead load and self weight",
+   "loads": [
+    {
+     "type": "selfWeight"
+    },
+    {
+     "type": "memberDistributed",
+     "member": "BXA1.1",
+     "direction": "Y",
+     "w1": -11.5
+    },
+    {
+     "type": "memberDistributed",
+     "member": "BXA2.1",
+     "direction": "Y",
+     "w1": -11.5
+    },
+    {
+     "type": "memberDistributed",
+     "member": "BYA1.1",
+     "direction": "Y",
+     "w1": -5
+    },
+    {
+     "type": "memberDistributed",
+     "member": "BYB1.1",
+     "direction": "Y",
+     "w1": -5
+    },
+    {
+     "type": "memberDistributed",
+     "member": "BXA1.2",
+     "direction": "Y",
+     "w1": -8
+    },
+    {
+     "type": "memberDistributed",
+     "member": "BXA2.2",
+     "direction": "Y",
+     "w1": -8
+    }
+   ]
+  },
+  "L": {
+   "description": "live load",
+   "loads": [
+    {
+     "type": "memberDistributed",
+     "member": "BXA1.1",
+     "direction": "Y",
+     "w1": -9.5
+    },
+    {
+     "type": "memberDistributed",
+     "member": "BXA2.1",
+     "direction": "Y",
+     "w1": -9.5
+    },
+    {
+     "type": "memberDistributed",
+     "member": "BXA1.2",
+     "direction": "Y",
+     "w1": -1.5
+    },
+    {
+     "type": "memberDistributed",
+     "member": "BXA2.2",
+     "direction": "Y",
+     "w1": -1.5
+    }
+   ]
+  },
+  "WX": {
+   "description": "wind along x",
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "CM1",
+     "Fx": 40,
+     "My": 11
+    },
+    {
+     "type": "nodal",
+     "node": "CM2",
+     "Fx": 25.5,
+     "My": 7
+    }
+   ]
+  },
+  "WY": {
+   "description": "wind along y",
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "CM1",
+     "Fz": -47.5,
+     "My": -15
+    },
+    {
+     "type": "nodal",
+     "node": "CM2",
+     "Fz": -30.5,
+     "My": -10
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "ULS1": {
+   "factors": {
+    "D": 1.2,
+    "L": 1.6
+   }
+  },
+  "SLS1": {
+   "factors": {
+    "D": 1,
+    "L": 1
+   },
+   "purpose": "serviceability"
+  },
+  "ULS2": {
+   "factors": {
+    "D": 1.2,
+    "L": 0.5,
+    "WX": 1
+   }
+  },
+  "ULS3": {
+   "factors": {
+    "D": 1.2,
+    "L": 0.5,
+    "WY": 1
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": false
+ },
+ "design": {
+  "defaults": {
+   "method": "LRFD"
+  },
+  "groups": {
+   "columns": {
+    "members": [
+     "CA1.1",
+     "CA1.2",
+     "CA2.1",
+     "CA2.2",
+     "CB1.1",
+     "CB1.2",
+     "CB2.1",
+     "CB2.2"
+    ],
+    "role": "column",
+    "Kx": 1.5,
+    "Ky": 1.5
+   },
+   "beamXs": {
+    "members": [
+     "BXA1.1",
+     "BXA2.1"
+    ],
+    "role": "beam",
+    "bracing": {
+     "topFlange": [
+      0.5
+     ],
+     "bottomFlange": [
+      0.5
+     ]
+    },
+    "deflectionLimits": [
+     {
+      "spanRatio": 300,
+      "direction": "y",
+      "combinations": [
+       "SLS1"
+      ]
+     }
+    ]
+   },
+   "roofBeamXs": {
+    "members": [
+     "BXA1.2",
+     "BXA2.2"
+    ],
+    "role": "beam",
+    "bracing": {
+     "topFlange": [
+      0.5
+     ],
+     "bottomFlange": [
+      0.5
+     ]
+    },
+    "deflectionLimits": [
+     {
+      "spanRatio": 300,
+      "direction": "y",
+      "combinations": [
+       "SLS1"
+      ]
+     }
+    ]
+   },
+   "beamsY": {
+    "members": [
+     "BYA1.1",
+     "BYB1.1",
+     "BYA1.2",
+     "BYB1.2"
+    ],
+    "role": "beam",
+    "bracing": {
+     "topFlange": [
+      0.5
+     ],
+     "bottomFlange": [
+      0.5
+     ]
+    },
+    "deflectionLimits": [
+     {
+      "spanRatio": 300,
+      "direction": "y",
+      "combinations": [
+       "SLS1"
+      ]
+     }
+    ]
+   }
+  }
+ }
+}

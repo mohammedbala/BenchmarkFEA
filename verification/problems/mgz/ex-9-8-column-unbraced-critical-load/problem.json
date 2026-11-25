@@ -1,0 +1,29 @@
+{
+ "id": "ex-9-8-column-unbraced-critical-load",
+ "title": "Column with a midheight strut of zero area: critical load",
+ "tier": "B",
+ "source": {
+  "work": "McGuire, W., Gallagher, R. H., Ziemian, R. D., Matrix Structural Analysis",
+  "edition": "2nd edition (copyright 2014 R. D. Ziemian)",
+  "location": "Example 9.8, part 1, sketch (a): value at A_br = 0",
+  "pages": "p. 254",
+  "notes": "input data and targets read on the cited pages; nothing of the source is reproduced"
+ },
+ "basis": "published",
+ "analysis": "Plane (x-y) problem of the source modelled in 3D with the global Y axis vertical, so that the source's x, y and theta_z are the model's X, Y and rz. In-plane bending is about local z for every member (default orientation), hence the source's I is the section's Iz. Units kip, in. Column ac of 2 x 13 ft, A = 7.08 in^2, I = 18.2 in^4, E = 29,000 ksi, base a pinned, top c held laterally, node b at midheight. Reference load 1 kip downward at c; the buckling factor is the critical load in kips. Linear buckling analysis. Brace area zero (no strut in the model). Target: the value 53.5 kips labelled on the source's plot of critical load against brace area (computed by the source with four elements). The engine's members carry the exact stability functions (no discretisation error for a prismatic member with constant axial force); the source's computed values use a stated number of elements with a polynomial (approximate) geometric stiffness. Plane stability problem: the source's model has no out-of-plane degrees of freedom. Here the out-of-plane DOFs (uz, rx, ry) of every node are held and Iy = 1000 Iz, so that no out-of-plane buckling mode precedes the in-plane modes compared; J is a placeholder. ",
+ "targets": [
+  {
+   "extract": "bucklingFactor",
+   "combination": "C",
+   "mode": 1,
+   "value": 53.5,
+   "unit": "kip (factor on 1 kip)",
+   "tolerance": {
+    "rel": 0.0009345794392523365
+   },
+   "precisionNote": "printed \"53.5\"; tolerance = half a unit in the last printed digit; axis label of the source's plot; four-element model",
+   "sign": "positive factor on a compressive load"
+  }
+ ],
+ "status": "active"
+}

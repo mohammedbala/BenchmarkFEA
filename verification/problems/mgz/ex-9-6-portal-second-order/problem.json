@@ -1,0 +1,59 @@
+{
+ "id": "ex-9-6-portal-second-order",
+ "title": "Unsymmetrically loaded pin-based portal frame: second-order moments",
+ "tier": "B",
+ "source": {
+  "work": "McGuire, W., Gallagher, R. H., Ziemian, R. D., Matrix Structural Analysis",
+  "edition": "2nd edition (copyright 2014 R. D. Ziemian)",
+  "location": "Example 9.6, part 2, moment diagram for Eq. 8.3",
+  "pages": "p. 252",
+  "notes": "input data and targets read on the cited pages; nothing of the source is reproduced"
+ },
+ "basis": "published",
+ "analysis": "Plane (x-y) problem of the source modelled in 3D with the global Y axis vertical, so that the source's x, y and theta_z are the model's X, Y and rz. In-plane bending is about local z for every member (default orientation), hence the source's I is the section's Iz. Units kip, in. a (0, 0), b (0, 24 ft), c (20 ft, 24 ft), d (60 ft, 24 ft), e (60 ft, 0); a and e pinned. Columns ab, ed: A = 13.3 in^2, I = 248 in^4; girder bc-cd: A = 24.8 in^2, I = 2850 in^4; E = 29,000 ksi. Loads: 6 kips along +x at b, 60 kips downward at c, 120 kips downward at d. Second-order analysis at the applied loads (load factor 1). Targets: the second-order values of the source's moment diagram (figure labels, in-kips): 519 at b (the source states that the moment at b changes sign), 9078 at c, 2661 at d. The engine's members carry the exact stability functions (no discretisation error for a prismatic member with constant axial force); the source's computed values use a stated number of elements with a polynomial (approximate) geometric stiffness. The source models each column with two elements and each girder segment with one. Plane stability problem: the source's model has no out-of-plane degrees of freedom. Here the out-of-plane DOFs (uz, rx, ry) of every node are held and Iy = 1000 Iz, so that no out-of-plane buckling mode precedes the in-plane modes compared; J is a placeholder. ",
+ "targets": [
+  {
+   "extract": "memberStation",
+   "member": "ab",
+   "quantity": "Mz",
+   "relative": 1.0,
+   "value": -519.0,
+   "unit": "kip in",
+   "tolerance": {
+    "rel": 0.0009633911368015414
+   },
+   "precisionNote": "printed \"519\"; tolerance = half a unit in the last printed digit; figure label (in. kips); source: two elements per column, incremental analysis",
+   "sign": "magnitude in the source, which states that the moment at b changes sign relative to the first-order analysis (+316 in the engine's convention)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "bc",
+   "quantity": "Mz",
+   "relative": 1.0,
+   "value": 9078.0,
+   "unit": "kip in",
+   "tolerance": {
+    "rel": 5.507821105970478e-05
+   },
+   "precisionNote": "printed \"9078\"; tolerance = half a unit in the last printed digit; figure label (in. kips); source: two elements per column, incremental analysis",
+   "sign": "magnitude in the source; sagging = positive Mz"
+  },
+  {
+   "extract": "memberStation",
+   "member": "ed",
+   "quantity": "Mz",
+   "relative": 1.0,
+   "value": -2661.0,
+   "unit": "kip in",
+   "tolerance": {
+    "rel": 0.00018789928598271326
+   },
+   "precisionNote": "printed \"2661\"; tolerance = half a unit in the last printed digit; figure label (in. kips); source: two elements per column, incremental analysis",
+   "sign": "magnitude in the source; same sign as the first-order moment at the top of ed"
+  }
+ ],
+ "status": "quarantined",
+ "quarantine": {
+  "diagnosis": "All three targets missed: engine -550.62, 9098.77, -2664.06 in-kips; figure labels of the source 519, 9078, 2661 in-kips (6.1 %, 0.23 %, 0.12 %). The source's values come from an incremental analysis (two elements per column) whose solution scheme and step size are not stated; no error bound is given. Evidence that the difference is not the source's discretisation: the source's own element matrices (Eq. 4.34 and Eq. 9.14, two elements per column, one per girder segment), solved here to equilibrium, give 550.6, 9098.6 and 2664.5 in-kips - the engine's values within 0.02 %. The first-order moments of the same example (316, 8708, 2044) and its critical load factor (2.20) are reproduced (problems ex-9-6-portal-first-order and ex-9-6-portal-critical-load). Separately, tier C does not pass on this model: the difference to OpenSeesPy, 7.42e-4 (displacement of d), exceeds the allowed 7.40e-4, and the difference to PyNite, 2.06e-3 (rotation at e), the allowed 9.07e-4 (allowed = 1e-6 plus the estimated discretisation error of the foreign run, which is not a bound). Read off a figure; approximate method in the source."
+ }
+}

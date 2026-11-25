@@ -1,0 +1,85 @@
+{
+ "format": "benchfea-task",
+ "formatVersion": "1.0.0",
+ "id": "t8e50a88f29f2bb",
+ "taskType": "predict",
+ "mode": "no-solver",
+ "family": "multistorey_3d",
+ "difficulty": 4,
+ "split": "train",
+ "quantities": [
+  {
+   "kind": "memberMaxMoment",
+   "combination": "ULS1",
+   "member": "CC3.1",
+   "component": "Mz",
+   "unit": "kN*mm",
+   "id": "q1",
+   "text": "largest absolute bending moment Mz along member CC3.1 in combination ULS1 [kN*mm] (a non-negative number; local axes)"
+  },
+  {
+   "kind": "memberMaxMoment",
+   "combination": "ULS3",
+   "member": "CC2.1",
+   "component": "Mz",
+   "unit": "kN*mm",
+   "id": "q2",
+   "text": "largest absolute bending moment Mz along member CC2.1 in combination ULS3 [kN*mm] (a non-negative number; local axes)"
+  },
+  {
+   "kind": "displacement",
+   "combination": "ULS1",
+   "node": "B1.1",
+   "component": "ry",
+   "unit": "rad",
+   "id": "q3",
+   "text": "rotation ry of node B1.1 in combination ULS1 [rad], global axes"
+  },
+  {
+   "kind": "memberEndForce",
+   "combination": "SLS1",
+   "member": "CC2.1",
+   "end": "j",
+   "component": "Fx",
+   "unit": "kN",
+   "id": "q4",
+   "text": "end force Fx at end j of member CC2.1 in combination SLS1 [kN], member local axes, acting on the member (docs/CONVENTIONS.md)"
+  },
+  {
+   "kind": "reaction",
+   "combination": "ULS2",
+   "node": "A3.0",
+   "component": "My",
+   "unit": "kN*mm",
+   "id": "q5",
+   "text": "reaction moment My at node A3.0 in combination ULS2 [kN*mm], global axes, acting on the structure"
+  },
+  {
+   "kind": "displacement",
+   "combination": "ULS3",
+   "node": "C3.1",
+   "component": "rz",
+   "unit": "rad",
+   "id": "q6",
+   "text": "rotation rz of node C3.1 in combination ULS3 [rad], global axes"
+  }
+ ],
+ "answerFormat": {
+  "values": {
+   "q1": "number",
+   "q2": "number",
+   "q3": "number",
+   "q4": "number",
+   "q5": "number",
+   "q6": "number"
+  }
+ },
+ "statement": "TASK (predict): give the named results of the model in the file below, exactly as it is given.\nStructure: multistorey 3d. Mode no-solver: the analysis tool is disabled; inspect the file and reason from it.\nSign conventions, axes and units are those of docs/CONVENTIONS.md; every number you give is in the units of the model file.\n\nQuantities:\n  q1: largest absolute bending moment Mz along member CC3.1 in combination ULS1 [kN*mm] (a non-negative number; local axes)\n  q2: largest absolute bending moment Mz along member CC2.1 in combination ULS3 [kN*mm] (a non-negative number; local axes)\n  q3: rotation ry of node B1.1 in combination ULS1 [rad], global axes\n  q4: end force Fx at end j of member CC2.1 in combination SLS1 [kN], member local axes, acting on the member (docs/CONVENTIONS.md)\n  q5: reaction moment My at node A3.0 in combination ULS2 [kN*mm], global axes, acting on the structure\n  q6: rotation rz of node C3.1 in combination ULS3 [rad], global axes\n\nSubmit your answer as JSON of this form:\n{\n \"values\": {\n  \"q1\": 0.0,\n  \"q2\": 0.0,\n  \"q3\": 0.0,\n  \"q4\": 0.0,\n  \"q5\": 0.0,\n  \"q6\": 0.0\n }\n}",
+ "verification": {
+  "status": "verified",
+  "scope": "analysis results of the given model",
+  "meaning": "'verified' means only: the reference solution passed every tier listed as applicable in this record, at the tolerances stated in it. It does not mean reviewed, approved or certified by anyone.",
+  "policy": "docs/VERIFICATION.md; the tiers passed and the tolerances are in the answers file and in the info returned when the episode ends"
+ },
+ "modelFile": "t8e50a88f29f2bb.model.json"
+}

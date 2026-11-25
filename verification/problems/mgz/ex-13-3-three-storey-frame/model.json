@@ -1,0 +1,173 @@
+{
+ "name": "mgz/ex-13-3-three-storey-frame",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kN",
+  "length": "mm"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "n7": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n8": {
+   "x": 8000.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n5": {
+   "x": 0.0,
+   "y": 5000.0,
+   "z": 0.0
+  },
+  "n6": {
+   "x": 8000.0,
+   "y": 5000.0,
+   "z": 0.0
+  },
+  "n3": {
+   "x": 0.0,
+   "y": 10000.0,
+   "z": 0.0
+  },
+  "n4": {
+   "x": 8000.0,
+   "y": 10000.0,
+   "z": 0.0
+  },
+  "n1": {
+   "x": 0.0,
+   "y": 15000.0,
+   "z": 0.0
+  },
+  "n2": {
+   "x": 8000.0,
+   "y": 15000.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "n7": {
+   "type": "fixed"
+  },
+  "n8": {
+   "type": "fixed"
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 200.0,
+   "nu": 0.3
+  }
+ },
+ "sections": {
+  "col": {
+   "type": "properties",
+   "A": 100000000.0,
+   "Iy": 50000000.0,
+   "Iz": 50000000.0,
+   "J": 50000000.0
+  },
+  "beam": {
+   "type": "properties",
+   "A": 100000000.0,
+   "Iy": 200000000.0,
+   "Iz": 200000000.0,
+   "J": 200000000.0
+  }
+ },
+ "members": {
+  "c75": {
+   "i": "n7",
+   "j": "n5",
+   "section": "col",
+   "material": "M"
+  },
+  "c53": {
+   "i": "n5",
+   "j": "n3",
+   "section": "col",
+   "material": "M"
+  },
+  "c31": {
+   "i": "n3",
+   "j": "n1",
+   "section": "col",
+   "material": "M"
+  },
+  "c86": {
+   "i": "n8",
+   "j": "n6",
+   "section": "col",
+   "material": "M"
+  },
+  "c64": {
+   "i": "n6",
+   "j": "n4",
+   "section": "col",
+   "material": "M"
+  },
+  "c42": {
+   "i": "n4",
+   "j": "n2",
+   "section": "col",
+   "material": "M"
+  },
+  "b12": {
+   "i": "n1",
+   "j": "n2",
+   "section": "beam",
+   "material": "M"
+  },
+  "b34": {
+   "i": "n3",
+   "j": "n4",
+   "section": "beam",
+   "material": "M"
+  },
+  "b56": {
+   "i": "n5",
+   "j": "n6",
+   "section": "beam",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "n1",
+     "Fx": 3.0,
+     "Mz": 2000.0
+    },
+    {
+     "type": "nodal",
+     "node": "n3",
+     "Fx": 3.0,
+     "Mz": 2000.0
+    },
+    {
+     "type": "nodal",
+     "node": "n5",
+     "Fx": 3.0,
+     "Mz": 2000.0
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.0
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": false
+ }
+}

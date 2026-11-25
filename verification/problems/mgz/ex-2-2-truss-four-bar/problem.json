@@ -1,0 +1,84 @@
+{
+ "id": "ex-2-2-truss-four-bar",
+ "title": "Statically indeterminate four-bar plane truss",
+ "tier": "B",
+ "source": {
+  "work": "McGuire, W., Gallagher, R. H., Ziemian, R. D., Matrix Structural Analysis",
+  "edition": "2nd edition (copyright 2014 R. D. Ziemian)",
+  "location": "Example 2.2",
+  "pages": "pp. 22-23",
+  "notes": "input data and targets read on the cited pages; nothing of the source is reproduced"
+ },
+ "basis": "published",
+ "analysis": "Pin-jointed plane truss in the x-y plane (global Y vertical): members of type 'truss'; the out-of-plane translation of every joint is held by a support (it has no stiffness in a plane truss). Joint a at the origin; bars to pinned supports b (+45 deg), c (-45 deg), d (210 deg), e (150 deg); the supports are 3 m above / below a, so b (3, 3), c (3, -3), d (-3 sqrt 3, -3), e (-3 sqrt 3, 3) m. A = 3000 mm^2 (ab, ac), 5000 mm^2 (ad, ae); E = 200,000 MPa. Load 1000 kN along +x at a. First order.",
+ "targets": [
+  {
+   "extract": "nodeDisplacement",
+   "node": "a",
+   "dof": "ux",
+   "value": 2.55,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.00196078431372549
+   },
+   "precisionNote": "printed \"2.55\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "ad",
+   "quantity": "N",
+   "relative": 0.5,
+   "value": 368.7,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.00013561160835367508
+   },
+   "precisionNote": "printed \"368.7\"; tolerance = half a unit in the last printed digit",
+   "sign": "bar force: tension positive in the source and in the engine (N)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "ae",
+   "quantity": "N",
+   "relative": 0.5,
+   "value": 368.7,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.00013561160835367508
+   },
+   "precisionNote": "printed \"368.7\"; tolerance = half a unit in the last printed digit",
+   "sign": "bar force: tension positive in the source and in the engine (N)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "ab",
+   "quantity": "N",
+   "relative": 0.5,
+   "value": -255.4,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.00019577133907595928
+   },
+   "precisionNote": "printed \"255.4\"; tolerance = half a unit in the last printed digit; printed -255.4",
+   "sign": "bar force: tension positive in the source and in the engine (N)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "ac",
+   "quantity": "N",
+   "relative": 0.5,
+   "value": -255.4,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.00019577133907595928
+   },
+   "precisionNote": "printed \"255.4\"; tolerance = half a unit in the last printed digit; printed -255.4",
+   "sign": "bar force: tension positive in the source and in the engine (N)"
+  }
+ ],
+ "status": "quarantined",
+ "quarantine": {
+  "diagnosis": "Displacement reproduced (2.5548 mm against the printed 2.55). The printed bar forces are missed by 1.05 and 1.6 times the tolerance: engine 368.752 and -255.479 kN, printed 368.7 and -255.4 kN. Cause: rounding in the source's hand calculation - its stiffness coefficients are carried with three or four significant figures and later results are computed from rounded earlier ones, so the last printed digit of its results is not reliable, while the policy counts every printed digit as significant. Evidence: the source obtains the forces as products of intermediate values rounded to four digits (319.3 x 2/sqrt 3 and 180.6 x sqrt 2); the printed forces leave a residual of 0.20 kN in the horizontal equilibrium of joint a (2 x 368.7 cos 30 + 2 x 255.4 cos 45 = 999.80 kN against the load of 1000 kN), the engine's forces none. The engine's results for this model are confirmed by the other tiers that apply (tier C: OpenSeesPy and PyNite agree with the engine; tier D: equilibrium and the other invariants pass); the difference is between the source's printed digits and the exact solution of the stated problem."
+ }
+}

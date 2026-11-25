@@ -1,0 +1,61 @@
+# Example 01 in YAML: exactly the same model as 01_simple_beam.json (JSON is the canonical form).
+formatVersion: 1.0.0
+name: Example 01 - simply supported beam with design check
+description: 8 m floor beam, uniform dead and live load, AISC 360-22 member checks
+  and a deflection limit.
+units: {force: kN, length: m}
+conventions: {verticalAxis: Z}
+nodes:
+  A: {x: 0, y: 0, z: 0}
+  B: {x: 8, y: 0, z: 0}
+supports:
+  A:
+    type: pinned
+    dofs: {rx: fixed}
+  B:
+    dofs: {uy: fixed, uz: fixed}
+materials:
+  steel: {description: structural steel, E: 200000000, G: 77000000, Fy: 345000, Fu: 450000,
+    unitWeight: 77}
+sections:
+  I-450x200x14x9: {type: I, d: 0.45, bf: 0.2, tf: 0.014, tw: 0.009, r: 0.018}
+members:
+  B1: {i: A, j: B, section: I-450x200x14x9, material: steel}
+loadCases:
+  D:
+    description: dead load
+    loads:
+    - {type: memberDistributed, member: B1, direction: Z, w1: -12}
+  L:
+    description: live load
+    loads:
+    - {type: memberDistributed, member: B1, direction: Z, w1: -18}
+combinations:
+  ULS:
+    description: strength
+    factors: {D: 1.2, L: 1.6}
+  SLS-L:
+    description: live load deflection
+    factors: {L: 1.0}
+    purpose: serviceability
+  SLS:
+    description: total deflection
+    factors: {D: 1.0, L: 1.0}
+    purpose: serviceability
+analysis: {shearDeformation: false, resultStations: 21}
+design:
+  defaults: {code: AISC 360-22, method: LRFD}
+  members:
+    B1:
+      members: [B1]
+      role: beam
+      bracing:
+        topFlange: [0.25, 0.5, 0.75]
+        bottomFlange: [0.5]
+      deflectionLimits:
+      - spanRatio: 360
+        direction: y
+        combinations: [SLS-L]
+      - spanRatio: 240
+        direction: y
+        combinations: [SLS]

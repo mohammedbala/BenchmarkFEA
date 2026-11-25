@@ -1,0 +1,252 @@
+{
+  "01_simple_beam": {
+    "ULS: vertical reaction at A": {
+      "value": 172.8,
+      "unit": "kN"
+    },
+    "ULS: bending moment Mz at midspan": {
+      "value": 345.6,
+      "unit": "kN*m"
+    },
+    "ULS: shear force Vy at A": {
+      "value": -172.8,
+      "unit": "kN"
+    },
+    "SLS-L: midspan deflection (local y)": {
+      "value": -0.0143494505799,
+      "unit": "m"
+    },
+    "SLS: midspan deflection (local y)": {
+      "value": -0.0239157509665,
+      "unit": "m"
+    },
+    "design: flexure ratio (largest of the Chapter F checks)": {
+      "value": 0.662898788823,
+      "unit": "-"
+    },
+    "design: shear ratio": {
+      "value": 0.206119162641,
+      "unit": "-"
+    },
+    "design: deflection limit 1 ratio (L/360, live)": {
+      "value": 0.645725276096,
+      "unit": "-"
+    },
+    "design: deflection limit 2 ratio (L/240, total)": {
+      "value": 0.717472528996,
+      "unit": "-"
+    },
+    "design: governing ratio": {
+      "value": 0.717472528996,
+      "unit": "-"
+    }
+  },
+  "02_continuous_beam": {
+    "ULS1: vertical reaction at A": {
+      "value": 29.8642204052,
+      "unit": "kip"
+    },
+    "ULS1: vertical reaction at B": {
+      "value": 169.012999152,
+      "unit": "kip"
+    },
+    "ULS1: vertical reaction at C": {
+      "value": 59.4097946202,
+      "unit": "kip"
+    },
+    "ULS1: moment taken by the rotational spring at A (reaction Mz)": {
+      "value": 140.501923789,
+      "unit": "kip*in"
+    },
+    "ULS1: rotation of the beam end at A": {
+      "value": -0.000351254809474,
+      "unit": "rad"
+    },
+    "ULS1: bending moment Mz over support B": {
+      "value": -6841.17535442,
+      "unit": "kip*in"
+    },
+    "ULS1: bending moment Mz at the hinge H": {
+      "value": 0.0,
+      "unit": "kip*in"
+    },
+    "ULS1: largest sagging moment in span 1": {
+      "value": 1062.62551756,
+      "unit": "kip*in"
+    },
+    "ULS1: largest sagging moment in the drop-in part H-C": {
+      "value": 4658.16113686,
+      "unit": "kip*in"
+    },
+    "ULS4 (with 0.5 in settlement of B): bending moment Mz over support B": {
+      "value": -6841.17535442,
+      "unit": "kip*in"
+    },
+    "ULS4 (with 0.5 in settlement of B): moment taken by the spring at A": {
+      "value": 593.914540649,
+      "unit": "kip*in"
+    },
+    "ULS4 (with 0.5 in settlement of B): vertical reaction at B": {
+      "value": 167.438649788,
+      "unit": "kip"
+    },
+    "ULS1: deflection of the hinge H": {
+      "value": -0.610861490971,
+      "unit": "in"
+    },
+    "design: governing ratio, span 1": {
+      "value": 0.640358858603,
+      "unit": "-"
+    },
+    "design: governing ratio, span 2 (S2a + S2b)": {
+      "value": 0.640358858603,
+      "unit": "-"
+    }
+  },
+  "03_portal_frame": {
+    "ULS2 (second order): sway of N2": {
+      "value": 45.2923498538,
+      "unit": "mm"
+    },
+    "ULS2-first-order: sway of N2": {
+      "value": 41.7682938902,
+      "unit": "mm"
+    },
+    "sway amplification second order / first order": {
+      "value": 1.0843715564,
+      "unit": "-"
+    },
+    "ULS2 (second order): beam moment Mz at the face of column C2 (end j)": {
+      "value": -257858.461356,
+      "unit": "kN*mm"
+    },
+    "ULS2-first-order: beam moment Mz at the face of column C2 (end j)": {
+      "value": -249975.13332,
+      "unit": "kN*mm"
+    },
+    "ULS2 (second order): horizontal reaction at N4": {
+      "value": -46.6841201466,
+      "unit": "kN"
+    },
+    "ULS2 (second order): vertical reaction at N4": {
+      "value": 220.803781401,
+      "unit": "kN"
+    },
+    "ULS1 (second order): largest sagging moment in the beam": {
+      "value": 652457.133506,
+      "unit": "kN*mm"
+    },
+    "buckling factor of ULS1, mode 1": {
+      "value": 8.68966391135,
+      "unit": "-"
+    },
+    "buckling factor of ULS1, mode 2": {
+      "value": 51.0942466145,
+      "unit": "-"
+    },
+    "SLS: sway of N2": {
+      "value": 25.085515631,
+      "unit": "mm"
+    },
+    "design: governing ratio, column C1": {
+      "value": 0.536872820029,
+      "unit": "-"
+    },
+    "design: governing ratio, column C2": {
+      "value": 0.629766854774,
+      "unit": "-"
+    },
+    "design: governing ratio, beam B1": {
+      "value": 0.683986119492,
+      "unit": "-"
+    }
+  },
+  "04_diaphragm_frame": {
+    "SLS-X: displacement of the master CM along X": {
+      "value": 0.544544474931,
+      "unit": "in"
+    },
+    "SLS-X: displacement of the master CM along Z": {
+      "value": -0.00806258424871,
+      "unit": "in"
+    },
+    "SLS-X: rotation of the floor about the vertical axis Y": {
+      "value": 0.000671882020726,
+      "unit": "rad"
+    },
+    "SLS-X: displacement of A1 along X (frame line z = 0)": {
+      "value": 0.471981216693,
+      "unit": "in"
+    },
+    "SLS-X: displacement of D1 along X (frame line z = 180)": {
+      "value": 0.592919980424,
+      "unit": "in"
+    },
+    "SLS-X: base shear along X taken by columns CA + CB (line z = 0)": {
+      "value": -8.86298535809,
+      "unit": "kip"
+    },
+    "SLS-X: base shear along X taken by columns CD + CC (line z = 180)": {
+      "value": -11.1370146419,
+      "unit": "kip"
+    },
+    "ULS2: axial force in column CB (compression negative)": {
+      "value": -18.0850552505,
+      "unit": "kip"
+    },
+    "design: governing ratio, column CB": {
+      "value": 0.8660303534,
+      "unit": "-"
+    },
+    "design: governing ratio, beam BX2": {
+      "value": 0.468754297606,
+      "unit": "-"
+    }
+  },
+  "05_braced_frame": {
+    "ULS2 (wind from the left): tension in brace X1a": {
+      "value": 77.460890005,
+      "unit": "kN"
+    },
+    "ULS3 (wind from the right): tension in brace X1b": {
+      "value": 76.4901512334,
+      "unit": "kN"
+    },
+    "ULS2: number of slack braces": {
+      "value": 3.0,
+      "unit": "-"
+    },
+    "ULS1 (gravity + minimum lateral load): tension in brace X1a": {
+      "value": 6.08707830709,
+      "unit": "kN"
+    },
+    "ULS1: axial force in column CB1 (compression negative)": {
+      "value": -1012.83212444,
+      "unit": "kN"
+    },
+    "SLS2: roof drift (A3 along X)": {
+      "value": 0.00875319259282,
+      "unit": "m"
+    },
+    "ULS4: vertical reaction at A0 (windward column, least compression)": {
+      "value": 153.477841408,
+      "unit": "kN"
+    },
+    "buckling factor of ULS1, mode 1": {
+      "value": 7.65342319581,
+      "unit": "-"
+    },
+    "design: governing ratio, column CB1": {
+      "value": 0.818365610868,
+      "unit": "-"
+    },
+    "design: governing ratio, floor beam BA1": {
+      "value": 0.942530903313,
+      "unit": "-"
+    },
+    "design: governing ratio, brace X1a": {
+      "value": 0.434032129556,
+      "unit": "-"
+    }
+  }
+}

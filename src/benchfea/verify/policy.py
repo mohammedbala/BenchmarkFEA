@@ -18,12 +18,19 @@ POLICY = {
     # tier B: published targets; tolerance from the printed precision or a tolerance stated by the source
     "B": {"relFloor": REL_FLOOR, "rule": "half a unit in the last printed digit, as a relative tolerance "
                                           "(floor 1e-6), or the acceptance tolerance stated by the source"},
-    # tier C: benchfea.crosscheck defaults; the estimated error of a converged approximation widens the
-    # tolerance of the comparisons it takes part in
-    "C": {"relative": 1.0e-6, "maxApproximation": 5.0e-3, "requiredSolvers": 2, "estimateSafety": 2.0,
+    # tier C: the rule of benchfea.crosscheck.cross_check, unchanged: agreement within ``relative`` plus the
+    # estimated errors of the two results compared (estimateSafety = 1.0 reproduces that rule exactly; it is
+    # NOT raised to make a case pass -- see docs/VERIFICATION.md, "Second-order cross-checks")
+    "C": {"relative": 1.0e-6, "maxApproximation": 5.0e-3, "requiredSolvers": 2, "estimateSafety": 1.0,
           "scale": "model-wide scales of benchfea.crosscheck.compare"},
     # tier D: the tolerances stored with every invariant by the solver, plus
-    "D": {"superposition": 1.0e-9, "reciprocity": 1.0e-9},
+    "D": {"superposition": 1.0e-9, "reciprocity": 1.0e-9,
+          # station forces recomputed from statics (benchfea.verify.stations): exact for a linear analysis;
+          # in an iterated analysis the axial force of the last iterate enters (the iteration tolerance governs)
+          "stationStatics": 1.0e-9, "stationStaticsIterated": 1.0e-6,
+          # station deflections / moments / shears from a numerical integration of the member equations
+          # (same tolerance as the ODE oracle of tier A)
+          "stationIntegration": 1.0e-6},
     # tier E
     "E": {"limit": 1.0e-5,                  # extrapolated limit of a stiffness series against the engine
           "splitFirstOrder": 1.0e-8,        # member split, linear analysis
@@ -31,10 +38,20 @@ POLICY = {
           "designVariables": 0.0,           # bitwise
           "seriesRatio": 10.0,              # stiffness ratio between successive members of a series
           "observedOrder": (0.5, 1.5)},     # accepted range of the observed order of convergence
-    # tier F: no numeric tolerance (coverage registry)
-    "F": {},
+    # tier F: coverage registry; a check is "used" when its utilisation exceeds this (a zero force is a
+    # round-off number in a results document)
+    "F": {"negligibleUtilisation": 1.0e-9},
     # verification of a mechanism diagnosis
-    "diagnosis": {"nullResidual": 1.0e-8, "singular": 1.0e-9},
+    # nullResidual: |K phi| / (|K| |phi|) of a mode rebuilt from the diagnosis.  The record gives directions
+    # and axes rounded to 6 decimals, i.e. a unit vector to 0.5e-6 x sqrt(3) = 8.7e-7; 2e-6 is that bound
+    # with the round-off of the product (a wrong mode gives O(1)).
+    "diagnosis": {"nullResidual": 2.0e-6,
+                  "singular": 1.0e-9,         # eigenvalue of the unit-diagonal matrix counted as zero
+                  "saneDisplacement": 1.0e3}, # foreign displacements beyond this x model size = no solution
+    # registered problems: a target of a tier-A problem (derived here by the ODE oracle) must be declared
+    # with this tolerance; a published target with the tolerance of ``printed_precision_tolerance`` or a
+    # tolerance stated by the source
+    "targets": {"derivedHere": 1.0e-6, "relFloor": REL_FLOOR},
 }
 
 

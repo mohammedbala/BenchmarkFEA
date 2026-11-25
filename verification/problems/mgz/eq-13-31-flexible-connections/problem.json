@@ -1,0 +1,238 @@
+{
+ "id": "eq-13-31-flexible-connections",
+ "title": "Beam with flexible (semi-rigid) and pinned end connections: stiffness coefficients",
+ "tier": "B",
+ "source": {
+  "work": "McGuire, W., Gallagher, R. H., Ziemian, R. D., Matrix Structural Analysis",
+  "edition": "2nd edition (copyright 2014 R. D. Ziemian)",
+  "location": "Equations 13.31, 13.32, 13.33 (Examples 13.6 and 13.7)",
+  "pages": "pp. 394-398",
+  "notes": "input data and targets read on the cited pages; nothing of the source is reproduced"
+ },
+ "basis": "recomputed-from-published-statement",
+ "analysis": "Plane (x-y) problem of the source modelled in 3D with the global Y axis vertical, so that the source's x, y and theta_z are the model's X, Y and rz. In-plane bending is about local z for every member (default orientation), hence the source's I is the section's Iz. The source gives the stiffness matrix of a beam with rotational springs k1 = alpha1 EI/L and k2 = alpha2 EI/L at its ends (Eq. 13.31) and the special cases of a pin at end 1 (Eq. 13.32) and at end 2 (Eq. 13.33). Numeric instance chosen here: L = 6 m, E = 200 kN/mm^2, I = 200e6 mm^4, alpha1 = 3, alpha2 = 6. Three separate members between fully held nodes: 'semi' (n1-n2) with partial rz releases (springs k1 at end i, k2 at end j), 'pin1' (n3-n4) with a full rz release at end i, 'pin2' (n5-n6) with a full rz release at end j. Combination V imposes v = 1 mm at the first node of each member, combination R a rotation of 0.001 rad there; the reactions are the first and second columns of the printed matrices times the imposed displacement (zero coefficients are not listed as targets). First order, no shear deformation. Section properties the source does not give because they do not enter its plane model (Iy, J; A where stated) are placeholders that do not influence the targets. ",
+ "targets": [
+  {
+   "extract": "reaction",
+   "node": "n1",
+   "component": "Fy",
+   "combination": "V",
+   "value": 0.9090909090909092,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision from the expression printed in the source (Equation 13.31); tolerance = policy floor 1e-6",
+   "sign": "stiffness coefficient x imposed displacement = reaction at the node (force on the structure by the support), same axes and signs as the source's element forces"
+  },
+  {
+   "extract": "reaction",
+   "node": "n1",
+   "component": "Mz",
+   "combination": "V",
+   "value": 2424.242424242424,
+   "unit": "kN mm",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision from the expression printed in the source (Equation 13.31); tolerance = policy floor 1e-6",
+   "sign": "stiffness coefficient x imposed displacement = reaction at the node (force on the structure by the support), same axes and signs as the source's element forces"
+  },
+  {
+   "extract": "reaction",
+   "node": "n2",
+   "component": "Fy",
+   "combination": "V",
+   "value": -0.9090909090909092,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision from the expression printed in the source (Equation 13.31); tolerance = policy floor 1e-6",
+   "sign": "stiffness coefficient x imposed displacement = reaction at the node (force on the structure by the support), same axes and signs as the source's element forces"
+  },
+  {
+   "extract": "reaction",
+   "node": "n2",
+   "component": "Mz",
+   "combination": "V",
+   "value": 3030.30303030303,
+   "unit": "kN mm",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision from the expression printed in the source (Equation 13.31); tolerance = policy floor 1e-6",
+   "sign": "stiffness coefficient x imposed displacement = reaction at the node (force on the structure by the support), same axes and signs as the source's element forces"
+  },
+  {
+   "extract": "reaction",
+   "node": "n1",
+   "component": "Fy",
+   "combination": "R",
+   "value": 2.424242424242424,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision from the expression printed in the source (Equation 13.31); tolerance = policy floor 1e-6",
+   "sign": "stiffness coefficient x imposed displacement = reaction at the node (force on the structure by the support), same axes and signs as the source's element forces"
+  },
+  {
+   "extract": "reaction",
+   "node": "n1",
+   "component": "Mz",
+   "combination": "R",
+   "value": 10909.090909090908,
+   "unit": "kN mm",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision from the expression printed in the source (Equation 13.31); tolerance = policy floor 1e-6",
+   "sign": "stiffness coefficient x imposed displacement = reaction at the node (force on the structure by the support), same axes and signs as the source's element forces"
+  },
+  {
+   "extract": "reaction",
+   "node": "n2",
+   "component": "Fy",
+   "combination": "R",
+   "value": -2.424242424242424,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision from the expression printed in the source (Equation 13.31); tolerance = policy floor 1e-6",
+   "sign": "stiffness coefficient x imposed displacement = reaction at the node (force on the structure by the support), same axes and signs as the source's element forces"
+  },
+  {
+   "extract": "reaction",
+   "node": "n2",
+   "component": "Mz",
+   "combination": "R",
+   "value": 3636.3636363636365,
+   "unit": "kN mm",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision from the expression printed in the source (Equation 13.31); tolerance = policy floor 1e-6",
+   "sign": "stiffness coefficient x imposed displacement = reaction at the node (force on the structure by the support), same axes and signs as the source's element forces"
+  },
+  {
+   "extract": "reaction",
+   "node": "n3",
+   "component": "Fy",
+   "combination": "V",
+   "value": 0.5555555555555556,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision from the expression printed in the source (Equation 13.32); tolerance = policy floor 1e-6",
+   "sign": "stiffness coefficient x imposed displacement = reaction at the node (force on the structure by the support), same axes and signs as the source's element forces"
+  },
+  {
+   "extract": "reaction",
+   "node": "n4",
+   "component": "Fy",
+   "combination": "V",
+   "value": -0.5555555555555556,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision from the expression printed in the source (Equation 13.32); tolerance = policy floor 1e-6",
+   "sign": "stiffness coefficient x imposed displacement = reaction at the node (force on the structure by the support), same axes and signs as the source's element forces"
+  },
+  {
+   "extract": "reaction",
+   "node": "n4",
+   "component": "Mz",
+   "combination": "V",
+   "value": 3333.3333333333335,
+   "unit": "kN mm",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision from the expression printed in the source (Equation 13.32); tolerance = policy floor 1e-6",
+   "sign": "stiffness coefficient x imposed displacement = reaction at the node (force on the structure by the support), same axes and signs as the source's element forces"
+  },
+  {
+   "extract": "reaction",
+   "node": "n5",
+   "component": "Fy",
+   "combination": "V",
+   "value": 0.5555555555555556,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision from the expression printed in the source (Equation 13.33); tolerance = policy floor 1e-6",
+   "sign": "stiffness coefficient x imposed displacement = reaction at the node (force on the structure by the support), same axes and signs as the source's element forces"
+  },
+  {
+   "extract": "reaction",
+   "node": "n5",
+   "component": "Mz",
+   "combination": "V",
+   "value": 3333.3333333333335,
+   "unit": "kN mm",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision from the expression printed in the source (Equation 13.33); tolerance = policy floor 1e-6",
+   "sign": "stiffness coefficient x imposed displacement = reaction at the node (force on the structure by the support), same axes and signs as the source's element forces"
+  },
+  {
+   "extract": "reaction",
+   "node": "n6",
+   "component": "Fy",
+   "combination": "V",
+   "value": -0.5555555555555556,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision from the expression printed in the source (Equation 13.33); tolerance = policy floor 1e-6",
+   "sign": "stiffness coefficient x imposed displacement = reaction at the node (force on the structure by the support), same axes and signs as the source's element forces"
+  },
+  {
+   "extract": "reaction",
+   "node": "n5",
+   "component": "Fy",
+   "combination": "R",
+   "value": 3.3333333333333335,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision from the expression printed in the source (Equation 13.33); tolerance = policy floor 1e-6",
+   "sign": "stiffness coefficient x imposed displacement = reaction at the node (force on the structure by the support), same axes and signs as the source's element forces"
+  },
+  {
+   "extract": "reaction",
+   "node": "n5",
+   "component": "Mz",
+   "combination": "R",
+   "value": 20000.0,
+   "unit": "kN mm",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision from the expression printed in the source (Equation 13.33); tolerance = policy floor 1e-6",
+   "sign": "stiffness coefficient x imposed displacement = reaction at the node (force on the structure by the support), same axes and signs as the source's element forces"
+  },
+  {
+   "extract": "reaction",
+   "node": "n6",
+   "component": "Fy",
+   "combination": "R",
+   "value": -3.3333333333333335,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision from the expression printed in the source (Equation 13.33); tolerance = policy floor 1e-6",
+   "sign": "stiffness coefficient x imposed displacement = reaction at the node (force on the structure by the support), same axes and signs as the source's element forces"
+  }
+ ],
+ "status": "active"
+}

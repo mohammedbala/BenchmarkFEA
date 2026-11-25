@@ -1,0 +1,235 @@
+{
+ "id": "space-frame-three-members",
+ "title": "Space frame of three members under joint loads",
+ "tier": "B",
+ "source": {
+  "work": "Bentley Systems, STAAD.Pro Help, Verification Examples (public documentation, docs.bentley.com)",
+  "edition": "STAAD.Pro Help v21 build (pages refer to the STAAD.Pro 2023 sample files), read 2026-11-22",
+  "location": "'V. 3D Frame Max Forces' (https://docs.bentley.com/LiveContent/web/STAAD.Pro%20Help-v21/en/GUID-A250C718-03E4-4C7F-AAA6-A446F07B306A.html)",
+  "pages": "web page",
+  "notes": "problem statement taken from the vendor page (text and input listing). The page cites: Weaver, Computer Programs for Structural Analysis, p. 146, problem 8 - NOT opened for this project; no number is taken from it. The page's 'theory' values are recorded as printed; the program's own results are not used."
+ },
+ "basis": "recomputed-from-published-statement",
+ "analysis": "Space frame, global Y vertical: nodes 1 (0, 120, 0), 2 (240, 120, 0), 3 (0, 0, 0), 4 (360, 0, 120) in; members 1-2, 3-1, 2-4, all A = 11 in^2, torsion constant 83 in^4, Iy = Iz = 56 in^4; E = 30,000 ksi, nu = 0.25 (G = 12,000 ksi); nodes 3 and 4 built in. Loads: 2 kip along +X at node 1; 1 kip downward and a moment of 120 kip in about -Z at node 2. First-order analysis, no shear deformation. Of the page's three printed values only the largest axial force (member 2-4) is used: its largest bending moments 'about local y' and 'about local z' depend on the vendor's local-axis convention for an inclined member, which the page does not state. Reference values: computed here from this statement (verification/derive/vendor_reference.py); the textbook cited by the vendor page was not opened and no number is taken from it.",
+ "targets": [
+  {
+   "extract": "nodeDisplacement",
+   "node": "n1",
+   "dof": "ux",
+   "value": 0.2226714862961093,
+   "unit": "in",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (space frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n1",
+   "dof": "uy",
+   "value": 0.00015716986423335217,
+   "unit": "in",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (space frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n1",
+   "dof": "uz",
+   "value": -0.17182307509569497,
+   "unit": "in",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (space frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n1",
+   "dof": "rz",
+   "value": -0.00213387464209028,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (space frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n2",
+   "dof": "ux",
+   "value": 0.2220199384832546,
+   "unit": "in",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (space frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n2",
+   "dof": "uy",
+   "value": -0.48118948162800407,
+   "unit": "in",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (space frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n2",
+   "dof": "uz",
+   "value": -0.7016062295731679,
+   "unit": "in",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (space frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n2",
+   "dof": "rx",
+   "value": -0.008024871238913957,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (space frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n2",
+   "dof": "rz",
+   "value": -0.004347159605916757,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (space frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "reaction",
+   "node": "n3",
+   "component": "Fx",
+   "value": -1.1041217573247462,
+   "unit": "kip",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (space frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "reaction",
+   "node": "n3",
+   "component": "Fy",
+   "value": -0.43221712664171846,
+   "unit": "kip",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (space frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "reaction",
+   "node": "n3",
+   "component": "Fz",
+   "value": 0.21731147468775336,
+   "unit": "kip",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (space frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "reaction",
+   "node": "n3",
+   "component": "Mz",
+   "value": 96.12155042874869,
+   "unit": "kip in",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (space frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "reaction",
+   "node": "n4",
+   "component": "Fy",
+   "value": 1.432217126641774,
+   "unit": "kip",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (space frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "reaction",
+   "node": "n4",
+   "component": "Fz",
+   "value": -0.21731147468784684,
+   "unit": "kip",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (space frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "reaction",
+   "node": "n4",
+   "component": "Mx",
+   "value": 123.0815453538324,
+   "unit": "kip in",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (space frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "m3",
+   "quantity": "N",
+   "relative": 0.5,
+   "value": -1.469591326583213,
+   "unit": "kip",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (space frame program); tolerance = policy floor 1e-6",
+   "sign": "tension positive"
+  },
+  {
+   "extract": "memberStation",
+   "member": "m3",
+   "quantity": "N",
+   "relative": 0.5,
+   "value": -1.47,
+   "unit": "kip",
+   "tolerance": {
+    "rel": 0.0034013605442176874
+   },
+   "precisionNote": "printed \"1.47\"; tolerance = half a unit in the last printed digit",
+   "sign": "the page prints a magnitude; sign from the reference solution, engine convention (docs/CONVENTIONS.md)"
+  }
+ ],
+ "status": "active"
+}

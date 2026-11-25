@@ -1,0 +1,153 @@
+{
+ "id": "vm21-tie-rod-lateral-load",
+ "title": "Tie rod with uniform lateral load: deflection, end slope and moment, with and without the tensile force",
+ "tier": "B",
+ "source": {
+  "work": "ANSYS, Inc., Mechanical APDL Verification Manual (public help site ansyshelp.ansys.com)",
+  "edition": "Release 2025 R2, read 2026-11-22",
+  "location": "VM21, 'Tie Rod with Lateral Loading' (https://ansyshelp.ansys.com/public/Views/Secured/corp/v252/en/ans_vm/Hlp_V_VM21.html)",
+  "pages": "web page",
+  "notes": "problem statement taken from the vendor page (text; the sketch was not readable). The page cites: Timoshenko, Strength of Materials, Part II, 3rd ed. 1956, p. 42, article 6 - NOT opened for this project; no number is taken from it. The page's 'Target' values are recorded as printed; the program's own results are not used."
+ },
+ "basis": "recomputed-from-published-statement",
+ "analysis": "Plane problem in the global X-Y plane (Y vertical); the out-of-plane DOFs (uz, rx, ry) of every node are held; in-plane bending about local z. Rod of 200 in, square section 2.5 in x 2.5 in (A = 6.25 in^2, I = 3.2552 in^4), E = 30e6 psi, uniform lateral load 1.79253 lb/in, tensile force 21,972.6 lb. Supports: both ends held laterally and free to rotate, one end free to move axially - the page's text asks for the slope at the end and uses symmetry about midspan (the sketch was not readable). Combination 'stiffened': second-order analysis with the tensile force (exact stability functions for tension); 'unstiffened': first-order analysis of the lateral load alone. Reference values: computed here from this statement (verification/derive/vendor_reference.py); the textbook cited by the vendor page was not opened and no number is taken from it.",
+ "targets": [
+  {
+   "extract": "memberStation",
+   "member": "m",
+   "quantity": "uy",
+   "relative": 0.5,
+   "combination": "stiffened",
+   "value": -0.19945292098463865,
+   "unit": "in",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (ODE oracle, second-order beam-column in tension); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "a",
+   "dof": "rz",
+   "combination": "stiffened",
+   "value": -0.0032352055014484814,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (ODE oracle, second-order beam-column in tension); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "m",
+   "quantity": "Mz",
+   "relative": 0.5,
+   "combination": "stiffened",
+   "value": 4580.150748372929,
+   "unit": "lbf in",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (ODE oracle, second-order beam-column in tension); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "m",
+   "quantity": "uy",
+   "relative": 0.5,
+   "combination": "unstiffened",
+   "value": -0.3824063999999999,
+   "unit": "in",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (ODE oracle, first order); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "a",
+   "dof": "rz",
+   "combination": "unstiffened",
+   "value": -0.006118502399999999,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (ODE oracle, first order); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "m",
+   "quantity": "Mz",
+   "relative": 0.5,
+   "combination": "unstiffened",
+   "value": 8962.65,
+   "unit": "lbf in",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (ODE oracle, first order); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "m",
+   "quantity": "uy",
+   "relative": 0.5,
+   "combination": "stiffened",
+   "value": -0.19945,
+   "unit": "in",
+   "tolerance": {
+    "rel": 2.5068939583855606e-05
+   },
+   "precisionNote": "printed \"0.19945\"; tolerance = half a unit in the last printed digit",
+   "sign": "printed negative; in the direction of the lateral load"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "a",
+   "dof": "rz",
+   "combination": "stiffened",
+   "value": -0.0032352,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 1.5454995054401582e-05
+   },
+   "precisionNote": "printed \"0.0032352\"; tolerance = half a unit in the last printed digit",
+   "sign": "printed positive; sign from the reference solution, engine convention (docs/CONVENTIONS.md); the page's sign convention is not stated"
+  },
+  {
+   "extract": "memberStation",
+   "member": "m",
+   "quantity": "uy",
+   "relative": 0.5,
+   "combination": "unstiffened",
+   "value": -0.38241,
+   "unit": "in",
+   "tolerance": {
+    "rel": 1.3074971888810438e-05
+   },
+   "precisionNote": "printed \"0.38241\"; tolerance = half a unit in the last printed digit",
+   "sign": "printed negative; in the direction of the lateral load"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "a",
+   "dof": "rz",
+   "combination": "unstiffened",
+   "value": -0.0061185,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 8.171937566396993e-06
+   },
+   "precisionNote": "printed \"0.0061185\"; tolerance = half a unit in the last printed digit",
+   "sign": "printed positive; sign from the reference solution, engine convention (docs/CONVENTIONS.md); the page's sign convention is not stated"
+  }
+ ],
+ "status": "active"
+}

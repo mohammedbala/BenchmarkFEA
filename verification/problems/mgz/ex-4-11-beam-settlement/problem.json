@@ -1,0 +1,118 @@
+{
+ "id": "ex-4-11-beam-settlement",
+ "title": "Two-span beam with fixed ends, settlement of the interior support",
+ "tier": "B",
+ "source": {
+  "work": "McGuire, W., Gallagher, R. H., Ziemian, R. D., Matrix Structural Analysis",
+  "edition": "2nd edition (copyright 2014 R. D. Ziemian)",
+  "location": "Example 4.11",
+  "pages": "pp. 82-83",
+  "notes": "input data and targets read on the cited pages; nothing of the source is reproduced"
+ },
+ "basis": "published",
+ "analysis": "Plane (x-y) problem of the source modelled in 3D with the global Y axis vertical, so that the source's x, y and theta_z are the model's X, Y and rz. In-plane bending is about local z for every member (default orientation), hence the source's I is the section's Iz. Beam of Example 4.8 along x: a (0), b (8 m), c (13 m). ab: A = 6e3 mm^2, Iz = 200e6 mm^4, J = 300e3 mm^4; bc: A = 4e3 mm^2, Iz = 50e6 mm^4, J = 100e3 mm^4; E = 200,000 MPa, nu = 0.3. The source omits bending normal to the plane: Iy is a placeholder (= Iz) that does not influence the targets. a and c fixed, b on a roller that settles 20 mm (imposed uy = -20 mm). No other load. First order.",
+ "targets": [
+  {
+   "extract": "nodeDisplacement",
+   "node": "b",
+   "dof": "rz",
+   "value": -0.0009643,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 5.185108368764907e-05
+   },
+   "precisionNote": "printed \"0.0009643\"; tolerance = half a unit in the last printed digit; printed -0.0009643",
+   "sign": "moment / rotation about z, counter-clockwise positive in the source = rz / Mz of the engine"
+  },
+  {
+   "extract": "reaction",
+   "node": "a",
+   "component": "Fy",
+   "value": 15.14,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.00033025099075297226
+   },
+   "precisionNote": "printed \"15.14\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "a",
+   "component": "Mz",
+   "value": 65360.0,
+   "unit": "kN mm",
+   "tolerance": {
+    "rel": 7.649938800489597e-05
+   },
+   "precisionNote": "printed \"65.36\" x 1000 (unit conversion / common factor of the source); tolerance = half a unit in the last printed digit",
+   "sign": "moment / rotation about z, counter-clockwise positive in the source = rz / Mz of the engine"
+  },
+  {
+   "extract": "reaction",
+   "node": "b",
+   "component": "Fy",
+   "value": -36.66,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.0001363884342607747
+   },
+   "precisionNote": "printed \"36.66\"; tolerance = half a unit in the last printed digit; printed -36.66",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "c",
+   "component": "Fy",
+   "value": 21.51,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.00023245002324500232
+   },
+   "precisionNote": "printed \"21.51\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "c",
+   "component": "Mz",
+   "value": -51860.0,
+   "unit": "kN mm",
+   "tolerance": {
+    "rel": 9.641342074816814e-05
+   },
+   "precisionNote": "printed \"51.86\" x 1000 (unit conversion / common factor of the source); tolerance = half a unit in the last printed digit; printed -51.86",
+   "sign": "moment / rotation about z, counter-clockwise positive in the source = rz / Mz of the engine"
+  },
+  {
+   "extract": "memberEndForce",
+   "member": "ab",
+   "end": "j",
+   "component": "Mz",
+   "value": 55710.0,
+   "unit": "kN mm",
+   "tolerance": {
+    "rel": 8.975049362771496e-05
+   },
+   "precisionNote": "printed \"55.71\" x 1000 (unit conversion / common factor of the source); tolerance = half a unit in the last printed digit",
+   "sign": "member end moment on member ab at b, element convention = endForces of the engine"
+  },
+  {
+   "extract": "memberEndForce",
+   "member": "bc",
+   "end": "i",
+   "component": "Mz",
+   "value": -55710.0,
+   "unit": "kN mm",
+   "tolerance": {
+    "rel": 8.975049362771496e-05
+   },
+   "precisionNote": "printed \"55.71\" x 1000 (unit conversion / common factor of the source); tolerance = half a unit in the last printed digit; printed -55.71",
+   "sign": "member end moment on member bc at b, element convention = endForces of the engine"
+  }
+ ],
+ "status": "quarantined",
+ "quarantine": {
+  "diagnosis": "6 of 8 targets reproduced; R_ya and R_yb are missed by 1.2 and 2.4 times the tolerance: engine 15.1339 and -36.6482 kN, printed 15.14 and -36.66 kN. Cause: rounding in the source's hand calculation - its stiffness coefficients are carried with three or four significant figures and later results are computed from rounded earlier ones, so the last printed digit of its results is not reliable, while the policy counts every printed digit as significant. Evidence: the source's coefficients 0.00469 and 0.00949 are 12EI/L^3/200 = 0.0046875 and 0.0094875 rounded to three digits; with them 200 x (0.00949 x (-20) + 6.750 x 0.0009643) = -36.658 (printed -36.66), with the unrounded coefficients -36.648 (engine). The printed vertical reactions sum to -0.01 kN instead of zero. The engine's results for this model are confirmed by the other tiers that apply (tier C: OpenSeesPy and PyNite agree with the engine; tier D: equilibrium and the other invariants pass); the difference is between the source's printed digits and the exact solution of the stated problem."
+ }
+}

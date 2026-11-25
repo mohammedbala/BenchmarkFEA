@@ -1,0 +1,32 @@
+{
+ "id": "ex-9-8-column-braced-critical-load",
+ "title": "Column fully braced at midheight by an elastic strut: critical load",
+ "tier": "B",
+ "source": {
+  "work": "McGuire, W., Gallagher, R. H., Ziemian, R. D., Matrix Structural Analysis",
+  "edition": "2nd edition (copyright 2014 R. D. Ziemian)",
+  "location": "Example 9.8, part 1, sketch (a): plateau value; part 2 brace area",
+  "pages": "p. 254",
+  "notes": "input data and targets read on the cited pages; nothing of the source is reproduced"
+ },
+ "basis": "published",
+ "analysis": "Plane (x-y) problem of the source modelled in 3D with the global Y axis vertical, so that the source's x, y and theta_z are the model's X, Y and rz. In-plane bending is about local z for every member (default orientation), hence the source's I is the section's Iz. Units kip, in. Column ac of 2 x 13 ft, A = 7.08 in^2, I = 18.2 in^4, E = 29,000 ksi, base a pinned, top c held laterally, node b at midheight. Reference load 1 kip downward at c; the buckling factor is the critical load in kips. Linear buckling analysis. Horizontal strut bd at midheight, 10 ft long, A_br = 1.27 in^2 (the brace area of part 2, far above the 0.01136 in^2 the source derives as the minimum for buckling in two half waves), far end d held. Target: the plateau value 215.7 kips labelled on the source's plot (four-element model). The engine's members carry the exact stability functions (no discretisation error for a prismatic member with constant axial force); the source's computed values use a stated number of elements with a polynomial (approximate) geometric stiffness. Plane stability problem: the source's model has no out-of-plane degrees of freedom. Here the out-of-plane DOFs (uz, rx, ry) of every node are held and Iy = 1000 Iz, so that no out-of-plane buckling mode precedes the in-plane modes compared; J is a placeholder. ",
+ "targets": [
+  {
+   "extract": "bucklingFactor",
+   "combination": "C",
+   "mode": 1,
+   "value": 215.7,
+   "unit": "kip (factor on 1 kip)",
+   "tolerance": {
+    "rel": 0.00023180343069077424
+   },
+   "precisionNote": "printed \"215.7\"; tolerance = half a unit in the last printed digit; axis label of the source's plot; computed by the source with four elements and the polynomial geometric stiffness of its Eq. 9.14: an approximation by construction, no error bound stated",
+   "sign": "positive factor on a compressive load"
+  }
+ ],
+ "status": "quarantined",
+ "quarantine": {
+  "diagnosis": "Source value is a discretised approximation; no stated error bound. Engine (exact stability functions): 214.05 kips = pi^2 EI/L^2 with L = 156 in (buckling in two half waves, as the source's text states for a sufficiently stiff brace); label on the source's plot 215.7 kips (four elements with the polynomial geometric stiffness of Eq. 9.14); difference 0.77 %, tolerance from the printed precision 2.3e-4. Evidence: a plane-frame calculation with the source's own element matrices gives 215.66 kips with four elements - the printed value - and 214.06 kips with sixteen. Buckling factors cannot be cross-checked by the foreign solvers of tier C."
+ }
+}

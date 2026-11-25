@@ -1,0 +1,85 @@
+{
+ "name": "derived/timoshenko-fixed-fixed",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kN",
+  "length": "m"
+ },
+ "conventions": {
+  "verticalAxis": "Z"
+ },
+ "nodes": {
+  "a": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "b": {
+   "x": 2.0,
+   "y": 0.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "a": {
+   "type": "fixed"
+  },
+  "b": {
+   "type": "fixed"
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 200000000.0,
+   "nu": 0.3
+  }
+ },
+ "sections": {
+  "S": {
+   "type": "properties",
+   "A": 0.01,
+   "Iy": 0.0001,
+   "Iz": 0.0002,
+   "J": 0.00015,
+   "Asy": 0.008
+  }
+ },
+ "members": {
+  "m": {
+   "section": "S",
+   "material": "M",
+   "i": "a",
+   "j": "b"
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "memberDistributed",
+     "member": "m",
+     "direction": "Z",
+     "w1": -40.0
+    },
+    {
+     "type": "memberPoint",
+     "member": "m",
+     "direction": "Z",
+     "value": -60.0,
+     "position": 0.3
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.0
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": true,
+  "resultStations": 11
+ }
+}

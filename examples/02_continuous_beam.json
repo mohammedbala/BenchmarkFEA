@@ -1,0 +1,66 @@
+{
+  "formatVersion": "1.0.0",
+  "name": "Example 02 - two-span beam with a hinge and a partially fixed end",
+  "description": "Continuous beam (24 ft + 30 ft): rotational spring at the left end, internal hinge in span 2, pattern live load, a support settlement.",
+  "units": {"force": "kip", "length": "in"},
+  "conventions": {"verticalAxis": "Y"},
+  "nodes": {
+    "A": {"x": 0, "y": 0, "z": 0},
+    "B": {"x": 288, "y": 0, "z": 0},
+    "H": {"x": 378, "y": 0, "z": 0},
+    "C": {"x": 648, "y": 0, "z": 0}
+  },
+  "supports": {
+    "A": {"type": "pinned", "dofs": {"rx": "fixed", "ry": "fixed", "rz": {"spring": 400000}}},
+    "B": {"dofs": {"uy": "fixed", "uz": "fixed"}},
+    "C": {"dofs": {"uy": "fixed", "uz": "fixed"}}
+  },
+  "materials": {
+    "steel": {"description": "structural steel", "E": 29000, "G": 11200, "Fy": 50, "Fu": 65, "unitWeight": 0.000284}
+  },
+  "sections": {
+    "I-24x9x0.8x0.5": {"type": "I", "d": 24, "bf": 9, "tf": 0.8, "tw": 0.5, "r": 0.9}
+  },
+  "members": {
+    "S1": {"i": "A", "j": "B", "section": "I-24x9x0.8x0.5", "material": "steel"},
+    "S2a": {"i": "B", "j": "H", "section": "I-24x9x0.8x0.5", "material": "steel"},
+    "S2b": {"i": "H", "j": "C", "section": "I-24x9x0.8x0.5", "material": "steel", "releases": {"i": {"rz": true}}}
+  },
+  "loadCases": {
+    "D": {"description": "dead load and self weight", "loads": [
+      {"type": "selfWeight"},
+      {"type": "memberDistributed", "member": "S1", "direction": "Y", "w1": -0.1},
+      {"type": "memberDistributed", "member": "S2a", "direction": "Y", "w1": -0.1},
+      {"type": "memberDistributed", "member": "S2b", "direction": "Y", "w1": -0.1}
+    ]},
+    "L1": {"description": "live load on span 1", "loads": [
+      {"type": "memberDistributed", "member": "S1", "direction": "Y", "w1": -0.15}
+    ]},
+    "L2": {"description": "live load on span 2 and a 12 kip point load", "loads": [
+      {"type": "memberDistributed", "member": "S2a", "direction": "Y", "w1": -0.15},
+      {"type": "memberDistributed", "member": "S2b", "direction": "Y", "w1": -0.15},
+      {"type": "memberPoint", "member": "S2b", "direction": "Y", "value": -12, "position": 0.5}
+    ]},
+    "S": {"description": "settlement of support B", "loads": [
+      {"type": "supportDisplacement", "node": "B", "uy": -0.5}
+    ]}
+  },
+  "combinations": {
+    "ULS1": {"factors": {"D": 1.2, "L1": 1.6, "L2": 1.6}},
+    "ULS2": {"factors": {"D": 1.2, "L1": 1.6}},
+    "ULS3": {"factors": {"D": 1.2, "L2": 1.6}},
+    "ULS4": {"factors": {"D": 1.2, "L1": 1.6, "L2": 1.6, "S": 1.0}},
+    "SLS": {"factors": {"L1": 1.0, "L2": 1.0}, "purpose": "serviceability"}
+  },
+  "analysis": {"shearDeformation": false, "resultStations": 21},
+  "design": {
+    "defaults": {"method": "LRFD"},
+    "groups": {
+      "beams": {"members": ["S1", "S2"], "role": "beam", "bracing": {"topFlange": [0.25, 0.5, 0.75], "bottomFlange": [0.25, 0.5, 0.75]}}
+    },
+    "members": {
+      "S1": {"members": ["S1"], "deflectionLimits": [{"spanRatio": 360, "direction": "y"}]},
+      "S2": {"members": ["S2a", "S2b"], "deflectionLimits": [{"spanRatio": 360, "direction": "y"}]}
+    }
+  }
+}

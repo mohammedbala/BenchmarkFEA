@@ -1,0 +1,141 @@
+{
+ "id": "ex-4-9-beam-overhang",
+ "title": "Propped cantilever with overhang, inclined end load",
+ "tier": "B",
+ "source": {
+  "work": "McGuire, W., Gallagher, R. H., Ziemian, R. D., Matrix Structural Analysis",
+  "edition": "2nd edition (copyright 2014 R. D. Ziemian)",
+  "location": "Example 4.9",
+  "pages": "pp. 80-81",
+  "notes": "input data and targets read on the cited pages; nothing of the source is reproduced"
+ },
+ "basis": "published",
+ "analysis": "Plane (x-y) problem of the source modelled in 3D with the global Y axis vertical, so that the source's x, y and theta_z are the model's X, Y and rz. In-plane bending is about local z for every member (default orientation), hence the source's I is the section's Iz. Beam of Example 4.8 along x: a (0), b (8 m), c (13 m). ab: A = 6e3 mm^2, Iz = 200e6 mm^4, J = 300e3 mm^4; bc: A = 4e3 mm^2, Iz = 50e6 mm^4, J = 100e3 mm^4; E = 200,000 MPa, nu = 0.3. The source omits bending normal to the plane: Iy is a placeholder (= Iz) that does not influence the targets. a fixed, b on a roller (vertical restraint), c free. Load at c: 5 kN at 45 deg, components +5/sqrt 2 (x) and -5/sqrt 2 (y) kN. First order, no shear deformation.",
+ "targets": [
+  {
+   "extract": "nodeDisplacement",
+   "node": "b",
+   "dof": "ux",
+   "value": 0.024,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.020833333333333332
+   },
+   "precisionNote": "printed \"0.024\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "c",
+   "dof": "ux",
+   "value": 0.046,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.010869565217391304
+   },
+   "precisionNote": "printed \"0.046\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "c",
+   "dof": "uy",
+   "value": -19.15,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.0002610966057441254
+   },
+   "precisionNote": "printed \"19.15\"; tolerance = half a unit in the last printed digit; printed -19.15",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "b",
+   "dof": "rz",
+   "value": -0.00088,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 0.005681818181818182
+   },
+   "precisionNote": "printed \"0.00088\"; tolerance = half a unit in the last printed digit; printed -0.00088",
+   "sign": "moment / rotation about z, counter-clockwise positive in the source = rz / Mz of the engine"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "c",
+   "dof": "rz",
+   "value": -0.0053,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 0.0009433962264150945
+   },
+   "precisionNote": "printed \"0.00530\"; tolerance = half a unit in the last printed digit; printed -0.00530",
+   "sign": "moment / rotation about z, counter-clockwise positive in the source = rz / Mz of the engine"
+  },
+  {
+   "extract": "reaction",
+   "node": "a",
+   "component": "Fx",
+   "value": -3.6,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.001388888888888889
+   },
+   "precisionNote": "printed \"3.60\"; tolerance = half a unit in the last printed digit; printed -3.60",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "a",
+   "component": "Fy",
+   "value": -3.3,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.0015151515151515154
+   },
+   "precisionNote": "printed \"3.30\"; tolerance = half a unit in the last printed digit; printed -3.30",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "a",
+   "component": "Mz",
+   "value": -8800.0,
+   "unit": "kN mm",
+   "tolerance": {
+    "rel": 0.0005681818181818182
+   },
+   "precisionNote": "printed \"8.80\" x 1000 (unit conversion / common factor of the source); tolerance = half a unit in the last printed digit; printed -8.80 kNm",
+   "sign": "moment / rotation about z, counter-clockwise positive in the source = rz / Mz of the engine"
+  },
+  {
+   "extract": "reaction",
+   "node": "b",
+   "component": "Fy",
+   "value": 6.85,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.0007299270072992701
+   },
+   "precisionNote": "printed \"6.85\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "ab",
+   "quantity": "Mz",
+   "relative": 1.0,
+   "value": -17680.0,
+   "unit": "kN mm",
+   "tolerance": {
+    "rel": 0.0002828054298642534
+   },
+   "precisionNote": "printed \"17.68\" x 1000 (unit conversion / common factor of the source); tolerance = half a unit in the last printed digit; moment-diagram label 17.68 kNm at b (magnitude)",
+   "sign": "hogging moment at b (downward load on the overhang): negative Mz in the engine (y up)"
+  }
+ ],
+ "status": "quarantined",
+ "quarantine": {
+  "diagnosis": "The engine reproduces the printed displacements and the moment-diagram value at b (17.68 kN m; statics: 5/sqrt 2 kN x 5 m = 17.678), but 3 of the 4 printed reactions are missed. Engine: R_xa = -3.5355 kN, R_ya = -3.3146 kN, R_mza = -8.8388 kN m, R_yb = 6.8501 kN. Printed: -3.60, -3.30, -8.80, 6.85. Cause: rounding in the source's hand calculation - its stiffness coefficients are carried with three or four significant figures and later results are computed from rounded earlier ones, so the last printed digit of its results is not reliable, while the policy counts every printed digit as significant. Evidence: the printed reactions do not satisfy equilibrium with the stated load - horizontal equilibrium requires R_xa = -5/sqrt 2 = -3.536 kN (printed -3.60, 1.8 % off), and moments about b require R_mza = 8 m x R_ya + 17.678 kN m, which the printed pair (-3.30, -8.80) misses by 0.08 kN m. The source obtains them by multiplying stiffness coefficients with displacements rounded to two or three significant figures (200 x 0.750 x 0.024 = 3.60). The engine's results for this model are confirmed by the other tiers that apply (tier C: OpenSeesPy and PyNite agree with the engine; tier D: equilibrium and the other invariants pass); the difference is between the source's printed digits and the exact solution of the stated problem."
+ }
+}

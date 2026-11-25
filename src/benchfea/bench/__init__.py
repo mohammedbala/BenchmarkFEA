@@ -10,10 +10,10 @@ definition of the difficulty levels: docs/DIFFICULTY.md.
 from .difficulty import amplification, difficulty, feature_flags, level_of, static_properties
 from .families import FAMILIES
 from .families._common import CATALOGUE, UNIT_SYSTEMS, Draw, section_definition, stable_seed
-from .generate import (BUCKLING_MIN, GENERATOR_VERSION, RATIO_HIGH, RATIO_LOW, RATIO_MAX, Generated,
-                       GenerationFailed, families, generate, levels, tier_c_expected)
+from .generate import (AMPLIFICATION_MAX, BUCKLING_MIN, GENERATOR_VERSION, RATIO_BAND, RATIO_BAND_FRACTION, RATIO_HIGH,
+                       RATIO_LOW, RATIO_MAX, Generated, GenerationFailed, families, generate, levels, tier_c_expected)
 
 __all__ = ["generate", "Generated", "GenerationFailed", "families", "levels", "difficulty", "feature_flags",
            "static_properties", "amplification", "level_of", "tier_c_expected", "FAMILIES", "CATALOGUE",
            "UNIT_SYSTEMS", "Draw", "stable_seed", "section_definition", "RATIO_LOW", "RATIO_HIGH", "RATIO_MAX",
-           "BUCKLING_MIN", "GENERATOR_VERSION"]
+           "RATIO_BAND", "RATIO_BAND_FRACTION", "BUCKLING_MIN", "AMPLIFICATION_MAX", "GENERATOR_VERSION"]

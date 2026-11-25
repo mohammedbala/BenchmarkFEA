@@ -1,0 +1,94 @@
+{
+ "name": "mgz/ex-8-3-beam-column-end-moments",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kN",
+  "length": "mm"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "a": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "b": {
+   "x": 0.0,
+   "y": 8000.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "a": {
+   "dofs": {
+    "ux": "fixed",
+    "uy": "fixed",
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "b": {
+   "dofs": {
+    "ux": "fixed",
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 200.0,
+   "nu": 0.3
+  }
+ },
+ "sections": {
+  "s": {
+   "type": "properties",
+   "A": 12700.0,
+   "Iy": 36600000000.0,
+   "Iz": 36600000.0,
+   "J": 36600000.0
+  }
+ },
+ "members": {
+  "ab": {
+   "i": "a",
+   "j": "b",
+   "section": "s",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "b",
+     "Fy": -600.0,
+     "Mz": 600.0
+    },
+    {
+     "type": "nodal",
+     "node": "a",
+     "Mz": -600.0
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.0
+   },
+   "analysisType": "secondOrder"
+  }
+ },
+ "analysis": {
+  "shearDeformation": false,
+  "convergenceTolerance": 1e-10
+ }
+}

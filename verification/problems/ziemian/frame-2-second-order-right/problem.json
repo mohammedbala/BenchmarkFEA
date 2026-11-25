@@ -1,0 +1,108 @@
+{
+ "id": "frame-2-second-order-right",
+ "title": "Ziemian frame 2 (single-storey gabled frame, pinned bases): second-order joint displacements and member design moments, case 'right'",
+ "tier": "B",
+ "source": {
+  "work": "C. W. Ziemian, R. D. Ziemian, Steel benchmark frames for structural analysis and validation studies: Finite element models and numerical simulation data, Data in Brief 39 (2021) 107564, doi:10.1016/j.dib.2021.107564, with the data set on Mendeley Data, doi:10.17632/39sjhchwtx.1",
+  "edition": "data set version 1 (2021), licence CC BY 4.0",
+  "location": "Frame 2: 'FEA Model Details_All frames.xlsx', tab 'Frame 2'; 'Simulation Results_All frames.xlsx', tab 'Frame 2', columns WC / Right",
+  "pages": "article Tables 2 and 3 (modelling and analysis conditions); 'Description Of Frames.pdf'",
+  "notes": "C. W. Ziemian and R. D. Ziemian, 'Steel benchmark frames for structural analysis and validation studies: Finite element models and numerical simulation data', Data in Brief 39 (2021) 107564, doi:10.1016/j.dib.2021.107564; data set: Mendeley Data, doi:10.17632/39sjhchwtx.1; licence CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). The model data of this frame are reproduced from the data set under that licence, converted to this project's input format (changes: 4 elements per member merged into one member, plane model embedded in 3D, 0.8 E entered as the modulus)."
+ },
+ "basis": "published",
+ "analysis": "Frame 2 of the data set (single-storey gabled frame, pinned bases), units kip and inch. Plane frame in the global X-Y plane (Y vertical); the out-of-plane DOFs (uz, rx, ry) of every node are held (the data set's frames are 'fully braced out-of-plane'); in-plane bending about local z, so the data set's Izz is the section's Iz. Modulus 0.8 E = 23200 ksi (the data set's condition for all elastic analyses; its element table points to E = 29000 ksi, the published results correspond to 0.8 E - verified for this frame with the first-order displacements). No shear deformation. A straight line of the data set's elements is one member here, the loads at its interior nodes are point loads on the member. The data set's model is plane (no out-of-plane buckling of a member between joints); the engine's member is spatial, so Iy = 1000 Izz is entered for every section instead of the listed Iyy: no out-of-plane mode can precede the in-plane behaviour compared, and Iy does not enter the in-plane results. Case 'Right' of the data set: imperfect geometry with every node at x + y/500, lateral loads acting toward +x. Second-order elastic analysis, compared with the data set's 'WC' results: MASTAN2, work-control incremental analysis with step size 0.001, updated Lagrangian formulation with geometric stiffness matrices, 4 elements per member (article, Tables 2 and 3). The engine solves the small-displacement second-order theory with exact member stability functions (docs/THEORY.md 10, 12). ",
+ "targets": [
+  {
+   "extract": "nodeDisplacement",
+   "node": "n9",
+   "dof": "ux",
+   "value": 7.071,
+   "unit": "in",
+   "tolerance": {
+    "rel": 7.071135624381276e-05
+   },
+   "precisionNote": "printed \"7.071\"; tolerance = half a unit in the last printed digit; number as displayed by the data set's spreadsheet (cell format 0.000); stored value 7.070669194622045",
+   "sign": "same as the data set: displacement along +x (to the right) positive"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n10",
+   "dof": "ux",
+   "value": 12.108,
+   "unit": "in",
+   "tolerance": {
+    "rel": 4.1295011562603234e-05
+   },
+   "precisionNote": "printed \"12.108\"; tolerance = half a unit in the last printed digit; number as displayed by the data set's spreadsheet (cell format 0.000); stored value 12.107842592116752",
+   "sign": "same as the data set: displacement along +x (to the right) positive"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n17",
+   "dof": "ux",
+   "value": 9.62,
+   "unit": "in",
+   "tolerance": {
+    "rel": 5.197505197505198e-05
+   },
+   "precisionNote": "printed \"9.620\"; tolerance = half a unit in the last printed digit; number as displayed by the data set's spreadsheet (cell format 0.000); stored value 9.620407281697311",
+   "sign": "same as the data set: displacement along +x (to the right) positive"
+  },
+  {
+   "extract": "memberExtreme",
+   "member": "m1-4",
+   "quantity": "Mz",
+   "kind": "absmax",
+   "value": 483.59,
+   "unit": "kip in",
+   "tolerance": {
+    "rel": 1.0339337041708886e-05
+   },
+   "precisionNote": "printed \"483.59\"; tolerance = half a unit in the last printed digit; number as displayed by the data set's spreadsheet (cell format 0.00); stored value 483.5942576767001; member 1 of the data set identified as the member line of elements 1 to 4 (identification inferred from the first-order values, see README.md)",
+   "sign": "magnitude: 'design moment' = largest moment magnitude in the member (here: over the result stations at the quarter points, the element ends of the data set)"
+  },
+  {
+   "extract": "memberExtreme",
+   "member": "m5-8",
+   "quantity": "Mz",
+   "kind": "absmax",
+   "value": 4678.42,
+   "unit": "kip in",
+   "tolerance": {
+    "rel": 1.0687368812547825e-06
+   },
+   "precisionNote": "printed \"4678.42\"; tolerance = half a unit in the last printed digit; number as displayed by the data set's spreadsheet (cell format 0.00); stored value 4678.416447322308; member 2 of the data set identified as the member line of elements 5 to 8 (identification inferred from the first-order values, see README.md)",
+   "sign": "magnitude: 'design moment' = largest moment magnitude in the member (here: over the result stations at the quarter points, the element ends of the data set)"
+  },
+  {
+   "extract": "memberExtreme",
+   "member": "m9-12",
+   "quantity": "Mz",
+   "kind": "absmax",
+   "value": 4166.3,
+   "unit": "kip in",
+   "tolerance": {
+    "rel": 1.200105609293618e-06
+   },
+   "precisionNote": "printed \"4166.30\"; tolerance = half a unit in the last printed digit; number as displayed by the data set's spreadsheet (cell format 0.00); stored value 4166.303135540541; member 3 of the data set identified as the member line of elements 9 to 12 (identification inferred from the first-order values, see README.md)",
+   "sign": "magnitude: 'design moment' = largest moment magnitude in the member (here: over the result stations at the quarter points, the element ends of the data set)"
+  },
+  {
+   "extract": "memberExtreme",
+   "member": "m13-16",
+   "quantity": "Mz",
+   "kind": "absmax",
+   "value": 4678.42,
+   "unit": "kip in",
+   "tolerance": {
+    "rel": 1.0687368812547825e-06
+   },
+   "precisionNote": "printed \"4678.42\"; tolerance = half a unit in the last printed digit; number as displayed by the data set's spreadsheet (cell format 0.00); stored value 4678.416447322308; member 4 of the data set identified as the member line of elements 13 to 16 (identification inferred from the first-order values, see README.md)",
+   "sign": "magnitude: 'design moment' = largest moment magnitude in the member (here: over the result stations at the quarter points, the element ends of the data set)"
+  }
+ ],
+ "status": "quarantined",
+ "quarantine": {
+  "diagnosis": "All 7 targets missed: displacements by 1.6e-3 ... 1.8e-2 relative (eaves: engine 6.9466 and 9.5419 in, data set 7.0707 and 9.6204; ridge 12.1274 against 12.1078), moments by 2e-3 ... 1.6e-2. Cause: different theory. The data set's WC values come from MASTAN2's incremental work-control analysis (step 0.001) in an updated Lagrangian formulation, 4 elements per member: a large-displacement analysis. The engine solves the classical small-displacement second-order theory (P-Delta and P-delta with exact stability functions; docs/THEORY.md 10 and 12), which neglects terms of second order in the kinematics such as the shortening of the chord of a bent member. Evidence (verification/derive/ziemian_diagnosis.py, case 'Right', joint displacements): OpenSeesPy with the linearised 'PDelta' transformation, 32 elements per member, agrees with the engine within 3.0e-5; OpenSeesPy with the 'Corotational' (large-displacement) transformation agrees with the data set within 1.5e-3 (32 elements per member; 1.2e-3 with the data set's own 4 elements per member), while the engine differs from the data set by up to 1.8e-2. The remaining difference between the corotational results and the data set (element formulation, increment size) was not resolved. The targets are outside what the engine's theory can reproduce at the printed precision; they are kept, evaluated and reported, and never counted as passed."
+ }
+}

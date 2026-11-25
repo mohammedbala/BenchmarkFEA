@@ -1,0 +1,114 @@
+{
+ "id": "beam-point-load",
+ "title": "Simply supported beam, point load at 0.3 L (factored combination)",
+ "tier": "A",
+ "source": {
+  "work": "derived here (no publication): benchfea.oracle direct integration of the member equations / numerically solved characteristic equation",
+  "edition": "",
+  "location": "verification/derive/derive_problems.py, problem 'beam-point-load'",
+  "pages": "",
+  "notes": "regenerate with: python3 verification/derive/derive_problems.py"
+ },
+ "basis": "derived-here",
+ "analysis": "First order, no shear deformation. Span 6 m, EI = 40 000 kN m^2, P = 25 kN down at x = 1.8 m, combination factor 1.5.",
+ "targets": [
+  {
+   "path": "/combinations/C/reactions/a/Fz",
+   "value": 26.250000000000007,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "path": "/combinations/C/reactions/b/Fz",
+   "value": 11.249999999999996,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "path": "/combinations/C/displacements/a/ry",
+   "value": 0.002008125,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "path": "/combinations/C/displacements/b/ry",
+   "value": -0.0015356249999999994,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "extract": "memberStation",
+   "combination": "C",
+   "member": "m",
+   "quantity": "uy",
+   "relative": 0.5,
+   "side": "left",
+   "value": -0.003341249999999998,
+   "unit": "m",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "extract": "memberStation",
+   "combination": "C",
+   "member": "m",
+   "quantity": "uy",
+   "relative": 0.3,
+   "side": "left",
+   "value": -0.0029767499999999968,
+   "unit": "m",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "extract": "memberStation",
+   "combination": "C",
+   "member": "m",
+   "quantity": "Mz",
+   "relative": 0.3,
+   "side": "left",
+   "value": 47.24999999999999,
+   "unit": "kN m",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "extract": "memberStation",
+   "combination": "C",
+   "member": "m",
+   "quantity": "Vy",
+   "relative": 0.3,
+   "side": "left",
+   "value": -26.250000000000007,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "extract": "memberStation",
+   "combination": "C",
+   "member": "m",
+   "quantity": "Vy",
+   "relative": 0.3,
+   "side": "right",
+   "value": 11.249999999999996,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  }
+ ],
+ "status": "active"
+}

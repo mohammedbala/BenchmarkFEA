@@ -1,0 +1,228 @@
+{
+ "formatVersion": "1.0.0",
+ "name": "stair frame model",
+ "units": {
+  "force": "kip",
+  "length": "in"
+ },
+ "conventions": {
+  "verticalAxis": "Z"
+ },
+ "nodes": {
+  "N1": {
+   "x": 0,
+   "y": 0,
+   "z": 0
+  },
+  "N2": {
+   "x": 0,
+   "y": 108,
+   "z": 66
+  },
+  "N3": {
+   "x": 0,
+   "y": 168,
+   "z": 66
+  },
+  "N4": {
+   "x": 0,
+   "y": 276,
+   "z": 132
+  }
+ },
+ "supports": {
+  "N1": {
+   "type": "fixed"
+  },
+  "N4": {
+   "dofs": {
+    "ux": "fixed",
+    "uz": "fixed",
+    "ry": "fixed",
+    "rz": "fixed"
+   }
+  },
+  "N2": {
+   "dofs": {
+    "ux": "fixed",
+    "ry": "fixed",
+    "rz": "fixed"
+   }
+  },
+  "N3": {
+   "dofs": {
+    "ux": "fixed",
+    "ry": "fixed",
+    "rz": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "steel": {
+   "description": "structural steel (nominal properties)",
+   "E": 29000,
+   "G": 11200,
+   "Fy": 50,
+   "Fu": 65,
+   "unitWeight": 0.000284
+  }
+ },
+ "sections": {
+  "Box-7x7x0.3": {
+   "type": "box",
+   "H": 7,
+   "B": 7,
+   "t": 0.3
+  }
+ },
+ "members": {
+  "S1": {
+   "i": "N1",
+   "j": "N2",
+   "section": "Box-7x7x0.3",
+   "material": "steel"
+  },
+  "S2": {
+   "i": "N2",
+   "j": "N3",
+   "section": "Box-7x7x0.3",
+   "material": "steel"
+  },
+  "S3": {
+   "i": "N3",
+   "j": "N4",
+   "section": "Box-7x7x0.3",
+   "material": "steel"
+  }
+ },
+ "loadCases": {
+  "D": {
+   "description": "dead load and self weight",
+   "loads": [
+    {
+     "type": "selfWeight"
+    },
+    {
+     "type": "memberDistributed",
+     "member": "S1",
+     "direction": "Z",
+     "w1": -0.015,
+     "projected": true
+    },
+    {
+     "type": "memberDistributed",
+     "member": "S2",
+     "direction": "Z",
+     "w1": -0.015
+    },
+    {
+     "type": "memberDistributed",
+     "member": "S3",
+     "direction": "Z",
+     "w1": -0.015,
+     "projected": true
+    }
+   ]
+  },
+  "L1": {
+   "description": "live load on the flights",
+   "loads": [
+    {
+     "type": "memberDistributed",
+     "member": "S1",
+     "direction": "Z",
+     "w1": -0.015,
+     "projected": true
+    },
+    {
+     "type": "memberDistributed",
+     "member": "S3",
+     "direction": "Z",
+     "w1": -0.015,
+     "projected": true
+    }
+   ]
+  },
+  "L2": {
+   "description": "live load on the landing",
+   "loads": [
+    {
+     "type": "memberDistributed",
+     "member": "S2",
+     "direction": "Z",
+     "w1": -0.015
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "ULS1": {
+   "factors": {
+    "D": 1.2,
+    "L1": 1.6,
+    "L2": 1.6
+   }
+  },
+  "SLS1": {
+   "factors": {
+    "D": 1,
+    "L1": 1,
+    "L2": 1
+   },
+   "purpose": "serviceability"
+  }
+ },
+ "analysis": {
+  "shearDeformation": false
+ },
+ "design": {
+  "defaults": {
+   "method": "LRFD"
+  },
+  "groups": {
+   "stringers": {
+    "members": [
+     "S1",
+     "S3"
+    ],
+    "role": "beam",
+    "bracing": {
+     "topFlange": [
+      0.25,
+      0.5,
+      0.75
+     ],
+     "bottomFlange": [
+      0.25,
+      0.5,
+      0.75
+     ]
+    },
+    "deflectionLimits": [
+     {
+      "spanRatio": 360,
+      "direction": "y",
+      "combinations": [
+       "SLS1"
+      ]
+     }
+    ]
+   },
+   "landingBeams": {
+    "members": [
+     "S2"
+    ],
+    "role": "beam",
+    "deflectionLimits": [
+     {
+      "spanRatio": 360,
+      "direction": "y",
+      "combinations": [
+       "SLS1"
+      ]
+     }
+    ]
+   }
+  }
+ }
+}

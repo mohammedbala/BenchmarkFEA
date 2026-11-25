@@ -1,0 +1,104 @@
+{
+ "id": "vm217-portal-frame-uniform-load",
+ "title": "Fixed-base portal frame with a stiff span under uniform load: joint rotation and largest moment",
+ "tier": "B",
+ "source": {
+  "work": "ANSYS, Inc., Mechanical APDL Verification Manual (public help site ansyshelp.ansys.com)",
+  "edition": "Release 2025 R2, read 2026-11-22",
+  "location": "VM217, 'Portal Frame Under Symmetric Loading' (https://ansyshelp.ansys.com/public/Views/Secured/corp/v252/en/ans_vm/Hlp_V_VM217.html)",
+  "pages": "web page",
+  "notes": "problem statement taken from the vendor page (text; the sketch was not readable). The page cites: N. J. Hoff, The Analysis of Structures, 1956, pp. 115-119 - NOT opened for this project; no number is taken from it. The page's 'Target' values are recorded as printed; the program's own results are not used."
+ },
+ "basis": "recomputed-from-published-statement",
+ "analysis": "Plane problem in the global X-Y plane (Y vertical); the out-of-plane DOFs (uz, rx, ry) of every node are held; in-plane bending about local z. Portal: columns of 400 in with I = 20,300 in^4, span of 800 in with I = 5 x 20,300 in^4, E = 30e6 psi, 500 lb/in downward on the span. Column bases built in: the sketch was not readable, but the two formulas the page gives for its targets (rotation = w a^3 / (27 E I_col), largest moment = (19/54) w a^2) hold for built-in bases only (pinned bases give (3/8) w a^2 at midspan). The formulas neglect axial and shear deformation; the model follows them: every member A = 1e7 in^2, no shear deformation (the page's program model with finite area and shear deformation differs from its own targets by 9 % and 2 %). Targets: rotation of the beam-column joint, moment at midspan of the span. Reference values: computed here from this statement (verification/derive/vendor_reference.py); the textbook cited by the vendor page was not opened and no number is taken from it.",
+ "targets": [
+  {
+   "extract": "nodeDisplacement",
+   "node": "n2",
+   "dof": "rz",
+   "value": -0.0019461169874110458,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (plane frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "b",
+   "quantity": "Mz",
+   "relative": 0.5,
+   "value": 28148148.899999913,
+   "unit": "lbf in",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (plane frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "b",
+   "quantity": "Mz",
+   "relative": 0.0,
+   "value": -11851851.100000072,
+   "unit": "lbf in",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (plane frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "reaction",
+   "node": "n1",
+   "component": "Fx",
+   "value": 44444.43993333377,
+   "unit": "lbf",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (plane frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "reaction",
+   "node": "n1",
+   "component": "Mz",
+   "value": -5925924.873333437,
+   "unit": "lbf in",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (plane frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n2",
+   "dof": "rz",
+   "value": -0.00195,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 0.0025641025641025645
+   },
+   "precisionNote": "printed \"0.195E-2\"; tolerance = half a unit in the last printed digit",
+   "sign": "sign from the reference solution, engine convention (docs/CONVENTIONS.md); the page's sign convention is not stated"
+  },
+  {
+   "extract": "memberStation",
+   "member": "b",
+   "quantity": "Mz",
+   "relative": 0.5,
+   "value": 28100000.0,
+   "unit": "lbf in",
+   "tolerance": {
+    "rel": 0.0017793594306049821
+   },
+   "precisionNote": "printed \"0.281E8\"; tolerance = half a unit in the last printed digit",
+   "sign": "sagging at midspan: positive Mz (local y up)"
+  }
+ ],
+ "status": "active"
+}

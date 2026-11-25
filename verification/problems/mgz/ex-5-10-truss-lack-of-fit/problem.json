@@ -1,0 +1,104 @@
+{
+ "id": "ex-5-10-truss-lack-of-fit",
+ "title": "Plane truss with a bar fabricated 3 mm too short",
+ "tier": "B",
+ "source": {
+  "work": "McGuire, W., Gallagher, R. H., Ziemian, R. D., Matrix Structural Analysis",
+  "edition": "2nd edition (copyright 2014 R. D. Ziemian)",
+  "location": "Example 5.10 (truss of Example 3.3)",
+  "pages": "pp. 123-124",
+  "notes": "input data and targets read on the cited pages; nothing of the source is reproduced"
+ },
+ "basis": "published",
+ "analysis": "Pin-jointed plane truss in the x-y plane (global Y vertical): members of type 'truss'; the out-of-plane translation of every joint is held by a support (it has no stiffness in a plane truss). Joints from the printed geometry (height 4 m, bar ac at 30 deg, bar ab at 45 deg to the horizontal; the source prints the resulting base length as 10.928 m): c (0, 0), a (4/tan 30 deg, 4), b (4/tan 30 deg + 4, 0) m. A_ac = 15e3, A_ab = 20e3, A_bc = 18e3 mm^2, E = 200,000 MPa. Tie ad (A = 20e3 mm^2) is fabricated 3 mm too short; no external load. The input format has no initial-strain load. The lack of fit is entered as an exactly equivalent loading: the full-length bar with its wall support d moved 3 mm away from a (imposed ux = -3 mm at d). The force in bar ad is (EA/L)(u_a - u_d + 3 mm) with u_d = 0 in the source and (EA/L)(u_a - (-3 mm)) here: the same equation, hence the same joint displacements and reactions. First order.",
+ "targets": [
+  {
+   "extract": "nodeDisplacement",
+   "node": "a",
+   "dof": "ux",
+   "value": -1.683,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.00029708853238265005
+   },
+   "precisionNote": "printed \"1.683\"; tolerance = half a unit in the last printed digit; printed -1.683",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "a",
+   "dof": "uy",
+   "value": -0.0518,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.0009652509652509653
+   },
+   "precisionNote": "printed \"0.0518\"; tolerance = half a unit in the last printed digit; printed -0.0518",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "b",
+   "dof": "ux",
+   "value": -0.8448,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 5.918560606060606e-05
+   },
+   "precisionNote": "printed \"0.8448\"; tolerance = half a unit in the last printed digit; printed -0.8448",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "b",
+   "component": "Fy",
+   "value": -278.1,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.00017979144192736425
+   },
+   "precisionNote": "printed \"278.1\"; tolerance = half a unit in the last printed digit; printed -278.1",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "c",
+   "component": "Fx",
+   "value": 760.0,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 6.578947368421052e-05
+   },
+   "precisionNote": "printed \"760.0\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "c",
+   "component": "Fy",
+   "value": 278.1,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.00017979144192736425
+   },
+   "precisionNote": "printed \"278.1\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "d",
+   "component": "Fx",
+   "value": -760.2,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 6.577216521967904e-05
+   },
+   "precisionNote": "printed \"760.2\"; tolerance = half a unit in the last printed digit; printed -760.2",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  }
+ ],
+ "status": "quarantined",
+ "quarantine": {
+  "diagnosis": "6 of 7 targets missed, by 1e-4 to 2.4e-3 relative (tolerances 6e-5 to 1e-3). Engine: -1.68343, -0.05192, -0.84458 mm; reactions R_yb = -278.223, R_xc = 760.120, R_yc = 278.223, R_xd = -760.120 kN. Printed: -1.683, -0.0518, -0.8448; -278.1, 760.0, 278.1, -760.2. Cause: rounding in the source's hand calculation - its stiffness coefficients are carried with three or four significant figures and later results are computed from rounded earlier ones, so the last printed digit of its results is not reliable, while the policy counts every printed digit as significant. Evidence: there is no external load, so horizontal equilibrium requires R_xc = -R_xd; the printed pair 760.0 and -760.2 cannot both be right, and the engine's 760.12 lies between them. The exact solution of the source's printed equations is -1.68347, -0.05183, -0.84473 mm. The engine's results for this model are confirmed by the other tiers that apply (tier C: OpenSeesPy and PyNite agree with the engine; tier D: equilibrium and the other invariants pass); the difference is between the source's printed digits and the exact solution of the stated problem."
+ }
+}

@@ -1,0 +1,403 @@
+{
+ "name": "ziemian/frame-9-first-order-displacements-left",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kip",
+  "length": "in"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "n1": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n2": {
+   "x": 240.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n3": {
+   "x": 816.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n13": {
+   "x": -0.48,
+   "y": 240.0,
+   "z": 0.0
+  },
+  "n17": {
+   "x": 239.52,
+   "y": 240.0,
+   "z": 0.0
+  },
+  "n21": {
+   "x": 815.52,
+   "y": 240.0,
+   "z": 0.0
+  },
+  "n31": {
+   "x": -0.84,
+   "y": 420.0,
+   "z": 0.0
+  },
+  "n35": {
+   "x": 239.16,
+   "y": 420.0,
+   "z": 0.0
+  },
+  "n39": {
+   "x": 815.16,
+   "y": 420.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "n1": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed",
+    "ux": "fixed",
+    "uy": "fixed"
+   }
+  },
+  "n2": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed",
+    "ux": "fixed",
+    "uy": "fixed"
+   }
+  },
+  "n3": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed",
+    "ux": "fixed",
+    "uy": "fixed"
+   }
+  },
+  "n13": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "n17": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "n21": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "n31": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "n35": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "n39": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 23200.0,
+   "nu": 0.3,
+   "description": "0.8 x 29,000 ksi (analysis condition of the data set)"
+  }
+ },
+ "sections": {
+  "s1": {
+   "type": "properties",
+   "description": "W8X15: A, Izz and J as listed in the data set; Iy = 1000 Izz (plane problem, see problem.json)",
+   "A": 4.44,
+   "Iz": 48.0,
+   "Iy": 48000.0,
+   "J": 0.137
+  },
+  "s2": {
+   "type": "properties",
+   "description": "W8X13: A, Izz and J as listed in the data set; Iy = 1000 Izz (plane problem, see problem.json)",
+   "A": 3.84,
+   "Iz": 39.6,
+   "Iy": 39600.0,
+   "J": 0.0871
+  },
+  "s3": {
+   "type": "properties",
+   "description": "W14X132: A, Izz and J as listed in the data set; Iy = 1000 Izz (plane problem, see problem.json)",
+   "A": 38.8,
+   "Iz": 1530.0,
+   "Iy": 1530000.0,
+   "J": 12.3
+  },
+  "s4": {
+   "type": "properties",
+   "description": "W14X120: A, Izz and J as listed in the data set; Iy = 1000 Izz (plane problem, see problem.json)",
+   "A": 35.3,
+   "Iz": 1380.0,
+   "Iy": 1380000.0,
+   "J": 9.37
+  },
+  "s5": {
+   "type": "properties",
+   "description": "W14X109: A, Izz and J as listed in the data set; Iy = 1000 Izz (plane problem, see problem.json)",
+   "A": 32.0,
+   "Iz": 1240.0,
+   "Iy": 1240000.0,
+   "J": 7.12
+  },
+  "s6": {
+   "type": "properties",
+   "description": "W27X102: A, Izz and J as listed in the data set; Iy = 1000 Izz (plane problem, see problem.json)",
+   "A": 30.0,
+   "Iz": 3620.0,
+   "Iy": 3620000.0,
+   "J": 5.28
+  },
+  "s7": {
+   "type": "properties",
+   "description": "W36X170: A, Izz and J as listed in the data set; Iy = 1000 Izz (plane problem, see problem.json)",
+   "A": 50.1,
+   "Iz": 10500.0,
+   "Iy": 10500000.0,
+   "J": 15.1
+  },
+  "s8": {
+   "type": "properties",
+   "description": "W27X84: A, Izz and J as listed in the data set; Iy = 1000 Izz (plane problem, see problem.json)",
+   "A": 24.8,
+   "Iz": 2850.0,
+   "Iy": 2850000.0,
+   "J": 2.81
+  },
+  "s9": {
+   "type": "properties",
+   "description": "W21X44: A, Izz and J as listed in the data set; Iy = 1000 Izz (plane problem, see problem.json)",
+   "A": 13.0,
+   "Iz": 843.0,
+   "Iy": 843000.0,
+   "J": 0.77
+  }
+ },
+ "members": {
+  "m1-4": {
+   "i": "n1",
+   "j": "n13",
+   "section": "s1",
+   "material": "M"
+  },
+  "m5-8": {
+   "i": "n2",
+   "j": "n17",
+   "section": "s3",
+   "material": "M"
+  },
+  "m9-12": {
+   "i": "n3",
+   "j": "n21",
+   "section": "s4",
+   "material": "M"
+  },
+  "m13-16": {
+   "i": "n13",
+   "j": "n17",
+   "section": "s8",
+   "material": "M"
+  },
+  "m17-20": {
+   "i": "n17",
+   "j": "n21",
+   "section": "s7",
+   "material": "M"
+  },
+  "m21-24": {
+   "i": "n13",
+   "j": "n31",
+   "section": "s2",
+   "material": "M"
+  },
+  "m25-28": {
+   "i": "n17",
+   "j": "n35",
+   "section": "s4",
+   "material": "M"
+  },
+  "m29-32": {
+   "i": "n21",
+   "j": "n39",
+   "section": "s5",
+   "material": "M"
+  },
+  "m33-36": {
+   "i": "n31",
+   "j": "n35",
+   "section": "s9",
+   "material": "M"
+  },
+  "m37-40": {
+   "i": "n35",
+   "j": "n39",
+   "section": "s6",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "n13",
+     "Fy": -25.363
+    },
+    {
+     "type": "memberPoint",
+     "member": "m13-16",
+     "direction": "Y",
+     "value": -50.726,
+     "position": 0.25
+    },
+    {
+     "type": "memberPoint",
+     "member": "m13-16",
+     "direction": "Y",
+     "value": -50.726,
+     "position": 0.5
+    },
+    {
+     "type": "memberPoint",
+     "member": "m13-16",
+     "direction": "Y",
+     "value": -50.726,
+     "position": 0.75
+    },
+    {
+     "type": "nodal",
+     "node": "n17",
+     "Fy": -86.234
+    },
+    {
+     "type": "memberPoint",
+     "member": "m17-20",
+     "direction": "Y",
+     "value": -121.74,
+     "position": 0.25
+    },
+    {
+     "type": "memberPoint",
+     "member": "m17-20",
+     "direction": "Y",
+     "value": -121.74,
+     "position": 0.5
+    },
+    {
+     "type": "memberPoint",
+     "member": "m17-20",
+     "direction": "Y",
+     "value": -121.74,
+     "position": 0.75
+    },
+    {
+     "type": "nodal",
+     "node": "n21",
+     "Fy": -60.871
+    },
+    {
+     "type": "nodal",
+     "node": "n31",
+     "Fy": -11.836
+    },
+    {
+     "type": "memberPoint",
+     "member": "m33-36",
+     "direction": "Y",
+     "value": -23.672,
+     "position": 0.25
+    },
+    {
+     "type": "memberPoint",
+     "member": "m33-36",
+     "direction": "Y",
+     "value": -23.672,
+     "position": 0.5
+    },
+    {
+     "type": "memberPoint",
+     "member": "m33-36",
+     "direction": "Y",
+     "value": -23.672,
+     "position": 0.75
+    },
+    {
+     "type": "nodal",
+     "node": "n35",
+     "Fy": -40.243
+    },
+    {
+     "type": "memberPoint",
+     "member": "m37-40",
+     "direction": "Y",
+     "value": -56.813,
+     "position": 0.25
+    },
+    {
+     "type": "memberPoint",
+     "member": "m37-40",
+     "direction": "Y",
+     "value": -56.813,
+     "position": 0.5
+    },
+    {
+     "type": "memberPoint",
+     "member": "m37-40",
+     "direction": "Y",
+     "value": -56.813,
+     "position": 0.75
+    },
+    {
+     "type": "nodal",
+     "node": "n39",
+     "Fy": -28.407
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.0
+   },
+   "analysisType": "firstOrder"
+  }
+ },
+ "analysis": {
+  "shearDeformation": false
+ }
+}

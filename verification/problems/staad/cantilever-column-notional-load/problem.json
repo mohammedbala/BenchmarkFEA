@@ -1,0 +1,74 @@
+{
+ "id": "cantilever-column-notional-load",
+ "title": "Cantilever column with axial load and a small lateral load: second-order moment and deflection",
+ "tier": "B",
+ "source": {
+  "work": "Bentley Systems, STAAD.Pro Help, Verification Examples (public documentation, docs.bentley.com)",
+  "edition": "STAAD.Pro Help v21 build (pages refer to the STAAD.Pro 2023 sample files), read 2026-11-22",
+  "location": "'V. Direct Analysis of a Column' (https://docs.bentley.com/LiveContent/web/STAAD.Pro%20Help-v21/en/GUID-4E631D44-D7D9-497E-85C5-ABFA4E11CF76.html)",
+  "pages": "web page",
+  "notes": "problem statement taken from the vendor page (text and input listing). The page cites: AISC, Specification for Structural Steel Buildings, 2005, p. 16.1-435, Case 2 (the 2005 edition was not opened; the same benchmark of the 2022 edition is in ../aisc-commentary) - NOT opened for this project; no number is taken from it. The page's 'theory' values are recorded as printed; the program's own results are not used."
+ },
+ "basis": "recomputed-from-published-statement",
+ "analysis": "Plane problem in the global X-Y plane (Y vertical); the out-of-plane DOFs (uz, rx, ry) of every node are held; in-plane bending about local z. Cantilever column of 300 in, built in at the base, free at the top; W8x18 with the moment of inertia the page gives, Iz = 61.9 in^4, E = 29,000 ksi; axial load 30 kip and lateral load 0.09 kip at the top. Combination 'second': second-order analysis of both loads (the engine's member carries the exact stability functions); combination 'first': first-order analysis of the lateral load alone. The area does not enter the targets (placeholder 10 in^2); Iy = 1000 Iz so that no out-of-plane buckling enters. The lateral load is 0.003 x 30 kip = 0.09 kip (the page's text has '0.03 x 30'; its arithmetic uses 0.09). The page's closed form uses the full E (no stiffness reduction).  Reference values: computed here from this statement (verification/derive/vendor_reference.py); the textbook cited by the vendor page was not opened and no number is taken from it.",
+ "targets": [
+  {
+   "extract": "memberStation",
+   "member": "m",
+   "quantity": "Mz",
+   "relative": 0.0,
+   "combination": "second",
+   "value": 61.3799550211974,
+   "unit": "kip in",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (ODE oracle, second-order beam-column); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "b",
+   "dof": "ux",
+   "combination": "second",
+   "value": 1.14599850070658,
+   "unit": "in",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (ODE oracle, second-order beam-column); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "m",
+   "quantity": "Mz",
+   "relative": 0.0,
+   "combination": "first",
+   "value": 26.999999999999993,
+   "unit": "kip in",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (ODE oracle, first order); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "b",
+   "dof": "ux",
+   "combination": "first",
+   "value": 0.45122834382485644,
+   "unit": "in",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (ODE oracle, first order); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  }
+ ],
+ "status": "quarantined",
+ "quarantine": {
+  "diagnosis": "All targets are reproduced (the reference values of the ODE oracle to 1e-6, the page's printed values at their printed precision), and the engine agrees with the ODE oracle on this model (tier A). Tier C does not pass: in the second-order combination engine and OpenSeesPy differ by 1.26e-3 in the rotation of the top (allowed 1.26e-3; exceeded in the next digit). Tier C allows a difference of 1e-6 plus the ESTIMATED discretisation error of the foreign solver (OpenSeesPy with a linearised P-Delta transformation and a finite number of elements per member), which is an estimate and not a bound (docs/VERIFICATION.md, section 7); here the difference exceeds it by less than 1 %. The engine's result is the exact solution of the second-order member equations, so the disagreement lies in the foreign solver's discretisation; but under the rule that nothing is published when a tier disagrees, the problem is quarantined."
+ }
+}

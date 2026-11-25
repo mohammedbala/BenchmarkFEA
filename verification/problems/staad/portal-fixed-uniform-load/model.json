@@ -1,0 +1,127 @@
+{
+ "name": "staad/portal-fixed-uniform-load",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kip",
+  "length": "ft"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "n1": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n2": {
+   "x": 0.0,
+   "y": 20.0,
+   "z": 0.0
+  },
+  "n3": {
+   "x": 20.0,
+   "y": 20.0,
+   "z": 0.0
+  },
+  "n4": {
+   "x": 20.0,
+   "y": 0.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "n1": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed",
+    "ux": "fixed",
+    "uy": "fixed",
+    "rz": "fixed"
+   }
+  },
+  "n2": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "n3": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "n4": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed",
+    "ux": "fixed",
+    "uy": "fixed",
+    "rz": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 4132000.0,
+   "nu": 0.3
+  }
+ },
+ "sections": {
+  "S": {
+   "type": "properties",
+   "A": 1.0,
+   "Iz": 0.05,
+   "Iy": 0.05,
+   "J": 0.05
+  }
+ },
+ "members": {
+  "c1": {
+   "i": "n1",
+   "j": "n2",
+   "section": "S",
+   "material": "M"
+  },
+  "b": {
+   "i": "n2",
+   "j": "n3",
+   "section": "S",
+   "material": "M"
+  },
+  "c2": {
+   "i": "n4",
+   "j": "n3",
+   "section": "S",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "memberDistributed",
+     "member": "b",
+     "direction": "Y",
+     "w1": -2.0
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.0
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": false,
+  "resultStations": 3
+ }
+}

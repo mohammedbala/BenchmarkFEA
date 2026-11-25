@@ -1,0 +1,149 @@
+{
+ "name": "staad/truss-five-bars-thrust",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kip",
+  "length": "in"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "n1": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n2": {
+   "x": 150.0,
+   "y": 100.0,
+   "z": 0.0
+  },
+  "n3": {
+   "x": 150.0,
+   "y": 50.0,
+   "z": 0.0
+  },
+  "n4": {
+   "x": 300.0,
+   "y": 0.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "n1": {
+   "dofs": {
+    "ux": "fixed",
+    "uy": "fixed",
+    "uz": "fixed"
+   }
+  },
+  "n2": {
+   "dofs": {
+    "uz": "fixed"
+   }
+  },
+  "n3": {
+   "dofs": {
+    "uz": "fixed"
+   }
+  },
+  "n4": {
+   "dofs": {
+    "ux": "fixed",
+    "uy": "fixed",
+    "uz": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 30000.0,
+   "nu": 0.3
+  }
+ },
+ "sections": {
+  "a5": {
+   "type": "properties",
+   "description": "axial-force member: Iy, Iz, J are placeholders, not used",
+   "A": 5.0,
+   "Iy": 1.0,
+   "Iz": 1.0,
+   "J": 1.0
+  },
+  "a3": {
+   "type": "properties",
+   "description": "axial-force member: Iy, Iz, J are placeholders, not used",
+   "A": 3.0,
+   "Iy": 1.0,
+   "Iz": 1.0,
+   "J": 1.0
+  },
+  "a2": {
+   "type": "properties",
+   "description": "axial-force member: Iy, Iz, J are placeholders, not used",
+   "A": 2.0,
+   "Iy": 1.0,
+   "Iz": 1.0,
+   "J": 1.0
+  }
+ },
+ "members": {
+  "m1": {
+   "type": "truss",
+   "i": "n1",
+   "j": "n2",
+   "section": "a5",
+   "material": "M"
+  },
+  "m2": {
+   "type": "truss",
+   "i": "n1",
+   "j": "n3",
+   "section": "a3",
+   "material": "M"
+  },
+  "m3": {
+   "type": "truss",
+   "i": "n2",
+   "j": "n3",
+   "section": "a2",
+   "material": "M"
+  },
+  "m4": {
+   "type": "truss",
+   "i": "n2",
+   "j": "n4",
+   "section": "a5",
+   "material": "M"
+  },
+  "m5": {
+   "type": "truss",
+   "i": "n3",
+   "j": "n4",
+   "section": "a3",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "n2",
+     "Fy": -10.0
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.0
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": false
+ }
+}

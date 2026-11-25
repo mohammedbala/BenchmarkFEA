@@ -1,0 +1,67 @@
+{
+ "id": "two-bar-truss",
+ "title": "Two-bar truss: bar force and joint deflection",
+ "tier": "B",
+ "source": {
+  "work": "Bentley Systems, STAAD.Pro Help, Verification Examples (public documentation, docs.bentley.com)",
+  "edition": "STAAD.Pro Help v21 build (pages refer to the STAAD.Pro 2023 sample files), read 2026-11-22",
+  "location": "'V. Stress in a 2D Truss Model' (https://docs.bentley.com/LiveContent/web/STAAD.Pro%20Help-v21/en/GUID-08C53183-5FAC-4C64-B3DC-984BE8F8DF38.html)",
+  "pages": "web page",
+  "notes": "problem statement taken from the vendor page (text and input listing). The page cites: Timoshenko, Strength of Materials, Part I, 3rd ed. 1956, p. 10, problem 2 - NOT opened for this project; no number is taken from it. The page's 'theory' values are recorded as printed; the program's own results are not used."
+ },
+ "basis": "recomputed-from-published-statement",
+ "analysis": "Plane truss (X-Y plane, Y vertical; uz of every joint held): two bars of 180 in, each inclined 30 degrees to the horizontal, from two pinned supports down to a common joint; A = 0.5 in^2, E = 30e6 psi; 5000 lb downward at the joint. The page prints the bar stress; the target here is the bar force = stress x 0.5 in^2. Reference values: computed here from this statement (verification/derive/vendor_reference.py); the textbook cited by the vendor page was not opened and no number is taken from it.",
+ "targets": [
+  {
+   "extract": "memberStation",
+   "member": "m1",
+   "quantity": "N",
+   "relative": 0.5,
+   "value": 5000.000000000001,
+   "unit": "lbf",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (plane truss program); tolerance = policy floor 1e-6",
+   "sign": "tension positive"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n2",
+   "dof": "uy",
+   "value": -0.12000000000000005,
+   "unit": "in",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (plane truss program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "m1",
+   "quantity": "N",
+   "relative": 0.5,
+   "value": 5000.0,
+   "unit": "lbf",
+   "tolerance": {
+    "rel": 5e-05
+   },
+   "precisionNote": "printed \"10,000.\" x 0.5 (unit conversion / common factor of the source); tolerance = half a unit in the last printed digit; printed bar stress in psi",
+   "sign": "tension positive"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n2",
+   "dof": "uy",
+   "value": -0.12,
+   "unit": "in",
+   "tolerance": {
+    "rel": 0.04166666666666667
+   },
+   "precisionNote": "printed \"0.12\"; tolerance = half a unit in the last printed digit",
+   "sign": "downward"
+  }
+ ],
+ "status": "active"
+}

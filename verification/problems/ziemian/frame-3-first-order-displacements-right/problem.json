@@ -1,0 +1,68 @@
+{
+ "id": "frame-3-first-order-displacements-right",
+ "title": "Ziemian frame 3 (two-storey one-bay frame with pin-ended beams and diagonals): first-order joint displacements, case 'right'",
+ "tier": "B",
+ "source": {
+  "work": "C. W. Ziemian, R. D. Ziemian, Steel benchmark frames for structural analysis and validation studies: Finite element models and numerical simulation data, Data in Brief 39 (2021) 107564, doi:10.1016/j.dib.2021.107564, with the data set on Mendeley Data, doi:10.17632/39sjhchwtx.1",
+  "edition": "data set version 1 (2021), licence CC BY 4.0",
+  "location": "Frame 3: 'FEA Model Details_All frames.xlsx', tab 'Frame 3'; 'Simulation Results_All frames.xlsx', tab 'Frame 3', columns LA / Right",
+  "pages": "article Tables 2 and 3 (modelling and analysis conditions); 'Description Of Frames.pdf'",
+  "notes": "C. W. Ziemian and R. D. Ziemian, 'Steel benchmark frames for structural analysis and validation studies: Finite element models and numerical simulation data', Data in Brief 39 (2021) 107564, doi:10.1016/j.dib.2021.107564; data set: Mendeley Data, doi:10.17632/39sjhchwtx.1; licence CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). The model data of this frame are reproduced from the data set under that licence, converted to this project's input format (changes: 4 elements per member merged into one member, plane model embedded in 3D, 0.8 E entered as the modulus)."
+ },
+ "basis": "published",
+ "analysis": "Frame 3 of the data set (two-storey one-bay frame with pin-ended beams and diagonals), units kip and inch. Plane frame in the global X-Y plane (Y vertical); the out-of-plane DOFs (uz, rx, ry) of every node are held (the data set's frames are 'fully braced out-of-plane'); in-plane bending about local z, so the data set's Izz is the section's Iz. Modulus 0.8 E = 23200 ksi (the data set's condition for all elastic analyses; its element table points to E = 29000 ksi, the published results correspond to 0.8 E - verified for this frame with the first-order displacements). No shear deformation. A straight line of the data set's elements is one member here, the loads at its interior nodes are point loads on the member. The data set's model is plane (no out-of-plane buckling of a member between joints); the engine's member is spatial, so Iy = 1000 Izz is entered for every section instead of the listed Iyy: no out-of-plane mode can precede the in-plane behaviour compared, and Iy does not enter the in-plane results. Case 'Right' of the data set: imperfect geometry with every node at x + y/500, lateral loads acting toward +x. First-order (linear) analysis: the data set's 'LA'. ",
+ "targets": [
+  {
+   "extract": "nodeDisplacement",
+   "node": "n9",
+   "dof": "ux",
+   "value": 0.517,
+   "unit": "in",
+   "tolerance": {
+    "rel": 0.0009671179883945841
+   },
+   "precisionNote": "printed \"0.517\"; tolerance = half a unit in the last printed digit; number as displayed by the data set's spreadsheet (cell format 0.000); stored value 0.5173328114418076",
+   "sign": "same as the data set: displacement along +x (to the right) positive"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n10",
+   "dof": "ux",
+   "value": 0.557,
+   "unit": "in",
+   "tolerance": {
+    "rel": 0.0008976660682226211
+   },
+   "precisionNote": "printed \"0.557\"; tolerance = half a unit in the last printed digit; number as displayed by the data set's spreadsheet (cell format 0.000); stored value 0.5569002923782915",
+   "sign": "same as the data set: displacement along +x (to the right) positive"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n17",
+   "dof": "ux",
+   "value": 0.533,
+   "unit": "in",
+   "tolerance": {
+    "rel": 0.0009380863039399625
+   },
+   "precisionNote": "printed \"0.533\"; tolerance = half a unit in the last printed digit; number as displayed by the data set's spreadsheet (cell format 0.000); stored value 0.5333053753843738",
+   "sign": "same as the data set: displacement along +x (to the right) positive"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n18",
+   "dof": "ux",
+   "value": 0.571,
+   "unit": "in",
+   "tolerance": {
+    "rel": 0.0008756567425569178
+   },
+   "precisionNote": "printed \"0.571\"; tolerance = half a unit in the last printed digit; number as displayed by the data set's spreadsheet (cell format 0.000); stored value 0.5712973190822213",
+   "sign": "same as the data set: displacement along +x (to the right) positive"
+  }
+ ],
+ "status": "quarantined",
+ "quarantine": {
+  "diagnosis": "One of four targets missed (joint 18: engine 0.57205 in, displayed 0.571, stored 0.571297); all four differ from the stored values by +3.1e-4, -2.7e-4, -1.4e-3, +1.3e-3 relative, two orders of magnitude more than for the other frames (1e-5). Cause NOT identified. What was established: the stiffness model is the data set's (the critical load ratio of the same model is reproduced to 6e-5, and to 6e-6 by the cubic-element program of verification/derive/ziemian_diagnosis.py relative to the engine); the differences alternate in sign between the left and the right column line, the pattern of a different distribution of the loads between the two column lines (the lateral displacements of this frame depend on the difference of the two gravity loads, listed as 235.25 and 239.88 kip, through the diagonals), not of a stiffness difference. Variants tried without success: E = 29,000 ksi for the pin-ended members, the two pin-ended sections exchanged. Open question for the data set, see README.md."
+ }
+}

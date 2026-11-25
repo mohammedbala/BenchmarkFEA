@@ -1,0 +1,92 @@
+{
+ "id": "ex-13-2-fixed-beam-three-loads",
+ "title": "Fixed-ended beam with three point loads",
+ "tier": "B",
+ "source": {
+  "work": "McGuire, W., Gallagher, R. H., Ziemian, R. D., Matrix Structural Analysis",
+  "edition": "2nd edition (copyright 2014 R. D. Ziemian)",
+  "location": "Example 13.2",
+  "pages": "pp. 380-381",
+  "notes": "input data and targets read on the cited pages; nothing of the source is reproduced"
+ },
+ "basis": "published",
+ "analysis": "Plane (x-y) problem of the source modelled in 3D with the global Y axis vertical, so that the source's x, y and theta_z are the model's X, Y and rz. In-plane bending is about local z for every member (default orientation), hence the source's I is the section's Iz. Beam of 8 m, both ends fixed, I = 200e6 mm^4, E = 200,000 MPa, nodes every 2 m. Loads 50, 30 and 10 kN downward at x = 2, 4 and 6 m. First order, no shear deformation. Section properties the source does not give because they do not enter its plane model (Iy, J; A where stated) are placeholders that do not influence the targets. ",
+ "targets": [
+  {
+   "extract": "nodeDisplacement",
+   "node": "n1",
+   "dof": "uy",
+   "value": -2.54,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.001968503937007874
+   },
+   "precisionNote": "printed \"2.54\"; tolerance = half a unit in the last printed digit; printed -2.54",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n1",
+   "dof": "rz",
+   "value": -0.00156,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 0.0032051282051282055
+   },
+   "precisionNote": "printed \"1.56e-3\"; tolerance = half a unit in the last printed digit; printed -1.56 x 10^-3",
+   "sign": "moment / rotation about z, counter-clockwise positive in the source = rz / Mz of the engine"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n2",
+   "dof": "uy",
+   "value": -4.0,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.0125
+   },
+   "precisionNote": "printed \"4.0\"; tolerance = half a unit in the last printed digit; printed -4.0",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n2",
+   "dof": "rz",
+   "value": 0.00025,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 0.02
+   },
+   "precisionNote": "printed \"0.25e-3\"; tolerance = half a unit in the last printed digit; printed 0.25 x 10^-3",
+   "sign": "moment / rotation about z, counter-clockwise positive in the source = rz / Mz of the engine"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n3",
+   "dof": "uy",
+   "value": -1.96,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.0025510204081632655
+   },
+   "precisionNote": "printed \"1.96\"; tolerance = half a unit in the last printed digit; printed -1.96",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n3",
+   "dof": "rz",
+   "value": 0.00148,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 0.0033783783783783786
+   },
+   "precisionNote": "printed \"1.48e-3\"; tolerance = half a unit in the last printed digit; printed 1.48 x 10^-3",
+   "sign": "moment / rotation about z, counter-clockwise positive in the source = rz / Mz of the engine"
+  }
+ ],
+ "status": "quarantined",
+ "quarantine": {
+  "diagnosis": "5 of 6 targets reproduced (v1, theta1, v2, theta2, v3). Missed: theta3, engine 1.4375e-3 rad, printed 1.48e-3 rad (2.9 % apart, tolerance 0.34 %). Suspected misprint or arithmetic slip in the source. Evidence: the source's own substructure equations give 1.4375e-3 - with its printed matrices, theta3 = -(1/4)(1.5e-3 x v2 + theta2) = -(1/4)(1.5e-3 x (-4.0) + 0.25e-3) = 1.4375e-3 rad for the printed v2 = -4.0 mm and theta2 = 0.25e-3 rad. The engine's results for this model are confirmed by the other tiers that apply (tier C: OpenSeesPy and PyNite agree with the engine; tier D: equilibrium and the other invariants pass); the difference is between the source's printed digits and the exact solution of the stated problem."
+ }
+}

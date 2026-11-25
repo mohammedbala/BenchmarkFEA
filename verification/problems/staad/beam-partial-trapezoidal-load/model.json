@@ -1,0 +1,93 @@
+{
+ "name": "staad/beam-partial-trapezoidal-load",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kN",
+  "length": "m"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "a": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "b": {
+   "x": 7.5,
+   "y": 0.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "a": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed",
+    "ux": "fixed",
+    "uy": "fixed"
+   }
+  },
+  "b": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed",
+    "ux": "fixed",
+    "uy": "fixed",
+    "rz": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 200000000.0,
+   "nu": 0.3
+  }
+ },
+ "sections": {
+  "S": {
+   "type": "properties",
+   "A": 0.005,
+   "Iz": 5e-05,
+   "Iy": 5e-05,
+   "J": 5e-05
+  }
+ },
+ "members": {
+  "m": {
+   "i": "a",
+   "j": "b",
+   "section": "S",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "memberDistributed",
+     "member": "m",
+     "direction": "Y",
+     "w1": -4.0,
+     "w2": -7.0,
+     "start": 0.4,
+     "end": 1.0
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.0
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": false,
+  "resultStations": 6
+ }
+}

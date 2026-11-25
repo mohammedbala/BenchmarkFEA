@@ -1,0 +1,706 @@
+{
+ "format": "benchfea-task-answers",
+ "formatVersion": "1.0.0",
+ "id": "t9746780017629c",
+ "taskType": "diagnose",
+ "mode": "no-solver",
+ "key": {
+  "family": "multistorey_2d",
+  "curveBall": "release_pinned_frame",
+  "seed": 4,
+  "difficulty": 4,
+  "versions": {
+   "task": "1",
+   "generator": "1",
+   "curveBall": "1",
+   "engine": "0.1.0"
+  }
+ },
+ "generatorSeed": 980956522,
+ "skips": [
+  {
+   "attempt": 0,
+   "generatorSeed": 4,
+   "stage": "curve-ball",
+   "category": "not-applicable",
+   "reason": "none of the 2 target(s) tried has a material effect of class creates-mechanism / changes-analysis: major-axis bending rotation released at 24 beam end(s) at the columns: the perturbed model is refused by the engine (stability.beyond-critical-load): no reference solution; both bending rotations released at 32 beam end(s) at the columns: the perturbed model is refused by the engine (stability.beyond-critical-load): no reference solution"
+  }
+ ],
+ "effectClass": "creates-mechanism",
+ "changeRecord": {
+  "format": "benchfea-curveball-record",
+  "formatVersion": "1.0.0",
+  "curveBall": "release_pinned_frame",
+  "title": "moment frame pinned at every beam-column joint",
+  "curveBallVersion": "1",
+  "seed": 980956522,
+  "category": "releases",
+  "effectClass": "creates-mechanism",
+  "target": "both bending rotations released at 20 beam end(s) at the columns",
+  "changes": [
+   {
+    "op": "add",
+    "path": "/members/BA1/releases/i/ry",
+    "after": true,
+    "index": 1
+   },
+   {
+    "op": "add",
+    "path": "/members/BA1/releases/j/ry",
+    "after": true,
+    "index": 1
+   },
+   {
+    "op": "add",
+    "path": "/members/BB1/releases",
+    "after": {
+     "i": {
+      "ry": true,
+      "rz": true
+     },
+     "j": {
+      "ry": true,
+      "rz": true
+     }
+    },
+    "index": 4
+   },
+   {
+    "op": "add",
+    "path": "/members/BA2/releases/i/ry",
+    "after": true,
+    "index": 1
+   },
+   {
+    "op": "add",
+    "path": "/members/BA2/releases/j/ry",
+    "after": true,
+    "index": 1
+   },
+   {
+    "op": "add",
+    "path": "/members/BB2/releases",
+    "after": {
+     "i": {
+      "ry": true,
+      "rz": true
+     },
+     "j": {
+      "ry": true,
+      "rz": true
+     }
+    },
+    "index": 4
+   },
+   {
+    "op": "add",
+    "path": "/members/BA3/releases/i/ry",
+    "after": true,
+    "index": 1
+   },
+   {
+    "op": "add",
+    "path": "/members/BA3/releases/j/ry",
+    "after": true,
+    "index": 1
+   },
+   {
+    "op": "add",
+    "path": "/members/BB3/releases",
+    "after": {
+     "i": {
+      "ry": true,
+      "rz": true
+     },
+     "j": {
+      "ry": true,
+      "rz": true
+     }
+    },
+    "index": 4
+   },
+   {
+    "op": "add",
+    "path": "/members/BA4/releases/i/ry",
+    "after": true,
+    "index": 1
+   },
+   {
+    "op": "add",
+    "path": "/members/BA4/releases/j/ry",
+    "after": true,
+    "index": 1
+   },
+   {
+    "op": "add",
+    "path": "/members/BB4/releases",
+    "after": {
+     "i": {
+      "ry": true,
+      "rz": true
+     },
+     "j": {
+      "ry": true,
+      "rz": true
+     }
+    },
+    "index": 4
+   },
+   {
+    "op": "add",
+    "path": "/members/BA5/releases/i/ry",
+    "after": true,
+    "index": 1
+   },
+   {
+    "op": "add",
+    "path": "/members/BA5/releases/j/ry",
+    "after": true,
+    "index": 1
+   },
+   {
+    "op": "add",
+    "path": "/members/BB5/releases",
+    "after": {
+     "i": {
+      "ry": true,
+      "rz": true
+     },
+     "j": {
+      "ry": true,
+      "rz": true
+     }
+    },
+    "index": 4
+   }
+  ],
+  "entities": {
+   "members": [
+    "BA1",
+    "BA2",
+    "BA3",
+    "BA4",
+    "BA5",
+    "BB1",
+    "BB2",
+    "BB3",
+    "BB4",
+    "BB5"
+   ],
+   "nodes": [
+    "A1",
+    "A2",
+    "A3",
+    "A4",
+    "A5",
+    "B1",
+    "B2",
+    "B3",
+    "B4",
+    "B5",
+    "C1",
+    "C2",
+    "C3",
+    "C4",
+    "C5"
+   ]
+  },
+  "whyItMatters": "A moment frame resists sway by the bending of beams and columns through rigid joints. With every beam-column joint pinned the beams become simply supported and no longer restrain the columns: on pinned bases the frame is a sway mechanism (no solution, the answer is the diagnosis); on fixed or partially fixed bases the columns act as cantilevers from the base and the drift and base moments grow several times.",
+  "precondition": "non-vertical frame members (beams) with a rigidly connected end at a node where a vertical frame member (column) ends",
+  "effect": {
+   "class": "creates-mechanism",
+   "material": true,
+   "criterion": "creates-mechanism",
+   "criteria": [
+    "creates-mechanism"
+   ],
+   "thresholds": {
+    "analysisChange": 0.05,
+    "designRatioChange": 0.05
+   },
+   "base": {
+    "status": "ok",
+    "units": {
+     "force": "kN",
+     "length": "m"
+    },
+    "combinations": {
+     "ULS1": {
+      "analysisType": "secondOrder",
+      "maxTranslation": 0.007837725542916747,
+      "maxMemberDisplacement": 0.022464458287683044,
+      "maxReactionForce": 1889.4381516283058,
+      "maxMemberMoment": 286.24137255402536
+     },
+     "SLS1": {
+      "analysisType": "firstOrder",
+      "maxTranslation": 0.004955032556414505,
+      "maxMemberDisplacement": 0.01650763261656798,
+      "maxReactionForce": 1362.1624811179213,
+      "maxMemberMoment": 205.11413897262094
+     },
+     "ULS2": {
+      "analysisType": "secondOrder",
+      "maxTranslation": 0.07744671407708574,
+      "maxMemberDisplacement": 0.07884039897885392,
+      "maxReactionForce": 954.5512100408973,
+      "maxMemberMoment": 413.48281410964796
+     },
+     "ULS3": {
+      "analysisType": "secondOrder",
+      "maxTranslation": 0.07390643983835647,
+      "maxMemberDisplacement": 0.07443369508124308,
+      "maxReactionForce": 563.3293654381531,
+      "maxMemberMoment": 344.32620110869675
+     },
+     "SLS2": {
+      "analysisType": "firstOrder",
+      "maxTranslation": 0.03966347794871995,
+      "maxMemberDisplacement": 0.04095293286077676,
+      "maxReactionForce": 605.7033902088191,
+      "maxMemberMoment": 220.2285785752052
+     },
+     "ULS4": {
+      "analysisType": "secondOrder",
+      "maxTranslation": 0.007486838742159187,
+      "maxMemberDisplacement": 0.021548520073978058,
+      "maxReactionForce": 1384.7443475594937,
+      "maxMemberMoment": 286.23297262709315
+     },
+     "ULS5": {
+      "analysisType": "secondOrder",
+      "maxTranslation": 0.08660381794676807,
+      "maxMemberDisplacement": 0.08792408948506943,
+      "maxReactionForce": 1435.1469687638184,
+      "maxMemberMoment": 419.4536662708224
+     }
+    },
+    "design": {
+     "status": "pass",
+     "maxRatio": 0.8079534490366556,
+     "maxRatioMember": "BB1",
+     "failing": []
+    }
+   },
+   "perturbed": {
+    "status": "unstable",
+    "nMechanisms": 1
+   },
+   "releasedDofs": [
+    "ry",
+    "rz"
+   ]
+  },
+  "reference": {
+   "kind": "diagnosis",
+   "note": "the perturbed model is a mechanism: the reference solution is the solver's structured mechanism diagnosis, not a set of results",
+   "diagnosis": {
+    "stable": false,
+    "classification": "mechanism",
+    "nMechanisms": 1,
+    "nFreeDofs": 48,
+    "tolerance": 1e-10,
+    "modes": [
+     {
+      "kind": "distributed",
+      "description": "1 mechanism(s) involving several nodes; largest participation: A5 (uy/rx), B5 (uy/rx), C5 (uy/rx), A4 (uy/rx), B4 (uy/rx), C4 (uy/rx), A3 (uy/rx), B3 (uy/rx), C3 (uy/rx), A2 (uy/rx), B2 (uy/rx), C2 (uy/rx)",
+      "motion": "mixed",
+      "cause": "no-stiffness",
+      "count": 1,
+      "direction": null,
+      "axis": null,
+      "through": null,
+      "nodes": [
+       {
+        "node": "A5",
+        "share": 0.073851,
+        "dofs": {
+         "uy": 0.413448,
+         "rx": 0.586552
+        }
+       },
+       {
+        "node": "B5",
+        "share": 0.073851,
+        "dofs": {
+         "uy": 0.413448,
+         "rx": 0.586552
+        }
+       },
+       {
+        "node": "C5",
+        "share": 0.073851,
+        "dofs": {
+         "uy": 0.413448,
+         "rx": 0.586552
+        }
+       },
+       {
+        "node": "A4",
+        "share": 0.064025,
+        "dofs": {
+         "uy": 0.323432,
+         "rx": 0.676568
+        }
+       },
+       {
+        "node": "B4",
+        "share": 0.064025,
+        "dofs": {
+         "uy": 0.323432,
+         "rx": 0.676568
+        }
+       },
+       {
+        "node": "C4",
+        "share": 0.064025,
+        "dofs": {
+         "uy": 0.323432,
+         "rx": 0.676568
+        }
+       },
+       {
+        "node": "A3",
+        "share": 0.056101,
+        "dofs": {
+         "uy": 0.227872,
+         "rx": 0.772128
+        }
+       },
+       {
+        "node": "B3",
+        "share": 0.056101,
+        "dofs": {
+         "uy": 0.227872,
+         "rx": 0.772128
+        }
+       },
+       {
+        "node": "C3",
+        "share": 0.056101,
+        "dofs": {
+         "uy": 0.227872,
+         "rx": 0.772128
+        }
+       },
+       {
+        "node": "A2",
+        "share": 0.050079,
+        "dofs": {
+         "uy": 0.135021,
+         "rx": 0.864979
+        }
+       },
+       {
+        "node": "B2",
+        "share": 0.050079,
+        "dofs": {
+         "uy": 0.135021,
+         "rx": 0.864979
+        }
+       },
+       {
+        "node": "C2",
+        "share": 0.050079,
+        "dofs": {
+         "uy": 0.135021,
+         "rx": 0.864979
+        }
+       }
+      ],
+      "members": [
+       "CA1",
+       "CA2",
+       "CA3",
+       "CA4",
+       "CA5",
+       "CB1",
+       "CB2",
+       "CB3",
+       "CB4",
+       "CB5",
+       "CC1",
+       "CC2",
+       "CC3",
+       "CC4",
+       "CC5",
+       "BA1",
+       "BB1",
+       "BA2",
+       "BB2",
+       "BA3",
+       "BB3",
+       "BA4",
+       "BB4",
+       "BA5",
+       "BB5"
+      ]
+     }
+    ]
+   },
+   "problems": [
+    {
+     "code": "stability.mechanism",
+     "path": "/nodes/A5",
+     "message": "the structure is a mechanism: 1 mechanism(s) involving several nodes; largest participation: A5 (uy/rx), B5 (uy/rx), C5 (uy/rx), A4 (uy/rx), B4 (uy/rx), C4 (uy/rx), A3 (uy/rx), B3 (uy/rx), C3 (uy/rx), A2 (uy/rx), B2 (uy/rx), C2 (uy/rx)"
+    }
+   ]
+  },
+  "verification": {
+   "reference": "diagnosis",
+   "route": "diagnosis tiers N, K, C, E of benchfea.verify (docs/VERIFICATION.md section 4): null space of an independently assembled stiffness, engine matrix, two foreign solvers under a probing load, invariance of the diagnosis; NOT expected to pass: the diagnosis reports a loaded node without any member (cause no-stiffness), and the diagnosis tiers have been measured not to confirm this kind of mechanism (docs/CURVEBALLS.md section 4) -- the pipeline quarantines it",
+   "expectedVerifiable": false
+  },
+  "rejected": [],
+  "baseHash": "24a3613e832e1494db1c114a6f9ee6f24f052e8503ccb7ce9ac6589188ca2309",
+  "perturbedHash": "712b54240cfe46b53090f8c7a3c7c881a26778e613e956a56807212cc1ffbcde"
+ },
+ "verification": {
+  "format": "benchfea-verification",
+  "kind": "diagnosis",
+  "status": "verified",
+  "meaning": "'verified' means only: the reference solution passed every tier listed as applicable in this record, at the tolerances stated in it. It does not mean reviewed, approved or certified by anyone.",
+  "modelHash": "712b54240cfe46b53090f8c7a3c7c881a26778e613e956a56807212cc1ffbcde",
+  "tiersPassed": [
+   "N",
+   "K",
+   "C",
+   "E"
+  ],
+  "tiersNotPassed": [],
+  "tiersNotApplicable": [],
+  "quarantine": null,
+  "tiers": {
+   "N": {
+    "applies": true,
+    "passed": true,
+    "summary": "independent stiffness: 1 zero-stiffness motion(s) (diagnosis: 1); 0 described mode(s) tested for K phi = 0: agree",
+    "tolerances": {
+     "singular": 1e-09,
+     "nullResidual": 2e-06
+    },
+    "largestDifferences": []
+   },
+   "K": {
+    "applies": true,
+    "passed": true,
+    "summary": "engine matrix: 1 eigenvalue(s) below 1.0e-09; the described modes satisfy K phi = 0",
+    "tolerances": {
+     "singular": 1e-09,
+     "nullResidual": 2e-06
+    },
+    "largestDifferences": []
+   },
+   "C": {
+    "applies": true,
+    "passed": true,
+    "summary": "2 foreign solver(s) find no equilibrium state under a load that does work on the mechanism(s)",
+    "tolerances": {
+     "saneDisplacement": "1000 x model size"
+    },
+    "largestDifferences": []
+   },
+   "E": {
+    "applies": true,
+    "passed": true,
+    "summary": "diagnosis identical on a second run and after changing every design variable",
+    "tolerances": {
+     "designVariables": 0.0
+    },
+    "largestDifferences": []
+   }
+  },
+  "versions": {
+   "benchfea": "0.1.0",
+   "python": "3.13.18",
+   "numpy": "2.5.3",
+   "scipy": "1.18.1",
+   "foreign:opensees": "3.8.0.0",
+   "foreign:pynite": "3.2.1"
+  },
+  "notes": [
+   "verified diagnosis: passed tier(s) N, K, C, E (docs/VERIFICATION.md, 'Unstable models')"
+  ]
+ },
+ "designVerification": null,
+ "reference": {
+  "category": "releases",
+  "entities": {
+   "members": [
+    "BA1",
+    "BA2",
+    "BA3",
+    "BA4",
+    "BA5",
+    "BB1",
+    "BB2",
+    "BB3",
+    "BB4",
+    "BB5"
+   ],
+   "nodes": [
+    "A1",
+    "A2",
+    "A3",
+    "A4",
+    "A5",
+    "B1",
+    "B2",
+    "B3",
+    "B4",
+    "B5",
+    "C1",
+    "C2",
+    "C3",
+    "C4",
+    "C5"
+   ]
+  },
+  "direction": "added",
+  "target": "both bending rotations released at 20 beam end(s) at the columns",
+  "mechanism": {
+   "stable": false,
+   "classification": "mechanism",
+   "nMechanisms": 1,
+   "nFreeDofs": 48,
+   "tolerance": 1e-10,
+   "modes": [
+    {
+     "kind": "distributed",
+     "description": "1 mechanism(s) involving several nodes; largest participation: A5 (uy/rx), B5 (uy/rx), C5 (uy/rx), A4 (uy/rx), B4 (uy/rx), C4 (uy/rx), A3 (uy/rx), B3 (uy/rx), C3 (uy/rx), A2 (uy/rx), B2 (uy/rx), C2 (uy/rx)",
+     "motion": "mixed",
+     "cause": "no-stiffness",
+     "count": 1,
+     "direction": null,
+     "axis": null,
+     "through": null,
+     "nodes": [
+      {
+       "node": "A5",
+       "share": 0.073851,
+       "dofs": {
+        "uy": 0.413448,
+        "rx": 0.586552
+       }
+      },
+      {
+       "node": "B5",
+       "share": 0.073851,
+       "dofs": {
+        "uy": 0.413448,
+        "rx": 0.586552
+       }
+      },
+      {
+       "node": "C5",
+       "share": 0.073851,
+       "dofs": {
+        "uy": 0.413448,
+        "rx": 0.586552
+       }
+      },
+      {
+       "node": "A4",
+       "share": 0.064025,
+       "dofs": {
+        "uy": 0.323432,
+        "rx": 0.676568
+       }
+      },
+      {
+       "node": "B4",
+       "share": 0.064025,
+       "dofs": {
+        "uy": 0.323432,
+        "rx": 0.676568
+       }
+      },
+      {
+       "node": "C4",
+       "share": 0.064025,
+       "dofs": {
+        "uy": 0.323432,
+        "rx": 0.676568
+       }
+      },
+      {
+       "node": "A3",
+       "share": 0.056101,
+       "dofs": {
+        "uy": 0.227872,
+        "rx": 0.772128
+       }
+      },
+      {
+       "node": "B3",
+       "share": 0.056101,
+       "dofs": {
+        "uy": 0.227872,
+        "rx": 0.772128
+       }
+      },
+      {
+       "node": "C3",
+       "share": 0.056101,
+       "dofs": {
+        "uy": 0.227872,
+        "rx": 0.772128
+       }
+      },
+      {
+       "node": "A2",
+       "share": 0.050079,
+       "dofs": {
+        "uy": 0.135021,
+        "rx": 0.864979
+       }
+      },
+      {
+       "node": "B2",
+       "share": 0.050079,
+       "dofs": {
+        "uy": 0.135021,
+        "rx": 0.864979
+       }
+      },
+      {
+       "node": "C2",
+       "share": 0.050079,
+       "dofs": {
+        "uy": 0.135021,
+        "rx": 0.864979
+       }
+      }
+     ],
+     "members": [
+      "CA1",
+      "CA2",
+      "CA3",
+      "CA4",
+      "CA5",
+      "CB1",
+      "CB2",
+      "CB3",
+      "CB4",
+      "CB5",
+      "CC1",
+      "CC2",
+      "CC3",
+      "CC4",
+      "CC5",
+      "BA1",
+      "BB1",
+      "BA2",
+      "BB2",
+      "BA3",
+      "BB3",
+      "BA4",
+      "BB4",
+      "BA5",
+      "BB5"
+     ]
+    }
+   ]
+  }
+ }
+}

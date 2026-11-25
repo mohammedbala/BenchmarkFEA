@@ -1,0 +1,116 @@
+{
+ "name": "mgz/ex-9-1-truss-critical-load",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kN",
+  "length": "mm"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "a": {
+   "x": 0.0,
+   "y": 4000.0,
+   "z": 0.0
+  },
+  "b": {
+   "x": 4000.0,
+   "y": 4000.0,
+   "z": 0.0
+  },
+  "c": {
+   "x": 4000.0,
+   "y": 0.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "a": {
+   "dofs": {
+    "ux": "fixed",
+    "uy": "fixed",
+    "uz": "fixed"
+   }
+  },
+  "c": {
+   "dofs": {
+    "ux": "fixed",
+    "uy": "fixed",
+    "uz": "fixed"
+   }
+  },
+  "b": {
+   "dofs": {
+    "uz": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 200.0,
+   "nu": 0.3
+  }
+ },
+ "sections": {
+  "ab": {
+   "type": "properties",
+   "description": "axial-force member: Iy, Iz, J are placeholders, not used",
+   "A": 2.0,
+   "Iy": 1.0,
+   "Iz": 1.0,
+   "J": 1.0
+  },
+  "bc": {
+   "type": "properties",
+   "description": "axial-force member; I = 1e10 mm^4 keeps its own Euler load (1.2e6 kN) out of the comparison",
+   "A": 5000.0,
+   "Iy": 10000000000.0,
+   "Iz": 10000000000.0,
+   "J": 1.0
+  }
+ },
+ "members": {
+  "ab": {
+   "type": "truss",
+   "i": "a",
+   "j": "b",
+   "section": "ab",
+   "material": "M"
+  },
+  "bc": {
+   "type": "truss",
+   "i": "c",
+   "j": "b",
+   "section": "bc",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "b",
+     "Fy": -1.0
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.0
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": false,
+  "buckling": {
+   "combinations": [
+    "C"
+   ],
+   "modes": 1
+  }
+ }
+}

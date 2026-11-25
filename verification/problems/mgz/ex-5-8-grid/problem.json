@@ -1,0 +1,128 @@
+{
+ "id": "ex-5-8-grid",
+ "title": "Grid (plane frame loaded normal to its plane): bending and torsion",
+ "tier": "B",
+ "source": {
+  "work": "McGuire, W., Gallagher, R. H., Ziemian, R. D., Matrix Structural Analysis",
+  "edition": "2nd edition (copyright 2014 R. D. Ziemian)",
+  "location": "Example 5.8",
+  "pages": "pp. 116-119",
+  "notes": "input data and targets read on the cited pages; nothing of the source is reproduced"
+ },
+ "basis": "published",
+ "analysis": "Grid in the horizontal x-y plane, z vertical (model: verticalAxis Z; the source's axes are the model's). a (0, 0, 0), b (5, 0, 0), c (5, 8, 0) m, right angle at b; a and c fixed. Member ab (5 m) has the properties of member bc of Example 4.8 (I = 50e6 mm^4, J = 100e3 mm^4, A = 4e3 mm^2), member bc (8 m) those of member ab of Example 4.8 (I = 200e6 mm^4, J = 300e3 mm^4, A = 6e3 mm^2); E = 200,000 MPa, nu = 0.3. Default orientation: local y vertical for both members, so vertical loads bend them about local z and the source's I is Iz (Iy is a placeholder). Loads: 3 kN/m downward on ab, 5 kN downward at b. First order, no shear deformation.",
+ "targets": [
+  {
+   "extract": "nodeDisplacement",
+   "node": "b",
+   "dof": "uz",
+   "value": -22.37,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.00022351363433169424
+   },
+   "precisionNote": "printed \"22.37\"; tolerance = half a unit in the last printed digit; printed -22.37",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "b",
+   "dof": "rx",
+   "value": 0.004195,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 0.00011918951132300358
+   },
+   "precisionNote": "printed \"4.195e-3\"; tolerance = half a unit in the last printed digit; printed 4.195 x 10^-3",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "b",
+   "dof": "ry",
+   "value": 0.005931,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 8.430281571404485e-05
+   },
+   "precisionNote": "printed \"5.931e-3\"; tolerance = half a unit in the last printed digit; printed 5.931 x 10^-3",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "a",
+   "component": "Fz",
+   "value": 14.74,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.00033921302578019
+   },
+   "precisionNote": "printed \"14.74\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "a",
+   "component": "Mx",
+   "value": -6.45,
+   "unit": "kN mm",
+   "tolerance": {
+    "rel": 0.0007751937984496124
+   },
+   "precisionNote": "printed \"6.45\"; tolerance = half a unit in the last printed digit; printed -6.45 kNmm (torque in ab)",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "a",
+   "component": "My",
+   "value": -36210.0,
+   "unit": "kN mm",
+   "tolerance": {
+    "rel": 0.00013808340237503452
+   },
+   "precisionNote": "printed \"36.21e3\"; tolerance = half a unit in the last printed digit; printed -36.21 x 10^3 kNmm",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "c",
+   "component": "Fz",
+   "value": 5.25,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.0009523809523809524
+   },
+   "precisionNote": "printed \"5.25\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "c",
+   "component": "Mx",
+   "value": -41940.0,
+   "unit": "kN mm",
+   "tolerance": {
+    "rel": 0.00011921793037672866
+   },
+   "precisionNote": "printed \"41.94e3\"; tolerance = half a unit in the last printed digit; printed -41.94 x 10^3 kNmm",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "c",
+   "component": "My",
+   "value": -17.11,
+   "unit": "kN mm",
+   "tolerance": {
+    "rel": 0.00029222676797194627
+   },
+   "precisionNote": "printed \"17.11\"; tolerance = half a unit in the last printed digit; printed -17.11 kNmm (torque in bc)",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  }
+ ],
+ "status": "quarantined",
+ "quarantine": {
+  "diagnosis": "7 of 9 targets missed, by 1.6e-4 to 1.0e-3 relative (tolerances 8e-5 to 8e-4). Engine: w_b = -22.3845 mm, theta_xb = 4.19677e-3, theta_yb = 5.93197e-3 rad; R_za = 14.7524 kN, R_mxa = -6.4566 kN mm, R_mya = -36245.0 kN mm, R_zc = 5.2476 kN, R_mxc = -41974.2 kN mm, R_myc = -17.1114 kN mm. Printed: -22.37, 4.195e-3, 5.931e-3; 14.74, -6.45, -36.21e3, 5.25, -41.94e3, -17.11. Cause: rounding in the source's hand calculation - its stiffness coefficients are carried with three or four significant figures and later results are computed from rounded earlier ones, so the last printed digit of its results is not reliable, while the policy counts every printed digit as significant. Evidence: the exact solution of the source's printed 3 x 3 equations (with 12EI/L^3 terms rounded to 0.00949 for 0.0094875) is w_b = -22.374 mm, the printed value; the printed vertical reactions sum to 19.99 kN against the load of 20 kN. The engine's results for this model are confirmed by the other tiers that apply (tier C: OpenSeesPy and PyNite agree with the engine; tier D: equilibrium and the other invariants pass); the difference is between the source's printed digits and the exact solution of the stated problem."
+ }
+}

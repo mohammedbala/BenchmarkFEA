@@ -1,0 +1,96 @@
+{
+ "name": "aisc-commentary/case-1-us-with-shear-p150",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kip",
+  "length": "in"
+ },
+ "conventions": {
+  "verticalAxis": "Z"
+ },
+ "nodes": {
+  "a": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "b": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 336.0
+  }
+ },
+ "supports": {
+  "a": {
+   "type": "pinned",
+   "dofs": {
+    "rz": "fixed"
+   }
+  },
+  "b": {
+   "dofs": {
+    "ux": "fixed",
+    "uy": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 29000.0,
+   "G": 11153.846153846154
+  }
+ },
+ "sections": {
+  "S": {
+   "type": "properties",
+   "A": 10.71606261242298,
+   "Iy": 483.9202418768418,
+   "Iz": 483.9202418768418,
+   "J": 4.839202418768418,
+   "description": "W14x48 of the source; I calibrated on the source's own P = 0 deflection, see problem.json (source.notes); A, Iy, J do not enter the targets",
+   "Asy": 4.217379310344824
+  }
+ },
+ "members": {
+  "m": {
+   "i": "a",
+   "j": "b",
+   "section": "S",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "T": {
+   "loads": [
+    {
+     "type": "memberDistributed",
+     "member": "m",
+     "direction": "X",
+     "w1": 0.016666666666666666
+    }
+   ]
+  },
+  "P": {
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "b",
+     "Fz": -1.0
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "T": 1.0,
+    "P": 150.0
+   },
+   "analysisType": "secondOrder"
+  }
+ },
+ "analysis": {
+  "shearDeformation": true,
+  "resultStations": 3
+ }
+}

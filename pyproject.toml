@@ -28,6 +28,8 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 "benchfea.schema" = ["*.json"]
+"benchfea.verify" = ["*.json"]
+"benchfea.bench" = ["*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

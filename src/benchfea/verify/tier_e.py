@@ -126,6 +126,17 @@ def _stiff_numerics(doc):
     return doc
 
 
+def _without_buckling(doc):
+    """A stiffness series compares the combination results only; the linear buckling analysis of the
+    substitute (not compared, and slow with very stiff members) is not run."""
+    an = doc.get("analysis")
+    if an and "buckling" in an:
+        an = dict(an)
+        an.pop("buckling")
+        doc = {**doc, "analysis": an}
+    return doc
+
+
 def _same_axes(model, derived, pairs) -> str | None:
     for a, b in pairs:
         if not np.allclose(model.members[a].R, derived.members[b].R, atol=1e-12):
@@ -372,7 +383,11 @@ def _check_split(ctx) -> dict:
         # at the cut: station forces and displacement of the original member against the pieces
         fscale = max(cmp.scales["endForce"], 1e-300)
         mscale = max(cmp.scales["endMoment"], 1e-300)
-        dscale = max(cmp.scales["displacement"], 1e-300)
+        # translations: the largest of the node translations and the member-axis translations (a beam
+        # between two supports has no node translation at all)
+        dscale = max(cmp.scales["displacement"],
+                     max((float(np.abs(mr.displacements).max(initial=0.0)) for mr in cres.members.values()),
+                         default=0.0), 1e-300)
         cut_worst = {"value": 0.0}
         for mid, c in cuts.items():
             mr = cres.members[mid]
@@ -435,7 +450,7 @@ def _series(ctx, name, build, start, direction, base=None):
     s = start
     for _ in range(MAX_LEVELS):
         try:
-            m2, r2 = solve(build(s))
+            m2, r2 = solve(_without_buckling(build(s)))
             missing = [c for c in cids if c not in r2.combinations]
             if missing:
                 raise SolveFailure(f"combination {missing[0]!r} has no result in the substitute")

@@ -1,0 +1,91 @@
+{
+ "name": "aisc-commentary/case-2-us-with-shear-p0",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kip",
+  "length": "in"
+ },
+ "conventions": {
+  "verticalAxis": "Z"
+ },
+ "nodes": {
+  "a": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "b": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 336.0
+  }
+ },
+ "supports": {
+  "a": {
+   "type": "fixed"
+  },
+  "b": {
+   "dofs": {
+    "uy": "fixed",
+    "rx": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 29000.0,
+   "G": 11153.846153846154
+  }
+ },
+ "sections": {
+  "S": {
+   "type": "properties",
+   "A": 10.71606261242298,
+   "Iy": 483.9202418768418,
+   "Iz": 483.9202418768418,
+   "J": 4.839202418768418,
+   "description": "W14x48 of the source; I calibrated on the source's own P = 0 deflection, see problem.json (source.notes); A, Iy, J do not enter the targets",
+   "Asy": 5.020689655172409
+  }
+ },
+ "members": {
+  "m": {
+   "i": "a",
+   "j": "b",
+   "section": "S",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "T": {
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "b",
+     "Fx": 1.0
+    }
+   ]
+  },
+  "P": {
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "b",
+     "Fz": -1.0
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "T": 1.0
+   },
+   "analysisType": "secondOrder"
+  }
+ },
+ "analysis": {
+  "shearDeformation": true,
+  "resultStations": 3
+ }
+}

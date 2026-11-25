@@ -1,0 +1,431 @@
+{
+ "formatVersion": "1.0.0",
+ "name": "continuous beam model",
+ "units": {
+  "force": "kip",
+  "length": "in"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "N1": {
+   "x": 0,
+   "y": 0,
+   "z": 0
+  },
+  "N2": {
+   "x": 0,
+   "y": 0,
+   "z": -300
+  },
+  "N3": {
+   "x": 0,
+   "y": 0,
+   "z": -600
+  },
+  "N4": {
+   "x": 0,
+   "y": 0,
+   "z": -960
+  },
+  "N5": {
+   "x": 0,
+   "y": 0,
+   "z": -1260
+  },
+  "N6": {
+   "x": 0,
+   "y": 0,
+   "z": -1560
+  },
+  "N7": {
+   "x": 0,
+   "y": 0,
+   "z": -1860
+  },
+  "N8": {
+   "x": 0,
+   "y": 0,
+   "z": -2160
+  },
+  "H2": {
+   "x": 0,
+   "y": 0,
+   "z": -390
+  }
+ },
+ "supports": {
+  "N1": {
+   "type": "fixed"
+  },
+  "N2": {
+   "dofs": {
+    "ux": "fixed",
+    "uy": "fixed",
+    "ry": "fixed",
+    "rz": "fixed"
+   }
+  },
+  "N3": {
+   "dofs": {
+    "ux": "fixed",
+    "uy": "fixed",
+    "ry": "fixed",
+    "rz": "fixed"
+   }
+  },
+  "N4": {
+   "dofs": {
+    "ux": "fixed",
+    "uy": "fixed",
+    "ry": "fixed",
+    "rz": "fixed"
+   }
+  },
+  "N5": {
+   "dofs": {
+    "ux": "fixed",
+    "uy": "fixed",
+    "ry": "fixed",
+    "rz": "fixed"
+   }
+  },
+  "N6": {
+   "dofs": {
+    "ux": "fixed",
+    "uy": "fixed",
+    "ry": "fixed",
+    "rz": "fixed"
+   }
+  },
+  "N7": {
+   "dofs": {
+    "ux": "fixed",
+    "uy": "fixed",
+    "ry": "fixed",
+    "rz": "fixed"
+   }
+  },
+  "N8": {
+   "dofs": {
+    "ux": "fixed",
+    "uy": "fixed",
+    "ry": "fixed",
+    "rz": "fixed"
+   }
+  },
+  "H2": {
+   "dofs": {
+    "ux": "fixed",
+    "ry": "fixed",
+    "rz": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "steel": {
+   "description": "structural steel (nominal properties)",
+   "E": 29000,
+   "G": 11200,
+   "Fy": 50,
+   "Fu": 65,
+   "unitWeight": 0.000284
+  }
+ },
+ "sections": {
+  "I-24x9x0.8x0.5": {
+   "type": "I",
+   "d": 24,
+   "bf": 9,
+   "tf": 0.8,
+   "tw": 0.5,
+   "r": 0.9
+  }
+ },
+ "members": {
+  "B1": {
+   "i": "N1",
+   "j": "N2",
+   "section": "I-24x9x0.8x0.5",
+   "material": "steel"
+  },
+  "B2a": {
+   "i": "N2",
+   "j": "H2",
+   "section": "I-24x9x0.8x0.5",
+   "material": "steel"
+  },
+  "B2b": {
+   "i": "H2",
+   "j": "N3",
+   "section": "I-24x9x0.8x0.5",
+   "material": "steel",
+   "releases": {
+    "i": {
+     "rz": true
+    }
+   }
+  },
+  "B3": {
+   "i": "N3",
+   "j": "N4",
+   "section": "I-24x9x0.8x0.5",
+   "material": "steel"
+  },
+  "B4": {
+   "i": "N4",
+   "j": "N5",
+   "section": "I-24x9x0.8x0.5",
+   "material": "steel"
+  },
+  "B5": {
+   "i": "N5",
+   "j": "N6",
+   "section": "I-24x9x0.8x0.5",
+   "material": "steel"
+  },
+  "B6": {
+   "i": "N6",
+   "j": "N7",
+   "section": "I-24x9x0.8x0.5",
+   "material": "steel"
+  },
+  "B7": {
+   "i": "N7",
+   "j": "N8",
+   "section": "I-24x9x0.8x0.5",
+   "material": "steel"
+  }
+ },
+ "loadCases": {
+  "D": {
+   "description": "dead load and self weight",
+   "loads": [
+    {
+     "type": "selfWeight"
+    },
+    {
+     "type": "memberDistributed",
+     "member": "B1",
+     "direction": "Y",
+     "w1": -0.06
+    },
+    {
+     "type": "memberDistributed",
+     "member": "B2a",
+     "direction": "Y",
+     "w1": -0.06
+    },
+    {
+     "type": "memberDistributed",
+     "member": "B2b",
+     "direction": "Y",
+     "w1": -0.06
+    },
+    {
+     "type": "memberDistributed",
+     "member": "B3",
+     "direction": "Y",
+     "w1": -0.06
+    },
+    {
+     "type": "memberDistributed",
+     "member": "B4",
+     "direction": "Y",
+     "w1": -0.06
+    },
+    {
+     "type": "memberDistributed",
+     "member": "B5",
+     "direction": "Y",
+     "w1": -0.06
+    },
+    {
+     "type": "memberDistributed",
+     "member": "B6",
+     "direction": "Y",
+     "w1": -0.06
+    },
+    {
+     "type": "memberDistributed",
+     "member": "B7",
+     "direction": "Y",
+     "w1": -0.06
+    }
+   ]
+  },
+  "L1": {
+   "description": "live load on spans 1, 3, ...",
+   "loads": [
+    {
+     "type": "memberDistributed",
+     "member": "B1",
+     "direction": "Y",
+     "w1": -0.165
+    },
+    {
+     "type": "memberDistributed",
+     "member": "B3",
+     "direction": "Y",
+     "w1": -0.165
+    },
+    {
+     "type": "memberDistributed",
+     "member": "B5",
+     "direction": "Y",
+     "w1": -0.165
+    },
+    {
+     "type": "memberDistributed",
+     "member": "B7",
+     "direction": "Y",
+     "w1": -0.165
+    },
+    {
+     "type": "memberDistributed",
+     "member": "B7",
+     "direction": "Y",
+     "w1": -0.1,
+     "w2": 0,
+     "start": 0.5,
+     "end": 1
+    }
+   ]
+  },
+  "L2": {
+   "description": "live load on spans 2, 4, ...",
+   "loads": [
+    {
+     "type": "memberDistributed",
+     "member": "B2a",
+     "direction": "Y",
+     "w1": -0.165
+    },
+    {
+     "type": "memberDistributed",
+     "member": "B2b",
+     "direction": "Y",
+     "w1": -0.165
+    },
+    {
+     "type": "memberDistributed",
+     "member": "B4",
+     "direction": "Y",
+     "w1": -0.165
+    },
+    {
+     "type": "memberDistributed",
+     "member": "B6",
+     "direction": "Y",
+     "w1": -0.165
+    },
+    {
+     "type": "memberPoint",
+     "member": "B6",
+     "direction": "Y",
+     "value": -14.2,
+     "position": 0.25
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "ULS1": {
+   "factors": {
+    "D": 1.2,
+    "L1": 1.6,
+    "L2": 1.6
+   }
+  },
+  "SLS1": {
+   "factors": {
+    "D": 1,
+    "L1": 1,
+    "L2": 1
+   },
+   "purpose": "serviceability"
+  },
+  "ULS2": {
+   "factors": {
+    "D": 1.4
+   }
+  },
+  "SLS2": {
+   "factors": {
+    "L1": 1,
+    "L2": 1
+   },
+   "purpose": "serviceability"
+  },
+  "ULS3": {
+   "factors": {
+    "D": 1.2,
+    "L1": 1.6
+   }
+  },
+  "ULS4": {
+   "factors": {
+    "D": 1.2,
+    "L2": 1.6
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": false
+ },
+ "design": {
+  "defaults": {
+   "method": "LRFD"
+  },
+  "groups": {
+   "beams": {
+    "members": [
+     "B1",
+     "B2",
+     "B3",
+     "B4",
+     "B5",
+     "B6",
+     "B7"
+    ],
+    "role": "beam",
+    "bracing": {
+     "topFlange": [
+      0.2,
+      0.4,
+      0.6,
+      0.8
+     ],
+     "bottomFlange": [
+      0.5
+     ]
+    },
+    "deflectionLimits": [
+     {
+      "spanRatio": 240,
+      "direction": "y",
+      "combinations": [
+       "SLS1"
+      ]
+     },
+     {
+      "spanRatio": 360,
+      "direction": "y",
+      "combinations": [
+       "SLS2"
+      ]
+     }
+    ]
+   }
+  },
+  "members": {
+   "B2": {
+    "members": [
+     "B2a",
+     "B2b"
+    ]
+   }
+  }
+ }
+}

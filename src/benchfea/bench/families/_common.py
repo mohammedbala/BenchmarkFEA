@@ -114,29 +114,30 @@ KIP = 4.4482216152605          # kN per kip (exact factor used by benchfea.units
 # no dimension is taken from a shapes table.  Each list is ordered by increasing strength.
 # I-shapes: (d, bf, tf, tw, r); boxes: (H, B, t); pipes: (D, t).  Metric in mm, imperial in in.
 _METRIC = {
-    "beam": [(200, 100, 8, 5, 8), (250, 125, 9, 6, 10), (300, 150, 10, 7, 12), (350, 175, 11, 7, 14),
+    "beam": [(100, 55, 6, 4, 5), (120, 64, 6, 4.5, 6), (150, 75, 7, 5, 7), (180, 90, 8, 5, 8), (200, 100, 8, 5, 8), (250, 125, 9, 6, 10), (300, 150, 10, 7, 12), (350, 175, 11, 7, 14),
              (400, 180, 13, 8, 16), (450, 200, 14, 9, 18), (500, 200, 16, 10, 20), (550, 210, 18, 11, 20),
              (600, 220, 20, 12, 22), (700, 250, 22, 13, 24), (800, 300, 25, 14, 26), (900, 300, 30, 16, 28),
              (1000, 350, 35, 18, 30)],
-    "column": [(150, 150, 10, 7, 8), (200, 200, 12, 8, 12), (250, 250, 14, 9, 14), (300, 300, 16, 10, 16),
+    "column": [(100, 100, 8, 6, 6), (120, 120, 9, 6, 8), (150, 150, 10, 7, 8), (200, 200, 12, 8, 12), (250, 250, 14, 9, 14), (300, 300, 16, 10, 16),
                (350, 350, 19, 12, 18), (400, 400, 22, 13, 20), (400, 400, 30, 18, 20), (450, 400, 38, 22, 22),
                (500, 450, 45, 26, 24), (550, 500, 55, 32, 26)],
-    "box": [(80, 80, 4), (100, 100, 5), (120, 120, 6), (150, 150, 6), (180, 180, 8), (200, 200, 10),
+    "box": [(40, 40, 3), (50, 50, 3), (60, 60, 4), (80, 80, 4), (100, 100, 5), (120, 120, 6), (150, 150, 6), (180, 180, 8), (200, 200, 10),
             (250, 250, 10), (300, 300, 12), (350, 350, 14), (400, 400, 16)],
-    "pipe": [(60, 4), (76, 4), (89, 5), (114, 5), (140, 6), (168, 6), (194, 8), (219, 8), (273, 10),
+    "pipe": [(21, 2.5), (27, 3), (34, 3), (42, 3), (48, 4), (60, 4), (76, 4), (89, 5), (114, 5), (140, 6), (168, 6), (194, 8), (219, 8), (273, 10),
              (324, 10), (356, 12), (406, 12)],
 }
 _IMPERIAL = {
-    "beam": [(8, 4, 0.3, 0.2, 0.3), (10, 5, 0.35, 0.25, 0.4), (12, 6, 0.4, 0.25, 0.5), (14, 7, 0.45, 0.3, 0.5),
+    "beam": [(4, 2.2, 0.25, 0.15, 0.2), (5, 2.5, 0.25, 0.18, 0.25), (6, 3, 0.28, 0.2, 0.3), (7, 3.5, 0.3, 0.2, 0.3),
+             (8, 4, 0.3, 0.2, 0.3), (10, 5, 0.35, 0.25, 0.4), (12, 6, 0.4, 0.25, 0.5), (14, 7, 0.45, 0.3, 0.5),
              (16, 7, 0.5, 0.3, 0.6), (18, 8, 0.55, 0.35, 0.7), (20, 8, 0.65, 0.4, 0.8), (22, 8.5, 0.7, 0.45, 0.8),
              (24, 9, 0.8, 0.5, 0.9), (28, 10, 0.9, 0.5, 1), (32, 12, 1, 0.55, 1), (36, 12, 1.2, 0.65, 1.1),
              (40, 14, 1.4, 0.7, 1.2)],
-    "column": [(6, 6, 0.4, 0.25, 0.3), (8, 8, 0.45, 0.3, 0.5), (10, 10, 0.55, 0.35, 0.5), (12, 12, 0.65, 0.4, 0.6),
+    "column": [(4, 4, 0.3, 0.2, 0.25), (5, 5, 0.35, 0.25, 0.3), (6, 6, 0.4, 0.25, 0.3), (8, 8, 0.45, 0.3, 0.5), (10, 10, 0.55, 0.35, 0.5), (12, 12, 0.65, 0.4, 0.6),
                (14, 14, 0.75, 0.45, 0.7), (16, 16, 0.85, 0.5, 0.8), (16, 16, 1.2, 0.7, 0.8), (18, 16, 1.5, 0.9, 0.9),
                (20, 18, 1.8, 1, 1), (22, 20, 2.2, 1.25, 1)],
-    "box": [(3, 3, 0.15), (4, 4, 0.2), (5, 5, 0.25), (6, 6, 0.25), (7, 7, 0.3), (8, 8, 0.4), (10, 10, 0.4),
+    "box": [(1.5, 1.5, 0.12), (2, 2, 0.12), (2.5, 2.5, 0.15), (3, 3, 0.15), (4, 4, 0.2), (5, 5, 0.25), (6, 6, 0.25), (7, 7, 0.3), (8, 8, 0.4), (10, 10, 0.4),
             (12, 12, 0.5), (14, 14, 0.55), (16, 16, 0.65)],
-    "pipe": [(2.4, 0.15), (3, 0.15), (3.5, 0.2), (4.5, 0.2), (5.5, 0.25), (6.6, 0.25), (7.6, 0.3), (8.6, 0.3),
+    "pipe": [(0.8, 0.1), (1.05, 0.12), (1.3, 0.12), (1.7, 0.12), (1.9, 0.15), (2.4, 0.15), (3, 0.15), (3.5, 0.2), (4.5, 0.2), (5.5, 0.25), (6.6, 0.25), (7.6, 0.3), (8.6, 0.3),
              (10.8, 0.4), (12.8, 0.4), (14, 0.5), (16, 0.5)],
 }
 CATALOGUE = {"metric": _METRIC, "imperial": _IMPERIAL}
@@ -201,6 +202,8 @@ class Builder:
         self.design_groups: dict[str, dict] = {}
         self.design_members: dict[str, dict] = {}
         self.auto_members = True
+        #: combination whose elastic stability the generator checks (None: nothing to buckle)
+        self.stability_combination: str | None = "ULS1"
         self._late = []
         self.parameters: dict = {}
 
@@ -402,6 +405,12 @@ class Builder:
     def section_names(self) -> dict:
         return {g: section_definition(v["kind"], v["index"], self.unit_system)[0] for g, v in self.groups.items()}
 
+    def request_buckling(self, wanted: bool, modes: int = 1) -> bool:
+        """Ask for a linear buckling analysis of the stability combination in the file."""
+        if wanted and self.stability_combination:
+            self.analysis["buckling"] = {"combinations": [self.stability_combination], "modes": modes}
+        return "buckling" in self.analysis
+
     def render(self, fast: bool = False) -> dict:
         """The input document for the current catalogue indices of the sizing groups.
         ``fast=True``: every combination first order and no buckling analysis -- the model the
@@ -490,6 +499,16 @@ def add_combinations(builder: "Builder", candidates, count: int, second_order: b
 def service_ids(candidates, count: int) -> list:
     return [cid for cid, _, purpose in list(candidates)[:count] if purpose == "serviceability"]
 
+
+#: Probability that a model of a level asks for a linear buckling analysis in the file: zero.  No
+#: foreign solver reproduces linear buckling, so a file that asks for it cannot pass the cross-check
+#: (verification tier C); the feature is therefore OPT-IN (``features={"buckling": True}``).  The draw
+#: is still consumed, so that the flag does not change the rest of the model.
+BUCKLING_CHANCE = {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.0}
+BUCKLING_FLAG = ("linear buckling analysis of combination ULS1 requested in the file (opt-in: not reproduced "
+                 "by the foreign solvers)")
+#: Same for tension-only bracing: opt-in (``features={"tensionOnly": True}``).
+TENSION_ONLY_CHANCE = 0.0
 
 BRACING_PATTERNS = (
     ("both flanges braced at the quarter points", {"topFlange": [0.25, 0.5, 0.75], "bottomFlange": [0.25, 0.5, 0.75]}),

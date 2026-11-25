@@ -1,0 +1,163 @@
+{
+ "id": "propped-cantilever-self-weight",
+ "title": "Propped cantilever under its own weight",
+ "tier": "B",
+ "source": {
+  "work": "Bentley Systems, STAAD.Pro Help, Verification Examples (public documentation, docs.bentley.com)",
+  "edition": "STAAD.Pro Help v21 build (pages refer to the STAAD.Pro 2023 sample files), read 2026-11-22",
+  "location": "'V. Forces on a Propped Cantilever 2' (https://docs.bentley.com/LiveContent/web/STAAD.Pro%20Help-v21/en/GUID-A8D232D3-FBB3-4D80-BFD5-B5D25123CD7B.html)",
+  "pages": "web page",
+  "notes": "problem statement taken from the vendor page (text and input listing). The page cites: Roark and Young, Formulas for Stress and Strain, 5th ed., p. 109, no. 23 - NOT opened for this project; no number is taken from it. The page's 'theory' values are recorded as printed; the program's own results are not used."
+ },
+ "basis": "recomputed-from-published-statement",
+ "analysis": "Plane problem in the global X-Y plane (Y vertical); the out-of-plane DOFs (uz, rx, ry) of every node are held; in-plane bending about local z. Beam of 100 in, simply supported at node 1 (x = 0), built in at x = 100 in; A = 4 in^2, Iz = 1.3333 in^4, depth 2 in, E = 30e6 psi; load = self weight with the density of the page's input listing, 0.282072 lb/in^3 (the page's text rounds it to 0.2821; the printed results correspond to the listing). A node at x = 42.15 in. First-order analysis, no shear deformation. Reference values: computed here from this statement (verification/derive/vendor_reference.py); the textbook cited by the vendor page was not opened and no number is taken from it.",
+ "targets": [
+  {
+   "extract": "reaction",
+   "node": "a",
+   "component": "Fy",
+   "value": 42.3108,
+   "unit": "lbf",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (ODE oracle); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "reaction",
+   "node": "b",
+   "component": "Fy",
+   "value": 70.518,
+   "unit": "lbf",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (ODE oracle); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "reaction",
+   "node": "b",
+   "component": "Mz",
+   "value": -1410.3600000000001,
+   "unit": "lbf in",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (ODE oracle); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "a",
+   "dof": "rz",
+   "value": -0.0005876646916172905,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (ODE oracle); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "c",
+   "dof": "uy",
+   "value": -0.015277744346623434,
+   "unit": "in",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (ODE oracle); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "m1",
+   "quantity": "Mz",
+   "relative": 1.0,
+   "value": 781.12929636,
+   "unit": "lbf in",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (ODE oracle); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "reaction",
+   "node": "a",
+   "component": "Fy",
+   "value": 42.31,
+   "unit": "lbf",
+   "tolerance": {
+    "rel": 0.00011817537225242258
+   },
+   "precisionNote": "printed \"42.31\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign as the source"
+  },
+  {
+   "extract": "reaction",
+   "node": "b",
+   "component": "Fy",
+   "value": 70.52,
+   "unit": "lbf",
+   "tolerance": {
+    "rel": 7.090187180941577e-05
+   },
+   "precisionNote": "printed \"70.52\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign as the source"
+  },
+  {
+   "extract": "reaction",
+   "node": "b",
+   "component": "Mz",
+   "value": -1410.4,
+   "unit": "lbf in",
+   "tolerance": {
+    "rel": 3.545093590470789e-05
+   },
+   "precisionNote": "printed \"1410.4\"; tolerance = half a unit in the last printed digit",
+   "sign": "the page prints a magnitude; sign from the reference solution, engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "m1",
+   "quantity": "Mz",
+   "relative": 1.0,
+   "value": 781.1804699999999,
+   "unit": "lbf in",
+   "tolerance": {
+    "rel": 8.533879501621438e-05
+   },
+   "precisionNote": "printed \"585.9\" x 1.3333 (unit conversion / common factor of the source); tolerance = half a unit in the last printed digit; the page prints the bending stress at the node at 42.15 in (psi); moment = stress x Iz / (depth/2) = stress x 1.3333 in^3",
+   "sign": "sagging: positive Mz (local y up)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "a",
+   "dof": "rz",
+   "value": -0.000588,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 0.0008503401360544217
+   },
+   "precisionNote": "printed \"0.000588\"; tolerance = half a unit in the last printed digit",
+   "sign": "printed negative; same sense (rotation about +Z)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "c",
+   "dof": "uy",
+   "value": -0.01528,
+   "unit": "in",
+   "tolerance": {
+    "rel": 0.0003272251308900524
+   },
+   "precisionNote": "printed \"0.01528\"; tolerance = half a unit in the last printed digit",
+   "sign": "printed negative; downward"
+  }
+ ],
+ "status": "active"
+}

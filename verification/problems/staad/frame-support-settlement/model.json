@@ -1,0 +1,143 @@
+{
+ "name": "staad/frame-support-settlement",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kN",
+  "length": "mm"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "n1": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n2": {
+   "x": 0.0,
+   "y": 7500.0,
+   "z": 0.0
+  },
+  "n3": {
+   "x": 6000.0,
+   "y": 7500.0,
+   "z": 0.0
+  },
+  "n4": {
+   "x": 6000.0,
+   "y": 2500.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "n1": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed",
+    "ux": "fixed",
+    "uy": "fixed"
+   }
+  },
+  "n2": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "n3": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "n4": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed",
+    "uy": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 21.7184,
+   "nu": 0.17
+  }
+ },
+ "sections": {
+  "col": {
+   "type": "properties",
+   "A": 240000.0,
+   "Iz": 7200000000.0,
+   "Iy": 7200000000.0,
+   "J": 7200000000.0
+  },
+  "beam": {
+   "type": "properties",
+   "A": 480000.0,
+   "Iz": 14400000000.0,
+   "Iy": 14400000000.0,
+   "J": 14400000000.0
+  }
+ },
+ "members": {
+  "m1": {
+   "i": "n1",
+   "j": "n2",
+   "section": "col",
+   "material": "M"
+  },
+  "m2": {
+   "i": "n2",
+   "j": "n3",
+   "section": "beam",
+   "material": "M"
+  },
+  "m3": {
+   "i": "n3",
+   "j": "n4",
+   "section": "col",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "A": {
+   "loads": [
+    {
+     "type": "supportDisplacement",
+     "node": "n1",
+     "uy": -10.0
+    }
+   ]
+  },
+  "D": {
+   "loads": [
+    {
+     "type": "supportDisplacement",
+     "node": "n4",
+     "uy": -10.0
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "LC1": {
+   "factors": {
+    "A": 1.0
+   }
+  },
+  "LC2": {
+   "factors": {
+    "D": 1.0
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": false
+ }
+}

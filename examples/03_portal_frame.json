@@ -1,0 +1,58 @@
+{
+  "formatVersion": "1.0.0",
+  "name": "Example 03 - portal frame, second-order analysis, rigid end offsets",
+  "description": "12 m x 6 m portal frame with pinned bases; the beam is flexible only between the column faces (rigid end offsets of half the column depth); strength combinations are analysed second order.",
+  "units": {"force": "kN", "length": "mm"},
+  "conventions": {"verticalAxis": "Z"},
+  "nodes": {
+    "N1": {"x": 0, "y": 0, "z": 0},
+    "N2": {"x": 0, "y": 0, "z": 6000},
+    "N3": {"x": 12000, "y": 0, "z": 6000},
+    "N4": {"x": 12000, "y": 0, "z": 0}
+  },
+  "supports": {
+    "N1": {"type": "pinned", "dofs": {"rx": "fixed", "rz": "fixed"}},
+    "N4": {"type": "pinned", "dofs": {"rx": "fixed", "rz": "fixed"}},
+    "N2": {"dofs": {"uy": "fixed", "rx": "fixed", "rz": "fixed"}},
+    "N3": {"dofs": {"uy": "fixed", "rx": "fixed", "rz": "fixed"}}
+  },
+  "materials": {
+    "steel": {"description": "structural steel", "E": 200, "G": 77, "Fy": 0.345, "Fu": 0.45, "unitWeight": 7.7e-08}
+  },
+  "sections": {
+    "I-300x300x16x10": {"type": "I", "d": 300, "bf": 300, "tf": 16, "tw": 10, "r": 16},
+    "I-600x220x20x12": {"type": "I", "d": 600, "bf": 220, "tf": 20, "tw": 12, "r": 22}
+  },
+  "members": {
+    "C1": {"i": "N1", "j": "N2", "section": "I-300x300x16x10", "material": "steel"},
+    "C2": {"i": "N4", "j": "N3", "section": "I-300x300x16x10", "material": "steel"},
+    "B1": {"i": "N2", "j": "N3", "section": "I-600x220x20x12", "material": "steel", "offsets": {"axes": "global", "i": [150, 0, 0], "j": [-150, 0, 0]}}
+  },
+  "loadCases": {
+    "D": {"description": "dead load and self weight", "loads": [
+      {"type": "selfWeight"},
+      {"type": "memberDistributed", "member": "B1", "direction": "Z", "w1": -0.02}
+    ]},
+    "L": {"description": "live load", "loads": [
+      {"type": "memberDistributed", "member": "B1", "direction": "Z", "w1": -0.015}
+    ]},
+    "W": {"description": "wind", "loads": [
+      {"type": "nodal", "node": "N2", "Fx": 30},
+      {"type": "memberDistributed", "member": "C1", "direction": "X", "w1": 0.003}
+    ]}
+  },
+  "combinations": {
+    "ULS1": {"description": "gravity", "factors": {"D": 1.2, "L": 1.6}, "analysisType": "secondOrder"},
+    "ULS2": {"description": "gravity and wind", "factors": {"D": 1.2, "L": 0.5, "W": 1.0}, "analysisType": "secondOrder"},
+    "ULS2-first-order": {"description": "ULS2 analysed first order, for comparison", "factors": {"D": 1.2, "L": 0.5, "W": 1.0}},
+    "SLS": {"description": "service wind drift and beam deflection", "factors": {"D": 1.0, "L": 1.0, "W": 0.6}, "purpose": "serviceability"}
+  },
+  "analysis": {"shearDeformation": false, "resultStations": 21, "buckling": {"combinations": ["ULS1"], "modes": 2}},
+  "design": {
+    "defaults": {"method": "LRFD"},
+    "groups": {
+      "columns": {"members": ["C1", "C2"], "role": "column", "Kx": 1.0, "Ky": 1.0, "bracing": {"minor": [0.5], "torsion": [0.5]}},
+      "beams": {"members": ["B1"], "role": "beam", "bracing": {"topFlange": [0.2, 0.4, 0.6, 0.8], "bottomFlange": [0.2, 0.4, 0.6, 0.8]}, "deflectionLimits": [{"spanRatio": 240, "direction": "y", "combinations": ["SLS"]}]}
+    }
+  }
+}

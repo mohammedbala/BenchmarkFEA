@@ -1,0 +1,95 @@
+{
+ "id": "ex-5-9-portal-axially-rigid",
+ "title": "Portal frame, axial deformation neglected: vertical and horizontal load",
+ "tier": "B",
+ "source": {
+  "work": "McGuire, W., Gallagher, R. H., Ziemian, R. D., Matrix Structural Analysis",
+  "edition": "2nd edition (copyright 2014 R. D. Ziemian)",
+  "location": "Example 5.9",
+  "pages": "pp. 119-120",
+  "notes": "input data and targets read on the cited pages; nothing of the source is reproduced"
+ },
+ "basis": "published",
+ "analysis": "Plane (x-y) problem of the source modelled in 3D with the global Y axis vertical, so that the source's x, y and theta_z are the model's X, Y and rz. In-plane bending is about local z for every member (default orientation), hence the source's I is the section's Iz. a (0, 0), b (0, 5), c (8, 5), d (8, 0) m; a and d fixed. Columns I = 50e6 mm^4, beam I = 200e6 mm^4, E = 200,000 MPa. The source neglects axial deformation. The engine always includes axial deformation; the source's assumption is represented by a member area of 1e8 mm^2 for every member (four orders of magnitude above the areas the source uses for the same members elsewhere, 4e3 and 6e3 mm^2), one value for all problems of this kind. The remaining axial flexibility changes the targets by less than 1e-5 of their value (measured by repeating the analysis with 1e9 mm^2; see README.md), far below their printed precision. Combination W: 2 kN/m downward on the beam; combination H: 2.5 kN (+x) at b and at c. First order, no shear deformation. Section properties the source does not give because they do not enter its plane model (Iy, J; A where stated) are placeholders that do not influence the targets. ",
+ "targets": [
+  {
+   "extract": "nodeDisplacement",
+   "node": "b",
+   "dof": "rz",
+   "combination": "W",
+   "value": -0.000593,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 0.0008431703204047217
+   },
+   "precisionNote": "printed \"0.000593\"; tolerance = half a unit in the last printed digit; printed -0.000593",
+   "sign": "moment / rotation about z, counter-clockwise positive in the source = rz / Mz of the engine"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "c",
+   "dof": "rz",
+   "combination": "W",
+   "value": 0.000593,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 0.0008431703204047217
+   },
+   "precisionNote": "printed \"0.000593\"; tolerance = half a unit in the last printed digit; the source states theta_c = -theta_b (symmetry)",
+   "sign": "moment / rotation about z, counter-clockwise positive in the source = rz / Mz of the engine"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "b",
+   "dof": "ux",
+   "combination": "H",
+   "value": 3.09,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.0016181229773462784
+   },
+   "precisionNote": "printed \"3.09\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "c",
+   "dof": "ux",
+   "combination": "H",
+   "value": 3.09,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.0016181229773462784
+   },
+   "precisionNote": "printed \"3.09\"; tolerance = half a unit in the last printed digit; the source states u_c = u_b",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "b",
+   "dof": "rz",
+   "combination": "H",
+   "value": -0.000195,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 0.002564102564102564
+   },
+   "precisionNote": "printed \"0.000195\"; tolerance = half a unit in the last printed digit; printed -0.000195",
+   "sign": "moment / rotation about z, counter-clockwise positive in the source = rz / Mz of the engine"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "c",
+   "dof": "rz",
+   "combination": "H",
+   "value": -0.000195,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 0.002564102564102564
+   },
+   "precisionNote": "printed \"0.000195\"; tolerance = half a unit in the last printed digit; printed -0.000195; the source states theta_c = theta_b (antisymmetry)",
+   "sign": "moment / rotation about z, counter-clockwise positive in the source = rz / Mz of the engine"
+  }
+ ],
+ "status": "active"
+}

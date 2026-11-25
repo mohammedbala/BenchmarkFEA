@@ -1,0 +1,93 @@
+{
+ "id": "beam-point-moment",
+ "title": "Simply supported beam, concentrated moment at 0.4 L",
+ "tier": "A",
+ "source": {
+  "work": "derived here (no publication): benchfea.oracle direct integration of the member equations / numerically solved characteristic equation",
+  "edition": "",
+  "location": "verification/derive/derive_problems.py, problem 'beam-point-moment'",
+  "pages": "",
+  "notes": "regenerate with: python3 verification/derive/derive_problems.py"
+ },
+ "basis": "derived-here",
+ "analysis": "First order, no shear deformation. Span 6 m; moment of 30 kN m about the member's local z axis at x = 2.4 m.",
+ "targets": [
+  {
+   "path": "/combinations/C/reactions/a/Fz",
+   "value": 5.000000000000002,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "path": "/combinations/C/reactions/b/Fz",
+   "value": -5.000000000000002,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "extract": "memberStation",
+   "combination": "C",
+   "member": "m",
+   "quantity": "Mz",
+   "relative": 0.4,
+   "side": "left",
+   "value": 11.999999999999996,
+   "unit": "kN m",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "extract": "memberStation",
+   "combination": "C",
+   "member": "m",
+   "quantity": "Mz",
+   "relative": 0.4,
+   "side": "right",
+   "value": -18.000000000000004,
+   "unit": "kN m",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "extract": "memberStation",
+   "combination": "C",
+   "member": "m",
+   "quantity": "uy",
+   "relative": 0.4,
+   "side": "left",
+   "value": 0.00043199999999999944,
+   "unit": "m",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "extract": "memberStation",
+   "combination": "C",
+   "member": "m",
+   "quantity": "uy",
+   "relative": 0.7,
+   "side": "left",
+   "value": 0.0005804999999999999,
+   "unit": "m",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "path": "/combinations/C/displacements/a/ry",
+   "value": -5.9999999999999805e-05,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  }
+ ],
+ "status": "active"
+}

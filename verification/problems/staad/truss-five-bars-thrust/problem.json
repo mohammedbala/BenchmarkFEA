@@ -1,0 +1,78 @@
+{
+ "id": "truss-five-bars-thrust",
+ "title": "Statically indeterminate five-bar truss: horizontal reaction",
+ "tier": "B",
+ "source": {
+  "work": "Bentley Systems, STAAD.Pro Help, Verification Examples (public documentation, docs.bentley.com)",
+  "edition": "STAAD.Pro Help v21 build (pages refer to the STAAD.Pro 2023 sample files), read 2026-11-22",
+  "location": "'V. Reactions in a 2D Truss Model 3' (https://docs.bentley.com/LiveContent/web/STAAD.Pro%20Help-v21/en/GUID-A59F1504-07A9-4DE5-B09E-0FD8E1A37AAB.html)",
+  "pages": "web page",
+  "notes": "problem statement taken from the vendor page (text and input listing). The page cites: Timoshenko, Strength of Materials, Part I, 3rd ed. 1956, p. 346, problem 3 - NOT opened for this project; no number is taken from it. The page's 'theory' values are recorded as printed; the program's own results are not used."
+ },
+ "basis": "recomputed-from-published-statement",
+ "analysis": "Plane truss (X-Y plane, Y vertical; uz of every joint held): joints 1 (0, 0), 2 (150, 100), 3 (150, 50), 4 (300, 0) in; bars 1-2 and 2-4 with A = 5 in^2, 1-3 and 3-4 with A = 3 in^2, 2-3 with A = 2 in^2; E = 30,000 ksi; joints 1 and 4 pinned; 10 kip downward at joint 2. Target of the page: the horizontal reaction. Reference values: computed here from this statement (verification/derive/vendor_reference.py); the textbook cited by the vendor page was not opened and no number is taken from it.",
+ "targets": [
+  {
+   "extract": "reaction",
+   "node": "n4",
+   "component": "Fx",
+   "value": -8.765945449907761,
+   "unit": "kip",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (plane truss program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "reaction",
+   "node": "n1",
+   "component": "Fx",
+   "value": 8.765945449907761,
+   "unit": "kip",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (plane truss program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n2",
+   "dof": "uy",
+   "value": -0.016233535741509063,
+   "unit": "in",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (plane truss program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "m3",
+   "quantity": "N",
+   "relative": 0.5,
+   "value": -1.687927266543678,
+   "unit": "kip",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (plane truss program); tolerance = policy floor 1e-6",
+   "sign": "tension positive"
+  },
+  {
+   "extract": "reaction",
+   "node": "n4",
+   "component": "Fx",
+   "value": -8.77,
+   "unit": "kip",
+   "tolerance": {
+    "rel": 0.0005701254275940707
+   },
+   "precisionNote": "printed \"8.77\"; tolerance = half a unit in the last printed digit",
+   "sign": "the page prints a magnitude; sign from the reference solution, engine convention (docs/CONVENTIONS.md)"
+  }
+ ],
+ "status": "active"
+}

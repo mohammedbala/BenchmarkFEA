@@ -1,0 +1,122 @@
+{
+ "name": "derived/beam-on-spring-supports",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kN",
+  "length": "m"
+ },
+ "conventions": {
+  "verticalAxis": "Z"
+ },
+ "nodes": {
+  "a": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "b": {
+   "x": 4.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "c": {
+   "x": 9.0,
+   "y": 0.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "a": {
+   "dofs": {
+    "ux": "fixed",
+    "uy": "fixed",
+    "rx": "fixed",
+    "uz": {
+     "spring": 5000.0
+    },
+    "ry": {
+     "spring": 2000.0
+    }
+   }
+  },
+  "b": {
+   "dofs": {
+    "uy": "fixed",
+    "uz": {
+     "spring": 8000.0
+    }
+   }
+  },
+  "c": {
+   "dofs": {
+    "uy": "fixed",
+    "uz": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 200000000.0,
+   "nu": 0.3
+  }
+ },
+ "sections": {
+  "S": {
+   "type": "properties",
+   "A": 0.01,
+   "Iy": 0.0001,
+   "Iz": 0.0002,
+   "J": 0.00015
+  }
+ },
+ "members": {
+  "m1": {
+   "section": "S",
+   "material": "M",
+   "i": "a",
+   "j": "b"
+  },
+  "m2": {
+   "section": "S",
+   "material": "M",
+   "i": "b",
+   "j": "c"
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "memberDistributed",
+     "member": "m1",
+     "direction": "Z",
+     "w1": -10.0
+    },
+    {
+     "type": "memberDistributed",
+     "member": "m2",
+     "direction": "Z",
+     "w1": -10.0
+    },
+    {
+     "type": "memberPoint",
+     "member": "m1",
+     "direction": "Z",
+     "value": -30.0,
+     "position": 0.4
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.0
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": false,
+  "resultStations": 11
+ }
+}

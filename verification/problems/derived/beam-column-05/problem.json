@@ -1,0 +1,101 @@
+{
+ "id": "beam-column-05",
+ "title": "Simply supported beam-column, uniform load, axial compression 0.5 P_e",
+ "tier": "A",
+ "source": {
+  "work": "derived here (no publication): benchfea.oracle direct integration of the member equations / numerically solved characteristic equation",
+  "edition": "",
+  "location": "verification/derive/derive_problems.py, problem 'beam-column-05'",
+  "pages": "",
+  "notes": "regenerate with: python3 verification/derive/derive_problems.py"
+ },
+ "basis": "derived-here",
+ "analysis": "Second order (member equations with the axial force acting on the deflected axis), no shear deformation. Span 6 m, EI = 40 000 kN m^2 in both planes, uniform load 8 kN/m, axial force 0.5 x pi^2 EI / L^2 in compression.",
+ "targets": [
+  {
+   "extract": "memberStation",
+   "combination": "C",
+   "member": "m",
+   "quantity": "uy",
+   "relative": 0.5,
+   "side": "left",
+   "value": -0.00676221753711144,
+   "unit": "m",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "extract": "memberStation",
+   "combination": "C",
+   "member": "m",
+   "quantity": "Mz",
+   "relative": 0.5,
+   "side": "left",
+   "value": 73.07800664744371,
+   "unit": "kN m",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "extract": "memberStation",
+   "combination": "C",
+   "member": "m",
+   "quantity": "uy",
+   "relative": 0.2,
+   "side": "left",
+   "value": -0.003996684520524745,
+   "unit": "m",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "extract": "memberStation",
+   "combination": "C",
+   "member": "m",
+   "quantity": "Mz",
+   "relative": 0.2,
+   "side": "left",
+   "value": 44.95427507418707,
+   "unit": "kN m",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "path": "/combinations/C/displacements/a/ry",
+   "value": 0.0035753180834719937,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "path": "/combinations/C/reactions/a/Fz",
+   "value": 23.999999999999996,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "extract": "memberStation",
+   "combination": "C",
+   "member": "m",
+   "quantity": "N",
+   "relative": 0.5,
+   "side": "left",
+   "value": -5483.113556160754,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  }
+ ],
+ "status": "quarantined",
+ "quarantine": {
+  "diagnosis": "Tier A passes: every target (ODE oracle) is reproduced to better than 1e-10.  Tier C does not: the largest difference between the engine and OpenSeesPy 3.8.0 (PDelta transformation, 16 elements per member) is 3.19e-3 (rotation at a support), the allowed difference under the rule of benchfea.crosscheck.cross_check -- 1e-6 plus the estimated discretisation error of the OpenSees run -- is 3.15e-3.  The estimate is |fine - coarse| / (ratio^2 - 1), the LEADING-ORDER value of the OpenSees error itself, not a bound: when the engine is exact the difference is expected to equal the estimate, and whether it lands just below or just above is decided by the next term of the error expansion.  Evidence that the difference is OpenSees's discretisation error and not an engine error: the ODE oracle agrees with the engine to 1e-10, and the difference equals the estimate to 1.3 %.  The tolerance rule was NOT widened to make this case pass (docs/VERIFICATION.md, 'Second-order cross-checks'; open question for the project owner).  In addition PyNite's estimated error (1.1e-2) exceeds the 5e-3 limit for an eligible solver, so only one foreign solver represents this model."
+ }
+}

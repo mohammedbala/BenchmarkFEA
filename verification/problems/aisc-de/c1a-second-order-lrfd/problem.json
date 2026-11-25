@@ -1,0 +1,107 @@
+{
+ "id": "c1a-second-order-lrfd",
+ "title": "AISC Design Example C1.A: second-order frame results, LRFD",
+ "tier": "B",
+ "source": {
+  "work": "American Institute of Steel Construction, Companion to the AISC Steel Construction Manual, Volume 1: Design Examples",
+  "edition": "Version 16.0 (2023)",
+  "location": "Example C.1A, Fig. C.1A-4, LRFD column",
+  "pages": "pp. C-2 to C-6",
+  "notes": "input data and targets read on the cited pages and figures; nothing of the source is reproduced. The source's results are output of unnamed analysis software; the area of the W18x40, the leaning column and link properties and the treatment of axial and shear deformation are not stated (see analysis)"
+ },
+ "basis": "published",
+ "analysis": "Example C.1A (direct analysis method), LRFD: columns B and C W12x65 (Ag = 19.1 in^2, Ix = 533 in^4, given in Examples C.1A-C), 20 ft, pinned bases; beam W18x40 (Ix = 612 in^4, given in C.1C), 30 ft, rigidly connected; a pin-ended leaning column linked to column C by a pin-ended bar at roof level (30 ft to the right; the distance does not matter for rigid bars); E = 29,000 ksi x 0.8. Loads: beam load 2.40 kip/ft, 36.0 kips on each frame column, 144 kips on the leaning column, lateral load 0.576 kip at the top of column B toward column C. Second-order analysis (the engine's members carry the exact stability functions: P-Delta and P-delta). Plane frame in the global X-Y plane (Y vertical), out-of-plane DOFs held, Iy = 1000 Ix so that no out-of-plane buckling enters (the source's analysis is plane). NOT given by the source and chosen here: beam, link and leaning column axially rigid (A = 1e5 in^2); no shear deformation. The source's results are output of unnamed software.",
+ "targets": [
+  {
+   "extract": "nodeDisplacement",
+   "node": "B1",
+   "dof": "ux",
+   "value": 0.29,
+   "unit": "in",
+   "tolerance": {
+    "rel": 0.001724137931034483
+   },
+   "precisionNote": "printed \"0.290\"; tolerance = half a unit in the last printed digit; drift = average of the drifts at grid lines B and C in the source; equal at B and C here (axially rigid beam)",
+   "sign": "the lateral load acts along +X; drift +X"
+  },
+  {
+   "extract": "memberStation",
+   "member": "colB",
+   "quantity": "Mz",
+   "relative": 1.0,
+   "value": 1308.0,
+   "unit": "kip in",
+   "tolerance": {
+    "rel": 0.0045871559633027525
+   },
+   "precisionNote": "printed \"109\" x 12 (unit conversion / common factor of the source); tolerance = half a unit in the last printed digit; column moment at the beam, printed in kip-ft",
+   "sign": "magnitude in the source's figure; in the engine's convention (column local x upward, local y = global +X, local z = -Z) the top moment Mz is positive in column B and negative in column C"
+  },
+  {
+   "extract": "reaction",
+   "node": "B0",
+   "component": "Fx",
+   "value": 5.52,
+   "unit": "kip",
+   "tolerance": {
+    "rel": 0.0009057971014492755
+   },
+   "precisionNote": "printed \"5.52\"; tolerance = half a unit in the last printed digit; horizontal base reaction",
+   "sign": "the source's arrows: toward +X at column B, toward -X at column C (force by the support on the structure)"
+  },
+  {
+   "extract": "reaction",
+   "node": "B0",
+   "component": "Fy",
+   "value": 71.4,
+   "unit": "kip",
+   "tolerance": {
+    "rel": 0.0007002801120448179
+   },
+   "precisionNote": "printed \"71.4\"; tolerance = half a unit in the last printed digit; vertical base reaction",
+   "sign": "upward"
+  },
+  {
+   "extract": "memberStation",
+   "member": "colC",
+   "quantity": "Mz",
+   "relative": 1.0,
+   "value": -1524.0,
+   "unit": "kip in",
+   "tolerance": {
+    "rel": 0.003937007874015748
+   },
+   "precisionNote": "printed \"127\" x 12 (unit conversion / common factor of the source); tolerance = half a unit in the last printed digit; column moment at the beam, printed in kip-ft",
+   "sign": "magnitude in the source's figure; in the engine's convention (column local x upward, local y = global +X, local z = -Z) the top moment Mz is positive in column B and negative in column C"
+  },
+  {
+   "extract": "reaction",
+   "node": "C0",
+   "component": "Fx",
+   "value": -6.26,
+   "unit": "kip",
+   "tolerance": {
+    "rel": 0.0007987220447284346
+   },
+   "precisionNote": "printed \"6.26\"; tolerance = half a unit in the last printed digit; horizontal base reaction",
+   "sign": "the source's arrows: toward +X at column B, toward -X at column C (force by the support on the structure)"
+  },
+  {
+   "extract": "reaction",
+   "node": "C0",
+   "component": "Fy",
+   "value": 72.6,
+   "unit": "kip",
+   "tolerance": {
+    "rel": 0.0006887052341597797
+   },
+   "precisionNote": "printed \"72.6\"; tolerance = half a unit in the last printed digit; vertical base reaction",
+   "sign": "upward"
+  }
+ ],
+ "status": "quarantined",
+ "quarantine": {
+  "diagnosis": "4 of 7 targets missed (drift, base shears, and column moments where printed with three figures). Cause: the source's model is not completely specified, and the missing part matters at the printed precision. The source's figures are output of unnamed analysis software; the source gives Ag and Ix of the W12x65 and Ix of the W18x40 but no shear areas, and does not say whether shear deformation is included. The model built here from the given data (no shear deformation) is systematically stiffer: first-order drift 1.8 % to 2.2 % smaller, base shears and column moments 0.4 % to 1.0 % larger than printed, vertical reactions reproduced (they follow from statics). Evidence that shear deformation in the source's software is the cause (parameter study, README.md; Example C.1B, first order, LRFD: printed drift 0.145 in, base shears 5.64 and 6.21 kips; without shear deformation 0.1422 in, 5.671 and 6.247 kips): with shear deformation and shear areas of about 4.5 in^2 (column) and 5 to 6 in^2 (beam) - values of the size of the web areas of such shapes, NOT taken from any table and NOT entered in the model - the same analysis gives 0.145 in, 5.64 and 6.21 kips. The beam area, which the source does not give either, is not the cause: between 5 in^2 and an axially rigid beam the average drift of grid lines B and C changes by less than 1e-5 in and the base shears by 0.15 %. The second-order to first-order drift ratios of the engine (C.1A LRFD 0.28935 / 0.17770 = 1.63, source 1.60; C.1B LRFD 1.45, source 1.41) are consistent with the same difference in first-order stiffness. Because the shear areas are not given by the source and no opened reference supplies them, the example cannot be completed without a guess: not usable as a target at the printed precision; kept, evaluated and reported, never counted as passed."
+ },
+ "limitsNote": "The source does not state the beam area, the leaning column / link properties or the treatment of axial and shear deformation in its software; see README.md for the measured influence of the choices made here."
+}

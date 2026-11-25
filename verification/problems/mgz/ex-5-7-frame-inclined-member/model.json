@@ -1,0 +1,93 @@
+{
+ "name": "mgz/ex-5-7-frame-inclined-member",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kN",
+  "length": "mm"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "a": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "b": {
+   "x": 7416.198487095663,
+   "y": 3000.0,
+   "z": 0.0
+  },
+  "c": {
+   "x": 15416.198487095662,
+   "y": 3000.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "a": {
+   "type": "fixed"
+  },
+  "c": {
+   "type": "fixed"
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 200.0,
+   "nu": 0.3
+  }
+ },
+ "sections": {
+  "s": {
+   "type": "properties",
+   "A": 6000.0,
+   "Iy": 200000000.0,
+   "Iz": 200000000.0,
+   "J": 200000000.0
+  }
+ },
+ "members": {
+  "ab": {
+   "i": "a",
+   "j": "b",
+   "section": "s",
+   "material": "M"
+  },
+  "bc": {
+   "i": "b",
+   "j": "c",
+   "section": "s",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "b",
+     "Fx": 18.75,
+     "Fy": -46.35
+    },
+    {
+     "type": "memberDistributed",
+     "member": "bc",
+     "direction": "Y",
+     "w1": -0.004
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.0
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": false
+ }
+}

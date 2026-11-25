@@ -1,0 +1,134 @@
+{
+ "id": "ex-13-12-spring-chain-changed",
+ "title": "Chain of axial springs: flexibility matrix of the changed structure",
+ "tier": "B",
+ "source": {
+  "work": "McGuire, W., Gallagher, R. H., Ziemian, R. D., Matrix Structural Analysis",
+  "edition": "2nd edition (copyright 2014 R. D. Ziemian)",
+  "location": "Example 13.12, summary result (changed structure)",
+  "pages": "pp. 411-412",
+  "notes": "input data and targets read on the cited pages; nothing of the source is reproduced"
+ },
+ "basis": "published",
+ "analysis": "Pin-jointed plane truss in the x-y plane (global Y vertical): members of type 'truss'; the out-of-plane translation of every joint is held by a support (it has no stiffness in a plane truss). Chain of four axial springs along x between fixed ends 1 and 5, free nodes 2, 3, 4. The source's stiffnesses are dimensionless; here kN/mm: k = 2, 2, 3, 2 (member 1-2 changed from 1 to 2). Each spring is a truss member of 1000 mm with E = 200 kN/mm^2 and A = 5 k mm^2 (EA/L = k). The transverse translations of the collinear joints are held. Three combinations with a unit load (1 kN) at node 2, 3, 4: the displacements are the flexibility coefficients the source prints as exact fractions. First order.",
+ "targets": [
+  {
+   "extract": "nodeDisplacement",
+   "node": "n2",
+   "dof": "ux",
+   "combination": "P2",
+   "value": 0.36363636363636365,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "exact rational number printed in the source (16/44); tolerance = policy floor 1e-6",
+   "sign": "displacement and load along +x"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n2",
+   "dof": "ux",
+   "combination": "P3",
+   "value": 0.22727272727272727,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "exact rational number printed in the source (10/44); tolerance = policy floor 1e-6",
+   "sign": "displacement and load along +x"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n2",
+   "dof": "ux",
+   "combination": "P4",
+   "value": 0.13636363636363635,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "exact rational number printed in the source (6/44); tolerance = policy floor 1e-6",
+   "sign": "displacement and load along +x"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n3",
+   "dof": "ux",
+   "combination": "P2",
+   "value": 0.22727272727272727,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "exact rational number printed in the source (10/44); tolerance = policy floor 1e-6",
+   "sign": "displacement and load along +x"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n3",
+   "dof": "ux",
+   "combination": "P3",
+   "value": 0.45454545454545453,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "exact rational number printed in the source (20/44); tolerance = policy floor 1e-6",
+   "sign": "displacement and load along +x"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n3",
+   "dof": "ux",
+   "combination": "P4",
+   "value": 0.2727272727272727,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "exact rational number printed in the source (12/44); tolerance = policy floor 1e-6",
+   "sign": "displacement and load along +x"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n4",
+   "dof": "ux",
+   "combination": "P2",
+   "value": 0.13636363636363635,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "exact rational number printed in the source (6/44); tolerance = policy floor 1e-6",
+   "sign": "displacement and load along +x"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n4",
+   "dof": "ux",
+   "combination": "P3",
+   "value": 0.2727272727272727,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "exact rational number printed in the source (12/44); tolerance = policy floor 1e-6",
+   "sign": "displacement and load along +x"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n4",
+   "dof": "ux",
+   "combination": "P4",
+   "value": 0.36363636363636365,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "exact rational number printed in the source (16/44); tolerance = policy floor 1e-6",
+   "sign": "displacement and load along +x"
+  }
+ ],
+ "status": "active"
+}

@@ -1,0 +1,275 @@
+{
+ "formatVersion": "1.0.0",
+ "name": "continuous beam model",
+ "units": {
+  "force": "N",
+  "length": "m"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "N1": {
+   "x": 0,
+   "y": 0,
+   "z": 0
+  },
+  "N2": {
+   "x": 11.5,
+   "y": 0,
+   "z": 0
+  },
+  "N3": {
+   "x": 21,
+   "y": 0,
+   "z": 0
+  },
+  "N4": {
+   "x": 30.5,
+   "y": 0,
+   "z": 0
+  },
+  "N5": {
+   "x": 42,
+   "y": 0,
+   "z": 0
+  }
+ },
+ "supports": {
+  "N1": {
+   "type": "fixed"
+  },
+  "N2": {
+   "dofs": {
+    "uy": "fixed",
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "N3": {
+   "dofs": {
+    "uy": "fixed",
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "N4": {
+   "dofs": {
+    "uy": "fixed",
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "N5": {
+   "dofs": {
+    "uy": "fixed",
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed",
+    "rz": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "steel": {
+   "description": "structural steel (nominal properties)",
+   "E": 200000000,
+   "G": 77000000,
+   "Fy": 345000,
+   "Fu": 450000,
+   "unitWeight": 77
+  }
+ },
+ "sections": {
+  "I-450x200x14x9": {
+   "type": "I",
+   "d": 0.45,
+   "bf": 0.2,
+   "tf": 0.014,
+   "tw": 0.009,
+   "r": 0.018
+  }
+ },
+ "members": {
+  "B1": {
+   "i": "N1",
+   "j": "N2",
+   "section": "I-450x200x14x9",
+   "material": "steel"
+  },
+  "B2": {
+   "i": "N2",
+   "j": "N3",
+   "section": "I-450x200x14x9",
+   "material": "steel"
+  },
+  "B3": {
+   "i": "N3",
+   "j": "N4",
+   "section": "I-450x200x14x9",
+   "material": "steel"
+  },
+  "B4": {
+   "i": "N4",
+   "j": "N5",
+   "section": "I-450x200x14x9",
+   "material": "steel"
+  }
+ },
+ "loadCases": {
+  "D": {
+   "description": "dead load and self weight",
+   "loads": [
+    {
+     "type": "selfWeight"
+    },
+    {
+     "type": "memberDistributed",
+     "member": "B1",
+     "direction": "Y",
+     "w1": -13
+    },
+    {
+     "type": "memberDistributed",
+     "member": "B2",
+     "direction": "Y",
+     "w1": -13
+    },
+    {
+     "type": "memberDistributed",
+     "member": "B3",
+     "direction": "Y",
+     "w1": -13
+    },
+    {
+     "type": "memberDistributed",
+     "member": "B4",
+     "direction": "Y",
+     "w1": -13
+    }
+   ]
+  },
+  "L1": {
+   "description": "live load on spans 1, 3, ...",
+   "loads": [
+    {
+     "type": "memberDistributed",
+     "member": "B1",
+     "direction": "Y",
+     "w1": -8
+    },
+    {
+     "type": "memberDistributed",
+     "member": "B3",
+     "direction": "Y",
+     "w1": -8
+    }
+   ]
+  },
+  "L2": {
+   "description": "live load on spans 2, 4, ...",
+   "loads": [
+    {
+     "type": "memberDistributed",
+     "member": "B2",
+     "direction": "Y",
+     "w1": -8
+    },
+    {
+     "type": "memberDistributed",
+     "member": "B4",
+     "direction": "Y",
+     "w1": -8
+    },
+    {
+     "type": "memberPoint",
+     "member": "B4",
+     "direction": "Y",
+     "value": -75,
+     "position": 0.25
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "ULS1": {
+   "factors": {
+    "D": 1.2,
+    "L1": 1.6,
+    "L2": 1.6
+   }
+  },
+  "SLS1": {
+   "factors": {
+    "D": 1,
+    "L1": 1,
+    "L2": 1
+   },
+   "purpose": "serviceability"
+  },
+  "ULS2": {
+   "factors": {
+    "D": 1.4
+   }
+  },
+  "SLS2": {
+   "factors": {
+    "L1": 1,
+    "L2": 1
+   },
+   "purpose": "serviceability"
+  },
+  "ULS3": {
+   "factors": {
+    "D": 1.2,
+    "L1": 1.6
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": false
+ },
+ "design": {
+  "defaults": {
+   "method": "LRFD"
+  },
+  "groups": {
+   "beams": {
+    "members": [
+     "B1",
+     "B2",
+     "B3",
+     "B4"
+    ],
+    "role": "beam",
+    "bracing": {
+     "topFlange": [
+      0.5
+     ],
+     "bottomFlange": [
+      0.5
+     ]
+    },
+    "deflectionLimits": [
+     {
+      "spanRatio": 240,
+      "direction": "y",
+      "combinations": [
+       "SLS1"
+      ]
+     },
+     {
+      "spanRatio": 360,
+      "direction": "y",
+      "combinations": [
+       "SLS2"
+      ]
+     }
+    ]
+   }
+  }
+ }
+}

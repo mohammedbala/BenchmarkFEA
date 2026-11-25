@@ -1,0 +1,123 @@
+{
+ "name": "staad/bent-cantilever-with-prop",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kip",
+  "length": "in"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "n1": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n2": {
+   "x": 0.0,
+   "y": 10.0,
+   "z": 0.0
+  },
+  "n3": {
+   "x": 0.0,
+   "y": 20.0,
+   "z": 0.0
+  },
+  "n4": {
+   "x": 10.0,
+   "y": 20.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "n1": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed",
+    "ux": "fixed",
+    "uy": "fixed",
+    "rz": "fixed"
+   }
+  },
+  "n2": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed",
+    "ux": "fixed"
+   }
+  },
+  "n3": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "n4": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 3000.0,
+   "nu": 0.17
+  }
+ },
+ "sections": {
+  "S": {
+   "type": "properties",
+   "A": 10.0,
+   "Iz": 100.0,
+   "Iy": 100.0,
+   "J": 100.0
+  }
+ },
+ "members": {
+  "m1": {
+   "i": "n1",
+   "j": "n2",
+   "section": "S",
+   "material": "M"
+  },
+  "m2": {
+   "i": "n2",
+   "j": "n3",
+   "section": "S",
+   "material": "M"
+  },
+  "m3": {
+   "i": "n3",
+   "j": "n4",
+   "section": "S",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "n4",
+     "Fy": -1.0
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.0
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": false
+ }
+}

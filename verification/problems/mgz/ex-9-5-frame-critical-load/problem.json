@@ -1,0 +1,32 @@
+{
+ "id": "ex-9-5-frame-critical-load",
+ "title": "Two-storey column with beams: elastic critical load",
+ "tier": "B",
+ "source": {
+  "work": "McGuire, W., Gallagher, R. H., Ziemian, R. D., Matrix Structural Analysis",
+  "edition": "2nd edition (copyright 2014 R. D. Ziemian)",
+  "location": "Example 9.5, case 1 (alpha = 0)",
+  "pages": "p. 251",
+  "notes": "input data and targets read on the cited pages; nothing of the source is reproduced"
+ },
+ "basis": "published",
+ "analysis": "Plane (x-y) problem of the source modelled in 3D with the global Y axis vertical, so that the source's x, y and theta_z are the model's X, Y and rz. In-plane bending is about local z for every member (default orientation), hence the source's I is the section's Iz. a (0, 0), b (0, 6), c (0, 10), d (4, 6), e (4, 10) m. Column ab-bc: A = 2.5e4 mm^2, I = 6.36e8 mm^4; beams bd, ce (rigidly connected to the column): A = 1.76e4 mm^2, I = 8.61e8 mm^4; E = 200,000 MPa. a is pinned; d and e are on rollers that hold the vertical displacement only (as drawn in the source). Reference load 1 kN downward at c; the buckling factor is the critical load in kN. Linear buckling analysis. The engine's members carry the exact stability functions (no discretisation error for a prismatic member with constant axial force); the source's computed values use a stated number of elements with a polynomial (approximate) geometric stiffness. The source models each member as a single element. Plane stability problem: the source's model has no out-of-plane degrees of freedom. Here the out-of-plane DOFs (uz, rx, ry) of every node are held and Iy = 1000 Iz, so that no out-of-plane buckling mode precedes the in-plane modes compared; J is a placeholder. ",
+ "targets": [
+  {
+   "extract": "bucklingFactor",
+   "combination": "C",
+   "mode": 1,
+   "value": 6630.0,
+   "unit": "kN (factor on 1 kN)",
+   "tolerance": {
+    "rel": 7.541478129713424e-05
+   },
+   "precisionNote": "printed \"6630\"; tolerance = half a unit in the last printed digit; computed by the source with one element per member and the polynomial geometric stiffness of its Eq. 9.14: an approximation by construction, no error bound stated",
+   "sign": "positive factor on a compressive load"
+  }
+ ],
+ "status": "quarantined",
+ "quarantine": {
+  "diagnosis": "Source value is a discretised approximation; no stated error bound. Engine (exact stability functions): 6609.41 kN; printed 6630 kN (one element per member with the polynomial geometric stiffness of the source's Eq. 9.14); difference 0.31 %, tolerance from the printed precision 7.5e-5. Evidence that the difference is the source's discretisation error: a plane-frame calculation with the source's own element matrices (Eq. 4.34 and Eq. 9.14) gives 6629.6 kN with one element per member - the printed value - and 6610.8 and 6609.39 kN with two and eight elements per member, converging to the engine's value. (That calculation is a diagnosis aid, not a verification tier.) Buckling factors cannot be cross-checked by the foreign solvers of tier C."
+ }
+}

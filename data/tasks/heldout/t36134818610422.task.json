@@ -1,0 +1,85 @@
+{
+ "format": "benchfea-task",
+ "formatVersion": "1.0.0",
+ "id": "t36134818610422",
+ "taskType": "predict",
+ "mode": "no-solver",
+ "family": "braced_frame",
+ "difficulty": 3,
+ "split": "held-out",
+ "quantities": [
+  {
+   "kind": "displacement",
+   "combination": "SLS2",
+   "node": "B1",
+   "component": "rz",
+   "unit": "rad",
+   "id": "q1",
+   "text": "rotation rz of node B1 in combination SLS2 [rad], global axes"
+  },
+  {
+   "kind": "displacement",
+   "combination": "SLS2",
+   "node": "C3",
+   "component": "rz",
+   "unit": "rad",
+   "id": "q2",
+   "text": "rotation rz of node C3 in combination SLS2 [rad], global axes"
+  },
+  {
+   "kind": "reaction",
+   "combination": "SLS1",
+   "node": "B0",
+   "component": "Fx",
+   "unit": "kN",
+   "id": "q3",
+   "text": "reaction force Fx at node B0 in combination SLS1 [kN], global axes, acting on the structure"
+  },
+  {
+   "kind": "memberEndForce",
+   "combination": "SLS1",
+   "member": "BB2",
+   "end": "j",
+   "component": "Fx",
+   "unit": "kN",
+   "id": "q4",
+   "text": "end force Fx at end j of member BB2 in combination SLS1 [kN], member local axes, acting on the member (docs/CONVENTIONS.md)"
+  },
+  {
+   "kind": "memberMaxMoment",
+   "combination": "ULS3",
+   "member": "CB1",
+   "component": "Mz",
+   "unit": "kN*m",
+   "id": "q5",
+   "text": "largest absolute bending moment Mz along member CB1 in combination ULS3 [kN*m] (a non-negative number; local axes)"
+  },
+  {
+   "kind": "displacement",
+   "combination": "ULS4",
+   "node": "C2",
+   "component": "ux",
+   "unit": "m",
+   "id": "q6",
+   "text": "translation ux of node C2 in combination ULS4 [m], global axes"
+  }
+ ],
+ "answerFormat": {
+  "values": {
+   "q1": "number",
+   "q2": "number",
+   "q3": "number",
+   "q4": "number",
+   "q5": "number",
+   "q6": "number"
+  }
+ },
+ "statement": "TASK (predict): give the named results of the model in the file below, exactly as it is given.\nStructure: braced frame. Mode no-solver: the analysis tool is disabled; inspect the file and reason from it.\nSign conventions, axes and units are those of docs/CONVENTIONS.md; every number you give is in the units of the model file.\n\nQuantities:\n  q1: rotation rz of node B1 in combination SLS2 [rad], global axes\n  q2: rotation rz of node C3 in combination SLS2 [rad], global axes\n  q3: reaction force Fx at node B0 in combination SLS1 [kN], global axes, acting on the structure\n  q4: end force Fx at end j of member BB2 in combination SLS1 [kN], member local axes, acting on the member (docs/CONVENTIONS.md)\n  q5: largest absolute bending moment Mz along member CB1 in combination ULS3 [kN*m] (a non-negative number; local axes)\n  q6: translation ux of node C2 in combination ULS4 [m], global axes\n\nSubmit your answer as JSON of this form:\n{\n \"values\": {\n  \"q1\": 0.0,\n  \"q2\": 0.0,\n  \"q3\": 0.0,\n  \"q4\": 0.0,\n  \"q5\": 0.0,\n  \"q6\": 0.0\n }\n}",
+ "verification": {
+  "status": "verified",
+  "scope": "analysis results of the given model",
+  "meaning": "'verified' means only: the reference solution passed every tier listed as applicable in this record, at the tolerances stated in it. It does not mean reviewed, approved or certified by anyone.",
+  "policy": "docs/VERIFICATION.md; the tiers passed and the tolerances are in the answers file and in the info returned when the episode ends"
+ },
+ "modelFile": "t36134818610422.model.json"
+}

@@ -1,0 +1,200 @@
+{
+ "id": "ex-5-4-space-truss",
+ "title": "Pin-jointed space truss: four bars to one loaded joint",
+ "tier": "B",
+ "source": {
+  "work": "McGuire, W., Gallagher, R. H., Ziemian, R. D., Matrix Structural Analysis",
+  "edition": "2nd edition (copyright 2014 R. D. Ziemian)",
+  "location": "Example 5.4",
+  "pages": "pp. 104-106",
+  "notes": "input data and targets read on the cited pages; nothing of the source is reproduced"
+ },
+ "basis": "published",
+ "analysis": "Space truss, global z vertical (model: verticalAxis Z, the source's axes are the model's). Joint a (2, 4, 8) m; pinned supports b (0, 0, 0), c (8, 0, 0), d (8, 6, 0), e (0, 6, 0) m - from the source's table of member projections (ab: -2, -4, -8; ac: 6, -4, -8; ad: 6, 2, -8; ae: -2, 2, -8). A = 20e3 (ab), 30e3 (ac), 40e3 (ad), 30e3 (ae) mm^2; E = 200,000 MPa. Loads at a: 200 kN (x), 600 kN (y), -800 kN (z). Members of type 'truss'. First order.",
+ "targets": [
+  {
+   "extract": "nodeDisplacement",
+   "node": "a",
+   "dof": "ux",
+   "value": 0.1783,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.0002804262478968032
+   },
+   "precisionNote": "printed \"0.1783\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "a",
+   "dof": "uy",
+   "value": 2.722,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.00018368846436443793
+   },
+   "precisionNote": "printed \"2.722\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "a",
+   "dof": "uz",
+   "value": -0.4863,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.00010281719103434095
+   },
+   "precisionNote": "printed \"0.4863\"; tolerance = half a unit in the last printed digit; printed -0.4863",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "b",
+   "component": "Fx",
+   "value": -76.4,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.0006544502617801048
+   },
+   "precisionNote": "printed \"76.4\"; tolerance = half a unit in the last printed digit; printed -76.4",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "b",
+   "component": "Fy",
+   "value": -152.8,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.0003272251308900524
+   },
+   "precisionNote": "printed \"152.8\"; tolerance = half a unit in the last printed digit; printed -152.8",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "b",
+   "component": "Fz",
+   "value": -305.6,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.0001636125654450262
+   },
+   "precisionNote": "printed \"305.6\"; tolerance = half a unit in the last printed digit; printed -305.6",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "c",
+   "component": "Fx",
+   "value": 170.8,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.0002927400468384075
+   },
+   "precisionNote": "printed \"170.8\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "c",
+   "component": "Fy",
+   "value": -113.8,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.00043936731107205627
+   },
+   "precisionNote": "printed \"113.8\"; tolerance = half a unit in the last printed digit; printed -113.8",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "c",
+   "component": "Fz",
+   "value": -227.7,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.00021958717610891528
+   },
+   "precisionNote": "printed \"227.7\"; tolerance = half a unit in the last printed digit; printed -227.7",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "d",
+   "component": "Fx",
+   "value": -470.7,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.00010622477161674103
+   },
+   "precisionNote": "printed \"470.7\"; tolerance = half a unit in the last printed digit; printed -470.7",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "d",
+   "component": "Fy",
+   "value": -156.9,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.00031867431485022306
+   },
+   "precisionNote": "printed \"156.9\"; tolerance = half a unit in the last printed digit; printed -156.9",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "d",
+   "component": "Fz",
+   "value": 627.8,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 7.96431984708506e-05
+   },
+   "precisionNote": "printed \"627.8\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "e",
+   "component": "Fx",
+   "value": 176.3,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.0002836074872376631
+   },
+   "precisionNote": "printed \"176.3\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "e",
+   "component": "Fy",
+   "value": -176.3,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.0002836074872376631
+   },
+   "precisionNote": "printed \"176.3\"; tolerance = half a unit in the last printed digit; printed -176.3",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "e",
+   "component": "Fz",
+   "value": 705.5,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 7.087172218284905e-05
+   },
+   "precisionNote": "printed \"705.5\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  }
+ ],
+ "status": "quarantined",
+ "quarantine": {
+  "diagnosis": "8 of 15 targets missed, by up to 2.4e-3 relative for u_a (engine 0.17787 mm, printed 0.1783 mm) and up to 7.5e-4 for the reactions; v_a reproduced (2.72196 against 2.722), w_a -0.48652 against -0.4863. Cause: rounding in the source's hand calculation - its stiffness coefficients are carried with three or four significant figures and later results are computed from rounded earlier ones, so the last printed digit of its results is not reliable, while the policy counts every printed digit as significant. Evidence: the printed displacements are the exact solution of the source's printed 3 x 3 matrix (0.17823, 2.72215, -0.48631), whose coefficients are sums of products rounded to four digits (for example 2.5215 entered as 2.522); the small displacement u_a is sensitive to that rounding. The printed reactions leave a residual of 0.2 kN in the y direction (sum -599.8 kN against the load of 600 kN); the engine's none. The engine's results for this model are confirmed by the other tiers that apply (tier C: OpenSeesPy and PyNite agree with the engine; tier D: equilibrium and the other invariants pass); the difference is between the source's printed digits and the exact solution of the stated problem."
+ }
+}

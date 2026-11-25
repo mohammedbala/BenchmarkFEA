@@ -1,0 +1,85 @@
+{
+ "name": "mgz/ex-12-7-cantilever-column-critical-loads",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kN",
+  "length": "mm"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "a": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "b": {
+   "x": 0.0,
+   "y": 10000.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "a": {
+   "type": "fixed"
+  },
+  "b": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 200.0,
+   "nu": 0.3
+  }
+ },
+ "sections": {
+  "s": {
+   "type": "properties",
+   "A": 7200.0,
+   "Iy": 150000000000.0,
+   "Iz": 150000000.0,
+   "J": 150000000.0
+  }
+ },
+ "members": {
+  "ab": {
+   "i": "a",
+   "j": "b",
+   "section": "s",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "b",
+     "Fy": -1.0
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.0
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": false,
+  "buckling": {
+   "combinations": [
+    "C"
+   ],
+   "modes": 2
+  }
+ }
+}

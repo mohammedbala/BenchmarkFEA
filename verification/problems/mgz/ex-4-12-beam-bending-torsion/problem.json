@@ -1,0 +1,128 @@
+{
+ "id": "ex-4-12-beam-bending-torsion",
+ "title": "Fixed-ended beam with an eccentric load: bending and torsion",
+ "tier": "B",
+ "source": {
+  "work": "McGuire, W., Gallagher, R. H., Ziemian, R. D., Matrix Structural Analysis",
+  "edition": "2nd edition (copyright 2014 R. D. Ziemian)",
+  "location": "Example 4.12",
+  "pages": "pp. 83-84",
+  "notes": "input data and targets read on the cited pages; nothing of the source is reproduced"
+ },
+ "basis": "published",
+ "analysis": "Plane (x-y) problem of the source modelled in 3D with the global Y axis vertical, so that the source's x, y and theta_z are the model's X, Y and rz. In-plane bending is about local z for every member (default orientation), hence the source's I is the section's Iz. Beam of Example 4.8 along x: a (0), b (8 m), c (13 m). ab: A = 6e3 mm^2, Iz = 200e6 mm^4, J = 300e3 mm^4; bc: A = 4e3 mm^2, Iz = 50e6 mm^4, J = 100e3 mm^4; E = 200,000 MPa, nu = 0.3. The source omits bending normal to the plane: Iy is a placeholder (= Iz) that does not influence the targets. a and c fixed, no support at b. A 1 kN downward force acts on a rigid bracket projecting 40 mm from the beam axis at b in the +z direction: entered as the source does, Fy = -1 kN and a torque Mx = +40 kN mm at b. First order; Saint-Venant torsion.",
+ "targets": [
+  {
+   "extract": "nodeDisplacement",
+   "node": "b",
+   "dof": "uy",
+   "value": -0.545,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.0009174311926605504
+   },
+   "precisionNote": "printed \"0.545\"; tolerance = half a unit in the last printed digit; printed -0.545",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "b",
+   "dof": "rx",
+   "value": 0.009044,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 5.5285272003538254e-05
+   },
+   "precisionNote": "printed \"0.009044\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "b",
+   "dof": "rz",
+   "value": -2.63e-05,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 0.0019011406844106464
+   },
+   "precisionNote": "printed \"0.0000263\"; tolerance = half a unit in the last printed digit; printed -0.0000263",
+   "sign": "moment / rotation about z, counter-clockwise positive in the source = rz / Mz of the engine"
+  },
+  {
+   "extract": "reaction",
+   "node": "a",
+   "component": "Fy",
+   "value": 0.423,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.001182033096926714
+   },
+   "precisionNote": "printed \"0.423\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "a",
+   "component": "Mx",
+   "value": -26.1,
+   "unit": "kN mm",
+   "tolerance": {
+    "rel": 0.0019157088122605363
+   },
+   "precisionNote": "printed \"26.1\"; tolerance = half a unit in the last printed digit; printed -26.1 kNmm",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "a",
+   "component": "Mz",
+   "value": 1781.0,
+   "unit": "kN mm",
+   "tolerance": {
+    "rel": 0.00028074115665356543
+   },
+   "precisionNote": "printed \"1.781\" x 1000 (unit conversion / common factor of the source); tolerance = half a unit in the last printed digit",
+   "sign": "moment / rotation about z, counter-clockwise positive in the source = rz / Mz of the engine"
+  },
+  {
+   "extract": "reaction",
+   "node": "c",
+   "component": "Fy",
+   "value": 0.586,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.0008532423208191127
+   },
+   "precisionNote": "printed \"0.586\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "c",
+   "component": "Mx",
+   "value": -13.9,
+   "unit": "kN mm",
+   "tolerance": {
+    "rel": 0.0035971223021582736
+   },
+   "precisionNote": "printed \"13.9\"; tolerance = half a unit in the last printed digit; printed -13.9 kNmm",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "c",
+   "component": "Mz",
+   "value": -1413.0,
+   "unit": "kN mm",
+   "tolerance": {
+    "rel": 0.00035385704175513094
+   },
+   "precisionNote": "printed \"1.413\" x 1000 (unit conversion / common factor of the source); tolerance = half a unit in the last printed digit; printed -1.413 kNm",
+   "sign": "moment / rotation about z, counter-clockwise positive in the source = rz / Mz of the engine"
+  }
+ ],
+ "status": "quarantined",
+ "quarantine": {
+  "diagnosis": "6 of 9 targets missed. Engine: v_b = -0.54573 mm, theta_xb = 0.00904348 rad, R_ya = 0.41295 kN, R_mza = 1783.4 kN mm, R_yc = 0.58705 kN, R_mzc = -1415.0 kN mm. Printed: -0.545, 0.009044, 0.423, 1.781 kN m, 0.586, -1.413 kN m. Two causes. (1) Suspected misprint: the printed reaction vector gives R_ya = 0.423 kN, but the source's own figure of the deflected structure labels this reaction .413 kN, and vertical equilibrium with the 1 kN load requires R_ya + R_yc = 1 (0.423 + 0.586 = 1.009; engine 0.41295 + 0.58705 = 1.00000). (2) Cause: rounding in the source's hand calculation - its stiffness coefficients are carried with three or four significant figures and later results are computed from rounded earlier ones, so the last printed digit of its results is not reliable, while the policy counts every printed digit as significant. The remaining misses are 6e-5 to 1.8e-3 relative (v_b from the three-digit coefficient 0.00949; theta_xb = 40/(200 x 22.115) with the torsional stiffness rounded to five digits; reactions from the rounded displacements). The engine's results for this model are confirmed by the other tiers that apply (tier C: OpenSeesPy and PyNite agree with the engine; tier D: equilibrium and the other invariants pass); the difference is between the source's printed digits and the exact solution of the stated problem."
+ }
+}

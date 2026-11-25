@@ -1,0 +1,113 @@
+{
+  "formatVersion": "1.0.0",
+  "name": "Example 05 - braced three-storey frame with tension-only X-bracing",
+  "description": "Two bays, three storeys; beams pinned to continuous columns; tension-only X-bracing in bay A-B. Load combinations with wind in both directions, linear buckling of the gravity combination, design groups.",
+  "units": {"force": "kN", "length": "m"},
+  "conventions": {"verticalAxis": "Z"},
+  "nodes": {
+    "A0": {"x": 0, "y": 0, "z": 0},
+    "A1": {"x": 0, "y": 0, "z": 4},
+    "A2": {"x": 0, "y": 0, "z": 7.5},
+    "A3": {"x": 0, "y": 0, "z": 11},
+    "B0": {"x": 6, "y": 0, "z": 0},
+    "B1": {"x": 6, "y": 0, "z": 4},
+    "B2": {"x": 6, "y": 0, "z": 7.5},
+    "B3": {"x": 6, "y": 0, "z": 11},
+    "C0": {"x": 12, "y": 0, "z": 0},
+    "C1": {"x": 12, "y": 0, "z": 4},
+    "C2": {"x": 12, "y": 0, "z": 7.5},
+    "C3": {"x": 12, "y": 0, "z": 11}
+  },
+  "supports": {
+    "A0": {"type": "pinned", "dofs": {"rx": "fixed", "rz": "fixed"}},
+    "A1": {"dofs": {"uy": "fixed", "rx": "fixed", "rz": "fixed"}},
+    "A2": {"dofs": {"uy": "fixed", "rx": "fixed", "rz": "fixed"}},
+    "A3": {"dofs": {"uy": "fixed", "rx": "fixed", "rz": "fixed"}},
+    "B0": {"type": "pinned", "dofs": {"rx": "fixed", "rz": "fixed"}},
+    "B1": {"dofs": {"uy": "fixed", "rx": "fixed", "rz": "fixed"}},
+    "B2": {"dofs": {"uy": "fixed", "rx": "fixed", "rz": "fixed"}},
+    "B3": {"dofs": {"uy": "fixed", "rx": "fixed", "rz": "fixed"}},
+    "C0": {"type": "pinned", "dofs": {"rx": "fixed", "rz": "fixed"}},
+    "C1": {"dofs": {"uy": "fixed", "rx": "fixed", "rz": "fixed"}},
+    "C2": {"dofs": {"uy": "fixed", "rx": "fixed", "rz": "fixed"}},
+    "C3": {"dofs": {"uy": "fixed", "rx": "fixed", "rz": "fixed"}}
+  },
+  "materials": {
+    "steel": {"description": "structural steel", "E": 200000000, "G": 77000000, "Fy": 345000, "Fu": 450000, "unitWeight": 77}
+  },
+  "sections": {
+    "I-200x200x12x8": {"type": "I", "d": 0.2, "bf": 0.2, "tf": 0.012, "tw": 0.008, "r": 0.012},
+    "I-400x180x13x8": {"type": "I", "d": 0.4, "bf": 0.18, "tf": 0.013, "tw": 0.008, "r": 0.016},
+    "Pipe-60x4": {"type": "pipe", "D": 0.06, "t": 0.004}
+  },
+  "members": {
+    "CA1": {"i": "A0", "j": "A1", "section": "I-200x200x12x8", "material": "steel"},
+    "CA2": {"i": "A1", "j": "A2", "section": "I-200x200x12x8", "material": "steel"},
+    "CA3": {"i": "A2", "j": "A3", "section": "I-200x200x12x8", "material": "steel"},
+    "CB1": {"i": "B0", "j": "B1", "section": "I-200x200x12x8", "material": "steel"},
+    "CB2": {"i": "B1", "j": "B2", "section": "I-200x200x12x8", "material": "steel"},
+    "CB3": {"i": "B2", "j": "B3", "section": "I-200x200x12x8", "material": "steel"},
+    "CC1": {"i": "C0", "j": "C1", "section": "I-200x200x12x8", "material": "steel"},
+    "CC2": {"i": "C1", "j": "C2", "section": "I-200x200x12x8", "material": "steel"},
+    "CC3": {"i": "C2", "j": "C3", "section": "I-200x200x12x8", "material": "steel"},
+    "BA1": {"i": "A1", "j": "B1", "section": "I-400x180x13x8", "material": "steel", "releases": {"i": {"rz": true}, "j": {"rz": true}}},
+    "BB1": {"i": "B1", "j": "C1", "section": "I-400x180x13x8", "material": "steel", "releases": {"i": {"rz": true}, "j": {"rz": true}}},
+    "BA2": {"i": "A2", "j": "B2", "section": "I-400x180x13x8", "material": "steel", "releases": {"i": {"rz": true}, "j": {"rz": true}}},
+    "BB2": {"i": "B2", "j": "C2", "section": "I-400x180x13x8", "material": "steel", "releases": {"i": {"rz": true}, "j": {"rz": true}}},
+    "BA3": {"i": "A3", "j": "B3", "section": "I-400x180x13x8", "material": "steel", "releases": {"i": {"rz": true}, "j": {"rz": true}}},
+    "BB3": {"i": "B3", "j": "C3", "section": "I-400x180x13x8", "material": "steel", "releases": {"i": {"rz": true}, "j": {"rz": true}}},
+    "X1a": {"type": "tensionOnly", "i": "A0", "j": "B1", "section": "Pipe-60x4", "material": "steel"},
+    "X1b": {"type": "tensionOnly", "i": "B0", "j": "A1", "section": "Pipe-60x4", "material": "steel"},
+    "X2a": {"type": "tensionOnly", "i": "A1", "j": "B2", "section": "Pipe-60x4", "material": "steel"},
+    "X2b": {"type": "tensionOnly", "i": "B1", "j": "A2", "section": "Pipe-60x4", "material": "steel"},
+    "X3a": {"type": "tensionOnly", "i": "A2", "j": "B3", "section": "Pipe-60x4", "material": "steel"},
+    "X3b": {"type": "tensionOnly", "i": "B2", "j": "A3", "section": "Pipe-60x4", "material": "steel"}
+  },
+  "loadCases": {
+    "D": {"description": "dead load and self weight", "loads": [
+      {"type": "selfWeight"},
+      {"type": "memberDistributed", "member": "BA1", "direction": "Z", "w1": -30},
+      {"type": "memberDistributed", "member": "BB1", "direction": "Z", "w1": -30},
+      {"type": "memberDistributed", "member": "BA2", "direction": "Z", "w1": -30},
+      {"type": "memberDistributed", "member": "BB2", "direction": "Z", "w1": -30},
+      {"type": "memberDistributed", "member": "BA3", "direction": "Z", "w1": -21},
+      {"type": "memberDistributed", "member": "BB3", "direction": "Z", "w1": -21}
+    ]},
+    "L": {"description": "live load", "loads": [
+      {"type": "memberDistributed", "member": "BA1", "direction": "Z", "w1": -18},
+      {"type": "memberDistributed", "member": "BB1", "direction": "Z", "w1": -18},
+      {"type": "memberDistributed", "member": "BA2", "direction": "Z", "w1": -18},
+      {"type": "memberDistributed", "member": "BB2", "direction": "Z", "w1": -18},
+      {"type": "memberDistributed", "member": "BA3", "direction": "Z", "w1": -6},
+      {"type": "memberDistributed", "member": "BB3", "direction": "Z", "w1": -6}
+    ]},
+    "W": {"description": "wind from the left (storey forces)", "loads": [
+      {"type": "nodal", "node": "A1", "Fx": 24},
+      {"type": "nodal", "node": "A2", "Fx": 26},
+      {"type": "nodal", "node": "A3", "Fx": 15}
+    ]},
+    "N": {"description": "minimum lateral load: 0.2 % of the dead + live load of each level", "loads": [
+      {"type": "nodal", "node": "A1", "Fx": 1.2},
+      {"type": "nodal", "node": "A2", "Fx": 1.2},
+      {"type": "nodal", "node": "A3", "Fx": 0.7}
+    ]}
+  },
+  "combinations": {
+    "ULS1": {"description": "gravity", "factors": {"D": 1.2, "L": 1.6, "N": 1.6}},
+    "ULS2": {"description": "gravity + wind from the left", "factors": {"D": 1.2, "L": 0.5, "W": 1.0}},
+    "ULS3": {"description": "gravity + wind from the right", "factors": {"D": 1.2, "L": 0.5, "W": -1.0}},
+    "ULS4": {"description": "uplift check, wind from the left", "factors": {"D": 0.9, "W": 1.0}},
+    "SLS1": {"description": "service gravity", "factors": {"D": 1.0, "L": 1.0, "N": 1.0}, "purpose": "serviceability"},
+    "SLS2": {"description": "service wind drift", "factors": {"D": 1.0, "W": 0.6}, "purpose": "serviceability"}
+  },
+  "analysis": {"shearDeformation": false, "buckling": {"combinations": ["ULS1"], "modes": 2}},
+  "design": {
+    "defaults": {"method": "LRFD"},
+    "groups": {
+      "columns": {"members": ["CA1", "CA2", "CA3", "CB1", "CB2", "CB3", "CC1", "CC2", "CC3"], "role": "column", "Kx": 1.0, "Ky": 1.0, "sideswayInhibited": true},
+      "floorBeams": {"members": ["BA1", "BB1", "BA2", "BB2"], "role": "beam", "bracing": {"topFlange": [0.25, 0.5, 0.75], "bottomFlange": [0.25, 0.5, 0.75]}, "deflectionLimits": [{"spanRatio": 300, "direction": "y", "combinations": ["SLS1"]}]},
+      "roofBeams": {"members": ["BA3", "BB3"], "role": "beam", "bracing": {"topFlange": [0.25, 0.5, 0.75], "bottomFlange": [0.25, 0.5, 0.75]}, "deflectionLimits": [{"spanRatio": 240, "direction": "y", "combinations": ["SLS1"]}]},
+      "braces": {"members": ["X1a", "X1b", "X2a", "X2b", "X3a", "X3b"], "role": "brace"}
+    }
+  }
+}

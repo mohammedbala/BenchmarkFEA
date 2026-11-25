@@ -1,0 +1,172 @@
+{
+ "id": "two-bay-frame-beam-forces",
+ "title": "Two-bay frame with beams pinned to the outer columns: beam moment and shear",
+ "tier": "B",
+ "source": {
+  "work": "Bentley Systems, STAAD.Pro Help, Verification Examples (public documentation, docs.bentley.com)",
+  "edition": "STAAD.Pro Help v21 build (pages refer to the STAAD.Pro 2023 sample files), read 2026-11-22",
+  "location": "'V. 2 Bay Frame Moments and Shear' (https://docs.bentley.com/LiveContent/web/STAAD.Pro%20Help-v21/en/GUID-62DF48AF-F8CE-45D2-8907-5D1598FA9969.html)",
+  "pages": "web page",
+  "notes": "problem statement taken from the vendor page (text and input listing). The page cites: AISC, Manual of Steel Construction - Allowable Stress Design, 9th ed. 1989 (no page given) - NOT opened for this project; no number is taken from it. The page's 'theory' values are recorded as printed; the program's own results are not used."
+ },
+ "basis": "recomputed-from-published-statement",
+ "analysis": "Plane problem in the global X-Y plane (Y vertical); the out-of-plane DOFs (uz, rx, ry) of every node are held; in-plane bending about local z. Two bays of 18 ft, columns 10 ft; columns 12 in x 24 in (I = 13,824 in^4), beams 12 in x 30 in (I = 27,000 in^4), every member A = 1e7 in^2 (the page's listing: axial deformation suppressed), E = 30,000 ksi. Outer column bases fixed, centre column base pinned. The two beams are continuous over the centre column and moment-released at the outer columns (the listing's member releases). Load case 1: 50 kip on the outer column tops, 100 kip on the centre column top, 100 kip at midspan of each beam; load case 2: 10 kip/ft on both beams. Targets at the middle of the first beam; in load case 1 the shear is the value on the side of the centre column (the page's section at 0.501 of the span). Units kip, in. First-order analysis. Reference values: computed here from this statement (verification/derive/vendor_reference.py); the textbook cited by the vendor page was not opened and no number is taken from it.",
+ "targets": [
+  {
+   "extract": "memberStation",
+   "member": "a",
+   "quantity": "Mz",
+   "relative": 0.5,
+   "combination": "LC1",
+   "value": 3375.001627603696,
+   "unit": "kip in",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (plane frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "a",
+   "quantity": "Vy",
+   "relative": 0.5,
+   "side": "right",
+   "combination": "LC1",
+   "value": 68.74998492959541,
+   "unit": "kip",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (plane frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "a",
+   "quantity": "Vy",
+   "relative": 0.5,
+   "side": "left",
+   "combination": "LC1",
+   "value": -31.250015070404597,
+   "unit": "kip",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (plane frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "reaction",
+   "node": "n2",
+   "component": "Fy",
+   "combination": "LC1",
+   "value": 237.49996985919083,
+   "unit": "kip",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (plane frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "a",
+   "quantity": "Mz",
+   "relative": 0.5,
+   "combination": "LC2",
+   "value": 2430.001640624524,
+   "unit": "kip in",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (plane frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "a",
+   "quantity": "Vy",
+   "relative": 0.5,
+   "combination": "LC2",
+   "value": 22.499984809032178,
+   "unit": "kip",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (plane frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "reaction",
+   "node": "n2",
+   "component": "Fy",
+   "combination": "LC2",
+   "value": 224.99996961806434,
+   "unit": "kip",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (plane frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "a",
+   "quantity": "Mz",
+   "relative": 0.5,
+   "combination": "LC1",
+   "value": 3375.0,
+   "unit": "kip in",
+   "tolerance": {
+    "rel": 0.00014814814814814815
+   },
+   "precisionNote": "printed \"3375\"; tolerance = half a unit in the last printed digit",
+   "sign": "sagging: positive Mz (local y up)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "a",
+   "quantity": "Vy",
+   "relative": 0.5,
+   "side": "right",
+   "combination": "LC1",
+   "value": 68.75,
+   "unit": "kip",
+   "tolerance": {
+    "rel": 7.272727272727273e-05
+   },
+   "precisionNote": "printed \"68.75\"; tolerance = half a unit in the last printed digit",
+   "sign": "the page prints a magnitude; sign from the reference solution, engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "a",
+   "quantity": "Mz",
+   "relative": 0.5,
+   "combination": "LC2",
+   "value": 2430.0,
+   "unit": "kip in",
+   "tolerance": {
+    "rel": 0.00020576131687242798
+   },
+   "precisionNote": "printed \"2430\"; tolerance = half a unit in the last printed digit",
+   "sign": "sagging: positive Mz (local y up)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "a",
+   "quantity": "Vy",
+   "relative": 0.5,
+   "combination": "LC2",
+   "value": 22.5,
+   "unit": "kip",
+   "tolerance": {
+    "rel": 0.00022222222222222223
+   },
+   "precisionNote": "printed \"22.50\"; tolerance = half a unit in the last printed digit",
+   "sign": "the page prints a magnitude; sign from the reference solution, engine convention (docs/CONVENTIONS.md)"
+  }
+ ],
+ "status": "active"
+}

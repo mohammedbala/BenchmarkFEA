@@ -1,0 +1,326 @@
+{
+ "format": "benchfea-task-answers",
+ "formatVersion": "1.0.0",
+ "id": "ta985938a1fa376",
+ "taskType": "diagnose",
+ "mode": "tool-allowed",
+ "key": {
+  "family": "pipe_rack",
+  "curveBall": "release_mechanism",
+  "seed": 4,
+  "difficulty": 4,
+  "versions": {
+   "task": "1",
+   "generator": "1",
+   "curveBall": "1",
+   "engine": "0.1.0"
+  }
+ },
+ "generatorSeed": 4,
+ "skips": [],
+ "effectClass": "creates-mechanism",
+ "changeRecord": {
+  "format": "benchfea-curveball-record",
+  "formatVersion": "1.0.0",
+  "curveBall": "release_mechanism",
+  "title": "releases that create a mechanism",
+  "curveBallVersion": "1",
+  "seed": 4,
+  "category": "releases",
+  "effectClass": "creates-mechanism",
+  "target": "node BR2: bending rotations released at every member end (CBR2.j, TB2.j, SAR2.j)",
+  "changes": [
+   {
+    "op": "add",
+    "path": "/members/CBR2/releases",
+    "after": {
+     "j": {
+      "ry": true,
+      "rz": true
+     }
+    },
+    "index": 5
+   },
+   {
+    "op": "add",
+    "path": "/members/TB2/releases/j/rz",
+    "after": true,
+    "index": 1
+   }
+  ],
+  "entities": {
+   "nodes": [
+    "BR2"
+   ],
+   "members": [
+    "CBR2",
+    "TB2"
+   ]
+  },
+  "whyItMatters": "Releases belong to member ends, the rotation belongs to the node. If every member end at a node is released, nothing holds the node's rotation: the stiffness matrix is singular. The structure may still look sensible (each member is pinned), but there is no solution; the correct answer is the diagnosis of the mechanism, and the fix is to keep one member end connected.",
+  "precondition": "a node with frame member ends whose rotations are still connected and whose own rotations are not all held by a support",
+  "effect": {
+   "class": "creates-mechanism",
+   "material": true,
+   "criterion": "creates-mechanism",
+   "criteria": [
+    "creates-mechanism"
+   ],
+   "thresholds": {
+    "analysisChange": 0.05,
+    "designRatioChange": 0.05
+   },
+   "base": {
+    "status": "ok",
+    "units": {
+     "force": "kN",
+     "length": "m"
+    },
+    "combinations": {
+     "ULS1": {
+      "analysisType": "firstOrder",
+      "maxTranslation": 0.0013140016922118401,
+      "maxMemberDisplacement": 0.04754957675049781,
+      "maxReactionForce": 40.65580138290143,
+      "maxMemberMoment": 16.055272678259534
+     },
+     "SLS1": {
+      "analysisType": "firstOrder",
+      "maxTranslation": 0.0002085700149187043,
+      "maxMemberDisplacement": 0.032767781371073695,
+      "maxReactionForce": 20.468429559215313,
+      "maxMemberMoment": 11.468051913042524
+     },
+     "ULS2": {
+      "analysisType": "firstOrder",
+      "maxTranslation": 0.14758070123905528,
+      "maxMemberDisplacement": 0.1527068321056133,
+      "maxReactionForce": 35.249615761120374,
+      "maxMemberMoment": 36.066158628308905
+     },
+     "ULS3": {
+      "analysisType": "firstOrder",
+      "maxTranslation": 0.14756684688490174,
+      "maxMemberDisplacement": 0.15046066416704557,
+      "maxReactionForce": 18.309086893353147,
+      "maxMemberMoment": 29.578214496522634
+     },
+     "SLS2": {
+      "analysisType": "firstOrder",
+      "maxTranslation": 0.0885526165175664,
+      "maxMemberDisplacement": 0.09440531616122322,
+      "maxReactionForce": 26.880929733250817,
+      "maxMemberMoment": 23.604561077638277
+     },
+     "ULS4": {
+      "analysisType": "firstOrder",
+      "maxTranslation": 0.0009302051364409886,
+      "maxMemberDisplacement": 0.04053787226224856,
+      "maxReactionForce": 34.84782975677266,
+      "maxMemberMoment": 13.76166229565104
+     }
+    },
+    "design": {
+     "status": "conditional",
+     "maxRatio": 0.72876905407412,
+     "maxRatioMember": "TA2",
+     "failing": []
+    }
+   },
+   "perturbed": {
+    "status": "unstable",
+    "nMechanisms": 1
+   },
+   "releasedDofs": [
+    "ry",
+    "rz"
+   ]
+  },
+  "reference": {
+   "kind": "diagnosis",
+   "note": "the perturbed model is a mechanism: the reference solution is the solver's structured mechanism diagnosis, not a set of results",
+   "diagnosis": {
+    "stable": false,
+    "classification": "mechanism",
+    "nMechanisms": 1,
+    "nFreeDofs": 56,
+    "tolerance": 1e-10,
+    "modes": [
+     {
+      "kind": "node",
+      "description": "node BR2 rotation about X unrestrained: all connected member ends released",
+      "motion": "rotation",
+      "cause": "all-member-ends-released",
+      "count": 1,
+      "direction": null,
+      "axis": [
+       1.0,
+       0.0,
+       0.0
+      ],
+      "through": null,
+      "nodes": [
+       {
+        "node": "BR2",
+        "share": 1.0,
+        "dofs": {
+         "rx": 1.0
+        }
+       }
+      ],
+      "members": [
+       "CBR2",
+       "TB2",
+       "SAR2"
+      ]
+     }
+    ]
+   },
+   "problems": [
+    {
+     "code": "stability.mechanism",
+     "path": "/nodes/BR2",
+     "message": "the structure is a mechanism: node BR2 rotation about X unrestrained: all connected member ends released"
+    }
+   ]
+  },
+  "verification": {
+   "reference": "diagnosis",
+   "route": "diagnosis tiers N, K, C, E of benchfea.verify (docs/VERIFICATION.md section 4): null space of an independently assembled stiffness, engine matrix, two foreign solvers under a probing load, invariance of the diagnosis"
+  },
+  "rejected": [],
+  "baseHash": "3d6f3500e1193d076c181cb49d3eadbe7ac9a65589a3323d6d30092dfe17e73b",
+  "perturbedHash": "406e1342c96ede3086b5ad1c12e054c1fc12d426ce5941ddf560af877de8c63f"
+ },
+ "verification": {
+  "format": "benchfea-verification",
+  "kind": "diagnosis",
+  "status": "verified",
+  "meaning": "'verified' means only: the reference solution passed every tier listed as applicable in this record, at the tolerances stated in it. It does not mean reviewed, approved or certified by anyone.",
+  "modelHash": "406e1342c96ede3086b5ad1c12e054c1fc12d426ce5941ddf560af877de8c63f",
+  "tiersPassed": [
+   "N",
+   "K",
+   "C",
+   "E"
+  ],
+  "tiersNotPassed": [],
+  "tiersNotApplicable": [],
+  "quarantine": null,
+  "tiers": {
+   "N": {
+    "applies": true,
+    "passed": true,
+    "summary": "independent stiffness: 1 zero-stiffness motion(s) (diagnosis: 1); 1 described mode(s) tested for K phi = 0: agree",
+    "tolerances": {
+     "singular": 1e-09,
+     "nullResidual": 2e-06
+    },
+    "largestDifferences": [
+     {
+      "what": "mode 0: |K phi| / (|K| |phi|) on the independent matrix",
+      "value": 0.0,
+      "tolerance": 2e-06
+     }
+    ]
+   },
+   "K": {
+    "applies": true,
+    "passed": true,
+    "summary": "engine matrix: 1 eigenvalue(s) below 1.0e-09; the described modes satisfy K phi = 0",
+    "tolerances": {
+     "singular": 1e-09,
+     "nullResidual": 2e-06
+    },
+    "largestDifferences": [
+     {
+      "what": "mode 0: |K phi| / (|K| |phi|) on the engine's matrix",
+      "value": 0.0,
+      "tolerance": 2e-06
+     }
+    ]
+   },
+   "C": {
+    "applies": true,
+    "passed": true,
+    "summary": "2 foreign solver(s) find no equilibrium state under a load that does work on the mechanism(s)",
+    "tolerances": {
+     "saneDisplacement": "1000 x model size"
+    },
+    "largestDifferences": []
+   },
+   "E": {
+    "applies": true,
+    "passed": true,
+    "summary": "diagnosis identical on a second run and after changing every design variable",
+    "tolerances": {
+     "designVariables": 0.0
+    },
+    "largestDifferences": []
+   }
+  },
+  "versions": {
+   "benchfea": "0.1.0",
+   "python": "3.13.18",
+   "numpy": "2.5.3",
+   "scipy": "1.18.1",
+   "foreign:opensees": "3.8.0.0",
+   "foreign:pynite": "3.2.1"
+  },
+  "notes": [
+   "verified diagnosis: passed tier(s) N, K, C, E (docs/VERIFICATION.md, 'Unstable models')"
+  ]
+ },
+ "designVerification": null,
+ "reference": {
+  "category": "releases",
+  "entities": {
+   "nodes": [
+    "BR2"
+   ],
+   "members": [
+    "CBR2",
+    "TB2"
+   ]
+  },
+  "direction": "added",
+  "target": "node BR2: bending rotations released at every member end (CBR2.j, TB2.j, SAR2.j)",
+  "mechanism": {
+   "stable": false,
+   "classification": "mechanism",
+   "nMechanisms": 1,
+   "nFreeDofs": 56,
+   "tolerance": 1e-10,
+   "modes": [
+    {
+     "kind": "node",
+     "description": "node BR2 rotation about X unrestrained: all connected member ends released",
+     "motion": "rotation",
+     "cause": "all-member-ends-released",
+     "count": 1,
+     "direction": null,
+     "axis": [
+      1.0,
+      0.0,
+      0.0
+     ],
+     "through": null,
+     "nodes": [
+      {
+       "node": "BR2",
+       "share": 1.0,
+       "dofs": {
+        "rx": 1.0
+       }
+      }
+     ],
+     "members": [
+      "CBR2",
+      "TB2",
+      "SAR2"
+     ]
+    }
+   ]
+  }
+ }
+}

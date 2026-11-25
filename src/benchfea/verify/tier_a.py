@@ -350,16 +350,33 @@ def _compare(model, line, cid, cres, sol) -> dict:
         mr = cres.members[mid]
         x0 = s[m.i]
         Lm = float(m.length)
+        n_st = len(mr.x)
         for k, (x, side) in enumerate(zip(mr.x, _sides(list(mr.x), Lm))):
             xx = min(max(x0 + float(x), 0.0), L)
             if abs(float(x) - Lm) <= 1e-12 * Lm:
                 side = -1
+            # An interior station AT a point load holds the limit from the left or from the right; which
+            # one is decided by an ulp of its position (a regular station that falls on a point load gives
+            # three stations there: left, left, right or left, right, right).  The oracle value compared is
+            # therefore the nearer of its two limits; that the stations of the point show BOTH limits is
+            # checked by tier D (benchfea.verify.stations).
+            interior = 0 < k < n_st - 1
+
+            def oracle(name, engine):
+                o = sol[name](xx, side)
+                if interior:
+                    other = sol[name](xx, -side)
+                    if other != o and abs(engine - other) < abs(engine - o):
+                        return other
+                return o
             for a, name in enumerate(names_f):
+                e = float(mr.forces[k, a])
                 rows.append(("force" if a < 3 else "moment", f"member {mid} station {k} (x = {float(x):.6g} mm) {name}",
-                             float(mr.forces[k, a]), sol[name](xx, side)))
+                             e, oracle(name, e)))
             for a, name in enumerate(("u", "v", "w")):
+                e = float(mr.displacements[k, a])
                 rows.append(("translation", f"member {mid} station {k} (x = {float(x):.6g} mm) u{'xyz'[a]}",
-                             float(mr.displacements[k, a]), sol[name](xx, side)))
+                             e, oracle(name, e)))
     scale = {}
     for kind in ("translation", "rotation", "force", "moment"):
         vals = [abs(v) for kd, _, e, o in rows if kd == kind for v in (e, o)]

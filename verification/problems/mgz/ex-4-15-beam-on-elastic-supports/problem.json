@@ -1,0 +1,45 @@
+{
+ "id": "ex-4-15-beam-on-elastic-supports",
+ "title": "Beam on an elastic foundation modelled by 19 axial members",
+ "tier": "B",
+ "source": {
+  "work": "McGuire, W., Gallagher, R. H., Ziemian, R. D., Matrix Structural Analysis",
+  "edition": "2nd edition (copyright 2014 R. D. Ziemian)",
+  "location": "Example 4.15, part 2 (stiffness method)",
+  "pages": "pp. 87-88",
+  "notes": "input data and targets read on the cited pages; nothing of the source is reproduced"
+ },
+ "basis": "published",
+ "analysis": "Plane (x-y) problem of the source modelled in 3D with the global Y axis vertical, so that the source's x, y and theta_z are the model's X, Y and rz. In-plane bending is about local z for every member (default orientation), hence the source's I is the section's Iz. Units kip, in. Beam ab of 300 in in 20 segments of 15 in, I = 128.5 in^4, E = 29,000 ksi, pin at a, roller at b. The foundation (modulus 1.5 kip/in^2) is represented as in the source by 19 vertical axial members, one under each interior node, L = 15 in, 22.5 kip/in each, pinned to the ground; their area is entered as the source's defining expression 22.5 x 15 / 29,000 in^2 (printed rounded as 0.0116 in^2). Load 40 kips downward at midspan c. The beam area is not given by the source and carries no force (A = 10 in^2 placeholder). First order. The targets are the source's values for this discrete model (not its closed-form continuous-foundation values 0.237 in and 554 in-kips, which the engine cannot represent).",
+ "targets": [
+  {
+   "extract": "nodeDisplacement",
+   "node": "n10",
+   "dof": "uy",
+   "value": -0.238,
+   "unit": "in",
+   "tolerance": {
+    "rel": 0.002100840336134454
+   },
+   "precisionNote": "printed \"0.238\"; tolerance = half a unit in the last printed digit; label on the deflected-shape figure (magnitude)",
+   "sign": "downward deflection: negative uy"
+  },
+  {
+   "extract": "memberStation",
+   "member": "s10",
+   "quantity": "Mz",
+   "relative": 1.0,
+   "value": 547.0,
+   "unit": "kip in",
+   "tolerance": {
+    "rel": 0.0009140767824497258
+   },
+   "precisionNote": "printed \"547\"; tolerance = half a unit in the last printed digit; label on the moment-diagram figure (magnitude)",
+   "sign": "sagging moment under the load: positive Mz in the engine (y up)"
+  }
+ ],
+ "status": "quarantined",
+ "quarantine": {
+  "diagnosis": "Both targets are reproduced by the model as written (support area entered as the source's defining expression 22.5 x 15 / 29,000 in^2: deflection -0.23795 in, moment 547.22 in-kips; printed 0.238 and 547). The problem is nevertheless quarantined because the outcome depends on how a rounded input of the source is read: with the area as the source prints it, 0.0116 in^2 (22.43 kip/in instead of the stated 22.5 kip/in per support), the engine gives -0.23855 in and 547.65 in-kips, which miss the printed values by 1.1 and 1.3 times the tolerance. The source does not say which value its computer run used, and both targets are labels on figures. An input that decides the outcome within its own printed precision is recorded as an open question, not resolved by choosing the reading that passes."
+ }
+}

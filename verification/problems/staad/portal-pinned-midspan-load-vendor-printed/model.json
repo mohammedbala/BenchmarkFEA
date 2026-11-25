@@ -1,0 +1,148 @@
+{
+ "name": "staad/portal-pinned-midspan-load-vendor-printed",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "lbf",
+  "length": "in"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "n1": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n2": {
+   "x": 0.0,
+   "y": 100.0,
+   "z": 0.0
+  },
+  "n3": {
+   "x": 60.0,
+   "y": 100.0,
+   "z": 0.0
+  },
+  "n4": {
+   "x": 120.0,
+   "y": 100.0,
+   "z": 0.0
+  },
+  "n5": {
+   "x": 120.0,
+   "y": 0.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "n1": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed",
+    "ux": "fixed",
+    "uy": "fixed"
+   }
+  },
+  "n2": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "n3": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "n4": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "n5": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed",
+    "ux": "fixed",
+    "uy": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 30000000.0,
+   "nu": 0.3
+  }
+ },
+ "sections": {
+  "col": {
+   "type": "properties",
+   "A": 4.0,
+   "Iz": 1.3333333333333333,
+   "Iy": 1.3333333333333333,
+   "J": 1.3333333333333333
+  },
+  "beam": {
+   "type": "properties",
+   "A": 8.0,
+   "Iz": 10.666666666666666,
+   "Iy": 10.666666666666666,
+   "J": 10.666666666666666
+  }
+ },
+ "members": {
+  "c1": {
+   "i": "n1",
+   "j": "n2",
+   "section": "col",
+   "material": "M"
+  },
+  "b1": {
+   "i": "n2",
+   "j": "n3",
+   "section": "beam",
+   "material": "M"
+  },
+  "b2": {
+   "i": "n3",
+   "j": "n4",
+   "section": "beam",
+   "material": "M"
+  },
+  "c2": {
+   "i": "n5",
+   "j": "n4",
+   "section": "col",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "n3",
+     "Fy": -1000.0
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.0
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": false
+ }
+}

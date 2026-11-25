@@ -1,0 +1,75 @@
+{
+  "formatVersion": "1.0.0",
+  "name": "Example 04 - 3D frame with a rigid diaphragm",
+  "description": "One-storey space frame (20 ft x 15 ft in plan, 12 ft high, vertical axis Y). The floor is a rigid diaphragm whose master node is at the mass centre, eccentric to the frame: a lateral load at the master twists the floor.",
+  "units": {"force": "kip", "length": "in"},
+  "conventions": {"verticalAxis": "Y"},
+  "nodes": {
+    "A0": {"x": 0, "y": 0, "z": 0},
+    "B0": {"x": 240, "y": 0, "z": 0},
+    "C0": {"x": 240, "y": 0, "z": 180},
+    "D0": {"x": 0, "y": 0, "z": 180},
+    "A1": {"x": 0, "y": 144, "z": 0},
+    "B1": {"x": 240, "y": 144, "z": 0},
+    "C1": {"x": 240, "y": 144, "z": 180},
+    "D1": {"x": 0, "y": 144, "z": 180},
+    "CM": {"x": 132, "y": 144, "z": 108}
+  },
+  "supports": {
+    "A0": {"type": "fixed"},
+    "B0": {"type": "fixed"},
+    "C0": {"type": "fixed"},
+    "D0": {"type": "fixed"}
+  },
+  "materials": {
+    "steel": {"description": "structural steel", "E": 29000, "G": 11200, "Fy": 50, "Fu": 65, "unitWeight": 0.000284}
+  },
+  "sections": {
+    "I-8x8x0.45x0.3": {"type": "I", "d": 8, "bf": 8, "tf": 0.45, "tw": 0.3, "r": 0.5},
+    "I-12x6x0.4x0.25": {"type": "I", "d": 12, "bf": 6, "tf": 0.4, "tw": 0.25, "r": 0.5}
+  },
+  "members": {
+    "CA": {"i": "A0", "j": "A1", "section": "I-8x8x0.45x0.3", "material": "steel"},
+    "CB": {"i": "B0", "j": "B1", "section": "I-8x8x0.45x0.3", "material": "steel"},
+    "CC": {"i": "C0", "j": "C1", "section": "I-8x8x0.45x0.3", "material": "steel"},
+    "CD": {"i": "D0", "j": "D1", "section": "I-8x8x0.45x0.3", "material": "steel"},
+    "BX1": {"i": "A1", "j": "B1", "section": "I-12x6x0.4x0.25", "material": "steel"},
+    "BX2": {"i": "D1", "j": "C1", "section": "I-12x6x0.4x0.25", "material": "steel"},
+    "BZ1": {"i": "A1", "j": "D1", "section": "I-12x6x0.4x0.25", "material": "steel"},
+    "BZ2": {"i": "B1", "j": "C1", "section": "I-12x6x0.4x0.25", "material": "steel"}
+  },
+  "constraints": {
+    "floor": {"type": "rigidDiaphragm", "master": "CM", "slaves": ["A1", "B1", "C1", "D1"]}
+  },
+  "loadCases": {
+    "D": {"description": "dead load and self weight", "loads": [
+      {"type": "selfWeight"},
+      {"type": "memberDistributed", "member": "BX1", "direction": "Y", "w1": -0.08},
+      {"type": "memberDistributed", "member": "BX2", "direction": "Y", "w1": -0.08}
+    ]},
+    "L": {"description": "live load", "loads": [
+      {"type": "memberDistributed", "member": "BX1", "direction": "Y", "w1": -0.05},
+      {"type": "memberDistributed", "member": "BX2", "direction": "Y", "w1": -0.05}
+    ]},
+    "EX": {"description": "lateral load along X at the mass centre", "loads": [
+      {"type": "nodal", "node": "CM", "Fx": 20}
+    ]},
+    "EZ": {"description": "lateral load along Z at the mass centre", "loads": [
+      {"type": "nodal", "node": "CM", "Fz": 20}
+    ]}
+  },
+  "combinations": {
+    "ULS1": {"factors": {"D": 1.2, "L": 1.6}},
+    "ULS2": {"factors": {"D": 1.2, "L": 0.5, "EX": 1.0}},
+    "ULS3": {"factors": {"D": 1.2, "L": 0.5, "EZ": 1.0}},
+    "SLS-X": {"factors": {"EX": 1.0}, "purpose": "serviceability"}
+  },
+  "analysis": {"shearDeformation": false},
+  "design": {
+    "defaults": {"method": "LRFD"},
+    "groups": {
+      "columns": {"members": ["CA", "CB", "CC", "CD"], "role": "column", "Kx": 1.5, "Ky": 1.5},
+      "beams": {"members": ["BX1", "BX2", "BZ1", "BZ2"], "role": "beam", "bracing": {"topFlange": [0.25, 0.5, 0.75], "bottomFlange": [0.5]}}
+    }
+  }
+}

@@ -1,0 +1,270 @@
+{
+ "name": "staad/truss-thirteen-bars-deflection",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kip",
+  "length": "in"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "n1": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n2": {
+   "x": 180.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n3": {
+   "x": 360.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n4": {
+   "x": 540.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n5": {
+   "x": 720.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n6": {
+   "x": 180.0,
+   "y": 90.0,
+   "z": 0.0
+  },
+  "n7": {
+   "x": 360.0,
+   "y": 180.0,
+   "z": 0.0
+  },
+  "n8": {
+   "x": 540.0,
+   "y": 90.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "n1": {
+   "dofs": {
+    "ux": "fixed",
+    "uy": "fixed",
+    "uz": "fixed"
+   }
+  },
+  "n2": {
+   "dofs": {
+    "uz": "fixed"
+   }
+  },
+  "n3": {
+   "dofs": {
+    "uy": "fixed",
+    "uz": "fixed"
+   }
+  },
+  "n4": {
+   "dofs": {
+    "uz": "fixed"
+   }
+  },
+  "n5": {
+   "dofs": {
+    "uz": "fixed"
+   }
+  },
+  "n6": {
+   "dofs": {
+    "uz": "fixed"
+   }
+  },
+  "n7": {
+   "dofs": {
+    "uz": "fixed"
+   }
+  },
+  "n8": {
+   "dofs": {
+    "uz": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 30000.0,
+   "nu": 0.3
+  }
+ },
+ "sections": {
+  "a1": {
+   "type": "properties",
+   "description": "axial-force member: Iy, Iz, J are placeholders, not used",
+   "A": 1.0,
+   "Iy": 1.0,
+   "Iz": 1.0,
+   "J": 1.0
+  },
+  "a1.5": {
+   "type": "properties",
+   "description": "axial-force member: Iy, Iz, J are placeholders, not used",
+   "A": 1.5,
+   "Iy": 1.0,
+   "Iz": 1.0,
+   "J": 1.0
+  },
+  "a2": {
+   "type": "properties",
+   "description": "axial-force member: Iy, Iz, J are placeholders, not used",
+   "A": 2.0,
+   "Iy": 1.0,
+   "Iz": 1.0,
+   "J": 1.0
+  },
+  "a3": {
+   "type": "properties",
+   "description": "axial-force member: Iy, Iz, J are placeholders, not used",
+   "A": 3.0,
+   "Iy": 1.0,
+   "Iz": 1.0,
+   "J": 1.0
+  },
+  "a4": {
+   "type": "properties",
+   "description": "axial-force member: Iy, Iz, J are placeholders, not used",
+   "A": 4.0,
+   "Iy": 1.0,
+   "Iz": 1.0,
+   "J": 1.0
+  }
+ },
+ "members": {
+  "m1": {
+   "type": "truss",
+   "i": "n2",
+   "j": "n6",
+   "section": "a1",
+   "material": "M"
+  },
+  "m2": {
+   "type": "truss",
+   "i": "n3",
+   "j": "n4",
+   "section": "a1",
+   "material": "M"
+  },
+  "m3": {
+   "type": "truss",
+   "i": "n4",
+   "j": "n8",
+   "section": "a1",
+   "material": "M"
+  },
+  "m4": {
+   "type": "truss",
+   "i": "n4",
+   "j": "n5",
+   "section": "a1",
+   "material": "M"
+  },
+  "m5": {
+   "type": "truss",
+   "i": "n1",
+   "j": "n2",
+   "section": "a2",
+   "material": "M"
+  },
+  "m6": {
+   "type": "truss",
+   "i": "n2",
+   "j": "n3",
+   "section": "a2",
+   "material": "M"
+  },
+  "m7": {
+   "type": "truss",
+   "i": "n3",
+   "j": "n6",
+   "section": "a1.5",
+   "material": "M"
+  },
+  "m8": {
+   "type": "truss",
+   "i": "n3",
+   "j": "n8",
+   "section": "a1.5",
+   "material": "M"
+  },
+  "m9": {
+   "type": "truss",
+   "i": "n3",
+   "j": "n7",
+   "section": "a3",
+   "material": "M"
+  },
+  "m10": {
+   "type": "truss",
+   "i": "n1",
+   "j": "n6",
+   "section": "a3",
+   "material": "M"
+  },
+  "m11": {
+   "type": "truss",
+   "i": "n5",
+   "j": "n8",
+   "section": "a3",
+   "material": "M"
+  },
+  "m12": {
+   "type": "truss",
+   "i": "n6",
+   "j": "n7",
+   "section": "a4",
+   "material": "M"
+  },
+  "m13": {
+   "type": "truss",
+   "i": "n7",
+   "j": "n8",
+   "section": "a4",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "n2",
+     "Fy": -20.0
+    },
+    {
+     "type": "nodal",
+     "node": "n4",
+     "Fy": -20.0
+    },
+    {
+     "type": "nodal",
+     "node": "n5",
+     "Fy": -20.0
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.0
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": false
+ }
+}

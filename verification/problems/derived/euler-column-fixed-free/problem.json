@@ -1,0 +1,28 @@
+{
+ "id": "euler-column-fixed-free",
+ "title": "Elastic critical load of a column, fixed base, free top",
+ "tier": "A",
+ "source": {
+  "work": "derived here (no publication): benchfea.oracle direct integration of the member equations / numerically solved characteristic equation",
+  "edition": "",
+  "location": "verification/derive/derive_problems.py, problem 'euler-column-fixed-free'",
+  "pages": "",
+  "notes": "regenerate with: python3 verification/derive/derive_problems.py"
+ },
+ "basis": "derived-here",
+ "analysis": "Linear buckling of a prismatic column, no shear deformation. Length 4 m, EI = 40 000 kN m^2 in both planes, reference load 100 kN. Target = smallest root of the characteristic determinant of EI v'''' + P v'' = 0 with the four end conditions, solved numerically.",
+ "targets": [
+  {
+   "extract": "bucklingFactor",
+   "combination": "C",
+   "mode": 1,
+   "value": 61.685027506808154,
+   "unit": "-",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "note": "kappa = L sqrt(Pcr / EI) = 1.570796326795; Pcr = 6168.50275 kN; reference load 100 kN"
+  }
+ ],
+ "status": "active"
+}

@@ -9,7 +9,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 __all__ = ["TierResult", "VerificationRecord", "ProblemRecord", "TargetResult", "LibraryReport",
-           "VERIFIED", "QUARANTINED", "REFUSED", "TIERS", "MEANING"]
+           "VERIFIED", "QUARANTINED", "REFUSED", "TIERS", "MEANING", "TIER_TITLES", "DIAGNOSIS_TITLES"]
 
 VERIFIED, QUARANTINED, REFUSED = "verified", "quarantined", "refused"
 TIERS = ("A", "B", "C", "D", "E", "F")
@@ -17,6 +17,8 @@ MEANING = ("'verified' means only: the reference solution passed every tier list
            "at the tolerances stated in it. It does not mean reviewed, approved or certified by anyone.")
 TIER_TITLES = {"A": "closed form / ODE oracle", "B": "published problem", "C": "independent solvers",
                "D": "invariants", "E": "equivalence checks", "F": "design-check coverage"}
+DIAGNOSIS_TITLES = {"N": "null space of an independently assembled stiffness", "K": "engine matrix: K phi = 0",
+                    "C": "foreign-solver evidence", "E": "invariance of the diagnosis"}
 
 
 def _clean(o):
@@ -57,9 +59,14 @@ class TierResult:
     seconds: float = 0.0
     skipped: bool = False             # excluded by the caller (tiers=...) or by the time budget
     timings: dict = field(default_factory=dict)       # seconds per part (volatile)
+    title: str = ""
+    # why an applicable tier is not passed: "disagreement" (two computations differ), "not-representable"
+    # (too few independent solvers can take the model), "not-covered" (tier F), "not-run", "error"
+    category: str = ""
 
     def to_dict(self, volatile: bool = True) -> dict:
-        d = {"tier": self.tier, "title": TIER_TITLES.get(self.tier, self.tier), "applies": self.applies,
+        d = {"tier": self.tier, "title": self.title or TIER_TITLES.get(self.tier, self.tier), "applies": self.applies,
+             "category": self.category,
              "passed": self.passed, "skipped": self.skipped, "summary": self.summary,
              "largestDifferences": _clean(self.largest), "tolerances": _clean(self.tolerances),
              "details": _clean(self.details)}
@@ -126,7 +133,7 @@ class VerificationRecord:
         lines = [f"{self.model or 'model'}: {self.status.upper()} ({self.kind})"]
         for k, t in self.tiers.items():
             state = "n/a" if not t.applies else ("not run" if t.skipped else ("passed" if t.passed else "NOT PASSED"))
-            lines.append(f"  tier {k} [{TIER_TITLES.get(k, k)}]: {state} -- {t.summary}")
+            lines.append(f"  tier {k} [{t.title or TIER_TITLES.get(k, k)}]: {state} -- {t.summary}")
         if self.quarantine:
             lines.append(f"  quarantine ({self.quarantine.get('category')}): {self.quarantine.get('diagnosis')}")
         if self.refusal:
@@ -178,6 +185,14 @@ class ProblemRecord:
     quarantine: dict | None = None
     errors: list = field(default_factory=list)
     seconds: float = 0.0
+    notes: list = field(default_factory=list)          # remarks on the tolerance policy found while loading
+    limits_note: str = ""
+
+    @property
+    def cross_checked(self) -> bool | None:
+        """Tier C of the model passed (None: not run / no results)."""
+        t = None if self.model_record is None else self.model_record.tiers.get("C")
+        return None if t is None or t.skipped else bool(t.passed)
 
     @property
     def largest_relative(self) -> float | None:
@@ -190,6 +205,7 @@ class ProblemRecord:
              "source": _clean(self.source), "basis": self.basis,
              "targets": [t.to_dict() for t in self.targets], "largestRelativeDifference": self.largest_relative,
              "failures": list(self.failures), "quarantine": _clean(self.quarantine), "errors": list(self.errors),
+             "notes": list(self.notes), "limitsNote": self.limits_note, "crossChecked": self.cross_checked,
              "modelRecord": None if self.model_record is None else self.model_record.to_dict(volatile, reference)}
         if volatile:
             d["seconds"] = round(self.seconds, 4)

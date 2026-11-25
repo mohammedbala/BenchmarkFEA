@@ -1,0 +1,120 @@
+{
+ "id": "cantilever-nodal-loads",
+ "title": "Cantilever with tip force, tip moment, axial force and torque",
+ "tier": "A",
+ "source": {
+  "work": "derived here (no publication): benchfea.oracle direct integration of the member equations / numerically solved characteristic equation",
+  "edition": "",
+  "location": "verification/derive/derive_problems.py, problem 'cantilever-nodal-loads'",
+  "pages": "",
+  "notes": "regenerate with: python3 verification/derive/derive_problems.py"
+ },
+ "basis": "derived-here",
+ "analysis": "First order, no shear deformation. Length 3 m; at the tip: Fz = -10 kN, My = +5 kN m (global), Fx = 20 kN, Mx = 2 kN m. Bending, axial and torsional responses are uncoupled.",
+ "targets": [
+  {
+   "path": "/combinations/C/displacements/b/uz",
+   "value": -0.002812500000067529,
+   "unit": "m",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "path": "/combinations/C/displacements/b/ry",
+   "value": 0.001500000000034106,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "path": "/combinations/C/displacements/b/ux",
+   "value": 2.9999999999999997e-05,
+   "unit": "m",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "path": "/combinations/C/displacements/b/rx",
+   "value": 0.0005199999999990542,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "path": "/combinations/C/reactions/a/Fz",
+   "value": 10.00000000029104,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "path": "/combinations/C/reactions/a/My",
+   "value": -35.00000000089131,
+   "unit": "kN m",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "path": "/combinations/C/reactions/a/Fx",
+   "value": -20.0,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "path": "/combinations/C/reactions/a/Mx",
+   "value": -2.0,
+   "unit": "kN m",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "extract": "memberStation",
+   "combination": "C",
+   "member": "m",
+   "quantity": "Mz",
+   "relative": 0.5,
+   "side": "left",
+   "value": -20.000000000454747,
+   "unit": "kN m",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "extract": "memberStation",
+   "combination": "C",
+   "member": "m",
+   "quantity": "N",
+   "relative": 0.5,
+   "side": "left",
+   "value": 20.0,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "extract": "memberStation",
+   "combination": "C",
+   "member": "m",
+   "quantity": "T",
+   "relative": 0.5,
+   "side": "left",
+   "value": 1.9999999999963622,
+   "unit": "kN m",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  }
+ ],
+ "status": "active"
+}

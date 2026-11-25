@@ -7,12 +7,13 @@ order).
 """
 from __future__ import annotations
 
-from ._common import (BRACING_PATTERNS, Builder, add_combinations, flag, grid_lines, line_id, service_ids,
+from ._common import (BUCKLING_CHANCE, BUCKLING_FLAG, BRACING_PATTERNS, Builder, add_combinations, flag, grid_lines, line_id, service_ids,
                       storey_levels)
 
 NAME = "multistorey_2d"
 LEVELS = (2, 3, 4)
 FEATURES = {
+    "buckling": BUCKLING_FLAG,
     "secondOrder": "strength combinations analysed second order",
     "pinnedBay": "one bay whose beams are pinned at both ends (gravity bay)",
     "baseSprings": "partially fixed bases (rotational springs)",
@@ -49,10 +50,10 @@ def build(draw, level: int, unit_system: str, vertical: str, features: dict) -> 
         for k, v in enumerate(vs):
             B.node(f"{line_id(i)}{k}", *xyv(x, v))
     split = ns >= 3
-    lower = B.group("columnLower" if split else "column", "column", 3)
-    upper = B.group("columnUpper", "column", 2) if split else lower
+    lower = B.group("columnLower" if split else "column", "column", 5)
+    upper = B.group("columnUpper", "column", 4) if split else lower
     half = (ns + 1) // 2
-    gb, gr = B.group("beam", "beam", 4), B.group("roofBeam", "beam", 3)
+    gb, gr = B.group("beam", "beam", 8), B.group("roofBeam", "beam", 7)
     columns, beams = {lower: [], upper: []}, {gb: [], gr: []}
     for i in range(nb + 1):
         for k in range(ns):
@@ -105,7 +106,7 @@ def build(draw, level: int, unit_system: str, vertical: str, features: dict) -> 
              ("ULS5", {"D": 1.2, **half5, "W": -1.0}, "strength"),
              ("ULS6", {"D": 1.4}, "strength")]
     add_combinations(B, cands, n_combos, second_order=second)
-    B.analysis["buckling"] = {"combinations": ["ULS1"], "modes": 1}
+    buckling = B.request_buckling(flag(features, "buckling", draw.chance(BUCKLING_CHANCE[level])), modes=1)
     sls = service_ids(cands, n_combos)
     kx = 1.0 if second else 1.5
     for g, ids in columns.items():
@@ -115,6 +116,7 @@ def build(draw, level: int, unit_system: str, vertical: str, features: dict) -> 
         B.design_group(g + "s", ids, role="beam", bracing=dict(bracing[1]),
                        deflectionLimits=[{"spanRatio": 300, "direction": "y", "combinations": [sls[0]]}])
     B.parameters = {
+        "buckling": buckling,
         "plane": plane, "bays": nb, "storeys": ns, "gridLines": xs, "levels": vs,
         "bases": "spring" if springs else base, "baseSpring": B.k_rot(k_base) if springs else None,
         "frameSpacing_m": round(spacing, 3), "secondOrder": second,

@@ -1,0 +1,196 @@
+{
+ "name": "aisc-de/c1a-second-order-lrfd",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kip",
+  "length": "in"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "B0": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "B1": {
+   "x": 0.0,
+   "y": 240.0,
+   "z": 0.0
+  },
+  "C0": {
+   "x": 360.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "C1": {
+   "x": 360.0,
+   "y": 240.0,
+   "z": 0.0
+  },
+  "L0": {
+   "x": 720.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "L1": {
+   "x": 720.0,
+   "y": 240.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "B0": {
+   "dofs": {
+    "ux": "fixed",
+    "uy": "fixed",
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "C0": {
+   "dofs": {
+    "ux": "fixed",
+    "uy": "fixed",
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "B1": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "C1": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "L0": {
+   "dofs": {
+    "ux": "fixed",
+    "uy": "fixed",
+    "uz": "fixed"
+   }
+  },
+  "L1": {
+   "dofs": {
+    "uz": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 23200.0,
+   "nu": 0.3,
+   "description": "0.8 x 29,000 ksi (AISC 360 C2.3 stiffness reduction, tau_b = 1)"
+  }
+ },
+ "sections": {
+  "col": {
+   "type": "properties",
+   "description": "W12x65: Ag and Ix as given by the source; Iy = 1000 Ix (plane problem), J placeholder",
+   "A": 19.1,
+   "Iz": 533.0,
+   "Iy": 533000.0,
+   "J": 1.0
+  },
+  "beam": {
+   "type": "properties",
+   "description": "W18x40: Ix as given by the source; area not given: axially rigid; Iy = 1000 Ix, J placeholder",
+   "A": 100000.0,
+   "Iz": 612.0,
+   "Iy": 612000.0,
+   "J": 1.0
+  },
+  "rigid": {
+   "type": "properties",
+   "description": "leaning column and link: properties not given by the source; axially rigid pin-ended bars",
+   "A": 100000.0,
+   "Iz": 100000.0,
+   "Iy": 100000.0,
+   "J": 1.0
+  }
+ },
+ "members": {
+  "colB": {
+   "i": "B0",
+   "j": "B1",
+   "section": "col",
+   "material": "M"
+  },
+  "colC": {
+   "i": "C0",
+   "j": "C1",
+   "section": "col",
+   "material": "M"
+  },
+  "beam": {
+   "i": "B1",
+   "j": "C1",
+   "section": "beam",
+   "material": "M"
+  },
+  "lean": {
+   "type": "truss",
+   "i": "L0",
+   "j": "L1",
+   "section": "rigid",
+   "material": "M"
+  },
+  "link": {
+   "type": "truss",
+   "i": "C1",
+   "j": "L1",
+   "section": "rigid",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "memberDistributed",
+     "member": "beam",
+     "direction": "Y",
+     "w1": -0.19999999999999998
+    },
+    {
+     "type": "nodal",
+     "node": "B1",
+     "Fy": -36.0,
+     "Fx": 0.576
+    },
+    {
+     "type": "nodal",
+     "node": "C1",
+     "Fy": -36.0
+    },
+    {
+     "type": "nodal",
+     "node": "L1",
+     "Fy": -144.0
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.0
+   },
+   "analysisType": "secondOrder"
+  }
+ },
+ "analysis": {
+  "shearDeformation": false,
+  "resultStations": 3
+ }
+}

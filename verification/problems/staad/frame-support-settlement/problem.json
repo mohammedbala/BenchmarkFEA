@@ -1,0 +1,176 @@
+{
+ "id": "frame-support-settlement",
+ "title": "Statically determinate frame: displacements caused by support settlements",
+ "tier": "B",
+ "source": {
+  "work": "Bentley Systems, STAAD.Pro Help, Verification Examples (public documentation, docs.bentley.com)",
+  "edition": "STAAD.Pro Help v21 build (pages refer to the STAAD.Pro 2023 sample files), read 2026-11-22",
+  "location": "'V. 2D Portal Reactions Sidesway 1' (https://docs.bentley.com/LiveContent/web/STAAD.Pro%20Help-v21/en/GUID-8835257B-5327-43C0-B270-BA561A93D215.html)",
+  "pages": "web page",
+  "notes": "problem statement taken from the vendor page (text and input listing). The page cites: C. K. Wang, Intermediate Structural Analysis, 1983, section 2.11, p. 47 - NOT opened for this project; no number is taken from it. The page's 'theory' values are recorded as printed; the program's own results are not used."
+ },
+ "basis": "recomputed-from-published-statement",
+ "analysis": "Plane problem in the global X-Y plane (Y vertical); the out-of-plane DOFs (uz, rx, ry) of every node are held; in-plane bending about local z. Frame with nodes A (0, 0), B (0, 7.5 m), C (6 m, 7.5 m), D (6 m, 2.5 m); A pinned, D on a roller that holds the vertical displacement only. Members AB and CD: A = 2400 cm^2, I = 720,000 cm^4; BC: A = 4800 cm^2, I = 1.44e6 cm^4; E = 2171.84 kN/cm^2. Load case 1: support A settles 1 cm; load case 2: support D settles 1 cm. The frame is statically determinate: the displacements are a rigid-body motion. The page works in kN and cm; the model file is in kN and mm (the input format has no cm). Reference values: computed here from this statement (verification/derive/vendor_reference.py); the textbook cited by the vendor page was not opened and no number is taken from it.",
+ "targets": [
+  {
+   "extract": "nodeDisplacement",
+   "node": "n2",
+   "dof": "ux",
+   "combination": "LC1",
+   "value": -12.500000000001766,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (plane frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n2",
+   "dof": "rz",
+   "combination": "LC1",
+   "value": 0.0016666666666667346,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (plane frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n4",
+   "dof": "ux",
+   "combination": "LC1",
+   "value": -4.166666666668608,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (plane frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n2",
+   "dof": "ux",
+   "combination": "LC2",
+   "value": 12.500000000001766,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (plane frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n2",
+   "dof": "rz",
+   "combination": "LC2",
+   "value": -0.0016666666666667346,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (plane frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n4",
+   "dof": "ux",
+   "combination": "LC2",
+   "value": 4.166666666668608,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (plane frame program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n2",
+   "dof": "ux",
+   "combination": "LC1",
+   "value": -12.5,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.004
+   },
+   "precisionNote": "printed \"1.25\" x 10 (unit conversion / common factor of the source); tolerance = half a unit in the last printed digit; printed in cm",
+   "sign": "the page prints a magnitude; sign from the reference solution, engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n2",
+   "dof": "rz",
+   "combination": "LC1",
+   "value": 0.001667,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 0.00029994001199760045
+   },
+   "precisionNote": "printed \"0.001667\"; tolerance = half a unit in the last printed digit",
+   "sign": "the page prints a magnitude; sign from the reference solution, engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n4",
+   "dof": "ux",
+   "combination": "LC1",
+   "value": -4.167,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.00011999040076793856
+   },
+   "precisionNote": "printed \"0.4167\" x 10 (unit conversion / common factor of the source); tolerance = half a unit in the last printed digit; printed in cm",
+   "sign": "the page prints a magnitude; sign from the reference solution, engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n2",
+   "dof": "ux",
+   "combination": "LC2",
+   "value": 12.5,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.004
+   },
+   "precisionNote": "printed \"1.25\" x 10 (unit conversion / common factor of the source); tolerance = half a unit in the last printed digit; printed in cm",
+   "sign": "the page prints a magnitude; sign from the reference solution, engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n2",
+   "dof": "rz",
+   "combination": "LC2",
+   "value": -0.001667,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 0.00029994001199760045
+   },
+   "precisionNote": "printed \"0.001667\"; tolerance = half a unit in the last printed digit",
+   "sign": "the page prints a magnitude; sign from the reference solution, engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n4",
+   "dof": "ux",
+   "combination": "LC2",
+   "value": 4.167,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.00011999040076793856
+   },
+   "precisionNote": "printed \"0.4167\" x 10 (unit conversion / common factor of the source); tolerance = half a unit in the last printed digit; printed in cm",
+   "sign": "the page prints a magnitude; sign from the reference solution, engine convention (docs/CONVENTIONS.md)"
+  }
+ ],
+ "status": "quarantined",
+ "quarantine": {
+  "diagnosis": "The engine produces no results: it refuses both combinations with 'invariant failed' (global force equilibrium 4.0e-1, global moment equilibrium 3.2e-1, joint equilibrium 3.9e-1 against the tolerance 1e-6). Cause: a limitation of the engine's invariant check, not an error of its solution. The frame is statically determinate, so a support settlement produces a rigid-body motion with NO member forces and NO reactions; the invariants measure the equilibrium residual relative to the largest force present, and here every force is round-off of zero, so the relative residual is of order one. The reference solution (plane frame program of verification/derive/vendor_reference.py) gives the rigid-body displacements the page prints (1.25 cm, 0.001667 rad, 0.4167 cm) with forces of 1e-12 kN. The engine's displacements cannot be read because it returns no results. Reported as an engine limitation (README.md); nothing was changed to make the problem run (for instance by adding a load)."
+ }
+}

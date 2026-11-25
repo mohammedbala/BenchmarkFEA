@@ -7,11 +7,12 @@ analysis, semi-rigid eaves connections (rotational springs) and rigid end offset
 """
 from __future__ import annotations
 
-from ._common import BRACING_PATTERNS, Builder, add_combinations, flag, service_ids
+from ._common import BUCKLING_CHANCE, BUCKLING_FLAG, BRACING_PATTERNS, Builder, add_combinations, flag, service_ids
 
 NAME = "portal_frame"
 LEVELS = (1, 2, 3)
 FEATURES = {
+    "buckling": BUCKLING_FLAG,
     "pitched": "pitched roof with a ridge node (two rafters)",
     "secondOrder": "strength combinations analysed second order",
     "baseSprings": "partially fixed bases (rotational springs)",
@@ -55,7 +56,7 @@ def build(draw, level: int, unit_system: str, vertical: str, features: dict) -> 
         B.node("N3", *xyv(Ls / 2.0, H + B.L(rise, 0.25)))
     B.node("N4", *xyv(Ls, H))
     B.node("N5", *xyv(Ls, 0.0))
-    col, raf = B.group("column", "column", 3), B.group("rafter", "beam", 4)
+    col, raf = B.group("column", "column", 5), B.group("rafter", "beam", 8)
     B.member("C1", "N1", "N2", col, roll=roll)
     B.member("C2", "N5", "N4", col, roll=roll)
     k = B.k_rot(k_eave)
@@ -110,13 +111,14 @@ def build(draw, level: int, unit_system: str, vertical: str, features: dict) -> 
              ("ULS5", {"D": 1.2, "L": 0.5, "W": -1.0, **c}, "strength"),
              ("ULS6", {"D": 0.9, "W": -1.0}, "strength")]
     add_combinations(B, cands, n_combos, second_order=second)
-    B.analysis["buckling"] = {"combinations": ["ULS1"], "modes": 2}
+    buckling = B.request_buckling(flag(features, "buckling", draw.chance(BUCKLING_CHANCE[level])), modes=2)
     sls = service_ids(cands, n_combos)
     B.design_group("columns", ["C1", "C2"], role="column", Kx=1.0 if second else (2.0 if base == "pinned" and not springs else 1.5),
                    bracing={"minor": [0.5], "torsion": [0.5]})
     B.design_group("rafters", beams, role="beam", bracing=dict(bracing[1]),
                    deflectionLimits=[{"spanRatio": 240 if pitched else 300, "direction": "y", "combinations": [sls[0]]}])
     B.parameters = {
+        "buckling": buckling,
         "plane": plane, "span": Ls, "height": H, "rise": B.L(rise, 0.25) if pitched else None,
         "bases": "spring" if springs else base, "baseSpring": B.k_rot(k_base) if springs else None,
         "frameSpacing_m": round(spacing, 3), "deadLoad": B.W(qd * spacing), "liveLoad": B.W(ql * spacing),

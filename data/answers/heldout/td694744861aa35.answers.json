@@ -1,0 +1,521 @@
+{
+ "format": "benchfea-task-answers",
+ "formatVersion": "1.0.0",
+ "id": "td694744861aa35",
+ "taskType": "diagnose",
+ "mode": "tool-allowed",
+ "key": {
+  "family": "multistorey_3d",
+  "curveBall": "release_mechanism",
+  "seed": 4,
+  "difficulty": 4,
+  "versions": {
+   "task": "1",
+   "generator": "1",
+   "curveBall": "1",
+   "engine": "0.1.0"
+  }
+ },
+ "generatorSeed": 4,
+ "skips": [],
+ "effectClass": "creates-mechanism",
+ "changeRecord": {
+  "format": "benchfea-curveball-record",
+  "formatVersion": "1.0.0",
+  "curveBall": "release_mechanism",
+  "title": "releases that create a mechanism",
+  "curveBallVersion": "1",
+  "seed": 4,
+  "category": "releases",
+  "effectClass": "creates-mechanism",
+  "target": "node A1.1: all rotations released at every member end (CA1.1.j, CA1.2.i, BXA1.1.i, BYA1.1.i)",
+  "changes": [
+   {
+    "op": "add",
+    "path": "/members/CA1.1/releases",
+    "after": {
+     "j": {
+      "rx": true,
+      "ry": true,
+      "rz": true
+     }
+    },
+    "index": 4
+   },
+   {
+    "op": "add",
+    "path": "/members/CA1.2/releases",
+    "after": {
+     "i": {
+      "rx": true,
+      "ry": true,
+      "rz": true
+     }
+    },
+    "index": 4
+   },
+   {
+    "op": "add",
+    "path": "/members/BXA1.1/releases",
+    "after": {
+     "i": {
+      "rx": true,
+      "ry": true,
+      "rz": true
+     }
+    },
+    "index": 4
+   },
+   {
+    "op": "add",
+    "path": "/members/BYA1.1/releases",
+    "after": {
+     "i": {
+      "rx": true,
+      "ry": true,
+      "rz": true
+     }
+    },
+    "index": 4
+   }
+  ],
+  "entities": {
+   "nodes": [
+    "A1.1"
+   ],
+   "members": [
+    "BXA1.1",
+    "BYA1.1",
+    "CA1.1",
+    "CA1.2"
+   ]
+  },
+  "whyItMatters": "Releases belong to member ends, the rotation belongs to the node. If every member end at a node is released, nothing holds the node's rotation: the stiffness matrix is singular. The structure may still look sensible (each member is pinned), but there is no solution; the correct answer is the diagnosis of the mechanism, and the fix is to keep one member end connected.",
+  "precondition": "a node with frame member ends whose rotations are still connected and whose own rotations are not all held by a support",
+  "effect": {
+   "class": "creates-mechanism",
+   "material": true,
+   "criterion": "creates-mechanism",
+   "criteria": [
+    "creates-mechanism"
+   ],
+   "thresholds": {
+    "analysisChange": 0.05,
+    "designRatioChange": 0.05
+   },
+   "base": {
+    "status": "ok",
+    "units": {
+     "force": "kN",
+     "length": "m"
+    },
+    "combinations": {
+     "ULS1": {
+      "analysisType": "secondOrder",
+      "maxTranslation": 0.011350173170991696,
+      "maxMemberDisplacement": 0.02282266884357129,
+      "maxReactionForce": 215.86130933458034,
+      "maxMemberMoment": 134.57844012231124
+     },
+     "SLS1": {
+      "analysisType": "firstOrder",
+      "maxTranslation": 0.007872450673099617,
+      "maxMemberDisplacement": 0.016129349112697422,
+      "maxReactionForce": 160.88557381730806,
+      "maxMemberMoment": 96.65611865075252
+     },
+     "ULS2": {
+      "analysisType": "secondOrder",
+      "maxTranslation": 0.04542969114305502,
+      "maxMemberDisplacement": 0.04696165151036791,
+      "maxReactionForce": 169.86265192854174,
+      "maxMemberMoment": 116.2799499922776
+     },
+     "ULS3": {
+      "analysisType": "secondOrder",
+      "maxTranslation": 0.06269655624947294,
+      "maxMemberDisplacement": 0.06322794895541768,
+      "maxReactionForce": 170.93954628907161,
+      "maxMemberMoment": 83.08373312551561
+     }
+    },
+    "design": {
+     "status": "pass",
+     "maxRatio": 0.8101201601679321,
+     "maxRatioMember": "BXA2.2",
+     "failing": []
+    }
+   },
+   "perturbed": {
+    "status": "unstable",
+    "nMechanisms": 3
+   },
+   "releasedDofs": [
+    "rx",
+    "ry",
+    "rz"
+   ]
+  },
+  "reference": {
+   "kind": "diagnosis",
+   "note": "the perturbed model is a mechanism: the reference solution is the solver's structured mechanism diagnosis, not a set of results",
+   "diagnosis": {
+    "stable": false,
+    "classification": "mechanism",
+    "nMechanisms": 3,
+    "nFreeDofs": 56,
+    "tolerance": 1e-10,
+    "modes": [
+     {
+      "kind": "node",
+      "description": "node A1.1 rotation about X unrestrained: all connected member ends released",
+      "motion": "rotation",
+      "cause": "all-member-ends-released",
+      "count": 1,
+      "direction": null,
+      "axis": [
+       1.0,
+       0.0,
+       0.0
+      ],
+      "through": null,
+      "nodes": [
+       {
+        "node": "A1.1",
+        "share": 1.0,
+        "dofs": {
+         "rx": 1.0
+        }
+       }
+      ],
+      "members": [
+       "CA1.1",
+       "CA1.2",
+       "BXA1.1",
+       "BYA1.1"
+      ]
+     },
+     {
+      "kind": "node",
+      "description": "node A1.1 rotation about Y unrestrained: all connected member ends released",
+      "motion": "rotation",
+      "cause": "all-member-ends-released",
+      "count": 1,
+      "direction": null,
+      "axis": [
+       0.0,
+       1.0,
+       0.0
+      ],
+      "through": null,
+      "nodes": [
+       {
+        "node": "A1.1",
+        "share": 1.0,
+        "dofs": {
+         "ry": 1.0
+        }
+       }
+      ],
+      "members": [
+       "CA1.1",
+       "CA1.2",
+       "BXA1.1",
+       "BYA1.1"
+      ]
+     },
+     {
+      "kind": "node",
+      "description": "node A1.1 rotation about Z unrestrained: all connected member ends released",
+      "motion": "rotation",
+      "cause": "all-member-ends-released",
+      "count": 1,
+      "direction": null,
+      "axis": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "through": null,
+      "nodes": [
+       {
+        "node": "A1.1",
+        "share": 1.0,
+        "dofs": {
+         "rz": 1.0
+        }
+       }
+      ],
+      "members": [
+       "CA1.1",
+       "CA1.2",
+       "BXA1.1",
+       "BYA1.1"
+      ]
+     }
+    ]
+   },
+   "problems": [
+    {
+     "code": "stability.mechanism",
+     "path": "/nodes/A1.1",
+     "message": "the structure is a mechanism: node A1.1 rotation about X unrestrained: all connected member ends released"
+    },
+    {
+     "code": "stability.mechanism",
+     "path": "/nodes/A1.1",
+     "message": "the structure is a mechanism: node A1.1 rotation about Y unrestrained: all connected member ends released"
+    },
+    {
+     "code": "stability.mechanism",
+     "path": "/nodes/A1.1",
+     "message": "the structure is a mechanism: node A1.1 rotation about Z unrestrained: all connected member ends released"
+    }
+   ]
+  },
+  "verification": {
+   "reference": "diagnosis",
+   "route": "diagnosis tiers N, K, C, E of benchfea.verify (docs/VERIFICATION.md section 4): null space of an independently assembled stiffness, engine matrix, two foreign solvers under a probing load, invariance of the diagnosis"
+  },
+  "rejected": [
+   {
+    "target": "node B2.2: bending rotations released at every member end (CB2.2.j, BXA2.2.j, BYB1.2.j)",
+    "reason": "effect class 'changes-analysis' is not creates-mechanism"
+   },
+   {
+    "target": "node B2.1: bending rotations released at every member end (CB2.1.j, CB2.2.i, BXA2.1.j, BYB1.1.j)",
+    "reason": "effect class 'changes-analysis' is not creates-mechanism"
+   },
+   {
+    "target": "node B1.0: all rotations released at every member end (CB1.1.i)",
+    "reason": "effect class 'changes-analysis' is not creates-mechanism"
+   },
+   {
+    "target": "node B2.0: all rotations released at every member end (CB2.1.i)",
+    "reason": "effect class 'changes-analysis' is not creates-mechanism"
+   },
+   {
+    "target": "node A1.2: bending rotations released at every member end (CA1.2.j, BXA1.2.i, BYA1.2.i)",
+    "reason": "effect class 'changes-analysis' is not creates-mechanism"
+   },
+   {
+    "target": "node A2.0: all rotations released at every member end (CA2.1.i)",
+    "reason": "effect class 'changes-analysis' is not creates-mechanism"
+   }
+  ],
+  "baseHash": "852967a66b341c765084cd709f54212d368f7a6a6cf40e892ecddb3e822d5954",
+  "perturbedHash": "d3591eb1cb85e8e394aff1fafcc611804490dc31f7dfbbed290c5b22eccab7d3"
+ },
+ "verification": {
+  "format": "benchfea-verification",
+  "kind": "diagnosis",
+  "status": "verified",
+  "meaning": "'verified' means only: the reference solution passed every tier listed as applicable in this record, at the tolerances stated in it. It does not mean reviewed, approved or certified by anyone.",
+  "modelHash": "d3591eb1cb85e8e394aff1fafcc611804490dc31f7dfbbed290c5b22eccab7d3",
+  "tiersPassed": [
+   "N",
+   "K",
+   "C",
+   "E"
+  ],
+  "tiersNotPassed": [],
+  "tiersNotApplicable": [],
+  "quarantine": null,
+  "tiers": {
+   "N": {
+    "applies": true,
+    "passed": true,
+    "summary": "independent stiffness: 3 zero-stiffness motion(s) (diagnosis: 3); 3 described mode(s) tested for K phi = 0: agree",
+    "tolerances": {
+     "singular": 1e-09,
+     "nullResidual": 2e-06
+    },
+    "largestDifferences": [
+     {
+      "what": "mode 0: |K phi| / (|K| |phi|) on the independent matrix",
+      "value": 0.0,
+      "tolerance": 2e-06
+     },
+     {
+      "what": "mode 1: |K phi| / (|K| |phi|) on the independent matrix",
+      "value": 0.0,
+      "tolerance": 2e-06
+     },
+     {
+      "what": "mode 2: |K phi| / (|K| |phi|) on the independent matrix",
+      "value": 0.0,
+      "tolerance": 2e-06
+     }
+    ]
+   },
+   "K": {
+    "applies": true,
+    "passed": true,
+    "summary": "engine matrix: 3 eigenvalue(s) below 1.0e-09; the described modes satisfy K phi = 0",
+    "tolerances": {
+     "singular": 1e-09,
+     "nullResidual": 2e-06
+    },
+    "largestDifferences": [
+     {
+      "what": "mode 0: |K phi| / (|K| |phi|) on the engine's matrix",
+      "value": 0.0,
+      "tolerance": 2e-06
+     },
+     {
+      "what": "mode 1: |K phi| / (|K| |phi|) on the engine's matrix",
+      "value": 0.0,
+      "tolerance": 2e-06
+     },
+     {
+      "what": "mode 2: |K phi| / (|K| |phi|) on the engine's matrix",
+      "value": 0.0,
+      "tolerance": 2e-06
+     }
+    ]
+   },
+   "C": {
+    "applies": true,
+    "passed": true,
+    "summary": "2 foreign solver(s) find no equilibrium state under a load that does work on the mechanism(s)",
+    "tolerances": {
+     "saneDisplacement": "1000 x model size"
+    },
+    "largestDifferences": []
+   },
+   "E": {
+    "applies": true,
+    "passed": true,
+    "summary": "diagnosis identical on a second run and after changing every design variable",
+    "tolerances": {
+     "designVariables": 0.0
+    },
+    "largestDifferences": []
+   }
+  },
+  "versions": {
+   "benchfea": "0.1.0",
+   "python": "3.13.18",
+   "numpy": "2.5.3",
+   "scipy": "1.18.1",
+   "foreign:opensees": "3.8.0.0",
+   "foreign:pynite": "3.2.1"
+  },
+  "notes": [
+   "verified diagnosis: passed tier(s) N, K, C, E (docs/VERIFICATION.md, 'Unstable models')"
+  ]
+ },
+ "designVerification": null,
+ "reference": {
+  "category": "releases",
+  "entities": {
+   "nodes": [
+    "A1.1"
+   ],
+   "members": [
+    "BXA1.1",
+    "BYA1.1",
+    "CA1.1",
+    "CA1.2"
+   ]
+  },
+  "direction": "added",
+  "target": "node A1.1: all rotations released at every member end (CA1.1.j, CA1.2.i, BXA1.1.i, BYA1.1.i)",
+  "mechanism": {
+   "stable": false,
+   "classification": "mechanism",
+   "nMechanisms": 3,
+   "nFreeDofs": 56,
+   "tolerance": 1e-10,
+   "modes": [
+    {
+     "kind": "node",
+     "description": "node A1.1 rotation about X unrestrained: all connected member ends released",
+     "motion": "rotation",
+     "cause": "all-member-ends-released",
+     "count": 1,
+     "direction": null,
+     "axis": [
+      1.0,
+      0.0,
+      0.0
+     ],
+     "through": null,
+     "nodes": [
+      {
+       "node": "A1.1",
+       "share": 1.0,
+       "dofs": {
+        "rx": 1.0
+       }
+      }
+     ],
+     "members": [
+      "CA1.1",
+      "CA1.2",
+      "BXA1.1",
+      "BYA1.1"
+     ]
+    },
+    {
+     "kind": "node",
+     "description": "node A1.1 rotation about Y unrestrained: all connected member ends released",
+     "motion": "rotation",
+     "cause": "all-member-ends-released",
+     "count": 1,
+     "direction": null,
+     "axis": [
+      0.0,
+      1.0,
+      0.0
+     ],
+     "through": null,
+     "nodes": [
+      {
+       "node": "A1.1",
+       "share": 1.0,
+       "dofs": {
+        "ry": 1.0
+       }
+      }
+     ],
+     "members": [
+      "CA1.1",
+      "CA1.2",
+      "BXA1.1",
+      "BYA1.1"
+     ]
+    },
+    {
+     "kind": "node",
+     "description": "node A1.1 rotation about Z unrestrained: all connected member ends released",
+     "motion": "rotation",
+     "cause": "all-member-ends-released",
+     "count": 1,
+     "direction": null,
+     "axis": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "through": null,
+     "nodes": [
+      {
+       "node": "A1.1",
+       "share": 1.0,
+       "dofs": {
+        "rz": 1.0
+       }
+      }
+     ],
+     "members": [
+      "CA1.1",
+      "CA1.2",
+      "BXA1.1",
+      "BYA1.1"
+     ]
+    }
+   ]
+  }
+ }
+}

@@ -1,0 +1,161 @@
+{
+ "name": "mgz/ex-5-4-space-truss",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kN",
+  "length": "mm"
+ },
+ "conventions": {
+  "verticalAxis": "Z"
+ },
+ "nodes": {
+  "a": {
+   "x": 2000.0,
+   "y": 4000.0,
+   "z": 8000.0
+  },
+  "b": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "c": {
+   "x": 8000.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "d": {
+   "x": 8000.0,
+   "y": 6000.0,
+   "z": 0.0
+  },
+  "e": {
+   "x": 0.0,
+   "y": 6000.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "b": {
+   "dofs": {
+    "ux": "fixed",
+    "uy": "fixed",
+    "uz": "fixed"
+   }
+  },
+  "c": {
+   "dofs": {
+    "ux": "fixed",
+    "uy": "fixed",
+    "uz": "fixed"
+   }
+  },
+  "d": {
+   "dofs": {
+    "ux": "fixed",
+    "uy": "fixed",
+    "uz": "fixed"
+   }
+  },
+  "e": {
+   "dofs": {
+    "ux": "fixed",
+    "uy": "fixed",
+    "uz": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 200.0,
+   "nu": 0.3
+  }
+ },
+ "sections": {
+  "ab": {
+   "type": "properties",
+   "description": "axial-force member: Iy, Iz, J are placeholders, not used",
+   "A": 20000.0,
+   "Iy": 1.0,
+   "Iz": 1.0,
+   "J": 1.0
+  },
+  "ac": {
+   "type": "properties",
+   "description": "axial-force member: Iy, Iz, J are placeholders, not used",
+   "A": 30000.0,
+   "Iy": 1.0,
+   "Iz": 1.0,
+   "J": 1.0
+  },
+  "ad": {
+   "type": "properties",
+   "description": "axial-force member: Iy, Iz, J are placeholders, not used",
+   "A": 40000.0,
+   "Iy": 1.0,
+   "Iz": 1.0,
+   "J": 1.0
+  },
+  "ae": {
+   "type": "properties",
+   "description": "axial-force member: Iy, Iz, J are placeholders, not used",
+   "A": 30000.0,
+   "Iy": 1.0,
+   "Iz": 1.0,
+   "J": 1.0
+  }
+ },
+ "members": {
+  "ab": {
+   "type": "truss",
+   "i": "a",
+   "j": "b",
+   "section": "ab",
+   "material": "M"
+  },
+  "ac": {
+   "type": "truss",
+   "i": "a",
+   "j": "c",
+   "section": "ac",
+   "material": "M"
+  },
+  "ad": {
+   "type": "truss",
+   "i": "a",
+   "j": "d",
+   "section": "ad",
+   "material": "M"
+  },
+  "ae": {
+   "type": "truss",
+   "i": "a",
+   "j": "e",
+   "section": "ae",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "a",
+     "Fx": 200.0,
+     "Fy": 600.0,
+     "Fz": -800.0
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.0
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": false
+ }
+}

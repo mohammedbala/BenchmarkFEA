@@ -1,0 +1,118 @@
+{
+ "name": "mgz/ex-13-2-fixed-beam-three-loads",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kN",
+  "length": "mm"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "l": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n1": {
+   "x": 2000.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n2": {
+   "x": 4000.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n3": {
+   "x": 6000.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "r": {
+   "x": 8000.0,
+   "y": 0.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "l": {
+   "type": "fixed"
+  },
+  "r": {
+   "type": "fixed"
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 200.0,
+   "nu": 0.3
+  }
+ },
+ "sections": {
+  "s": {
+   "type": "properties",
+   "A": 10000.0,
+   "Iy": 200000000.0,
+   "Iz": 200000000.0,
+   "J": 200000000.0
+  }
+ },
+ "members": {
+  "m1": {
+   "i": "l",
+   "j": "n1",
+   "section": "s",
+   "material": "M"
+  },
+  "m2": {
+   "i": "n1",
+   "j": "n2",
+   "section": "s",
+   "material": "M"
+  },
+  "m3": {
+   "i": "n2",
+   "j": "n3",
+   "section": "s",
+   "material": "M"
+  },
+  "m4": {
+   "i": "n3",
+   "j": "r",
+   "section": "s",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "n1",
+     "Fy": -50.0
+    },
+    {
+     "type": "nodal",
+     "node": "n2",
+     "Fy": -30.0
+    },
+    {
+     "type": "nodal",
+     "node": "n3",
+     "Fy": -10.0
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.0
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": false
+ }
+}

@@ -1,0 +1,241 @@
+{
+ "name": "ziemian/frame-3-critical-load-ratio",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kip",
+  "length": "in"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "n1": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n2": {
+   "x": 144.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n9": {
+   "x": 0.0,
+   "y": 96.0,
+   "z": 0.0
+  },
+  "n10": {
+   "x": 144.0,
+   "y": 96.0,
+   "z": 0.0
+  },
+  "n17": {
+   "x": 0.0,
+   "y": 216.0,
+   "z": 0.0
+  },
+  "n18": {
+   "x": 144.0,
+   "y": 216.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "n1": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed",
+    "ux": "fixed",
+    "uy": "fixed"
+   }
+  },
+  "n2": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed",
+    "ux": "fixed",
+    "uy": "fixed"
+   }
+  },
+  "n9": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "n10": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "n17": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "n18": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 23200.0,
+   "nu": 0.3,
+   "description": "0.8 x 29,000 ksi (analysis condition of the data set)"
+  }
+ },
+ "sections": {
+  "s1": {
+   "type": "properties",
+   "description": "W8X31: A, Izz and J as listed in the data set; Iy = 1000 Izz (plane problem, see problem.json)",
+   "A": 9.12,
+   "Iz": 110.0,
+   "Iy": 110000.0,
+   "J": 0.536
+  },
+  "s2": {
+   "type": "properties",
+   "description": "W8X18: A, Izz and J as listed in the data set; Iy = 1000 Izz (plane problem, see problem.json)",
+   "A": 5.26,
+   "Iz": 61.9,
+   "Iy": 61900.0,
+   "J": 0.172
+  },
+  "s3": {
+   "type": "properties",
+   "description": "W12X26: A, Izz and J as listed in the data set; Iy = 1000 Izz (plane problem, see problem.json)",
+   "A": 7.65,
+   "Iz": 204.0,
+   "Iy": 204000.0,
+   "J": 0.3
+  }
+ },
+ "members": {
+  "m1": {
+   "i": "n9",
+   "j": "n10",
+   "section": "s2",
+   "material": "M",
+   "releases": {
+    "i": {
+     "rz": true
+    },
+    "j": {
+     "rz": true
+    }
+   }
+  },
+  "m2": {
+   "i": "n17",
+   "j": "n18",
+   "section": "s2",
+   "material": "M",
+   "releases": {
+    "i": {
+     "rz": true
+    },
+    "j": {
+     "rz": true
+    }
+   }
+  },
+  "m3": {
+   "i": "n17",
+   "j": "n10",
+   "section": "s3",
+   "material": "M",
+   "releases": {
+    "i": {
+     "rz": true
+    },
+    "j": {
+     "rz": true
+    }
+   }
+  },
+  "m4": {
+   "i": "n9",
+   "j": "n18",
+   "section": "s3",
+   "material": "M",
+   "releases": {
+    "i": {
+     "rz": true
+    },
+    "j": {
+     "rz": true
+    }
+   }
+  },
+  "m5-8": {
+   "i": "n9",
+   "j": "n17",
+   "section": "s1",
+   "material": "M"
+  },
+  "m9-12": {
+   "i": "n1",
+   "j": "n9",
+   "section": "s1",
+   "material": "M"
+  },
+  "m13-16": {
+   "i": "n10",
+   "j": "n18",
+   "section": "s1",
+   "material": "M"
+  },
+  "m17-20": {
+   "i": "n2",
+   "j": "n10",
+   "section": "s1",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "n17",
+     "Fx": 1.544,
+     "Fy": -235.25
+    },
+    {
+     "type": "nodal",
+     "node": "n18",
+     "Fx": 1.544,
+     "Fy": -239.88
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.0
+   },
+   "analysisType": "firstOrder"
+  }
+ },
+ "analysis": {
+  "shearDeformation": false,
+  "buckling": {
+   "combinations": [
+    "C"
+   ],
+   "modes": 1
+  }
+ }
+}

@@ -1,0 +1,29 @@
+{
+ "id": "ex-13-5-truss-inclined-roller",
+ "title": "Three-bar plane truss on an inclined roller",
+ "tier": "B",
+ "source": {
+  "work": "McGuire, W., Gallagher, R. H., Ziemian, R. D., Matrix Structural Analysis",
+  "edition": "2nd edition (copyright 2014 R. D. Ziemian)",
+  "location": "Example 13.5 (truss of Examples 3.1 and 3.2)",
+  "pages": "pp. 390-391",
+  "notes": "input data and targets read on the cited pages; nothing of the source is reproduced"
+ },
+ "basis": "published",
+ "analysis": "Pin-jointed plane truss in the x-y plane (global Y vertical): members of type 'truss'; the out-of-plane translation of every joint is held by a support (it has no stiffness in a plane truss). Truss of Example 3.2 (c (0, 0), a (4/tan 30 deg, 4), b (4/tan 30 deg + 4, 0) m; A_ac = 15e3, A_ab = 20e3, A_bc = 18e3 mm^2; E = 200,000 MPa; load at a 383.0 kN in x and 321.4 kN in y), c pinned, b on a roller whose plane is inclined 30 deg to the x axis. The input format has supports along global axes only. The model is therefore written in the source's joint axes x'', y'' of b: every coordinate and the load are rotated by -30 deg, so that the roller plane is the model's X axis and the roller holds uy at b. The rotation of the data is exact; the structure is the same. Only the displacement the source gives in these axes (u_b'') can be compared without transforming printed values; the source's u_a = 0.928 mm and v_a = 1.143 mm (global axes) are not targets (the engine gives 0.9282 and 1.1425 mm after rotating its result back, see README.md). First order.",
+ "targets": [
+  {
+   "extract": "nodeDisplacement",
+   "node": "b",
+   "dof": "ux",
+   "value": -0.094,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.005319148936170213
+   },
+   "precisionNote": "printed \"0.094\"; tolerance = half a unit in the last printed digit; printed -0.094 (u_b'' along the inclined plane)",
+   "sign": "the model's X axis is the source's joint axis x'' at b"
+  }
+ ],
+ "status": "active"
+}

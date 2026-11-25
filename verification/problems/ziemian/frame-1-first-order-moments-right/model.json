@@ -1,0 +1,143 @@
+{
+ "name": "ziemian/frame-1-first-order-moments-right",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kip",
+  "length": "in"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "n1": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n2": {
+   "x": 360.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n9": {
+   "x": 0.36,
+   "y": 180.0,
+   "z": 0.0
+  },
+  "n13": {
+   "x": 360.36,
+   "y": 180.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "n1": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed",
+    "ux": "fixed",
+    "uy": "fixed",
+    "rz": "fixed"
+   }
+  },
+  "n2": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed",
+    "ux": "fixed",
+    "uy": "fixed",
+    "rz": "fixed"
+   }
+  },
+  "n9": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "n13": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 23200.0,
+   "nu": 0.3,
+   "description": "0.8 x 29,000 ksi (analysis condition of the data set)"
+  }
+ },
+ "sections": {
+  "s1": {
+   "type": "properties",
+   "description": "W14X68: A, Izz and J as listed in the data set; Iy = 1000 Izz (plane problem, see problem.json)",
+   "A": 20.0,
+   "Iz": 722.0,
+   "Iy": 722000.0,
+   "J": 3.01
+  },
+  "s2": {
+   "type": "properties",
+   "description": "W18X35: A, Izz and J as listed in the data set; Iy = 1000 Izz (plane problem, see problem.json)",
+   "A": 10.3,
+   "Iz": 510.0,
+   "Iy": 510000.0,
+   "J": 0.506
+  }
+ },
+ "members": {
+  "m1-4": {
+   "i": "n1",
+   "j": "n9",
+   "section": "s1",
+   "material": "M"
+  },
+  "m5-8": {
+   "i": "n9",
+   "j": "n13",
+   "section": "s2",
+   "material": "M"
+  },
+  "m9-12": {
+   "i": "n2",
+   "j": "n13",
+   "section": "s1",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "n9",
+     "Fx": 34.849,
+     "Fy": -348.49
+    },
+    {
+     "type": "nodal",
+     "node": "n13",
+     "Fy": -348.49
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.0
+   },
+   "analysisType": "firstOrder"
+  }
+ },
+ "analysis": {
+  "shearDeformation": false,
+  "resultStations": 5
+ }
+}

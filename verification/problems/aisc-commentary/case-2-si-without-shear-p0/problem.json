@@ -1,0 +1,43 @@
+{
+ "id": "case-2-si-without-shear-p0",
+ "title": "AISC benchmark Case 2 (P-Delta and P-delta), SI table, without shear deformation, P = 0",
+ "tier": "B",
+ "source": {
+  "work": "ANSI/AISC 360-22, Specification for Structural Steel Buildings (American Institute of Steel Construction), Commentary",
+  "edition": "August 1, 2022",
+  "pages": "p. 16.1-337 (text p. 16.1-336 to 16.1-337)",
+  "notes": "input data and targets read on the cited page; nothing of the source is reproduced. Section properties of the W14x48 are not given by the source and are not taken from any table: I_x is calibrated on the source's own P = 0 deflection without shear deformation of Case 2, the shear flexibility on the source's P = 0 deflections with and without shear deformation (see build_problems.py and README.md)",
+  "location": "Commentary Section C2.1, Fig. C-C2.3 (benchmark problem Case 2), SI table, column P = 0, values in brackets"
+ },
+ "basis": "published",
+ "analysis": "Case 2 of the source: fixed-base cantilever under a lateral load of 4.45 kN and the axial compression P at the top; targets: moment at the base and lateral deflection of the top. Axial load level P = 0 x 1000 N (load case P holds the unit axial load, the combination factor is the level). SI table: E = 200 000 MPa, L = 8.53 m, I = 2.01011e+08 mm^4 (calibrated, see source.notes), shear deformation excluded (the source's values in brackets). Member vertical along global Z, bending in the X-Z plane about local z (the section's Iz = Iy = I). Second-order analysis; the engine's member carries the exact stability functions, so one member is the exact solution of the second-order theory. The support idealisation is read from the source's sketch.",
+ "targets": [
+  {
+   "extract": "memberStation",
+   "member": "m",
+   "quantity": "Mz",
+   "relative": 0.0,
+   "value": 38000000.0,
+   "unit": "N mm",
+   "tolerance": {
+    "rel": 0.03
+   },
+   "precisionNote": "stated tolerance 0.03 on printed \"38.0\" x 1000000 (unit conversion / common factor of the source); acceptance criterion stated by the source on the same page (AISC 360-22 Commentary C2.1, p. 16.1-337): moments within 3 %, deflections within 5 %; value printed to 3 significant figures",
+   "sign": "magnitude in the source; in the engine's convention (member local x upward, local y = global +X, loads along +X) the midspan moment Mz of Case 1 is negative and the base moment of Case 2 positive"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "b",
+   "dof": "ux",
+   "value": 22.9,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.05
+   },
+   "precisionNote": "stated tolerance 0.05 on printed \"22.9\"; acceptance criterion stated by the source on the same page (AISC 360-22 Commentary C2.1, p. 16.1-337): moments within 3 %, deflections within 5 %; value printed to 3 significant figures; I_x is calibrated on this number: reproduced by construction, not evidence",
+   "sign": "magnitude in the source; the load acts along +X, deflection +X"
+  }
+ ],
+ "status": "active",
+ "limitsNote": "Section properties are calibrated on the source's own P = 0 values (the source gives none): the problem verifies the second-order amplification, not section properties."
+}

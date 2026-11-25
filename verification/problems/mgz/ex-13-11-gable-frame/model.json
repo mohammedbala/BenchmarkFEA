@@ -1,0 +1,125 @@
+{
+ "name": "mgz/ex-13-11-gable-frame",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kN",
+  "length": "mm"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "a": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "b": {
+   "x": 0.0,
+   "y": 5000.0,
+   "z": 0.0
+  },
+  "c": {
+   "x": 7416.198487095663,
+   "y": 8000.0,
+   "z": 0.0
+  },
+  "d": {
+   "x": 14832.396974191326,
+   "y": 5000.0,
+   "z": 0.0
+  },
+  "e": {
+   "x": 14832.396974191326,
+   "y": 0.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "a": {
+   "type": "fixed"
+  },
+  "e": {
+   "type": "fixed"
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 200.0,
+   "nu": 0.3
+  }
+ },
+ "sections": {
+  "col": {
+   "type": "properties",
+   "A": 4000.0,
+   "Iy": 50000000.0,
+   "Iz": 50000000.0,
+   "J": 50000000.0
+  },
+  "raf": {
+   "type": "properties",
+   "A": 6000.0,
+   "Iy": 200000000.0,
+   "Iz": 200000000.0,
+   "J": 200000000.0
+  }
+ },
+ "members": {
+  "ab": {
+   "i": "a",
+   "j": "b",
+   "section": "col",
+   "material": "M"
+  },
+  "bc": {
+   "i": "b",
+   "j": "c",
+   "section": "raf",
+   "material": "M"
+  },
+  "cd": {
+   "i": "c",
+   "j": "d",
+   "section": "raf",
+   "material": "M"
+  },
+  "ed": {
+   "i": "e",
+   "j": "d",
+   "section": "col",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "b",
+     "Fx": 5.0
+    },
+    {
+     "type": "nodal",
+     "node": "d",
+     "Fx": 5.0
+    },
+    {
+     "type": "nodal",
+     "node": "c",
+     "Fy": -10.0
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.0
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": false
+ }
+}

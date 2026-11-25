@@ -1,0 +1,98 @@
+{
+ "id": "beam-column-08",
+ "title": "Simply supported beam-column, uniform load, axial compression 0.8 P_e",
+ "tier": "A",
+ "source": {
+  "work": "derived here (no publication): benchfea.oracle direct integration of the member equations / numerically solved characteristic equation",
+  "edition": "",
+  "location": "verification/derive/derive_problems.py, problem 'beam-column-08'",
+  "pages": "",
+  "notes": "regenerate with: python3 verification/derive/derive_problems.py"
+ },
+ "basis": "derived-here",
+ "analysis": "Second order (member equations with the axial force acting on the deflected axis), no shear deformation. Span 6 m, EI = 40 000 kN m^2 in both planes, uniform load 8 kN/m, axial force 0.8 x pi^2 EI / L^2 in compression.",
+ "targets": [
+  {
+   "extract": "memberStation",
+   "combination": "C",
+   "member": "m",
+   "quantity": "uy",
+   "relative": 0.5,
+   "side": "left",
+   "value": -0.016925742099190167,
+   "unit": "m",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "extract": "memberStation",
+   "combination": "C",
+   "member": "m",
+   "quantity": "Mz",
+   "relative": 0.5,
+   "side": "left",
+   "value": 184.48922552344064,
+   "unit": "kN m",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "extract": "memberStation",
+   "combination": "C",
+   "member": "m",
+   "quantity": "uy",
+   "relative": 0.2,
+   "side": "left",
+   "value": -0.00997147678312691,
+   "unit": "m",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "extract": "memberStation",
+   "combination": "C",
+   "member": "m",
+   "quantity": "Mz",
+   "relative": 0.2,
+   "side": "left",
+   "value": 110.51958323920861,
+   "unit": "kN m",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "path": "/combinations/C/displacements/a/ry",
+   "value": 0.008898093743363039,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "path": "/combinations/C/reactions/a/Fz",
+   "value": 23.999999999999996,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "extract": "memberStation",
+   "combination": "C",
+   "member": "m",
+   "quantity": "N",
+   "relative": 0.5,
+   "side": "left",
+   "value": -8772.981689857208,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  }
+ ],
+ "status": "active"
+}

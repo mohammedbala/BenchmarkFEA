@@ -1,0 +1,85 @@
+{
+ "name": "derived/euler-column-fixed-pinned",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kN",
+  "length": "m"
+ },
+ "conventions": {
+  "verticalAxis": "Z"
+ },
+ "nodes": {
+  "a": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "b": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 4.0
+  }
+ },
+ "supports": {
+  "a": {
+   "type": "fixed"
+  },
+  "b": {
+   "dofs": {
+    "ux": "fixed",
+    "uy": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 200000000.0,
+   "nu": 0.3
+  }
+ },
+ "sections": {
+  "S": {
+   "type": "properties",
+   "A": 0.01,
+   "Iy": 0.0002,
+   "Iz": 0.0002,
+   "J": 0.00015
+  }
+ },
+ "members": {
+  "m": {
+   "section": "S",
+   "material": "M",
+   "i": "a",
+   "j": "b"
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "b",
+     "Fz": -100.0
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.0
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": false,
+  "resultStations": 11,
+  "buckling": {
+   "combinations": [
+    "C"
+   ],
+   "modes": 1
+  }
+ }
+}

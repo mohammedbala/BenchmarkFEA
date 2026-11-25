@@ -1,0 +1,29 @@
+{
+ "id": "ex-9-1-truss-critical-load",
+ "title": "Two-bar truss: elastic critical load of a bar restrained by a weak tie",
+ "tier": "B",
+ "source": {
+  "work": "McGuire, W., Gallagher, R. H., Ziemian, R. D., Matrix Structural Analysis",
+  "edition": "2nd edition (copyright 2014 R. D. Ziemian)",
+  "location": "Example 9.1, case 1 (alpha = 0), Equation d",
+  "pages": "p. 247",
+  "notes": "input data and targets read on the cited pages; nothing of the source is reproduced"
+ },
+ "basis": "published",
+ "analysis": "Pin-jointed plane truss in the x-y plane (global Y vertical): members of type 'truss'; the out-of-plane translation of every joint is held by a support (it has no stiffness in a plane truss). a (0, 4) m pinned, b (4, 4) m, c (4, 0) m pinned; axial-force members ab (horizontal, A = 2 mm^2) and bc (vertical, A = 5e3 mm^2), E = 200,000 MPa. Reference load 1 kN downward at b, so the buckling factor is the critical load in kN. Linear buckling analysis; the mode is the rotation of bar bc about c, restrained by the axial stiffness of ab (P = k L = 0.1 kN/mm x 4000 mm). The source's axial-force member has no flexural buckling of its own; the engine treats a compressed truss member as a pin-ended beam-column with the section's I, so bar bc is given I = 1e10 mm^4 (member Euler load 1.2e6 kN; with 1e8 or 1e12 mm^4 the system factor is the same to 1e-7). The second case of the example (alpha = 0.05, large-displacement response with a limit point) is not applicable to the engine.",
+ "targets": [
+  {
+   "extract": "bucklingFactor",
+   "combination": "C",
+   "mode": 1,
+   "value": 400.0,
+   "unit": "kN (factor on 1 kN)",
+   "tolerance": {
+    "rel": 0.00125
+   },
+   "precisionNote": "printed \"400\"; tolerance = half a unit in the last printed digit; P_cre = lambda P_ref = 400 kN, an exact closed-form value (the source also derives it as k L = 2 x 200)",
+   "sign": "positive factor on a downward (compressive) load"
+  }
+ ],
+ "status": "active"
+}

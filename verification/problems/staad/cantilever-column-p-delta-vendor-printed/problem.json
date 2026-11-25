@@ -1,0 +1,34 @@
+{
+ "id": "cantilever-column-p-delta-vendor-printed",
+ "title": "Cantilever column with axial and lateral load: second-order base moment - values printed by the vendor that do not reproduce",
+ "tier": "B",
+ "source": {
+  "work": "Bentley Systems, STAAD.Pro Help, Verification Examples (public documentation, docs.bentley.com)",
+  "edition": "STAAD.Pro Help v21 build (pages refer to the STAAD.Pro 2023 sample files), read 2026-11-22",
+  "location": "'V. Single Column P-Delta Analysis' (https://docs.bentley.com/LiveContent/web/STAAD.Pro%20Help-v21/en/GUID-A271BC6F-0313-4D0A-8388-114D259A493F.html)",
+  "pages": "web page",
+  "notes": "problem statement taken from the vendor page (text and input listing). The page cites: no textbook; the page validates with M = H L + P x (first-order tip deflection) - NOT opened for this project; no number is taken from it. The page's 'theory' values are recorded as printed; the program's own results are not used."
+ },
+ "basis": "published",
+ "analysis": "Plane problem in the global X-Y plane (Y vertical); the out-of-plane DOFs (uz, rx, ry) of every node are held; in-plane bending about local z. Cantilever column of 144 in, built in at the base, free at the top; W8x10 with the moment of inertia the page uses, I = 30.80 in^4, E = 29,000 ksi; axial load 3 kip and lateral load 5 kip at the top. Combination 'second': second-order analysis of both loads (the engine's member carries the exact stability functions); combination 'first': first-order analysis of the lateral load alone. The area does not enter the targets (placeholder 10 in^2); Iy = 1000 Iz so that no out-of-plane buckling enters.  Same model as problem 'cantilever-column-p-delta' (whose recomputed targets are active); the targets here are the vendor's printed values only.",
+ "targets": [
+  {
+   "extract": "memberStation",
+   "member": "m",
+   "quantity": "Mz",
+   "relative": 0.0,
+   "combination": "second",
+   "value": 736.72,
+   "unit": "kip in",
+   "tolerance": {
+    "rel": 6.786838961885112e-06
+   },
+   "precisionNote": "printed \"736.72\"; tolerance = half a unit in the last printed digit; the page's reference base moment (its table header says ft kip; the value is in kip in)",
+   "sign": "the page prints a magnitude; sign from the reference solution, engine convention (docs/CONVENTIONS.md)"
+  }
+ ],
+ "status": "quarantined",
+ "quarantine": {
+  "diagnosis": "Missed by 6.4e-4 relative: engine 737.194 kip in, printed 736.72. The page's reference is a one-step approximation, M = H L + P x (FIRST-order tip deflection) = 5 x 144 + 3 x 5.57; the exact second-order solution of the stated beam-column (ODE oracle) is M = 737.194 kip in with a tip deflection of 5.731 in. The approximation omits the growth of the deflection under the axial load (P / P_e = 0.028). The page's first-order tip deflection 5.57 in reproduces and is a target of the active problem."
+ }
+}

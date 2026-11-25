@@ -1,0 +1,89 @@
+{
+ "id": "vm41-stiff-beam-on-rotational-spring",
+ "title": "Very stiff beam pinned on a weak rotational spring: small rotation",
+ "tier": "B",
+ "source": {
+  "work": "ANSYS, Inc., Mechanical APDL Verification Manual (public help site ansyshelp.ansys.com)",
+  "edition": "Release 2025 R2, read 2026-11-22",
+  "location": "VM41, 'Small Deflection of a Rigid Beam' (https://ansyshelp.ansys.com/public/Views/Secured/corp/v252/en/ans_vm/Hlp_V_VM41.html)",
+  "pages": "web page",
+  "notes": "problem statement taken from the vendor page (text; the sketch was not readable). The page cites: 'any basic statics and strength of material book' (the page names no specific reference) - NOT opened for this project; no number is taken from it. The page's 'Target' values are recorded as printed; the program's own results are not used."
+ },
+ "basis": "recomputed-from-published-statement",
+ "analysis": "Plane problem in the global X-Y plane (Y vertical); the out-of-plane DOFs (uz, rx, ry) of every node are held; in-plane bending about local z. Beam AB of 10 in; A is held against translation and restrained against rotation by a spring of 10,000 in lb/rad; lateral load of 10 lb at B. 'Thick beam' data of the page's modelling notes: A = 100 in^2, I = 1000 in^4, E = 30e6 psi (the beam is very stiff, not rigid: its bending adds 1.1e-7 in at B). First-order analysis. Reference values: computed here from this statement (verification/derive/vendor_reference.py); the textbook cited by the vendor page was not opened and no number is taken from it.",
+ "targets": [
+  {
+   "extract": "nodeDisplacement",
+   "node": "b",
+   "dof": "uy",
+   "value": -0.1000001111111111,
+   "unit": "in",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (ODE oracle, beam on a rotational spring support); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "b",
+   "dof": "rz",
+   "value": -0.010000016666666667,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (ODE oracle); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "a",
+   "dof": "rz",
+   "value": -0.01,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (ODE oracle); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "b",
+   "dof": "uy",
+   "value": -0.1,
+   "unit": "in",
+   "tolerance": {
+    "rel": 0.5
+   },
+   "precisionNote": "printed \"0.1\"; tolerance = half a unit in the last printed digit",
+   "sign": "printed negative; in the direction of the load"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "b",
+   "dof": "rz",
+   "value": -0.01,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 0.5
+   },
+   "precisionNote": "printed \"0.01\"; tolerance = half a unit in the last printed digit",
+   "sign": "printed negative; rotation in the sense of the load"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "b",
+   "dof": "ux",
+   "value": 0.0,
+   "unit": "in",
+   "tolerance": {
+    "abs": 0.05
+   },
+   "precisionNote": "printed \"0.0\"; tolerance = half a unit in the last printed digit",
+   "sign": "-"
+  }
+ ],
+ "status": "active"
+}

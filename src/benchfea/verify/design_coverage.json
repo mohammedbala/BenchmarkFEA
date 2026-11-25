@@ -1,0 +1,5533 @@
+{
+ "format": "benchfea-design-coverage",
+ "formatVersion": "1.0.0",
+ "generatedBy": "tools/build_design_coverage.py (from tests/test_design_*.py; do not edit by hand)",
+ "designExamples": "AISC, Companion to the AISC Steel Construction Manual, Volume 1: Design Examples, Version 16.0 (2023), accompanying ANSI/AISC 360-22",
+ "ruleA": "(a) lists the test_hand_* tests whose own code read the nominal / available strength or the utilisation (measured value of a limit check) of a check citing the item, plus the function-level entries of 'functionLevelA'; 'aDetail' lists hand tests that read only an intermediate value of such a check (not counted as (a)); a check the engine produced in a hand test without the test looking at it earns no credit",
+ "functionLevelA": [
+  {
+   "item": "Eq. F1-1",
+   "test": "tests/test_design_flexure.py::test_hand_f1_cb_values_of_the_user_note",
+   "function": "benchfea.design.aisc360_22.f_flexure.cb_f1_1"
+  }
+ ],
+ "rule": "an item is covered when it has at least one (a) test and at least one (b) entry of level 'strength' (a printed nominal / available strength, measured value or limit of a check that cites the item) or 'function' (the engine's function for that equation reproduces the printed value); (b) entries of level 'detail' only (an intermediate value) = partial",
+ "comparedValuesNotAttributedToACheck": 102,
+ "items": {
+  "Eq. B3-1": {
+   "a": [
+    "tests/test_design_compression.py::test_hand_e3_elastic_flexural_buckling_minor_axis_and_k_factor",
+    "tests/test_design_compression.py::test_hand_e3_inelastic_flexural_buckling_major_axis",
+    "tests/test_design_compression.py::test_hand_e4_torsional_buckling_inelastic_and_elastic",
+    "tests/test_design_compression.py::test_hand_e7_rectangular_hss_walls",
+    "tests/test_design_compression.py::test_hand_e7_round_hss",
+    "tests/test_design_compression.py::test_hand_e7_slender_flanges_and_web_of_a_built_up_shape",
+    "tests/test_design_compression.py::test_hand_e7_slender_web_effective_width",
+    "tests/test_design_flexure.py::test_hand_f2_elastic_ltb_and_the_classical_formula",
+    "tests/test_design_flexure.py::test_hand_f2_inelastic_ltb",
+    "tests/test_design_flexure.py::test_hand_f2_yielding",
+    "tests/test_design_flexure.py::test_hand_f3_flange_local_buckling",
+    "tests/test_design_flexure.py::test_hand_f6_minor_axis",
+    "tests/test_design_flexure.py::test_hand_f7_lateral_torsional_buckling",
+    "tests/test_design_flexure.py::test_hand_f7_slender_flange_effective_width",
+    "tests/test_design_flexure.py::test_hand_f7_yielding_and_local_buckling",
+    "tests/test_design_flexure.py::test_hand_f8_round_hss",
+    "tests/test_design_shear.py::test_hand_g21a_rolled_web_phi_1_00_omega_1_50",
+    "tests/test_design_shear.py::test_hand_g21b_built_up_web_cv1_one_phi_0_90",
+    "tests/test_design_shear.py::test_hand_g21b_cv1_below_one_built_up_and_rolled",
+    "tests/test_design_shear.py::test_hand_g4_rectangular_hss_both_directions_and_box",
+    "tests/test_design_shear.py::test_hand_g5_round_hss_yielding_and_buckling",
+    "tests/test_design_shear.py::test_hand_g6_minor_axis_shear_of_i_shape",
+    "tests/test_design_tension.py::test_hand_governing_tension_limit_state_differs_between_lrfd_and_asd",
+    "tests/test_design_tension.py::test_hand_tensile_rupture_d2b_with_an_and_u",
+    "tests/test_design_tension.py::test_hand_tensile_yielding_d2a"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_combined.py::test_design_example_h3_tension_and_biaxial_flexure[LRFD]",
+     "level": "strength",
+     "printed": "Pn",
+     "examples": [
+      {
+       "example": "H.3",
+       "pages": "H-8 to H-11 (PDF 270-273)",
+       "title": "W14x82, tension and biaxial flexure: D2-1, F2-2, F6-1, H1-1b"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e10_rectangular_hss_with_slender_walls_e7[18]",
+     "level": "strength",
+     "printed": "E.10 Pn",
+     "examples": [
+      {
+       "example": "E.10",
+       "pages": "E-62 to E-66 (PDF 126-130)",
+       "title": "Rectangular HSS compression member with slender elements (HSS12x8x3/16)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e10_rectangular_hss_with_slender_walls_e7[24]",
+     "level": "strength",
+     "printed": "E.10 Pn",
+     "examples": [
+      {
+       "example": "E.10",
+       "pages": "E-62 to E-66 (PDF 126-130)",
+       "title": "Rectangular HSS compression member with slender elements (HSS12x8x3/16)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e10_rectangular_hss_with_slender_walls_e7[40]",
+     "level": "strength",
+     "printed": "E.10 Pn",
+     "examples": [
+      {
+       "example": "E.10",
+       "pages": "E-62 to E-66 (PDF 126-130)",
+       "title": "Rectangular HSS compression member with slender elements (HSS12x8x3/16)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e11_pipe_compression_member",
+     "level": "strength",
+     "printed": "E.11 Pn",
+     "examples": [
+      {
+       "example": "E.11",
+       "pages": "E-67 to E-69 (PDF 131-133)",
+       "title": "Pipe compression member (Pipe 10 Std.)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1c_w14x132_flexural_buckling_e3",
+     "level": "strength",
+     "printed": "E.1C phi Pn",
+     "examples": [
+      {
+       "example": "E.1C",
+       "pages": "E-8 to E-9 (PDF 72-73)",
+       "title": "W-shape available compressive strength (W14x132, Lc = 30 ft)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1d_w14x90_flexural_buckling_e3",
+     "level": "strength",
+     "printed": "E.1D Pn",
+     "examples": [
+      {
+       "example": "E.1D",
+       "pages": "E-10 to E-12 (PDF 74-76)",
+       "title": "W-shape available compressive strength (W14x90, Lcx = 30 ft, Lcy = Lcz = 15 ft)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1e_w16x31_slender_web_e7[a]",
+     "level": "strength",
+     "printed": "E.1E Pn",
+     "examples": [
+      {
+       "example": "E.1E",
+       "pages": "E-13 to E-19 (PDF 77-83)",
+       "title": "W-shape compression member with slender elements (W16x31)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1e_w16x31_slender_web_e7[b]",
+     "level": "strength",
+     "printed": "E.1E Pn",
+     "examples": [
+      {
+       "example": "E.1E",
+       "pages": "E-13 to E-19 (PDF 77-83)",
+       "title": "W-shape compression member with slender elements (W16x31)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1e_w16x31_slender_web_e7[c]",
+     "level": "strength",
+     "printed": "E.1E Pn",
+     "examples": [
+      {
+       "example": "E.1E",
+       "pages": "E-13 to E-19 (PDF 77-83)",
+       "title": "W-shape compression member with slender elements (W16x31)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e2_built_up_column_slender_web_e7_and_e4_stress",
+     "level": "strength",
+     "printed": "E.2 Pn",
+     "examples": [
+      {
+       "example": "E.2",
+       "pages": "E-20 to E-24 (PDF 84-88)",
+       "title": "Built-up column with a slender web"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e3_built_up_column_slender_flanges_fully_effective",
+     "level": "strength",
+     "printed": "E.3 Pn",
+     "examples": [
+      {
+       "example": "E.3",
+       "pages": "E-25 to E-29 (PDF 89-93)",
+       "title": "Built-up column with slender flanges"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e9_rectangular_hss_without_slender_elements",
+     "level": "strength",
+     "printed": "E.9 Pn",
+     "examples": [
+      {
+       "example": "E.9",
+       "pages": "E-59 to E-61 (PDF 123-125)",
+       "title": "Rectangular HSS compression member without slender elements (HSS12x10x3/8)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f1_1b_w18x50_yielding",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.1-1B",
+       "pages": "F-8 (PDF 170)",
+       "title": "W18x50, major axis, continuously braced: yielding"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f1_2b_w18x50_inelastic_ltb_with_cb_from_the_diagram",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.1-2B",
+       "pages": "F-10 to F-11 (PDF 172-173)",
+       "title": "W18x50, major axis, braced at the ends and third points: inelastic LTB with Cb"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f1_3b_w18x50_elastic_ltb",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.1-3B",
+       "pages": "F-14 to F-15 (PDF 176-177)",
+       "title": "W18x50, major axis, braced at the ends and midspan: elastic LTB with Cb"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f3b_w21x48_noncompact_flange",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.3B",
+       "pages": "F-24 to F-25 (PDF 186-187)",
+       "title": "W21x48, major axis, continuously braced: noncompact flange local buckling"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f5_w12x58_minor_axis",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.5",
+       "pages": "F-28 to F-29 (PDF 190-191)",
+       "title": "W12x58, minor axis: yielding"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f7b_hss10x6_noncompact_flange_and_ltb",
+     "level": "strength",
+     "printed": "Mp",
+     "examples": [
+      {
+       "example": "F.7B",
+       "pages": "F-34 to F-36 (PDF 196-198)",
+       "title": "HSS10x6x3/16, major axis, braced at the ends: noncompact flange, LTB capped at Mp"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f8b_hss8x8_slender_flange",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.8B",
+       "pages": "F-39 to F-41 (PDF 201-203)",
+       "title": "HSS8x8x3/16, slender flange: effective width and effective section modulus"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f9b_pipe8_yielding",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.9B",
+       "pages": "F-43 to F-44 (PDF 205-206)",
+       "title": "Pipe 8 x-Strong: yielding"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_e4a_moment_frame_column_table_entry",
+     "level": "strength",
+     "printed": "E.4A LRFD at the table entry Lc = 9 ft",
+     "examples": [
+      {
+       "example": "E.4A",
+       "pages": "E-30 to E-33 (PDF 94-97)",
+       "title": "W-shape compression member in a moment frame (W14x82), column fixed at the base"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_e4b_moment_frame_column_effective_length",
+     "level": "strength",
+     "printed": "E.4B LRFD",
+     "examples": [
+      {
+       "example": "E.4B",
+       "pages": "E-34 to E-35 (PDF 98-99)",
+       "title": "W-shape compression member in a moment frame (W14x82), column pinned at the base"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[LRFD-phiVn]",
+     "level": "strength",
+     "printed": "F.14 Vn",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_g8a_built_up_girder_web_without_stiffeners[LRFD-phiVn-Vu]",
+     "level": "strength",
+     "printed": "G.8A Vn",
+     "examples": [
+      {
+       "example": "G.8A",
+       "pages": "G-17 to G-18 (PDF 253-254)",
+       "title": "Built-up girder, shear strength without transverse stiffeners (first step of the example)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_h5c_rectangular_hss_flexure_f7[LRFD-phiMn_kipin]",
+     "level": "strength",
+     "printed": "H.5C Mp",
+     "examples": [
+      {
+       "example": "H.5C",
+       "pages": "H-20 to H-23 (PDF 282-285)",
+       "title": "Rectangular HSS6x4x1/4: available shear (G4) and flexural (F7) strengths used in the torsion interaction"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_h5c_rectangular_hss_shear_g4[LRFD-phiVn]",
+     "level": "strength",
+     "printed": "H.5C Vn",
+     "examples": [
+      {
+       "example": "H.5C",
+       "pages": "H-20 to H-23 (PDF 282-285)",
+       "title": "Rectangular HSS6x4x1/4: available shear (G4) and flexural (F7) strengths used in the torsion interaction"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[LRFD-III.MF.B2]",
+     "level": "strength",
+     "printed": "III.MF.B2 LRFD Pc",
+     "examples": [
+      {
+       "example": "III.MF.B2",
+       "pages": "III-93 to III-94 (PDF 1033-1034)",
+       "title": "Part III, moment frame interior column W14x90, simplified method (B2 from Manual Table 2-2): Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[LRFD-III.MF.DA]",
+     "level": "strength",
+     "printed": "III.MF.DA LRFD Pc",
+     "examples": [
+      {
+       "example": "III.MF.DA",
+       "pages": "III-84 to III-86 (PDF 1024-1026)",
+       "title": "Part III, moment frame interior column W14x90, Method 1 (direct analysis): Pc, Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[LRFD-III.MF.ELM]",
+     "level": "strength",
+     "printed": "III.MF.ELM LRFD Pc",
+     "examples": [
+      {
+       "example": "III.MF.ELM",
+       "pages": "III-90 to III-91 (PDF 1030-1031)",
+       "title": "Part III, moment frame interior column W14x90, Method 2 (effective length): Pc, Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_tension_members_outside_the_shape_scope[D.2]",
+     "level": "strength",
+     "printed": "D.2 Pn yielding",
+     "examples": [
+      {
+       "example": "D.2",
+       "pages": "D-5 to D-7 (PDF 41-43)",
+       "title": "Single-angle tension member (L4x4x1/2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_tension_members_outside_the_shape_scope[D.3]",
+     "level": "strength",
+     "printed": "D.3 LRFD yielding",
+     "examples": [
+      {
+       "example": "D.3",
+       "pages": "D-8 to D-10 (PDF 44-46)",
+       "title": "WT-shape tension member (WT6x20)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_tension_members_outside_the_shape_scope[D.6]",
+     "level": "strength",
+     "printed": "D.6 LRFD yielding",
+     "examples": [
+      {
+       "example": "D.6",
+       "pages": "D-17 to D-19 (PDF 53-55)",
+       "title": "Double-angle tension member (2L4x4x1/2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_shear.py::test_de_g1b_w24x62_major_axis_shear_g21a",
+     "level": "strength",
+     "printed": "G.1B Vn",
+     "examples": [
+      {
+       "example": "G.1B",
+       "pages": "G-4 (PDF 240)",
+       "title": "W-shape in major-axis shear (W24x62)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_shear.py::test_de_g4_rectangular_hss_shear",
+     "level": "strength",
+     "printed": "G.4 Vn",
+     "examples": [
+      {
+       "example": "G.4",
+       "pages": "G-9 to G-10 (PDF 245-246)",
+       "title": "Rectangular HSS in shear (HSS6x4x3/8, 6-in. walls vertical)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_shear.py::test_de_g5_round_hss_shear_with_documented_asd_value",
+     "level": "strength",
+     "printed": "G.5 Vn",
+     "examples": [
+      {
+       "example": "G.5",
+       "pages": "G-11 to G-12 (PDF 247-248)",
+       "title": "Round HSS in shear (HSS16.000x0.375)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_shear.py::test_de_g6_w21x48_minor_axis_shear",
+     "level": "strength",
+     "printed": "G.6 Vn",
+     "examples": [
+      {
+       "example": "G.6",
+       "pages": "G-13 to G-14 (PDF 249-250)",
+       "title": "Doubly symmetric shape in minor-axis shear (W21x48)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_tension.py::test_de_d1_w_shape_tension_member",
+     "level": "strength",
+     "printed": "D.1 yielding phi Pn",
+     "examples": [
+      {
+       "example": "D.1",
+       "pages": "D-2 to D-4 (PDF 38-40)",
+       "title": "W-shape tension member (W8x21)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_tension.py::test_de_d4_rectangular_hss_tension_member",
+     "level": "strength",
+     "printed": "D.4 yielding phi Pn",
+     "examples": [
+      {
+       "example": "D.4",
+       "pages": "D-11 to D-13 (PDF 47-49)",
+       "title": "Rectangular HSS tension member (HSS6x4x3/8)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_tension.py::test_de_d5_round_hss_tension_member_and_slenderness",
+     "level": "strength",
+     "printed": "D.5 yielding phi Pn",
+     "examples": [
+      {
+       "example": "D.5",
+       "pages": "D-14 to D-16 (PDF 50-52)",
+       "title": "Round HSS tension member (HSS6.000x0.500)"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. B3-2": {
+   "a": [
+    "tests/test_design_compression.py::test_hand_e3_inelastic_flexural_buckling_major_axis",
+    "tests/test_design_flexure.py::test_hand_f2_yielding",
+    "tests/test_design_shear.py::test_hand_g21a_rolled_web_phi_1_00_omega_1_50",
+    "tests/test_design_shear.py::test_hand_g21b_built_up_web_cv1_one_phi_0_90",
+    "tests/test_design_shear.py::test_hand_g4_rectangular_hss_both_directions_and_box",
+    "tests/test_design_shear.py::test_hand_g5_round_hss_yielding_and_buckling",
+    "tests/test_design_shear.py::test_hand_g6_minor_axis_shear_of_i_shape",
+    "tests/test_design_tension.py::test_hand_governing_tension_limit_state_differs_between_lrfd_and_asd",
+    "tests/test_design_tension.py::test_hand_tensile_rupture_d2b_with_an_and_u",
+    "tests/test_design_tension.py::test_hand_tensile_yielding_d2a"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_combined.py::test_design_example_h3_tension_and_biaxial_flexure[ASD]",
+     "level": "strength",
+     "printed": "Pn",
+     "examples": [
+      {
+       "example": "H.3",
+       "pages": "H-8 to H-11 (PDF 270-273)",
+       "title": "W14x82, tension and biaxial flexure: D2-1, F2-2, F6-1, H1-1b"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e10_rectangular_hss_with_slender_walls_e7[18]",
+     "level": "strength",
+     "printed": "E.10 Pn",
+     "examples": [
+      {
+       "example": "E.10",
+       "pages": "E-62 to E-66 (PDF 126-130)",
+       "title": "Rectangular HSS compression member with slender elements (HSS12x8x3/16)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e10_rectangular_hss_with_slender_walls_e7[24]",
+     "level": "strength",
+     "printed": "E.10 Pn",
+     "examples": [
+      {
+       "example": "E.10",
+       "pages": "E-62 to E-66 (PDF 126-130)",
+       "title": "Rectangular HSS compression member with slender elements (HSS12x8x3/16)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e10_rectangular_hss_with_slender_walls_e7[40]",
+     "level": "strength",
+     "printed": "E.10 Pn",
+     "examples": [
+      {
+       "example": "E.10",
+       "pages": "E-62 to E-66 (PDF 126-130)",
+       "title": "Rectangular HSS compression member with slender elements (HSS12x8x3/16)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e11_pipe_compression_member",
+     "level": "strength",
+     "printed": "E.11 Pn",
+     "examples": [
+      {
+       "example": "E.11",
+       "pages": "E-67 to E-69 (PDF 131-133)",
+       "title": "Pipe compression member (Pipe 10 Std.)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1c_w14x132_flexural_buckling_e3",
+     "level": "strength",
+     "printed": "E.1C Pn/Omega",
+     "examples": [
+      {
+       "example": "E.1C",
+       "pages": "E-8 to E-9 (PDF 72-73)",
+       "title": "W-shape available compressive strength (W14x132, Lc = 30 ft)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1d_w14x90_flexural_buckling_e3",
+     "level": "strength",
+     "printed": "E.1D Pn",
+     "examples": [
+      {
+       "example": "E.1D",
+       "pages": "E-10 to E-12 (PDF 74-76)",
+       "title": "W-shape available compressive strength (W14x90, Lcx = 30 ft, Lcy = Lcz = 15 ft)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1e_w16x31_slender_web_e7[a]",
+     "level": "strength",
+     "printed": "E.1E Pn",
+     "examples": [
+      {
+       "example": "E.1E",
+       "pages": "E-13 to E-19 (PDF 77-83)",
+       "title": "W-shape compression member with slender elements (W16x31)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1e_w16x31_slender_web_e7[b]",
+     "level": "strength",
+     "printed": "E.1E Pn",
+     "examples": [
+      {
+       "example": "E.1E",
+       "pages": "E-13 to E-19 (PDF 77-83)",
+       "title": "W-shape compression member with slender elements (W16x31)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1e_w16x31_slender_web_e7[c]",
+     "level": "strength",
+     "printed": "E.1E Pn",
+     "examples": [
+      {
+       "example": "E.1E",
+       "pages": "E-13 to E-19 (PDF 77-83)",
+       "title": "W-shape compression member with slender elements (W16x31)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e2_built_up_column_slender_web_e7_and_e4_stress",
+     "level": "strength",
+     "printed": "E.2 Pn",
+     "examples": [
+      {
+       "example": "E.2",
+       "pages": "E-20 to E-24 (PDF 84-88)",
+       "title": "Built-up column with a slender web"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e3_built_up_column_slender_flanges_fully_effective",
+     "level": "strength",
+     "printed": "E.3 Pn",
+     "examples": [
+      {
+       "example": "E.3",
+       "pages": "E-25 to E-29 (PDF 89-93)",
+       "title": "Built-up column with slender flanges"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e9_rectangular_hss_without_slender_elements",
+     "level": "strength",
+     "printed": "E.9 Pn",
+     "examples": [
+      {
+       "example": "E.9",
+       "pages": "E-59 to E-61 (PDF 123-125)",
+       "title": "Rectangular HSS compression member without slender elements (HSS12x10x3/8)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f1_1b_w18x50_yielding",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.1-1B",
+       "pages": "F-8 (PDF 170)",
+       "title": "W18x50, major axis, continuously braced: yielding"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f1_2b_w18x50_inelastic_ltb_with_cb_from_the_diagram",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.1-2B",
+       "pages": "F-10 to F-11 (PDF 172-173)",
+       "title": "W18x50, major axis, braced at the ends and third points: inelastic LTB with Cb"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f1_3b_w18x50_elastic_ltb",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.1-3B",
+       "pages": "F-14 to F-15 (PDF 176-177)",
+       "title": "W18x50, major axis, braced at the ends and midspan: elastic LTB with Cb"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f3b_w21x48_noncompact_flange",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.3B",
+       "pages": "F-24 to F-25 (PDF 186-187)",
+       "title": "W21x48, major axis, continuously braced: noncompact flange local buckling"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f5_w12x58_minor_axis",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.5",
+       "pages": "F-28 to F-29 (PDF 190-191)",
+       "title": "W12x58, minor axis: yielding"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f7b_hss10x6_noncompact_flange_and_ltb",
+     "level": "strength",
+     "printed": "Mp",
+     "examples": [
+      {
+       "example": "F.7B",
+       "pages": "F-34 to F-36 (PDF 196-198)",
+       "title": "HSS10x6x3/16, major axis, braced at the ends: noncompact flange, LTB capped at Mp"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f8b_hss8x8_slender_flange",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.8B",
+       "pages": "F-39 to F-41 (PDF 201-203)",
+       "title": "HSS8x8x3/16, slender flange: effective width and effective section modulus"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f9b_pipe8_yielding",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.9B",
+       "pages": "F-43 to F-44 (PDF 205-206)",
+       "title": "Pipe 8 x-Strong: yielding"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_e4a_moment_frame_column_table_entry",
+     "level": "strength",
+     "printed": "E.4A ASD at the table entry Lc = 9 ft",
+     "examples": [
+      {
+       "example": "E.4A",
+       "pages": "E-30 to E-33 (PDF 94-97)",
+       "title": "W-shape compression member in a moment frame (W14x82), column fixed at the base"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_e4b_moment_frame_column_effective_length",
+     "level": "strength",
+     "printed": "E.4B ASD",
+     "examples": [
+      {
+       "example": "E.4B",
+       "pages": "E-34 to E-35 (PDF 98-99)",
+       "title": "W-shape compression member in a moment frame (W14x82), column pinned at the base"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[ASD-Vn_over_Omega]",
+     "level": "strength",
+     "printed": "F.14 Vn",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_g8a_built_up_girder_web_without_stiffeners[ASD-Vn_over_Omega-Va]",
+     "level": "strength",
+     "printed": "G.8A Vn",
+     "examples": [
+      {
+       "example": "G.8A",
+       "pages": "G-17 to G-18 (PDF 253-254)",
+       "title": "Built-up girder, shear strength without transverse stiffeners (first step of the example)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_h5c_rectangular_hss_flexure_f7[ASD-Mn_over_Omega_kipin]",
+     "level": "strength",
+     "printed": "H.5C Mp",
+     "examples": [
+      {
+       "example": "H.5C",
+       "pages": "H-20 to H-23 (PDF 282-285)",
+       "title": "Rectangular HSS6x4x1/4: available shear (G4) and flexural (F7) strengths used in the torsion interaction"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_h5c_rectangular_hss_shear_g4[ASD-Vn_over_Omega]",
+     "level": "strength",
+     "printed": "H.5C Vn",
+     "examples": [
+      {
+       "example": "H.5C",
+       "pages": "H-20 to H-23 (PDF 282-285)",
+       "title": "Rectangular HSS6x4x1/4: available shear (G4) and flexural (F7) strengths used in the torsion interaction"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[ASD-III.MF.B2]",
+     "level": "strength",
+     "printed": "III.MF.B2 ASD Pc",
+     "examples": [
+      {
+       "example": "III.MF.B2",
+       "pages": "III-93 to III-94 (PDF 1033-1034)",
+       "title": "Part III, moment frame interior column W14x90, simplified method (B2 from Manual Table 2-2): Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[ASD-III.MF.DA]",
+     "level": "strength",
+     "printed": "III.MF.DA ASD Pc",
+     "examples": [
+      {
+       "example": "III.MF.DA",
+       "pages": "III-84 to III-86 (PDF 1024-1026)",
+       "title": "Part III, moment frame interior column W14x90, Method 1 (direct analysis): Pc, Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[ASD-III.MF.ELM]",
+     "level": "strength",
+     "printed": "III.MF.ELM ASD Pc",
+     "examples": [
+      {
+       "example": "III.MF.ELM",
+       "pages": "III-90 to III-91 (PDF 1030-1031)",
+       "title": "Part III, moment frame interior column W14x90, Method 2 (effective length): Pc, Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_tension_members_outside_the_shape_scope[D.2]",
+     "level": "strength",
+     "printed": "D.2 Pn yielding",
+     "examples": [
+      {
+       "example": "D.2",
+       "pages": "D-5 to D-7 (PDF 41-43)",
+       "title": "Single-angle tension member (L4x4x1/2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_tension_members_outside_the_shape_scope[D.3]",
+     "level": "strength",
+     "printed": "D.3 Pn rupture",
+     "examples": [
+      {
+       "example": "D.3",
+       "pages": "D-8 to D-10 (PDF 44-46)",
+       "title": "WT-shape tension member (WT6x20)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_tension_members_outside_the_shape_scope[D.6]",
+     "level": "strength",
+     "printed": "D.6 Pn rupture",
+     "examples": [
+      {
+       "example": "D.6",
+       "pages": "D-17 to D-19 (PDF 53-55)",
+       "title": "Double-angle tension member (2L4x4x1/2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_shear.py::test_de_g1b_w24x62_major_axis_shear_g21a",
+     "level": "strength",
+     "printed": "G.1B Vn",
+     "examples": [
+      {
+       "example": "G.1B",
+       "pages": "G-4 (PDF 240)",
+       "title": "W-shape in major-axis shear (W24x62)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_shear.py::test_de_g4_rectangular_hss_shear",
+     "level": "strength",
+     "printed": "G.4 Vn",
+     "examples": [
+      {
+       "example": "G.4",
+       "pages": "G-9 to G-10 (PDF 245-246)",
+       "title": "Rectangular HSS in shear (HSS6x4x3/8, 6-in. walls vertical)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_shear.py::test_de_g5_round_hss_shear_with_documented_asd_value",
+     "level": "strength",
+     "printed": "G.5 Vn",
+     "examples": [
+      {
+       "example": "G.5",
+       "pages": "G-11 to G-12 (PDF 247-248)",
+       "title": "Round HSS in shear (HSS16.000x0.375)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_shear.py::test_de_g6_w21x48_minor_axis_shear",
+     "level": "strength",
+     "printed": "G.6 Vn",
+     "examples": [
+      {
+       "example": "G.6",
+       "pages": "G-13 to G-14 (PDF 249-250)",
+       "title": "Doubly symmetric shape in minor-axis shear (W21x48)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_tension.py::test_de_d1_w_shape_tension_member",
+     "level": "strength",
+     "printed": "D.1 yielding Pn/Omega",
+     "examples": [
+      {
+       "example": "D.1",
+       "pages": "D-2 to D-4 (PDF 38-40)",
+       "title": "W-shape tension member (W8x21)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_tension.py::test_de_d4_rectangular_hss_tension_member",
+     "level": "strength",
+     "printed": "D.4 yielding Pn/Omega",
+     "examples": [
+      {
+       "example": "D.4",
+       "pages": "D-11 to D-13 (PDF 47-49)",
+       "title": "Rectangular HSS tension member (HSS6x4x3/8)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_tension.py::test_de_d5_round_hss_tension_member_and_slenderness",
+     "level": "strength",
+     "printed": "D.5 yielding Pn/Omega",
+     "examples": [
+      {
+       "example": "D.5",
+       "pages": "D-14 to D-16 (PDF 50-52)",
+       "title": "Round HSS tension member (HSS6.000x0.500)"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. D2-1": {
+   "a": [
+    "tests/test_design_tension.py::test_hand_governing_tension_limit_state_differs_between_lrfd_and_asd",
+    "tests/test_design_tension.py::test_hand_tensile_yielding_d2a"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_combined.py::test_design_example_h3_tension_and_biaxial_flexure[ASD]",
+     "level": "strength",
+     "printed": "Pn",
+     "examples": [
+      {
+       "example": "H.3",
+       "pages": "H-8 to H-11 (PDF 270-273)",
+       "title": "W14x82, tension and biaxial flexure: D2-1, F2-2, F6-1, H1-1b"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_combined.py::test_design_example_h3_tension_and_biaxial_flexure[LRFD]",
+     "level": "strength",
+     "printed": "Pn",
+     "examples": [
+      {
+       "example": "H.3",
+       "pages": "H-8 to H-11 (PDF 270-273)",
+       "title": "W14x82, tension and biaxial flexure: D2-1, F2-2, F6-1, H1-1b"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_tension_members_outside_the_shape_scope[D.2]",
+     "level": "strength",
+     "printed": "D.2 Pn yielding",
+     "examples": [
+      {
+       "example": "D.2",
+       "pages": "D-5 to D-7 (PDF 41-43)",
+       "title": "Single-angle tension member (L4x4x1/2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_tension_members_outside_the_shape_scope[D.3]",
+     "level": "strength",
+     "printed": "D.3 LRFD yielding",
+     "examples": [
+      {
+       "example": "D.3",
+       "pages": "D-8 to D-10 (PDF 44-46)",
+       "title": "WT-shape tension member (WT6x20)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_tension_members_outside_the_shape_scope[D.6]",
+     "level": "strength",
+     "printed": "D.6 LRFD yielding",
+     "examples": [
+      {
+       "example": "D.6",
+       "pages": "D-17 to D-19 (PDF 53-55)",
+       "title": "Double-angle tension member (2L4x4x1/2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_tension.py::test_de_d1_w_shape_tension_member",
+     "level": "strength",
+     "printed": "D.1 yielding phi Pn",
+     "examples": [
+      {
+       "example": "D.1",
+       "pages": "D-2 to D-4 (PDF 38-40)",
+       "title": "W-shape tension member (W8x21)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_tension.py::test_de_d4_rectangular_hss_tension_member",
+     "level": "strength",
+     "printed": "D.4 yielding phi Pn",
+     "examples": [
+      {
+       "example": "D.4",
+       "pages": "D-11 to D-13 (PDF 47-49)",
+       "title": "Rectangular HSS tension member (HSS6x4x3/8)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_tension.py::test_de_d5_round_hss_tension_member_and_slenderness",
+     "level": "strength",
+     "printed": "D.5 yielding phi Pn",
+     "examples": [
+      {
+       "example": "D.5",
+       "pages": "D-14 to D-16 (PDF 50-52)",
+       "title": "Round HSS tension member (HSS6.000x0.500)"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. D2-2": {
+   "a": [
+    "tests/test_design_tension.py::test_hand_governing_tension_limit_state_differs_between_lrfd_and_asd",
+    "tests/test_design_tension.py::test_hand_tensile_rupture_d2b_with_an_and_u"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_review.py::test_de_tension_members_outside_the_shape_scope[D.2]",
+     "level": "strength",
+     "printed": "D.2 Pn rupture",
+     "examples": [
+      {
+       "example": "D.2",
+       "pages": "D-5 to D-7 (PDF 41-43)",
+       "title": "Single-angle tension member (L4x4x1/2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_tension_members_outside_the_shape_scope[D.3]",
+     "level": "strength",
+     "printed": "D.3 Pn rupture",
+     "examples": [
+      {
+       "example": "D.3",
+       "pages": "D-8 to D-10 (PDF 44-46)",
+       "title": "WT-shape tension member (WT6x20)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_tension_members_outside_the_shape_scope[D.6]",
+     "level": "strength",
+     "printed": "D.6 Pn rupture",
+     "examples": [
+      {
+       "example": "D.6",
+       "pages": "D-17 to D-19 (PDF 53-55)",
+       "title": "Double-angle tension member (2L4x4x1/2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_tension.py::test_de_d1_w_shape_tension_member",
+     "level": "strength",
+     "printed": "D.1 rupture Pn",
+     "examples": [
+      {
+       "example": "D.1",
+       "pages": "D-2 to D-4 (PDF 38-40)",
+       "title": "W-shape tension member (W8x21)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_tension.py::test_de_d4_rectangular_hss_tension_member",
+     "level": "strength",
+     "printed": "D.4 rupture Pn",
+     "examples": [
+      {
+       "example": "D.4",
+       "pages": "D-11 to D-13 (PDF 47-49)",
+       "title": "Rectangular HSS tension member (HSS6x4x3/8)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_tension.py::test_de_d5_round_hss_tension_member_and_slenderness",
+     "level": "strength",
+     "printed": "D.5 rupture Pn",
+     "examples": [
+      {
+       "example": "D.5",
+       "pages": "D-14 to D-16 (PDF 50-52)",
+       "title": "Round HSS tension member (HSS6.000x0.500)"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. D3-1": {
+   "a": [
+    "tests/test_design_tension.py::test_hand_governing_tension_limit_state_differs_between_lrfd_and_asd",
+    "tests/test_design_tension.py::test_hand_tensile_rupture_d2b_with_an_and_u"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_review.py::test_de_tension_members_outside_the_shape_scope[D.2]",
+     "level": "strength",
+     "printed": "D.2 Pn rupture",
+     "examples": [
+      {
+       "example": "D.2",
+       "pages": "D-5 to D-7 (PDF 41-43)",
+       "title": "Single-angle tension member (L4x4x1/2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_tension_members_outside_the_shape_scope[D.3]",
+     "level": "strength",
+     "printed": "D.3 Pn rupture",
+     "examples": [
+      {
+       "example": "D.3",
+       "pages": "D-8 to D-10 (PDF 44-46)",
+       "title": "WT-shape tension member (WT6x20)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_tension_members_outside_the_shape_scope[D.6]",
+     "level": "strength",
+     "printed": "D.6 Pn rupture",
+     "examples": [
+      {
+       "example": "D.6",
+       "pages": "D-17 to D-19 (PDF 53-55)",
+       "title": "Double-angle tension member (2L4x4x1/2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_tension.py::test_de_d1_w_shape_tension_member",
+     "level": "strength",
+     "printed": "D.1 rupture Pn",
+     "examples": [
+      {
+       "example": "D.1",
+       "pages": "D-2 to D-4 (PDF 38-40)",
+       "title": "W-shape tension member (W8x21)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_tension.py::test_de_d4_rectangular_hss_tension_member",
+     "level": "strength",
+     "printed": "D.4 rupture Pn",
+     "examples": [
+      {
+       "example": "D.4",
+       "pages": "D-11 to D-13 (PDF 47-49)",
+       "title": "Rectangular HSS tension member (HSS6x4x3/8)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_tension.py::test_de_d5_round_hss_tension_member_and_slenderness",
+     "level": "strength",
+     "printed": "D.5 rupture Pn",
+     "examples": [
+      {
+       "example": "D.5",
+       "pages": "D-14 to D-16 (PDF 50-52)",
+       "title": "Round HSS tension member (HSS6.000x0.500)"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. E3-2": {
+   "a": [
+    "tests/test_design_compression.py::test_hand_e3_elastic_flexural_buckling_minor_axis_and_k_factor",
+    "tests/test_design_compression.py::test_hand_e3_inelastic_flexural_buckling_major_axis",
+    "tests/test_design_compression.py::test_hand_e4_torsional_buckling_inelastic_and_elastic",
+    "tests/test_design_compression.py::test_hand_e7_rectangular_hss_walls",
+    "tests/test_design_compression.py::test_hand_e7_round_hss",
+    "tests/test_design_compression.py::test_hand_e7_slender_flanges_and_web_of_a_built_up_shape",
+    "tests/test_design_compression.py::test_hand_e7_slender_web_effective_width"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_compression.py::test_de_e10_rectangular_hss_with_slender_walls_e7[18]",
+     "level": "strength",
+     "printed": "E.10 Pn",
+     "examples": [
+      {
+       "example": "E.10",
+       "pages": "E-62 to E-66 (PDF 126-130)",
+       "title": "Rectangular HSS compression member with slender elements (HSS12x8x3/16)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e10_rectangular_hss_with_slender_walls_e7[24]",
+     "level": "strength",
+     "printed": "E.10 Pn",
+     "examples": [
+      {
+       "example": "E.10",
+       "pages": "E-62 to E-66 (PDF 126-130)",
+       "title": "Rectangular HSS compression member with slender elements (HSS12x8x3/16)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e11_pipe_compression_member",
+     "level": "strength",
+     "printed": "E.11 Pn",
+     "examples": [
+      {
+       "example": "E.11",
+       "pages": "E-67 to E-69 (PDF 131-133)",
+       "title": "Pipe compression member (Pipe 10 Std.)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1c_w14x132_flexural_buckling_e3",
+     "level": "strength",
+     "printed": "E.1C phi Pn",
+     "examples": [
+      {
+       "example": "E.1C",
+       "pages": "E-8 to E-9 (PDF 72-73)",
+       "title": "W-shape available compressive strength (W14x132, Lc = 30 ft)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1d_w14x90_flexural_buckling_e3",
+     "level": "strength",
+     "printed": "E.1D Pn",
+     "examples": [
+      {
+       "example": "E.1D",
+       "pages": "E-10 to E-12 (PDF 74-76)",
+       "title": "W-shape available compressive strength (W14x90, Lcx = 30 ft, Lcy = Lcz = 15 ft)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1e_w16x31_slender_web_e7[a]",
+     "level": "strength",
+     "printed": "E.1E Pn",
+     "examples": [
+      {
+       "example": "E.1E",
+       "pages": "E-13 to E-19 (PDF 77-83)",
+       "title": "W-shape compression member with slender elements (W16x31)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1e_w16x31_slender_web_e7[b]",
+     "level": "strength",
+     "printed": "E.1E Pn",
+     "examples": [
+      {
+       "example": "E.1E",
+       "pages": "E-13 to E-19 (PDF 77-83)",
+       "title": "W-shape compression member with slender elements (W16x31)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e2_built_up_column_slender_web_e7_and_e4_stress",
+     "level": "strength",
+     "printed": "E.2 Pn",
+     "examples": [
+      {
+       "example": "E.2",
+       "pages": "E-20 to E-24 (PDF 84-88)",
+       "title": "Built-up column with a slender web"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e3_built_up_column_slender_flanges_fully_effective",
+     "level": "strength",
+     "printed": "E.3 Pn",
+     "examples": [
+      {
+       "example": "E.3",
+       "pages": "E-25 to E-29 (PDF 89-93)",
+       "title": "Built-up column with slender flanges"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e9_rectangular_hss_without_slender_elements",
+     "level": "strength",
+     "printed": "E.9 Pn",
+     "examples": [
+      {
+       "example": "E.9",
+       "pages": "E-59 to E-61 (PDF 123-125)",
+       "title": "Rectangular HSS compression member without slender elements (HSS12x10x3/8)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_e4a_moment_frame_column_table_entry",
+     "level": "strength",
+     "printed": "E.4A LRFD at the table entry Lc = 9 ft",
+     "examples": [
+      {
+       "example": "E.4A",
+       "pages": "E-30 to E-33 (PDF 94-97)",
+       "title": "W-shape compression member in a moment frame (W14x82), column fixed at the base"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_e4b_moment_frame_column_effective_length",
+     "level": "strength",
+     "printed": "E.4B LRFD",
+     "examples": [
+      {
+       "example": "E.4B",
+       "pages": "E-34 to E-35 (PDF 98-99)",
+       "title": "W-shape compression member in a moment frame (W14x82), column pinned at the base"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[ASD-Vn_over_Omega]",
+     "level": "detail",
+     "printed": "F.14 h/tw",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[LRFD-phiVn]",
+     "level": "detail",
+     "printed": "F.14 h/tw",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[ASD-III.MF.B2]",
+     "level": "strength",
+     "printed": "III.MF.B2 ASD Pc",
+     "examples": [
+      {
+       "example": "III.MF.B2",
+       "pages": "III-93 to III-94 (PDF 1033-1034)",
+       "title": "Part III, moment frame interior column W14x90, simplified method (B2 from Manual Table 2-2): Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[ASD-III.MF.DA]",
+     "level": "strength",
+     "printed": "III.MF.DA ASD Pc",
+     "examples": [
+      {
+       "example": "III.MF.DA",
+       "pages": "III-84 to III-86 (PDF 1024-1026)",
+       "title": "Part III, moment frame interior column W14x90, Method 1 (direct analysis): Pc, Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[ASD-III.MF.ELM]",
+     "level": "strength",
+     "printed": "III.MF.ELM ASD Pc",
+     "examples": [
+      {
+       "example": "III.MF.ELM",
+       "pages": "III-90 to III-91 (PDF 1030-1031)",
+       "title": "Part III, moment frame interior column W14x90, Method 2 (effective length): Pc, Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[LRFD-III.MF.B2]",
+     "level": "strength",
+     "printed": "III.MF.B2 LRFD Pc",
+     "examples": [
+      {
+       "example": "III.MF.B2",
+       "pages": "III-93 to III-94 (PDF 1033-1034)",
+       "title": "Part III, moment frame interior column W14x90, simplified method (B2 from Manual Table 2-2): Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[LRFD-III.MF.DA]",
+     "level": "strength",
+     "printed": "III.MF.DA LRFD Pc",
+     "examples": [
+      {
+       "example": "III.MF.DA",
+       "pages": "III-84 to III-86 (PDF 1024-1026)",
+       "title": "Part III, moment frame interior column W14x90, Method 1 (direct analysis): Pc, Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[LRFD-III.MF.ELM]",
+     "level": "strength",
+     "printed": "III.MF.ELM LRFD Pc",
+     "examples": [
+      {
+       "example": "III.MF.ELM",
+       "pages": "III-90 to III-91 (PDF 1030-1031)",
+       "title": "Part III, moment frame interior column W14x90, Method 2 (effective length): Pc, Eq. H1-1a"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. E3-3": {
+   "a": [
+    "tests/test_design_compression.py::test_hand_e3_elastic_flexural_buckling_minor_axis_and_k_factor",
+    "tests/test_design_compression.py::test_hand_e4_torsional_buckling_inelastic_and_elastic",
+    "tests/test_design_compression.py::test_hand_e7_slender_web_effective_width"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_compression.py::test_de_e10_rectangular_hss_with_slender_walls_e7[40]",
+     "level": "strength",
+     "printed": "E.10 Pn",
+     "examples": [
+      {
+       "example": "E.10",
+       "pages": "E-62 to E-66 (PDF 126-130)",
+       "title": "Rectangular HSS compression member with slender elements (HSS12x8x3/16)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1e_w16x31_slender_web_e7[c]",
+     "level": "strength",
+     "printed": "E.1E Pn",
+     "examples": [
+      {
+       "example": "E.1E",
+       "pages": "E-13 to E-19 (PDF 77-83)",
+       "title": "W-shape compression member with slender elements (W16x31)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[ASD-Vn_over_Omega]",
+     "level": "detail",
+     "printed": "F.14 h/tw",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[LRFD-phiVn]",
+     "level": "detail",
+     "printed": "F.14 h/tw",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. E3-4": {
+   "a": [
+    "tests/test_design_compression.py::test_hand_e3_elastic_flexural_buckling_minor_axis_and_k_factor",
+    "tests/test_design_compression.py::test_hand_e3_inelastic_flexural_buckling_major_axis",
+    "tests/test_design_compression.py::test_hand_e7_rectangular_hss_walls",
+    "tests/test_design_compression.py::test_hand_e7_round_hss",
+    "tests/test_design_compression.py::test_hand_e7_slender_flanges_and_web_of_a_built_up_shape",
+    "tests/test_design_compression.py::test_hand_e7_slender_web_effective_width"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_compression.py::test_de_e10_rectangular_hss_with_slender_walls_e7[18]",
+     "level": "strength",
+     "printed": "E.10 Pn",
+     "examples": [
+      {
+       "example": "E.10",
+       "pages": "E-62 to E-66 (PDF 126-130)",
+       "title": "Rectangular HSS compression member with slender elements (HSS12x8x3/16)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e10_rectangular_hss_with_slender_walls_e7[24]",
+     "level": "strength",
+     "printed": "E.10 Pn",
+     "examples": [
+      {
+       "example": "E.10",
+       "pages": "E-62 to E-66 (PDF 126-130)",
+       "title": "Rectangular HSS compression member with slender elements (HSS12x8x3/16)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e10_rectangular_hss_with_slender_walls_e7[40]",
+     "level": "strength",
+     "printed": "E.10 Pn",
+     "examples": [
+      {
+       "example": "E.10",
+       "pages": "E-62 to E-66 (PDF 126-130)",
+       "title": "Rectangular HSS compression member with slender elements (HSS12x8x3/16)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e11_pipe_compression_member",
+     "level": "strength",
+     "printed": "E.11 Pn",
+     "examples": [
+      {
+       "example": "E.11",
+       "pages": "E-67 to E-69 (PDF 131-133)",
+       "title": "Pipe compression member (Pipe 10 Std.)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1c_w14x132_flexural_buckling_e3",
+     "level": "strength",
+     "printed": "E.1C phi Pn",
+     "examples": [
+      {
+       "example": "E.1C",
+       "pages": "E-8 to E-9 (PDF 72-73)",
+       "title": "W-shape available compressive strength (W14x132, Lc = 30 ft)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1d_w14x90_flexural_buckling_e3",
+     "level": "strength",
+     "printed": "E.1D Pn",
+     "examples": [
+      {
+       "example": "E.1D",
+       "pages": "E-10 to E-12 (PDF 74-76)",
+       "title": "W-shape available compressive strength (W14x90, Lcx = 30 ft, Lcy = Lcz = 15 ft)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1e_w16x31_slender_web_e7[a]",
+     "level": "strength",
+     "printed": "E.1E Pn",
+     "examples": [
+      {
+       "example": "E.1E",
+       "pages": "E-13 to E-19 (PDF 77-83)",
+       "title": "W-shape compression member with slender elements (W16x31)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1e_w16x31_slender_web_e7[b]",
+     "level": "strength",
+     "printed": "E.1E Pn",
+     "examples": [
+      {
+       "example": "E.1E",
+       "pages": "E-13 to E-19 (PDF 77-83)",
+       "title": "W-shape compression member with slender elements (W16x31)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1e_w16x31_slender_web_e7[c]",
+     "level": "strength",
+     "printed": "E.1E Pn",
+     "examples": [
+      {
+       "example": "E.1E",
+       "pages": "E-13 to E-19 (PDF 77-83)",
+       "title": "W-shape compression member with slender elements (W16x31)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e2_built_up_column_slender_web_e7_and_e4_stress",
+     "level": "strength",
+     "printed": "E.2 Pn",
+     "examples": [
+      {
+       "example": "E.2",
+       "pages": "E-20 to E-24 (PDF 84-88)",
+       "title": "Built-up column with a slender web"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e3_built_up_column_slender_flanges_fully_effective",
+     "level": "strength",
+     "printed": "E.3 Pn",
+     "examples": [
+      {
+       "example": "E.3",
+       "pages": "E-25 to E-29 (PDF 89-93)",
+       "title": "Built-up column with slender flanges"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e9_rectangular_hss_without_slender_elements",
+     "level": "strength",
+     "printed": "E.9 Pn",
+     "examples": [
+      {
+       "example": "E.9",
+       "pages": "E-59 to E-61 (PDF 123-125)",
+       "title": "Rectangular HSS compression member without slender elements (HSS12x10x3/8)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_e4a_moment_frame_column_table_entry",
+     "level": "strength",
+     "printed": "E.4A LRFD at the table entry Lc = 9 ft",
+     "examples": [
+      {
+       "example": "E.4A",
+       "pages": "E-30 to E-33 (PDF 94-97)",
+       "title": "W-shape compression member in a moment frame (W14x82), column fixed at the base"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_e4b_moment_frame_column_effective_length",
+     "level": "strength",
+     "printed": "E.4B LRFD",
+     "examples": [
+      {
+       "example": "E.4B",
+       "pages": "E-34 to E-35 (PDF 98-99)",
+       "title": "W-shape compression member in a moment frame (W14x82), column pinned at the base"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[ASD-Vn_over_Omega]",
+     "level": "detail",
+     "printed": "F.14 h/tw",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[LRFD-phiVn]",
+     "level": "detail",
+     "printed": "F.14 h/tw",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[ASD-III.MF.B2]",
+     "level": "strength",
+     "printed": "III.MF.B2 ASD Pc",
+     "examples": [
+      {
+       "example": "III.MF.B2",
+       "pages": "III-93 to III-94 (PDF 1033-1034)",
+       "title": "Part III, moment frame interior column W14x90, simplified method (B2 from Manual Table 2-2): Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[ASD-III.MF.DA]",
+     "level": "strength",
+     "printed": "III.MF.DA ASD Pc",
+     "examples": [
+      {
+       "example": "III.MF.DA",
+       "pages": "III-84 to III-86 (PDF 1024-1026)",
+       "title": "Part III, moment frame interior column W14x90, Method 1 (direct analysis): Pc, Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[ASD-III.MF.ELM]",
+     "level": "strength",
+     "printed": "III.MF.ELM ASD Pc",
+     "examples": [
+      {
+       "example": "III.MF.ELM",
+       "pages": "III-90 to III-91 (PDF 1030-1031)",
+       "title": "Part III, moment frame interior column W14x90, Method 2 (effective length): Pc, Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[LRFD-III.MF.B2]",
+     "level": "strength",
+     "printed": "III.MF.B2 LRFD Pc",
+     "examples": [
+      {
+       "example": "III.MF.B2",
+       "pages": "III-93 to III-94 (PDF 1033-1034)",
+       "title": "Part III, moment frame interior column W14x90, simplified method (B2 from Manual Table 2-2): Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[LRFD-III.MF.DA]",
+     "level": "strength",
+     "printed": "III.MF.DA LRFD Pc",
+     "examples": [
+      {
+       "example": "III.MF.DA",
+       "pages": "III-84 to III-86 (PDF 1024-1026)",
+       "title": "Part III, moment frame interior column W14x90, Method 1 (direct analysis): Pc, Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[LRFD-III.MF.ELM]",
+     "level": "strength",
+     "printed": "III.MF.ELM LRFD Pc",
+     "examples": [
+      {
+       "example": "III.MF.ELM",
+       "pages": "III-90 to III-91 (PDF 1030-1031)",
+       "title": "Part III, moment frame interior column W14x90, Method 2 (effective length): Pc, Eq. H1-1a"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. E4-1": {
+   "a": [
+    "tests/test_design_compression.py::test_hand_e4_torsional_buckling_inelastic_and_elastic"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_compression.py::test_de_e2_built_up_column_slender_web_e7_and_e4_stress",
+     "level": "detail",
+     "printed": "E.2 Fel",
+     "examples": [
+      {
+       "example": "E.2",
+       "pages": "E-20 to E-24 (PDF 84-88)",
+       "title": "Built-up column with a slender web"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e3_built_up_column_slender_flanges_fully_effective",
+     "level": "detail",
+     "printed": "E.3 Fe (E4-2)",
+     "examples": [
+      {
+       "example": "E.3",
+       "pages": "E-25 to E-29 (PDF 89-93)",
+       "title": "Built-up column with slender flanges"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. E4-2": {
+   "a": [
+    "tests/test_design_compression.py::test_hand_e4_torsional_buckling_inelastic_and_elastic"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_compression.py::test_de_e2_built_up_column_slender_web_e7_and_e4_stress",
+     "level": "detail",
+     "printed": "E.2 Fel",
+     "examples": [
+      {
+       "example": "E.2",
+       "pages": "E-20 to E-24 (PDF 84-88)",
+       "title": "Built-up column with a slender web"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e3_built_up_column_slender_flanges_fully_effective",
+     "level": "detail",
+     "printed": "E.3 Fe (E4-2)",
+     "examples": [
+      {
+       "example": "E.3",
+       "pages": "E-25 to E-29 (PDF 89-93)",
+       "title": "Built-up column with slender flanges"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. E7-1": {
+   "a": [
+    "tests/test_design_compression.py::test_hand_e7_rectangular_hss_walls",
+    "tests/test_design_compression.py::test_hand_e7_round_hss",
+    "tests/test_design_compression.py::test_hand_e7_slender_flanges_and_web_of_a_built_up_shape",
+    "tests/test_design_compression.py::test_hand_e7_slender_web_effective_width"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_compression.py::test_de_e10_rectangular_hss_with_slender_walls_e7[18]",
+     "level": "strength",
+     "printed": "E.10 Pn",
+     "examples": [
+      {
+       "example": "E.10",
+       "pages": "E-62 to E-66 (PDF 126-130)",
+       "title": "Rectangular HSS compression member with slender elements (HSS12x8x3/16)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e10_rectangular_hss_with_slender_walls_e7[24]",
+     "level": "strength",
+     "printed": "E.10 Pn",
+     "examples": [
+      {
+       "example": "E.10",
+       "pages": "E-62 to E-66 (PDF 126-130)",
+       "title": "Rectangular HSS compression member with slender elements (HSS12x8x3/16)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e10_rectangular_hss_with_slender_walls_e7[40]",
+     "level": "strength",
+     "printed": "E.10 Pn",
+     "examples": [
+      {
+       "example": "E.10",
+       "pages": "E-62 to E-66 (PDF 126-130)",
+       "title": "Rectangular HSS compression member with slender elements (HSS12x8x3/16)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1e_w16x31_slender_web_e7[a]",
+     "level": "strength",
+     "printed": "E.1E Pn",
+     "examples": [
+      {
+       "example": "E.1E",
+       "pages": "E-13 to E-19 (PDF 77-83)",
+       "title": "W-shape compression member with slender elements (W16x31)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1e_w16x31_slender_web_e7[b]",
+     "level": "strength",
+     "printed": "E.1E Pn",
+     "examples": [
+      {
+       "example": "E.1E",
+       "pages": "E-13 to E-19 (PDF 77-83)",
+       "title": "W-shape compression member with slender elements (W16x31)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1e_w16x31_slender_web_e7[c]",
+     "level": "strength",
+     "printed": "E.1E Pn",
+     "examples": [
+      {
+       "example": "E.1E",
+       "pages": "E-13 to E-19 (PDF 77-83)",
+       "title": "W-shape compression member with slender elements (W16x31)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e2_built_up_column_slender_web_e7_and_e4_stress",
+     "level": "strength",
+     "printed": "E.2 Pn",
+     "examples": [
+      {
+       "example": "E.2",
+       "pages": "E-20 to E-24 (PDF 84-88)",
+       "title": "Built-up column with a slender web"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e3_built_up_column_slender_flanges_fully_effective",
+     "level": "strength",
+     "printed": "E.3 Pn",
+     "examples": [
+      {
+       "example": "E.3",
+       "pages": "E-25 to E-29 (PDF 89-93)",
+       "title": "Built-up column with slender flanges"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[ASD-Vn_over_Omega]",
+     "level": "detail",
+     "printed": "F.14 h/tw",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[LRFD-phiVn]",
+     "level": "detail",
+     "printed": "F.14 h/tw",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. E7-2": {
+   "a": [
+    "tests/test_design_compression.py::test_hand_e7_rectangular_hss_walls",
+    "tests/test_design_compression.py::test_hand_e7_slender_web_effective_width"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_compression.py::test_de_e10_rectangular_hss_with_slender_walls_e7[24]",
+     "level": "strength",
+     "printed": "E.10 Pn",
+     "examples": [
+      {
+       "example": "E.10",
+       "pages": "E-62 to E-66 (PDF 126-130)",
+       "title": "Rectangular HSS compression member with slender elements (HSS12x8x3/16)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e10_rectangular_hss_with_slender_walls_e7[40]",
+     "level": "strength",
+     "printed": "E.10 Pn",
+     "examples": [
+      {
+       "example": "E.10",
+       "pages": "E-62 to E-66 (PDF 126-130)",
+       "title": "Rectangular HSS compression member with slender elements (HSS12x8x3/16)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1e_w16x31_slender_web_e7[a]",
+     "level": "strength",
+     "printed": "E.1E Pn",
+     "examples": [
+      {
+       "example": "E.1E",
+       "pages": "E-13 to E-19 (PDF 77-83)",
+       "title": "W-shape compression member with slender elements (W16x31)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1e_w16x31_slender_web_e7[b]",
+     "level": "strength",
+     "printed": "E.1E Pn",
+     "examples": [
+      {
+       "example": "E.1E",
+       "pages": "E-13 to E-19 (PDF 77-83)",
+       "title": "W-shape compression member with slender elements (W16x31)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1e_w16x31_slender_web_e7[c]",
+     "level": "strength",
+     "printed": "E.1E Pn",
+     "examples": [
+      {
+       "example": "E.1E",
+       "pages": "E-13 to E-19 (PDF 77-83)",
+       "title": "W-shape compression member with slender elements (W16x31)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e2_built_up_column_slender_web_e7_and_e4_stress",
+     "level": "strength",
+     "printed": "E.2 Pn",
+     "examples": [
+      {
+       "example": "E.2",
+       "pages": "E-20 to E-24 (PDF 84-88)",
+       "title": "Built-up column with a slender web"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e3_built_up_column_slender_flanges_fully_effective",
+     "level": "strength",
+     "printed": "E.3 Pn",
+     "examples": [
+      {
+       "example": "E.3",
+       "pages": "E-25 to E-29 (PDF 89-93)",
+       "title": "Built-up column with slender flanges"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[ASD-Vn_over_Omega]",
+     "level": "detail",
+     "printed": "F.14 h/tw",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[LRFD-phiVn]",
+     "level": "detail",
+     "printed": "F.14 h/tw",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. E7-3": {
+   "a": [
+    "tests/test_design_compression.py::test_hand_e7_rectangular_hss_walls",
+    "tests/test_design_compression.py::test_hand_e7_slender_flanges_and_web_of_a_built_up_shape",
+    "tests/test_design_compression.py::test_hand_e7_slender_web_effective_width"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_compression.py::test_de_e10_rectangular_hss_with_slender_walls_e7[18]",
+     "level": "strength",
+     "printed": "E.10 Pn",
+     "examples": [
+      {
+       "example": "E.10",
+       "pages": "E-62 to E-66 (PDF 126-130)",
+       "title": "Rectangular HSS compression member with slender elements (HSS12x8x3/16)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e10_rectangular_hss_with_slender_walls_e7[24]",
+     "level": "strength",
+     "printed": "E.10 Pn",
+     "examples": [
+      {
+       "example": "E.10",
+       "pages": "E-62 to E-66 (PDF 126-130)",
+       "title": "Rectangular HSS compression member with slender elements (HSS12x8x3/16)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1e_w16x31_slender_web_e7[a]",
+     "level": "strength",
+     "printed": "E.1E Pn",
+     "examples": [
+      {
+       "example": "E.1E",
+       "pages": "E-13 to E-19 (PDF 77-83)",
+       "title": "W-shape compression member with slender elements (W16x31)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e2_built_up_column_slender_web_e7_and_e4_stress",
+     "level": "strength",
+     "printed": "E.2 Pn",
+     "examples": [
+      {
+       "example": "E.2",
+       "pages": "E-20 to E-24 (PDF 84-88)",
+       "title": "Built-up column with a slender web"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[ASD-Vn_over_Omega]",
+     "level": "detail",
+     "printed": "F.14 h/tw",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[LRFD-phiVn]",
+     "level": "detail",
+     "printed": "F.14 h/tw",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. E7-5": {
+   "a": [
+    "tests/test_design_compression.py::test_hand_e7_rectangular_hss_walls",
+    "tests/test_design_compression.py::test_hand_e7_slender_flanges_and_web_of_a_built_up_shape",
+    "tests/test_design_compression.py::test_hand_e7_slender_web_effective_width"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_compression.py::test_de_e10_rectangular_hss_with_slender_walls_e7[18]",
+     "level": "strength",
+     "printed": "E.10 Pn",
+     "examples": [
+      {
+       "example": "E.10",
+       "pages": "E-62 to E-66 (PDF 126-130)",
+       "title": "Rectangular HSS compression member with slender elements (HSS12x8x3/16)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e10_rectangular_hss_with_slender_walls_e7[24]",
+     "level": "strength",
+     "printed": "E.10 Pn",
+     "examples": [
+      {
+       "example": "E.10",
+       "pages": "E-62 to E-66 (PDF 126-130)",
+       "title": "Rectangular HSS compression member with slender elements (HSS12x8x3/16)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1e_w16x31_slender_web_e7[a]",
+     "level": "strength",
+     "printed": "E.1E Pn",
+     "examples": [
+      {
+       "example": "E.1E",
+       "pages": "E-13 to E-19 (PDF 77-83)",
+       "title": "W-shape compression member with slender elements (W16x31)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e2_built_up_column_slender_web_e7_and_e4_stress",
+     "level": "strength",
+     "printed": "E.2 Pn",
+     "examples": [
+      {
+       "example": "E.2",
+       "pages": "E-20 to E-24 (PDF 84-88)",
+       "title": "Built-up column with a slender web"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[ASD-Vn_over_Omega]",
+     "level": "detail",
+     "printed": "F.14 h/tw",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[LRFD-phiVn]",
+     "level": "detail",
+     "printed": "F.14 h/tw",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. E7-7": {
+   "a": [
+    "tests/test_design_compression.py::test_hand_e7_round_hss"
+   ],
+   "aDetail": [],
+   "b": []
+  },
+  "Eq. F1-1": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f1_cb_values_of_the_user_note"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f1_2b_w18x50_inelastic_ltb_with_cb_from_the_diagram",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.1-2B",
+       "pages": "F-10 to F-11 (PDF 172-173)",
+       "title": "W18x50, major axis, braced at the ends and third points: inelastic LTB with Cb"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f1_3b_w18x50_elastic_ltb",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.1-3B",
+       "pages": "F-14 to F-15 (PDF 176-177)",
+       "title": "W18x50, major axis, braced at the ends and midspan: elastic LTB with Cb"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f7b_hss10x6_noncompact_flange_and_ltb",
+     "level": "strength",
+     "printed": "Mp",
+     "examples": [
+      {
+       "example": "F.7B",
+       "pages": "F-34 to F-36 (PDF 196-198)",
+       "title": "HSS10x6x3/16, major axis, braced at the ends: noncompact flange, LTB capped at Mp"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. F2-1": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f2_elastic_ltb_and_the_classical_formula",
+    "tests/test_design_flexure.py::test_hand_f2_inelastic_ltb",
+    "tests/test_design_flexure.py::test_hand_f2_yielding",
+    "tests/test_design_flexure.py::test_hand_f3_flange_local_buckling"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_combined.py::test_design_example_h3_tension_and_biaxial_flexure[ASD]",
+     "level": "strength",
+     "printed": "Mnx",
+     "examples": [
+      {
+       "example": "H.3",
+       "pages": "H-8 to H-11 (PDF 270-273)",
+       "title": "W14x82, tension and biaxial flexure: D2-1, F2-2, F6-1, H1-1b"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_combined.py::test_design_example_h3_tension_and_biaxial_flexure[LRFD]",
+     "level": "strength",
+     "printed": "Mnx",
+     "examples": [
+      {
+       "example": "H.3",
+       "pages": "H-8 to H-11 (PDF 270-273)",
+       "title": "W14x82, tension and biaxial flexure: D2-1, F2-2, F6-1, H1-1b"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f1_1b_w18x50_yielding",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.1-1B",
+       "pages": "F-8 (PDF 170)",
+       "title": "W18x50, major axis, continuously braced: yielding"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f1_2b_w18x50_inelastic_ltb_with_cb_from_the_diagram",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.1-2B",
+       "pages": "F-10 to F-11 (PDF 172-173)",
+       "title": "W18x50, major axis, braced at the ends and third points: inelastic LTB with Cb"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f1_3b_w18x50_elastic_ltb",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.1-3B",
+       "pages": "F-14 to F-15 (PDF 176-177)",
+       "title": "W18x50, major axis, braced at the ends and midspan: elastic LTB with Cb"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f3b_w21x48_noncompact_flange",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.3B",
+       "pages": "F-24 to F-25 (PDF 186-187)",
+       "title": "W21x48, major axis, continuously braced: noncompact flange local buckling"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. F2-2": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f2_inelastic_ltb",
+    "tests/test_design_flexure.py::test_hand_f3_flange_local_buckling"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f1_2b_w18x50_inelastic_ltb_with_cb_from_the_diagram",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.1-2B",
+       "pages": "F-10 to F-11 (PDF 172-173)",
+       "title": "W18x50, major axis, braced at the ends and third points: inelastic LTB with Cb"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. F2-3": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f2_elastic_ltb_and_the_classical_formula"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f1_3b_w18x50_elastic_ltb",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.1-3B",
+       "pages": "F-14 to F-15 (PDF 176-177)",
+       "title": "W18x50, major axis, braced at the ends and midspan: elastic LTB with Cb"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. F2-4": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f2_elastic_ltb_and_the_classical_formula"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f1_3b_w18x50_elastic_ltb",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.1-3B",
+       "pages": "F-14 to F-15 (PDF 176-177)",
+       "title": "W18x50, major axis, braced at the ends and midspan: elastic LTB with Cb"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. F2-5": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f2_elastic_ltb_and_the_classical_formula",
+    "tests/test_design_flexure.py::test_hand_f2_inelastic_ltb",
+    "tests/test_design_flexure.py::test_hand_f3_flange_local_buckling"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f1_2b_w18x50_inelastic_ltb_with_cb_from_the_diagram",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.1-2B",
+       "pages": "F-10 to F-11 (PDF 172-173)",
+       "title": "W18x50, major axis, braced at the ends and third points: inelastic LTB with Cb"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f1_3b_w18x50_elastic_ltb",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.1-3B",
+       "pages": "F-14 to F-15 (PDF 176-177)",
+       "title": "W18x50, major axis, braced at the ends and midspan: elastic LTB with Cb"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. F2-6": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f2_elastic_ltb_and_the_classical_formula",
+    "tests/test_design_flexure.py::test_hand_f2_inelastic_ltb",
+    "tests/test_design_flexure.py::test_hand_f3_flange_local_buckling"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f1_2b_w18x50_inelastic_ltb_with_cb_from_the_diagram",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.1-2B",
+       "pages": "F-10 to F-11 (PDF 172-173)",
+       "title": "W18x50, major axis, braced at the ends and third points: inelastic LTB with Cb"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f1_3b_w18x50_elastic_ltb",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.1-3B",
+       "pages": "F-14 to F-15 (PDF 176-177)",
+       "title": "W18x50, major axis, braced at the ends and midspan: elastic LTB with Cb"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. F2-7": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f2_elastic_ltb_and_the_classical_formula"
+   ],
+   "aDetail": [],
+   "b": []
+  },
+  "Eq. F2-8a": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f2_elastic_ltb_and_the_classical_formula",
+    "tests/test_design_flexure.py::test_hand_f2_inelastic_ltb",
+    "tests/test_design_flexure.py::test_hand_f3_flange_local_buckling"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f1_2b_w18x50_inelastic_ltb_with_cb_from_the_diagram",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.1-2B",
+       "pages": "F-10 to F-11 (PDF 172-173)",
+       "title": "W18x50, major axis, braced at the ends and third points: inelastic LTB with Cb"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f1_3b_w18x50_elastic_ltb",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.1-3B",
+       "pages": "F-14 to F-15 (PDF 176-177)",
+       "title": "W18x50, major axis, braced at the ends and midspan: elastic LTB with Cb"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. F3-1": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f3_flange_local_buckling"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f3b_w21x48_noncompact_flange",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.3B",
+       "pages": "F-24 to F-25 (PDF 186-187)",
+       "title": "W21x48, major axis, continuously braced: noncompact flange local buckling"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. F3-2": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f3_flange_local_buckling"
+   ],
+   "aDetail": [],
+   "b": []
+  },
+  "Eq. F6-1": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f6_minor_axis"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_combined.py::test_design_example_h3_tension_and_biaxial_flexure[ASD]",
+     "level": "strength",
+     "printed": "Mny",
+     "examples": [
+      {
+       "example": "H.3",
+       "pages": "H-8 to H-11 (PDF 270-273)",
+       "title": "W14x82, tension and biaxial flexure: D2-1, F2-2, F6-1, H1-1b"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_combined.py::test_design_example_h3_tension_and_biaxial_flexure[LRFD]",
+     "level": "strength",
+     "printed": "Mny",
+     "examples": [
+      {
+       "example": "H.3",
+       "pages": "H-8 to H-11 (PDF 270-273)",
+       "title": "W14x82, tension and biaxial flexure: D2-1, F2-2, F6-1, H1-1b"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f5_w12x58_minor_axis",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.5",
+       "pages": "F-28 to F-29 (PDF 190-191)",
+       "title": "W12x58, minor axis: yielding"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. F6-2": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f6_minor_axis"
+   ],
+   "aDetail": [],
+   "b": []
+  },
+  "Eq. F6-3": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f6_minor_axis"
+   ],
+   "aDetail": [],
+   "b": []
+  },
+  "Eq. F6-4": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f6_minor_axis"
+   ],
+   "aDetail": [],
+   "b": []
+  },
+  "Eq. F7-1": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f7_lateral_torsional_buckling",
+    "tests/test_design_flexure.py::test_hand_f7_slender_flange_effective_width",
+    "tests/test_design_flexure.py::test_hand_f7_yielding_and_local_buckling"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f7b_hss10x6_noncompact_flange_and_ltb",
+     "level": "strength",
+     "printed": "Mp",
+     "examples": [
+      {
+       "example": "F.7B",
+       "pages": "F-34 to F-36 (PDF 196-198)",
+       "title": "HSS10x6x3/16, major axis, braced at the ends: noncompact flange, LTB capped at Mp"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f8b_hss8x8_slender_flange",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.8B",
+       "pages": "F-39 to F-41 (PDF 201-203)",
+       "title": "HSS8x8x3/16, slender flange: effective width and effective section modulus"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_h5c_rectangular_hss_flexure_f7[ASD-Mn_over_Omega_kipin]",
+     "level": "strength",
+     "printed": "H.5C Mp",
+     "examples": [
+      {
+       "example": "H.5C",
+       "pages": "H-20 to H-23 (PDF 282-285)",
+       "title": "Rectangular HSS6x4x1/4: available shear (G4) and flexural (F7) strengths used in the torsion interaction"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_h5c_rectangular_hss_flexure_f7[LRFD-phiMn_kipin]",
+     "level": "strength",
+     "printed": "H.5C Mp",
+     "examples": [
+      {
+       "example": "H.5C",
+       "pages": "H-20 to H-23 (PDF 282-285)",
+       "title": "Rectangular HSS6x4x1/4: available shear (G4) and flexural (F7) strengths used in the torsion interaction"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. F7-10": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f7_lateral_torsional_buckling"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f7b_hss10x6_noncompact_flange_and_ltb",
+     "level": "strength",
+     "printed": "Mp",
+     "examples": [
+      {
+       "example": "F.7B",
+       "pages": "F-34 to F-36 (PDF 196-198)",
+       "title": "HSS10x6x3/16, major axis, braced at the ends: noncompact flange, LTB capped at Mp"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. F7-11": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f7_lateral_torsional_buckling"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f7b_hss10x6_noncompact_flange_and_ltb",
+     "level": "strength",
+     "printed": "Mp",
+     "examples": [
+      {
+       "example": "F.7B",
+       "pages": "F-34 to F-36 (PDF 196-198)",
+       "title": "HSS10x6x3/16, major axis, braced at the ends: noncompact flange, LTB capped at Mp"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. F7-2": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f7_yielding_and_local_buckling"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f7b_hss10x6_noncompact_flange_and_ltb",
+     "level": "strength",
+     "printed": "Mn (FLB)",
+     "examples": [
+      {
+       "example": "F.7B",
+       "pages": "F-34 to F-36 (PDF 196-198)",
+       "title": "HSS10x6x3/16, major axis, braced at the ends: noncompact flange, LTB capped at Mp"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. F7-3": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f7_slender_flange_effective_width"
+   ],
+   "aDetail": [
+    "tests/test_design_flexure.py::test_hand_f7_yielding_and_local_buckling"
+   ],
+   "b": [
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f8b_hss8x8_slender_flange",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.8B",
+       "pages": "F-39 to F-41 (PDF 201-203)",
+       "title": "HSS8x8x3/16, slender flange: effective width and effective section modulus"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. F7-4": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f7_slender_flange_effective_width"
+   ],
+   "aDetail": [
+    "tests/test_design_flexure.py::test_hand_f7_yielding_and_local_buckling"
+   ],
+   "b": [
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f8b_hss8x8_slender_flange",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.8B",
+       "pages": "F-39 to F-41 (PDF 201-203)",
+       "title": "HSS8x8x3/16, slender flange: effective width and effective section modulus"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. F7-5": {
+   "a": [],
+   "aDetail": [
+    "tests/test_design_flexure.py::test_hand_f7_slender_flange_effective_width"
+   ],
+   "b": []
+  },
+  "Eq. F7-6": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f7_yielding_and_local_buckling"
+   ],
+   "aDetail": [],
+   "b": []
+  },
+  "Eq. F7-8": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f7_lateral_torsional_buckling"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f7b_hss10x6_noncompact_flange_and_ltb",
+     "level": "strength",
+     "printed": "Mp",
+     "examples": [
+      {
+       "example": "F.7B",
+       "pages": "F-34 to F-36 (PDF 196-198)",
+       "title": "HSS10x6x3/16, major axis, braced at the ends: noncompact flange, LTB capped at Mp"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. F8-1": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f8_round_hss"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f9b_pipe8_yielding",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.9B",
+       "pages": "F-43 to F-44 (PDF 205-206)",
+       "title": "Pipe 8 x-Strong: yielding"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. F8-2": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f8_round_hss"
+   ],
+   "aDetail": [],
+   "b": []
+  },
+  "Eq. F8-3": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f8_round_hss"
+   ],
+   "aDetail": [],
+   "b": []
+  },
+  "Eq. F8-4": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f8_round_hss"
+   ],
+   "aDetail": [],
+   "b": []
+  },
+  "Eq. G2-1": {
+   "a": [
+    "tests/test_design_shear.py::test_hand_g21a_rolled_web_phi_1_00_omega_1_50",
+    "tests/test_design_shear.py::test_hand_g21b_built_up_web_cv1_one_phi_0_90",
+    "tests/test_design_shear.py::test_hand_g21b_cv1_below_one_built_up_and_rolled"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[ASD-Vn_over_Omega]",
+     "level": "strength",
+     "printed": "F.14 Vn",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[LRFD-phiVn]",
+     "level": "strength",
+     "printed": "F.14 Vn",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_g8a_built_up_girder_web_without_stiffeners[ASD-Vn_over_Omega-Va]",
+     "level": "strength",
+     "printed": "G.8A Vn",
+     "examples": [
+      {
+       "example": "G.8A",
+       "pages": "G-17 to G-18 (PDF 253-254)",
+       "title": "Built-up girder, shear strength without transverse stiffeners (first step of the example)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_g8a_built_up_girder_web_without_stiffeners[LRFD-phiVn-Vu]",
+     "level": "strength",
+     "printed": "G.8A Vn",
+     "examples": [
+      {
+       "example": "G.8A",
+       "pages": "G-17 to G-18 (PDF 253-254)",
+       "title": "Built-up girder, shear strength without transverse stiffeners (first step of the example)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_shear.py::test_de_g1b_w24x62_major_axis_shear_g21a",
+     "level": "strength",
+     "printed": "G.1B Vn",
+     "examples": [
+      {
+       "example": "G.1B",
+       "pages": "G-4 (PDF 240)",
+       "title": "W-shape in major-axis shear (W24x62)"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. G2-10": {
+   "a": [
+    "tests/test_design_shear.py::test_hand_g6_minor_axis_shear_of_i_shape"
+   ],
+   "aDetail": [],
+   "b": []
+  },
+  "Eq. G2-11": {
+   "a": [
+    "tests/test_design_shear.py::test_hand_g4_rectangular_hss_both_directions_and_box",
+    "tests/test_design_shear.py::test_hand_g6_minor_axis_shear_of_i_shape"
+   ],
+   "aDetail": [],
+   "b": []
+  },
+  "Eq. G2-2": {
+   "a": [
+    "tests/test_design_shear.py::test_hand_g21a_rolled_web_phi_1_00_omega_1_50"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_shear.py::test_de_g1b_w24x62_major_axis_shear_g21a",
+     "level": "strength",
+     "printed": "G.1B Vn",
+     "examples": [
+      {
+       "example": "G.1B",
+       "pages": "G-4 (PDF 240)",
+       "title": "W-shape in major-axis shear (W24x62)"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. G2-3": {
+   "a": [
+    "tests/test_design_shear.py::test_hand_g21b_built_up_web_cv1_one_phi_0_90",
+    "tests/test_design_shear.py::test_hand_g21b_cv1_below_one_built_up_and_rolled"
+   ],
+   "aDetail": [],
+   "b": []
+  },
+  "Eq. G2-4": {
+   "a": [
+    "tests/test_design_shear.py::test_hand_g21b_cv1_below_one_built_up_and_rolled"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[ASD-Vn_over_Omega]",
+     "level": "strength",
+     "printed": "F.14 Vn",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[LRFD-phiVn]",
+     "level": "strength",
+     "printed": "F.14 Vn",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_g8a_built_up_girder_web_without_stiffeners[ASD-Vn_over_Omega-Va]",
+     "level": "strength",
+     "printed": "G.8A Vn",
+     "examples": [
+      {
+       "example": "G.8A",
+       "pages": "G-17 to G-18 (PDF 253-254)",
+       "title": "Built-up girder, shear strength without transverse stiffeners (first step of the example)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_g8a_built_up_girder_web_without_stiffeners[LRFD-phiVn-Vu]",
+     "level": "strength",
+     "printed": "G.8A Vn",
+     "examples": [
+      {
+       "example": "G.8A",
+       "pages": "G-17 to G-18 (PDF 253-254)",
+       "title": "Built-up girder, shear strength without transverse stiffeners (first step of the example)"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. G2-9": {
+   "a": [
+    "tests/test_design_shear.py::test_hand_g4_rectangular_hss_both_directions_and_box",
+    "tests/test_design_shear.py::test_hand_g6_minor_axis_shear_of_i_shape"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[ASD-Vn_over_Omega]",
+     "level": "detail",
+     "printed": "F.14 bf/2tf",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[LRFD-phiVn]",
+     "level": "detail",
+     "printed": "F.14 bf/2tf",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_h5c_rectangular_hss_shear_g4[ASD-Vn_over_Omega]",
+     "level": "strength",
+     "printed": "H.5C Vn",
+     "examples": [
+      {
+       "example": "H.5C",
+       "pages": "H-20 to H-23 (PDF 282-285)",
+       "title": "Rectangular HSS6x4x1/4: available shear (G4) and flexural (F7) strengths used in the torsion interaction"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_h5c_rectangular_hss_shear_g4[LRFD-phiVn]",
+     "level": "strength",
+     "printed": "H.5C Vn",
+     "examples": [
+      {
+       "example": "H.5C",
+       "pages": "H-20 to H-23 (PDF 282-285)",
+       "title": "Rectangular HSS6x4x1/4: available shear (G4) and flexural (F7) strengths used in the torsion interaction"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_shear.py::test_de_g4_rectangular_hss_shear",
+     "level": "strength",
+     "printed": "G.4 Vn",
+     "examples": [
+      {
+       "example": "G.4",
+       "pages": "G-9 to G-10 (PDF 245-246)",
+       "title": "Rectangular HSS in shear (HSS6x4x3/8, 6-in. walls vertical)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_shear.py::test_de_g6_w21x48_minor_axis_shear",
+     "level": "strength",
+     "printed": "G.6 Vn",
+     "examples": [
+      {
+       "example": "G.6",
+       "pages": "G-13 to G-14 (PDF 249-250)",
+       "title": "Doubly symmetric shape in minor-axis shear (W21x48)"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. G4-1": {
+   "a": [
+    "tests/test_design_shear.py::test_hand_g4_rectangular_hss_both_directions_and_box"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_review.py::test_de_h5c_rectangular_hss_shear_g4[ASD-Vn_over_Omega]",
+     "level": "strength",
+     "printed": "H.5C Vn",
+     "examples": [
+      {
+       "example": "H.5C",
+       "pages": "H-20 to H-23 (PDF 282-285)",
+       "title": "Rectangular HSS6x4x1/4: available shear (G4) and flexural (F7) strengths used in the torsion interaction"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_h5c_rectangular_hss_shear_g4[LRFD-phiVn]",
+     "level": "strength",
+     "printed": "H.5C Vn",
+     "examples": [
+      {
+       "example": "H.5C",
+       "pages": "H-20 to H-23 (PDF 282-285)",
+       "title": "Rectangular HSS6x4x1/4: available shear (G4) and flexural (F7) strengths used in the torsion interaction"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_shear.py::test_de_g4_rectangular_hss_shear",
+     "level": "strength",
+     "printed": "G.4 Vn",
+     "examples": [
+      {
+       "example": "G.4",
+       "pages": "G-9 to G-10 (PDF 245-246)",
+       "title": "Rectangular HSS in shear (HSS6x4x3/8, 6-in. walls vertical)"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. G5-1": {
+   "a": [
+    "tests/test_design_shear.py::test_hand_g5_round_hss_yielding_and_buckling"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_shear.py::test_de_g5_round_hss_shear_with_documented_asd_value",
+     "level": "strength",
+     "printed": "G.5 Vn",
+     "examples": [
+      {
+       "example": "G.5",
+       "pages": "G-11 to G-12 (PDF 247-248)",
+       "title": "Round HSS in shear (HSS16.000x0.375)"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. G5-2a": {
+   "a": [
+    "tests/test_design_shear.py::test_hand_g5_round_hss_yielding_and_buckling"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_shear.py::test_de_g5_round_hss_shear_with_documented_asd_value",
+     "level": "strength",
+     "printed": "G.5 Vn",
+     "examples": [
+      {
+       "example": "G.5",
+       "pages": "G-11 to G-12 (PDF 247-248)",
+       "title": "Round HSS in shear (HSS16.000x0.375)"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. G5-2b": {
+   "a": [
+    "tests/test_design_shear.py::test_hand_g5_round_hss_yielding_and_buckling"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_shear.py::test_de_g5_round_hss_shear_with_documented_asd_value",
+     "level": "strength",
+     "printed": "G.5 Vn",
+     "examples": [
+      {
+       "example": "G.5",
+       "pages": "G-11 to G-12 (PDF 247-248)",
+       "title": "Round HSS in shear (HSS16.000x0.375)"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. G6-1": {
+   "a": [
+    "tests/test_design_shear.py::test_hand_g6_minor_axis_shear_of_i_shape"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[ASD-Vn_over_Omega]",
+     "level": "detail",
+     "printed": "F.14 bf/2tf",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[LRFD-phiVn]",
+     "level": "detail",
+     "printed": "F.14 bf/2tf",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_shear.py::test_de_g6_w21x48_minor_axis_shear",
+     "level": "strength",
+     "printed": "G.6 Vn",
+     "examples": [
+      {
+       "example": "G.6",
+       "pages": "G-13 to G-14 (PDF 249-250)",
+       "title": "Doubly symmetric shape in minor-axis shear (W21x48)"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. H1-1a": {
+   "a": [
+    "tests/test_design_combined.py::test_hand_appendix_8_b1_formulas",
+    "tests/test_design_combined.py::test_hand_h1_1_flexure_and_compression",
+    "tests/test_design_combined.py::test_hand_h1_2_flexure_and_tension"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_combined.py::test_design_example_h1b_interaction_with_tabulated_strengths[ASD]",
+     "level": "function",
+     "printed": "Eq. H1-1a",
+     "function": "benchfea.design.aisc360_22.h_combined.h1_interaction",
+     "examples": [
+      {
+       "example": "H.1B",
+       "pages": "H-4 to H-5 (PDF 266-267)",
+       "title": "W14x99, compression and biaxial flexure: Eq. H1-1a with tabulated available strengths"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_combined.py::test_design_example_h1b_interaction_with_tabulated_strengths[LRFD]",
+     "level": "function",
+     "printed": "Eq. H1-1a",
+     "function": "benchfea.design.aisc360_22.h_combined.h1_interaction",
+     "examples": [
+      {
+       "example": "H.1B",
+       "pages": "H-4 to H-5 (PDF 266-267)",
+       "title": "W14x99, compression and biaxial flexure: Eq. H1-1a with tabulated available strengths"
+      }
+     ]
+    }
+   ]
+  },
+  "Eq. H1-1b": {
+   "a": [
+    "tests/test_design_combined.py::test_hand_h1_1_flexure_and_compression"
+   ],
+   "aDetail": [
+    "tests/test_design_combined.py::test_hand_h1_2_flexure_and_tension"
+   ],
+   "b": [
+    {
+     "test": "tests/test_design_combined.py::test_design_example_h3_tension_and_biaxial_flexure[ASD]",
+     "level": "strength",
+     "printed": "Eq. H1-1b",
+     "examples": [
+      {
+       "example": "H.3",
+       "pages": "H-8 to H-11 (PDF 270-273)",
+       "title": "W14x82, tension and biaxial flexure: D2-1, F2-2, F6-1, H1-1b"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_combined.py::test_design_example_h3_tension_and_biaxial_flexure[LRFD]",
+     "level": "strength",
+     "printed": "Eq. H1-1b",
+     "examples": [
+      {
+       "example": "H.3",
+       "pages": "H-8 to H-11 (PDF 270-273)",
+       "title": "W14x82, tension and biaxial flexure: D2-1, F2-2, F6-1, H1-1b"
+      }
+     ]
+    }
+   ]
+  },
+  "Sec. D1": {
+   "a": [
+    "tests/test_design_tension.py::test_hand_slenderness_d1_is_advisory"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_compression.py::test_de_e2_built_up_column_slender_web_e7_and_e4_stress",
+     "level": "strength",
+     "printed": "E.2 Lcy/ry",
+     "examples": [
+      {
+       "example": "E.2",
+       "pages": "E-20 to E-24 (PDF 84-88)",
+       "title": "Built-up column with a slender web"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_tension_members_outside_the_shape_scope[D.2]",
+     "level": "strength",
+     "printed": "D.2 L/r",
+     "examples": [
+      {
+       "example": "D.2",
+       "pages": "D-5 to D-7 (PDF 41-43)",
+       "title": "Single-angle tension member (L4x4x1/2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_tension_members_outside_the_shape_scope[D.3]",
+     "level": "strength",
+     "printed": "D.3 L/r",
+     "examples": [
+      {
+       "example": "D.3",
+       "pages": "D-8 to D-10 (PDF 44-46)",
+       "title": "WT-shape tension member (WT6x20)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_tension_members_outside_the_shape_scope[D.6]",
+     "level": "strength",
+     "printed": "D.6 L/r",
+     "examples": [
+      {
+       "example": "D.6",
+       "pages": "D-17 to D-19 (PDF 53-55)",
+       "title": "Double-angle tension member (2L4x4x1/2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_tension.py::test_de_d5_round_hss_tension_member_and_slenderness",
+     "level": "strength",
+     "printed": "D.5 L/r",
+     "examples": [
+      {
+       "example": "D.5",
+       "pages": "D-14 to D-16 (PDF 50-52)",
+       "title": "Round HSS tension member (HSS6.000x0.500)"
+      }
+     ]
+    }
+   ]
+  },
+  "Sec. E2": {
+   "a": [
+    "tests/test_design_compression.py::test_hand_e2_slenderness_is_advisory",
+    "tests/test_design_compression.py::test_hand_e3_elastic_flexural_buckling_minor_axis_and_k_factor",
+    "tests/test_design_compression.py::test_hand_e3_inelastic_flexural_buckling_major_axis",
+    "tests/test_design_compression.py::test_hand_e7_rectangular_hss_walls",
+    "tests/test_design_compression.py::test_hand_e7_round_hss",
+    "tests/test_design_compression.py::test_hand_e7_slender_flanges_and_web_of_a_built_up_shape",
+    "tests/test_design_compression.py::test_hand_e7_slender_web_effective_width"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_compression.py::test_de_e10_rectangular_hss_with_slender_walls_e7[18]",
+     "level": "strength",
+     "printed": "E.10 Pn",
+     "examples": [
+      {
+       "example": "E.10",
+       "pages": "E-62 to E-66 (PDF 126-130)",
+       "title": "Rectangular HSS compression member with slender elements (HSS12x8x3/16)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e10_rectangular_hss_with_slender_walls_e7[24]",
+     "level": "strength",
+     "printed": "E.10 Pn",
+     "examples": [
+      {
+       "example": "E.10",
+       "pages": "E-62 to E-66 (PDF 126-130)",
+       "title": "Rectangular HSS compression member with slender elements (HSS12x8x3/16)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e10_rectangular_hss_with_slender_walls_e7[40]",
+     "level": "strength",
+     "printed": "E.10 Pn",
+     "examples": [
+      {
+       "example": "E.10",
+       "pages": "E-62 to E-66 (PDF 126-130)",
+       "title": "Rectangular HSS compression member with slender elements (HSS12x8x3/16)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e11_pipe_compression_member",
+     "level": "strength",
+     "printed": "E.11 Pn",
+     "examples": [
+      {
+       "example": "E.11",
+       "pages": "E-67 to E-69 (PDF 131-133)",
+       "title": "Pipe compression member (Pipe 10 Std.)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1c_w14x132_flexural_buckling_e3",
+     "level": "strength",
+     "printed": "E.1C phi Pn",
+     "examples": [
+      {
+       "example": "E.1C",
+       "pages": "E-8 to E-9 (PDF 72-73)",
+       "title": "W-shape available compressive strength (W14x132, Lc = 30 ft)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1d_w14x90_flexural_buckling_e3",
+     "level": "strength",
+     "printed": "E.1D Pn",
+     "examples": [
+      {
+       "example": "E.1D",
+       "pages": "E-10 to E-12 (PDF 74-76)",
+       "title": "W-shape available compressive strength (W14x90, Lcx = 30 ft, Lcy = Lcz = 15 ft)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1e_w16x31_slender_web_e7[a]",
+     "level": "strength",
+     "printed": "E.1E Pn",
+     "examples": [
+      {
+       "example": "E.1E",
+       "pages": "E-13 to E-19 (PDF 77-83)",
+       "title": "W-shape compression member with slender elements (W16x31)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1e_w16x31_slender_web_e7[b]",
+     "level": "strength",
+     "printed": "E.1E Pn",
+     "examples": [
+      {
+       "example": "E.1E",
+       "pages": "E-13 to E-19 (PDF 77-83)",
+       "title": "W-shape compression member with slender elements (W16x31)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1e_w16x31_slender_web_e7[c]",
+     "level": "strength",
+     "printed": "E.1E Pn",
+     "examples": [
+      {
+       "example": "E.1E",
+       "pages": "E-13 to E-19 (PDF 77-83)",
+       "title": "W-shape compression member with slender elements (W16x31)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e2_built_up_column_slender_web_e7_and_e4_stress",
+     "level": "strength",
+     "printed": "E.2 Pn",
+     "examples": [
+      {
+       "example": "E.2",
+       "pages": "E-20 to E-24 (PDF 84-88)",
+       "title": "Built-up column with a slender web"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e3_built_up_column_slender_flanges_fully_effective",
+     "level": "strength",
+     "printed": "E.3 Pn",
+     "examples": [
+      {
+       "example": "E.3",
+       "pages": "E-25 to E-29 (PDF 89-93)",
+       "title": "Built-up column with slender flanges"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e9_rectangular_hss_without_slender_elements",
+     "level": "strength",
+     "printed": "E.9 Pn",
+     "examples": [
+      {
+       "example": "E.9",
+       "pages": "E-59 to E-61 (PDF 123-125)",
+       "title": "Rectangular HSS compression member without slender elements (HSS12x10x3/8)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_e4a_moment_frame_column_table_entry",
+     "level": "strength",
+     "printed": "E.4A LRFD at the table entry Lc = 9 ft",
+     "examples": [
+      {
+       "example": "E.4A",
+       "pages": "E-30 to E-33 (PDF 94-97)",
+       "title": "W-shape compression member in a moment frame (W14x82), column fixed at the base"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_e4b_moment_frame_column_effective_length",
+     "level": "strength",
+     "printed": "E.4B LRFD",
+     "examples": [
+      {
+       "example": "E.4B",
+       "pages": "E-34 to E-35 (PDF 98-99)",
+       "title": "W-shape compression member in a moment frame (W14x82), column pinned at the base"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[ASD-Vn_over_Omega]",
+     "level": "detail",
+     "printed": "F.14 h/tw",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[LRFD-phiVn]",
+     "level": "detail",
+     "printed": "F.14 h/tw",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[ASD-III.MF.B2]",
+     "level": "strength",
+     "printed": "III.MF.B2 ASD Pc",
+     "examples": [
+      {
+       "example": "III.MF.B2",
+       "pages": "III-93 to III-94 (PDF 1033-1034)",
+       "title": "Part III, moment frame interior column W14x90, simplified method (B2 from Manual Table 2-2): Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[ASD-III.MF.DA]",
+     "level": "strength",
+     "printed": "III.MF.DA ASD Pc",
+     "examples": [
+      {
+       "example": "III.MF.DA",
+       "pages": "III-84 to III-86 (PDF 1024-1026)",
+       "title": "Part III, moment frame interior column W14x90, Method 1 (direct analysis): Pc, Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[ASD-III.MF.ELM]",
+     "level": "strength",
+     "printed": "III.MF.ELM ASD Pc",
+     "examples": [
+      {
+       "example": "III.MF.ELM",
+       "pages": "III-90 to III-91 (PDF 1030-1031)",
+       "title": "Part III, moment frame interior column W14x90, Method 2 (effective length): Pc, Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[LRFD-III.MF.B2]",
+     "level": "strength",
+     "printed": "III.MF.B2 LRFD Pc",
+     "examples": [
+      {
+       "example": "III.MF.B2",
+       "pages": "III-93 to III-94 (PDF 1033-1034)",
+       "title": "Part III, moment frame interior column W14x90, simplified method (B2 from Manual Table 2-2): Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[LRFD-III.MF.DA]",
+     "level": "strength",
+     "printed": "III.MF.DA LRFD Pc",
+     "examples": [
+      {
+       "example": "III.MF.DA",
+       "pages": "III-84 to III-86 (PDF 1024-1026)",
+       "title": "Part III, moment frame interior column W14x90, Method 1 (direct analysis): Pc, Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[LRFD-III.MF.ELM]",
+     "level": "strength",
+     "printed": "III.MF.ELM LRFD Pc",
+     "examples": [
+      {
+       "example": "III.MF.ELM",
+       "pages": "III-90 to III-91 (PDF 1030-1031)",
+       "title": "Part III, moment frame interior column W14x90, Method 2 (effective length): Pc, Eq. H1-1a"
+      }
+     ]
+    }
+   ]
+  },
+  "Sec. F1": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f2_elastic_ltb_and_the_classical_formula",
+    "tests/test_design_flexure.py::test_hand_f2_inelastic_ltb",
+    "tests/test_design_flexure.py::test_hand_f2_yielding",
+    "tests/test_design_flexure.py::test_hand_f3_flange_local_buckling",
+    "tests/test_design_flexure.py::test_hand_f6_minor_axis",
+    "tests/test_design_flexure.py::test_hand_f7_lateral_torsional_buckling",
+    "tests/test_design_flexure.py::test_hand_f7_slender_flange_effective_width",
+    "tests/test_design_flexure.py::test_hand_f7_yielding_and_local_buckling",
+    "tests/test_design_flexure.py::test_hand_f8_round_hss"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_combined.py::test_design_example_h3_tension_and_biaxial_flexure[ASD]",
+     "level": "strength",
+     "printed": "Mnx",
+     "examples": [
+      {
+       "example": "H.3",
+       "pages": "H-8 to H-11 (PDF 270-273)",
+       "title": "W14x82, tension and biaxial flexure: D2-1, F2-2, F6-1, H1-1b"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_combined.py::test_design_example_h3_tension_and_biaxial_flexure[LRFD]",
+     "level": "strength",
+     "printed": "Mnx",
+     "examples": [
+      {
+       "example": "H.3",
+       "pages": "H-8 to H-11 (PDF 270-273)",
+       "title": "W14x82, tension and biaxial flexure: D2-1, F2-2, F6-1, H1-1b"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f1_1b_w18x50_yielding",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.1-1B",
+       "pages": "F-8 (PDF 170)",
+       "title": "W18x50, major axis, continuously braced: yielding"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f1_2b_w18x50_inelastic_ltb_with_cb_from_the_diagram",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.1-2B",
+       "pages": "F-10 to F-11 (PDF 172-173)",
+       "title": "W18x50, major axis, braced at the ends and third points: inelastic LTB with Cb"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f1_3b_w18x50_elastic_ltb",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.1-3B",
+       "pages": "F-14 to F-15 (PDF 176-177)",
+       "title": "W18x50, major axis, braced at the ends and midspan: elastic LTB with Cb"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f3b_w21x48_noncompact_flange",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.3B",
+       "pages": "F-24 to F-25 (PDF 186-187)",
+       "title": "W21x48, major axis, continuously braced: noncompact flange local buckling"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f5_w12x58_minor_axis",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.5",
+       "pages": "F-28 to F-29 (PDF 190-191)",
+       "title": "W12x58, minor axis: yielding"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f7b_hss10x6_noncompact_flange_and_ltb",
+     "level": "strength",
+     "printed": "Mp",
+     "examples": [
+      {
+       "example": "F.7B",
+       "pages": "F-34 to F-36 (PDF 196-198)",
+       "title": "HSS10x6x3/16, major axis, braced at the ends: noncompact flange, LTB capped at Mp"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f8b_hss8x8_slender_flange",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.8B",
+       "pages": "F-39 to F-41 (PDF 201-203)",
+       "title": "HSS8x8x3/16, slender flange: effective width and effective section modulus"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f9b_pipe8_yielding",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.9B",
+       "pages": "F-43 to F-44 (PDF 205-206)",
+       "title": "Pipe 8 x-Strong: yielding"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_h5c_rectangular_hss_flexure_f7[ASD-Mn_over_Omega_kipin]",
+     "level": "strength",
+     "printed": "H.5C Mp",
+     "examples": [
+      {
+       "example": "H.5C",
+       "pages": "H-20 to H-23 (PDF 282-285)",
+       "title": "Rectangular HSS6x4x1/4: available shear (G4) and flexural (F7) strengths used in the torsion interaction"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_h5c_rectangular_hss_flexure_f7[LRFD-phiMn_kipin]",
+     "level": "strength",
+     "printed": "H.5C Mp",
+     "examples": [
+      {
+       "example": "H.5C",
+       "pages": "H-20 to H-23 (PDF 282-285)",
+       "title": "Rectangular HSS6x4x1/4: available shear (G4) and flexural (F7) strengths used in the torsion interaction"
+      }
+     ]
+    }
+   ]
+  },
+  "Sec. F3.1": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f3_flange_local_buckling"
+   ],
+   "aDetail": [],
+   "b": []
+  },
+  "Sec. G1": {
+   "a": [
+    "tests/test_design_shear.py::test_hand_g21b_built_up_web_cv1_one_phi_0_90",
+    "tests/test_design_shear.py::test_hand_g21b_cv1_below_one_built_up_and_rolled",
+    "tests/test_design_shear.py::test_hand_g4_rectangular_hss_both_directions_and_box",
+    "tests/test_design_shear.py::test_hand_g5_round_hss_yielding_and_buckling",
+    "tests/test_design_shear.py::test_hand_g6_minor_axis_shear_of_i_shape"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[ASD-Vn_over_Omega]",
+     "level": "strength",
+     "printed": "F.14 Vn",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[LRFD-phiVn]",
+     "level": "strength",
+     "printed": "F.14 Vn",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_g8a_built_up_girder_web_without_stiffeners[ASD-Vn_over_Omega-Va]",
+     "level": "strength",
+     "printed": "G.8A Vn",
+     "examples": [
+      {
+       "example": "G.8A",
+       "pages": "G-17 to G-18 (PDF 253-254)",
+       "title": "Built-up girder, shear strength without transverse stiffeners (first step of the example)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_g8a_built_up_girder_web_without_stiffeners[LRFD-phiVn-Vu]",
+     "level": "strength",
+     "printed": "G.8A Vn",
+     "examples": [
+      {
+       "example": "G.8A",
+       "pages": "G-17 to G-18 (PDF 253-254)",
+       "title": "Built-up girder, shear strength without transverse stiffeners (first step of the example)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_h5c_rectangular_hss_shear_g4[ASD-Vn_over_Omega]",
+     "level": "strength",
+     "printed": "H.5C Vn",
+     "examples": [
+      {
+       "example": "H.5C",
+       "pages": "H-20 to H-23 (PDF 282-285)",
+       "title": "Rectangular HSS6x4x1/4: available shear (G4) and flexural (F7) strengths used in the torsion interaction"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_h5c_rectangular_hss_shear_g4[LRFD-phiVn]",
+     "level": "strength",
+     "printed": "H.5C Vn",
+     "examples": [
+      {
+       "example": "H.5C",
+       "pages": "H-20 to H-23 (PDF 282-285)",
+       "title": "Rectangular HSS6x4x1/4: available shear (G4) and flexural (F7) strengths used in the torsion interaction"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_shear.py::test_de_g4_rectangular_hss_shear",
+     "level": "strength",
+     "printed": "G.4 Vn",
+     "examples": [
+      {
+       "example": "G.4",
+       "pages": "G-9 to G-10 (PDF 245-246)",
+       "title": "Rectangular HSS in shear (HSS6x4x3/8, 6-in. walls vertical)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_shear.py::test_de_g5_round_hss_shear_with_documented_asd_value",
+     "level": "strength",
+     "printed": "G.5 Vn",
+     "examples": [
+      {
+       "example": "G.5",
+       "pages": "G-11 to G-12 (PDF 247-248)",
+       "title": "Round HSS in shear (HSS16.000x0.375)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_shear.py::test_de_g6_w21x48_minor_axis_shear",
+     "level": "strength",
+     "printed": "G.6 Vn",
+     "examples": [
+      {
+       "example": "G.6",
+       "pages": "G-13 to G-14 (PDF 249-250)",
+       "title": "Doubly symmetric shape in minor-axis shear (W21x48)"
+      }
+     ]
+    }
+   ]
+  },
+  "Sec. L1": {
+   "a": [
+    "tests/test_design_service.py::test_hand_deflection_against_span_ratio_and_absolute_limit"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_service.py::test_design_example_f8a_live_load_deflection_with_the_solver",
+     "level": "strength",
+     "printed": "L/240",
+     "examples": [
+      {
+       "example": "F.8A",
+       "pages": "F-37 to F-38 (PDF 199-200)",
+       "title": "HSS8x8x3/16: live load deflection of a simply supported beam against L/240"
+      }
+     ]
+    }
+   ]
+  },
+  "Sec. L2": {
+   "a": [
+    "tests/test_design_service.py::test_hand_deflection_against_span_ratio_and_absolute_limit"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_service.py::test_design_example_f8a_live_load_deflection_with_the_solver",
+     "level": "strength",
+     "printed": "L/240",
+     "examples": [
+      {
+       "example": "F.8A",
+       "pages": "F-37 to F-38 (PDF 199-200)",
+       "title": "HSS8x8x3/16: live load deflection of a simply supported beam against L/240"
+      }
+     ]
+    }
+   ]
+  },
+  "Table B4.1a": {
+   "a": [
+    "tests/test_design_compression.py::test_hand_e3_elastic_flexural_buckling_minor_axis_and_k_factor",
+    "tests/test_design_compression.py::test_hand_e3_inelastic_flexural_buckling_major_axis",
+    "tests/test_design_compression.py::test_hand_e4_torsional_buckling_inelastic_and_elastic",
+    "tests/test_design_compression.py::test_hand_e7_rectangular_hss_walls",
+    "tests/test_design_compression.py::test_hand_e7_round_hss",
+    "tests/test_design_compression.py::test_hand_e7_slender_flanges_and_web_of_a_built_up_shape",
+    "tests/test_design_compression.py::test_hand_e7_slender_web_effective_width"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_compression.py::test_de_e10_rectangular_hss_with_slender_walls_e7[18]",
+     "level": "strength",
+     "printed": "E.10 Pn",
+     "examples": [
+      {
+       "example": "E.10",
+       "pages": "E-62 to E-66 (PDF 126-130)",
+       "title": "Rectangular HSS compression member with slender elements (HSS12x8x3/16)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e10_rectangular_hss_with_slender_walls_e7[24]",
+     "level": "strength",
+     "printed": "E.10 Pn",
+     "examples": [
+      {
+       "example": "E.10",
+       "pages": "E-62 to E-66 (PDF 126-130)",
+       "title": "Rectangular HSS compression member with slender elements (HSS12x8x3/16)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e10_rectangular_hss_with_slender_walls_e7[40]",
+     "level": "strength",
+     "printed": "E.10 Pn",
+     "examples": [
+      {
+       "example": "E.10",
+       "pages": "E-62 to E-66 (PDF 126-130)",
+       "title": "Rectangular HSS compression member with slender elements (HSS12x8x3/16)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e11_pipe_compression_member",
+     "level": "strength",
+     "printed": "E.11 Pn",
+     "examples": [
+      {
+       "example": "E.11",
+       "pages": "E-67 to E-69 (PDF 131-133)",
+       "title": "Pipe compression member (Pipe 10 Std.)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1c_w14x132_flexural_buckling_e3",
+     "level": "strength",
+     "printed": "E.1C phi Pn",
+     "examples": [
+      {
+       "example": "E.1C",
+       "pages": "E-8 to E-9 (PDF 72-73)",
+       "title": "W-shape available compressive strength (W14x132, Lc = 30 ft)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1d_w14x90_flexural_buckling_e3",
+     "level": "strength",
+     "printed": "E.1D Pn",
+     "examples": [
+      {
+       "example": "E.1D",
+       "pages": "E-10 to E-12 (PDF 74-76)",
+       "title": "W-shape available compressive strength (W14x90, Lcx = 30 ft, Lcy = Lcz = 15 ft)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1e_w16x31_slender_web_e7[a]",
+     "level": "strength",
+     "printed": "E.1E Pn",
+     "examples": [
+      {
+       "example": "E.1E",
+       "pages": "E-13 to E-19 (PDF 77-83)",
+       "title": "W-shape compression member with slender elements (W16x31)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1e_w16x31_slender_web_e7[b]",
+     "level": "strength",
+     "printed": "E.1E Pn",
+     "examples": [
+      {
+       "example": "E.1E",
+       "pages": "E-13 to E-19 (PDF 77-83)",
+       "title": "W-shape compression member with slender elements (W16x31)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1e_w16x31_slender_web_e7[c]",
+     "level": "strength",
+     "printed": "E.1E Pn",
+     "examples": [
+      {
+       "example": "E.1E",
+       "pages": "E-13 to E-19 (PDF 77-83)",
+       "title": "W-shape compression member with slender elements (W16x31)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e2_built_up_column_slender_web_e7_and_e4_stress",
+     "level": "strength",
+     "printed": "E.2 Pn",
+     "examples": [
+      {
+       "example": "E.2",
+       "pages": "E-20 to E-24 (PDF 84-88)",
+       "title": "Built-up column with a slender web"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e3_built_up_column_slender_flanges_fully_effective",
+     "level": "strength",
+     "printed": "E.3 Pn",
+     "examples": [
+      {
+       "example": "E.3",
+       "pages": "E-25 to E-29 (PDF 89-93)",
+       "title": "Built-up column with slender flanges"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e9_rectangular_hss_without_slender_elements",
+     "level": "strength",
+     "printed": "E.9 Pn",
+     "examples": [
+      {
+       "example": "E.9",
+       "pages": "E-59 to E-61 (PDF 123-125)",
+       "title": "Rectangular HSS compression member without slender elements (HSS12x10x3/8)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_e4a_moment_frame_column_table_entry",
+     "level": "strength",
+     "printed": "E.4A LRFD at the table entry Lc = 9 ft",
+     "examples": [
+      {
+       "example": "E.4A",
+       "pages": "E-30 to E-33 (PDF 94-97)",
+       "title": "W-shape compression member in a moment frame (W14x82), column fixed at the base"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_e4b_moment_frame_column_effective_length",
+     "level": "strength",
+     "printed": "E.4B LRFD",
+     "examples": [
+      {
+       "example": "E.4B",
+       "pages": "E-34 to E-35 (PDF 98-99)",
+       "title": "W-shape compression member in a moment frame (W14x82), column pinned at the base"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[ASD-Vn_over_Omega]",
+     "level": "detail",
+     "printed": "F.14 h/tw",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[LRFD-phiVn]",
+     "level": "detail",
+     "printed": "F.14 h/tw",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[ASD-III.MF.B2]",
+     "level": "strength",
+     "printed": "III.MF.B2 ASD Pc",
+     "examples": [
+      {
+       "example": "III.MF.B2",
+       "pages": "III-93 to III-94 (PDF 1033-1034)",
+       "title": "Part III, moment frame interior column W14x90, simplified method (B2 from Manual Table 2-2): Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[ASD-III.MF.DA]",
+     "level": "strength",
+     "printed": "III.MF.DA ASD Pc",
+     "examples": [
+      {
+       "example": "III.MF.DA",
+       "pages": "III-84 to III-86 (PDF 1024-1026)",
+       "title": "Part III, moment frame interior column W14x90, Method 1 (direct analysis): Pc, Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[ASD-III.MF.ELM]",
+     "level": "strength",
+     "printed": "III.MF.ELM ASD Pc",
+     "examples": [
+      {
+       "example": "III.MF.ELM",
+       "pages": "III-90 to III-91 (PDF 1030-1031)",
+       "title": "Part III, moment frame interior column W14x90, Method 2 (effective length): Pc, Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[LRFD-III.MF.B2]",
+     "level": "strength",
+     "printed": "III.MF.B2 LRFD Pc",
+     "examples": [
+      {
+       "example": "III.MF.B2",
+       "pages": "III-93 to III-94 (PDF 1033-1034)",
+       "title": "Part III, moment frame interior column W14x90, simplified method (B2 from Manual Table 2-2): Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[LRFD-III.MF.DA]",
+     "level": "strength",
+     "printed": "III.MF.DA LRFD Pc",
+     "examples": [
+      {
+       "example": "III.MF.DA",
+       "pages": "III-84 to III-86 (PDF 1024-1026)",
+       "title": "Part III, moment frame interior column W14x90, Method 1 (direct analysis): Pc, Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[LRFD-III.MF.ELM]",
+     "level": "strength",
+     "printed": "III.MF.ELM LRFD Pc",
+     "examples": [
+      {
+       "example": "III.MF.ELM",
+       "pages": "III-90 to III-91 (PDF 1030-1031)",
+       "title": "Part III, moment frame interior column W14x90, Method 2 (effective length): Pc, Eq. H1-1a"
+      }
+     ]
+    }
+   ]
+  },
+  "Table B4.1a Case 1": {
+   "a": [
+    "tests/test_design_compression.py::test_hand_e3_elastic_flexural_buckling_minor_axis_and_k_factor",
+    "tests/test_design_compression.py::test_hand_e3_inelastic_flexural_buckling_major_axis",
+    "tests/test_design_compression.py::test_hand_e4_torsional_buckling_inelastic_and_elastic",
+    "tests/test_design_compression.py::test_hand_e7_slender_web_effective_width"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_compression.py::test_de_e1c_w14x132_flexural_buckling_e3",
+     "level": "strength",
+     "printed": "E.1C phi Pn",
+     "examples": [
+      {
+       "example": "E.1C",
+       "pages": "E-8 to E-9 (PDF 72-73)",
+       "title": "W-shape available compressive strength (W14x132, Lc = 30 ft)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1d_w14x90_flexural_buckling_e3",
+     "level": "strength",
+     "printed": "E.1D Pn",
+     "examples": [
+      {
+       "example": "E.1D",
+       "pages": "E-10 to E-12 (PDF 74-76)",
+       "title": "W-shape available compressive strength (W14x90, Lcx = 30 ft, Lcy = Lcz = 15 ft)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1e_w16x31_slender_web_e7[a]",
+     "level": "strength",
+     "printed": "E.1E Pn",
+     "examples": [
+      {
+       "example": "E.1E",
+       "pages": "E-13 to E-19 (PDF 77-83)",
+       "title": "W-shape compression member with slender elements (W16x31)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1e_w16x31_slender_web_e7[b]",
+     "level": "strength",
+     "printed": "E.1E Pn",
+     "examples": [
+      {
+       "example": "E.1E",
+       "pages": "E-13 to E-19 (PDF 77-83)",
+       "title": "W-shape compression member with slender elements (W16x31)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1e_w16x31_slender_web_e7[c]",
+     "level": "strength",
+     "printed": "E.1E Pn",
+     "examples": [
+      {
+       "example": "E.1E",
+       "pages": "E-13 to E-19 (PDF 77-83)",
+       "title": "W-shape compression member with slender elements (W16x31)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_e4a_moment_frame_column_table_entry",
+     "level": "strength",
+     "printed": "E.4A LRFD at the table entry Lc = 9 ft",
+     "examples": [
+      {
+       "example": "E.4A",
+       "pages": "E-30 to E-33 (PDF 94-97)",
+       "title": "W-shape compression member in a moment frame (W14x82), column fixed at the base"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_e4b_moment_frame_column_effective_length",
+     "level": "strength",
+     "printed": "E.4B LRFD",
+     "examples": [
+      {
+       "example": "E.4B",
+       "pages": "E-34 to E-35 (PDF 98-99)",
+       "title": "W-shape compression member in a moment frame (W14x82), column pinned at the base"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[ASD-III.MF.B2]",
+     "level": "strength",
+     "printed": "III.MF.B2 ASD Pc",
+     "examples": [
+      {
+       "example": "III.MF.B2",
+       "pages": "III-93 to III-94 (PDF 1033-1034)",
+       "title": "Part III, moment frame interior column W14x90, simplified method (B2 from Manual Table 2-2): Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[ASD-III.MF.DA]",
+     "level": "strength",
+     "printed": "III.MF.DA ASD Pc",
+     "examples": [
+      {
+       "example": "III.MF.DA",
+       "pages": "III-84 to III-86 (PDF 1024-1026)",
+       "title": "Part III, moment frame interior column W14x90, Method 1 (direct analysis): Pc, Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[ASD-III.MF.ELM]",
+     "level": "strength",
+     "printed": "III.MF.ELM ASD Pc",
+     "examples": [
+      {
+       "example": "III.MF.ELM",
+       "pages": "III-90 to III-91 (PDF 1030-1031)",
+       "title": "Part III, moment frame interior column W14x90, Method 2 (effective length): Pc, Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[LRFD-III.MF.B2]",
+     "level": "strength",
+     "printed": "III.MF.B2 LRFD Pc",
+     "examples": [
+      {
+       "example": "III.MF.B2",
+       "pages": "III-93 to III-94 (PDF 1033-1034)",
+       "title": "Part III, moment frame interior column W14x90, simplified method (B2 from Manual Table 2-2): Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[LRFD-III.MF.DA]",
+     "level": "strength",
+     "printed": "III.MF.DA LRFD Pc",
+     "examples": [
+      {
+       "example": "III.MF.DA",
+       "pages": "III-84 to III-86 (PDF 1024-1026)",
+       "title": "Part III, moment frame interior column W14x90, Method 1 (direct analysis): Pc, Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[LRFD-III.MF.ELM]",
+     "level": "strength",
+     "printed": "III.MF.ELM LRFD Pc",
+     "examples": [
+      {
+       "example": "III.MF.ELM",
+       "pages": "III-90 to III-91 (PDF 1030-1031)",
+       "title": "Part III, moment frame interior column W14x90, Method 2 (effective length): Pc, Eq. H1-1a"
+      }
+     ]
+    }
+   ]
+  },
+  "Table B4.1a Case 2": {
+   "a": [
+    "tests/test_design_compression.py::test_hand_e7_slender_flanges_and_web_of_a_built_up_shape"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_compression.py::test_de_e2_built_up_column_slender_web_e7_and_e4_stress",
+     "level": "strength",
+     "printed": "E.2 Pn",
+     "examples": [
+      {
+       "example": "E.2",
+       "pages": "E-20 to E-24 (PDF 84-88)",
+       "title": "Built-up column with a slender web"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e3_built_up_column_slender_flanges_fully_effective",
+     "level": "strength",
+     "printed": "E.3 Pn",
+     "examples": [
+      {
+       "example": "E.3",
+       "pages": "E-25 to E-29 (PDF 89-93)",
+       "title": "Built-up column with slender flanges"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[ASD-Vn_over_Omega]",
+     "level": "detail",
+     "printed": "F.14 h/tw",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[LRFD-phiVn]",
+     "level": "detail",
+     "printed": "F.14 h/tw",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    }
+   ]
+  },
+  "Table B4.1a Case 5": {
+   "a": [
+    "tests/test_design_compression.py::test_hand_e3_elastic_flexural_buckling_minor_axis_and_k_factor",
+    "tests/test_design_compression.py::test_hand_e3_inelastic_flexural_buckling_major_axis",
+    "tests/test_design_compression.py::test_hand_e4_torsional_buckling_inelastic_and_elastic",
+    "tests/test_design_compression.py::test_hand_e7_slender_flanges_and_web_of_a_built_up_shape",
+    "tests/test_design_compression.py::test_hand_e7_slender_web_effective_width"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_compression.py::test_de_e1c_w14x132_flexural_buckling_e3",
+     "level": "strength",
+     "printed": "E.1C phi Pn",
+     "examples": [
+      {
+       "example": "E.1C",
+       "pages": "E-8 to E-9 (PDF 72-73)",
+       "title": "W-shape available compressive strength (W14x132, Lc = 30 ft)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1d_w14x90_flexural_buckling_e3",
+     "level": "strength",
+     "printed": "E.1D Pn",
+     "examples": [
+      {
+       "example": "E.1D",
+       "pages": "E-10 to E-12 (PDF 74-76)",
+       "title": "W-shape available compressive strength (W14x90, Lcx = 30 ft, Lcy = Lcz = 15 ft)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1e_w16x31_slender_web_e7[a]",
+     "level": "strength",
+     "printed": "E.1E Pn",
+     "examples": [
+      {
+       "example": "E.1E",
+       "pages": "E-13 to E-19 (PDF 77-83)",
+       "title": "W-shape compression member with slender elements (W16x31)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1e_w16x31_slender_web_e7[b]",
+     "level": "strength",
+     "printed": "E.1E Pn",
+     "examples": [
+      {
+       "example": "E.1E",
+       "pages": "E-13 to E-19 (PDF 77-83)",
+       "title": "W-shape compression member with slender elements (W16x31)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1e_w16x31_slender_web_e7[c]",
+     "level": "strength",
+     "printed": "E.1E Pn",
+     "examples": [
+      {
+       "example": "E.1E",
+       "pages": "E-13 to E-19 (PDF 77-83)",
+       "title": "W-shape compression member with slender elements (W16x31)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e2_built_up_column_slender_web_e7_and_e4_stress",
+     "level": "strength",
+     "printed": "E.2 Pn",
+     "examples": [
+      {
+       "example": "E.2",
+       "pages": "E-20 to E-24 (PDF 84-88)",
+       "title": "Built-up column with a slender web"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e3_built_up_column_slender_flanges_fully_effective",
+     "level": "strength",
+     "printed": "E.3 Pn",
+     "examples": [
+      {
+       "example": "E.3",
+       "pages": "E-25 to E-29 (PDF 89-93)",
+       "title": "Built-up column with slender flanges"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_e4a_moment_frame_column_table_entry",
+     "level": "strength",
+     "printed": "E.4A LRFD at the table entry Lc = 9 ft",
+     "examples": [
+      {
+       "example": "E.4A",
+       "pages": "E-30 to E-33 (PDF 94-97)",
+       "title": "W-shape compression member in a moment frame (W14x82), column fixed at the base"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_e4b_moment_frame_column_effective_length",
+     "level": "strength",
+     "printed": "E.4B LRFD",
+     "examples": [
+      {
+       "example": "E.4B",
+       "pages": "E-34 to E-35 (PDF 98-99)",
+       "title": "W-shape compression member in a moment frame (W14x82), column pinned at the base"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[ASD-Vn_over_Omega]",
+     "level": "detail",
+     "printed": "F.14 h/tw",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[LRFD-phiVn]",
+     "level": "detail",
+     "printed": "F.14 h/tw",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[ASD-III.MF.B2]",
+     "level": "strength",
+     "printed": "III.MF.B2 ASD Pc",
+     "examples": [
+      {
+       "example": "III.MF.B2",
+       "pages": "III-93 to III-94 (PDF 1033-1034)",
+       "title": "Part III, moment frame interior column W14x90, simplified method (B2 from Manual Table 2-2): Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[ASD-III.MF.DA]",
+     "level": "strength",
+     "printed": "III.MF.DA ASD Pc",
+     "examples": [
+      {
+       "example": "III.MF.DA",
+       "pages": "III-84 to III-86 (PDF 1024-1026)",
+       "title": "Part III, moment frame interior column W14x90, Method 1 (direct analysis): Pc, Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[ASD-III.MF.ELM]",
+     "level": "strength",
+     "printed": "III.MF.ELM ASD Pc",
+     "examples": [
+      {
+       "example": "III.MF.ELM",
+       "pages": "III-90 to III-91 (PDF 1030-1031)",
+       "title": "Part III, moment frame interior column W14x90, Method 2 (effective length): Pc, Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[LRFD-III.MF.B2]",
+     "level": "strength",
+     "printed": "III.MF.B2 LRFD Pc",
+     "examples": [
+      {
+       "example": "III.MF.B2",
+       "pages": "III-93 to III-94 (PDF 1033-1034)",
+       "title": "Part III, moment frame interior column W14x90, simplified method (B2 from Manual Table 2-2): Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[LRFD-III.MF.DA]",
+     "level": "strength",
+     "printed": "III.MF.DA LRFD Pc",
+     "examples": [
+      {
+       "example": "III.MF.DA",
+       "pages": "III-84 to III-86 (PDF 1024-1026)",
+       "title": "Part III, moment frame interior column W14x90, Method 1 (direct analysis): Pc, Eq. H1-1a"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_part3_moment_frame_column_e3_and_h1_1a[LRFD-III.MF.ELM]",
+     "level": "strength",
+     "printed": "III.MF.ELM LRFD Pc",
+     "examples": [
+      {
+       "example": "III.MF.ELM",
+       "pages": "III-90 to III-91 (PDF 1030-1031)",
+       "title": "Part III, moment frame interior column W14x90, Method 2 (effective length): Pc, Eq. H1-1a"
+      }
+     ]
+    }
+   ]
+  },
+  "Table B4.1a Case 6": {
+   "a": [
+    "tests/test_design_compression.py::test_hand_e7_rectangular_hss_walls"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_compression.py::test_de_e10_rectangular_hss_with_slender_walls_e7[18]",
+     "level": "strength",
+     "printed": "E.10 Pn",
+     "examples": [
+      {
+       "example": "E.10",
+       "pages": "E-62 to E-66 (PDF 126-130)",
+       "title": "Rectangular HSS compression member with slender elements (HSS12x8x3/16)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e10_rectangular_hss_with_slender_walls_e7[24]",
+     "level": "strength",
+     "printed": "E.10 Pn",
+     "examples": [
+      {
+       "example": "E.10",
+       "pages": "E-62 to E-66 (PDF 126-130)",
+       "title": "Rectangular HSS compression member with slender elements (HSS12x8x3/16)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e10_rectangular_hss_with_slender_walls_e7[40]",
+     "level": "strength",
+     "printed": "E.10 Pn",
+     "examples": [
+      {
+       "example": "E.10",
+       "pages": "E-62 to E-66 (PDF 126-130)",
+       "title": "Rectangular HSS compression member with slender elements (HSS12x8x3/16)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e9_rectangular_hss_without_slender_elements",
+     "level": "strength",
+     "printed": "E.9 Pn",
+     "examples": [
+      {
+       "example": "E.9",
+       "pages": "E-59 to E-61 (PDF 123-125)",
+       "title": "Rectangular HSS compression member without slender elements (HSS12x10x3/8)"
+      }
+     ]
+    }
+   ]
+  },
+  "Table B4.1a Case 8": {
+   "a": [
+    "tests/test_design_compression.py::test_hand_e7_rectangular_hss_walls"
+   ],
+   "aDetail": [],
+   "b": []
+  },
+  "Table B4.1a Case 9": {
+   "a": [
+    "tests/test_design_compression.py::test_hand_e7_round_hss"
+   ],
+   "aDetail": [
+    "tests/test_design_compression.py::test_hand_e4_torsional_buckling_inelastic_and_elastic"
+   ],
+   "b": [
+    {
+     "test": "tests/test_design_compression.py::test_de_e11_pipe_compression_member",
+     "level": "strength",
+     "printed": "E.11 Pn",
+     "examples": [
+      {
+       "example": "E.11",
+       "pages": "E-67 to E-69 (PDF 131-133)",
+       "title": "Pipe compression member (Pipe 10 Std.)"
+      }
+     ]
+    }
+   ]
+  },
+  "Table B4.1b": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f2_elastic_ltb_and_the_classical_formula",
+    "tests/test_design_flexure.py::test_hand_f2_inelastic_ltb",
+    "tests/test_design_flexure.py::test_hand_f2_yielding",
+    "tests/test_design_flexure.py::test_hand_f3_flange_local_buckling",
+    "tests/test_design_flexure.py::test_hand_f6_minor_axis",
+    "tests/test_design_flexure.py::test_hand_f7_slender_flange_effective_width",
+    "tests/test_design_flexure.py::test_hand_f7_yielding_and_local_buckling",
+    "tests/test_design_flexure.py::test_hand_f8_round_hss"
+   ],
+   "aDetail": [
+    "tests/test_design_flexure.py::test_hand_f7_lateral_torsional_buckling"
+   ],
+   "b": [
+    {
+     "test": "tests/test_design_combined.py::test_design_example_h3_tension_and_biaxial_flexure[ASD]",
+     "level": "strength",
+     "printed": "Mnx",
+     "examples": [
+      {
+       "example": "H.3",
+       "pages": "H-8 to H-11 (PDF 270-273)",
+       "title": "W14x82, tension and biaxial flexure: D2-1, F2-2, F6-1, H1-1b"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_combined.py::test_design_example_h3_tension_and_biaxial_flexure[LRFD]",
+     "level": "strength",
+     "printed": "Mnx",
+     "examples": [
+      {
+       "example": "H.3",
+       "pages": "H-8 to H-11 (PDF 270-273)",
+       "title": "W14x82, tension and biaxial flexure: D2-1, F2-2, F6-1, H1-1b"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f1_1b_w18x50_yielding",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.1-1B",
+       "pages": "F-8 (PDF 170)",
+       "title": "W18x50, major axis, continuously braced: yielding"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f1_2b_w18x50_inelastic_ltb_with_cb_from_the_diagram",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.1-2B",
+       "pages": "F-10 to F-11 (PDF 172-173)",
+       "title": "W18x50, major axis, braced at the ends and third points: inelastic LTB with Cb"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f1_3b_w18x50_elastic_ltb",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.1-3B",
+       "pages": "F-14 to F-15 (PDF 176-177)",
+       "title": "W18x50, major axis, braced at the ends and midspan: elastic LTB with Cb"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f3b_w21x48_noncompact_flange",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.3B",
+       "pages": "F-24 to F-25 (PDF 186-187)",
+       "title": "W21x48, major axis, continuously braced: noncompact flange local buckling"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f5_w12x58_minor_axis",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.5",
+       "pages": "F-28 to F-29 (PDF 190-191)",
+       "title": "W12x58, minor axis: yielding"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f7b_hss10x6_noncompact_flange_and_ltb",
+     "level": "strength",
+     "printed": "Mp",
+     "examples": [
+      {
+       "example": "F.7B",
+       "pages": "F-34 to F-36 (PDF 196-198)",
+       "title": "HSS10x6x3/16, major axis, braced at the ends: noncompact flange, LTB capped at Mp"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f8b_hss8x8_slender_flange",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.8B",
+       "pages": "F-39 to F-41 (PDF 201-203)",
+       "title": "HSS8x8x3/16, slender flange: effective width and effective section modulus"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f9b_pipe8_yielding",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.9B",
+       "pages": "F-43 to F-44 (PDF 205-206)",
+       "title": "Pipe 8 x-Strong: yielding"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_h5c_rectangular_hss_flexure_f7[ASD-Mn_over_Omega_kipin]",
+     "level": "strength",
+     "printed": "H.5C Mp",
+     "examples": [
+      {
+       "example": "H.5C",
+       "pages": "H-20 to H-23 (PDF 282-285)",
+       "title": "Rectangular HSS6x4x1/4: available shear (G4) and flexural (F7) strengths used in the torsion interaction"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_h5c_rectangular_hss_flexure_f7[LRFD-phiMn_kipin]",
+     "level": "strength",
+     "printed": "H.5C Mp",
+     "examples": [
+      {
+       "example": "H.5C",
+       "pages": "H-20 to H-23 (PDF 282-285)",
+       "title": "Rectangular HSS6x4x1/4: available shear (G4) and flexural (F7) strengths used in the torsion interaction"
+      }
+     ]
+    }
+   ]
+  },
+  "Table B4.1b Case 10": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f2_elastic_ltb_and_the_classical_formula",
+    "tests/test_design_flexure.py::test_hand_f2_inelastic_ltb",
+    "tests/test_design_flexure.py::test_hand_f2_yielding",
+    "tests/test_design_flexure.py::test_hand_f3_flange_local_buckling"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_combined.py::test_design_example_h3_tension_and_biaxial_flexure[ASD]",
+     "level": "strength",
+     "printed": "Mnx",
+     "examples": [
+      {
+       "example": "H.3",
+       "pages": "H-8 to H-11 (PDF 270-273)",
+       "title": "W14x82, tension and biaxial flexure: D2-1, F2-2, F6-1, H1-1b"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_combined.py::test_design_example_h3_tension_and_biaxial_flexure[LRFD]",
+     "level": "strength",
+     "printed": "Mnx",
+     "examples": [
+      {
+       "example": "H.3",
+       "pages": "H-8 to H-11 (PDF 270-273)",
+       "title": "W14x82, tension and biaxial flexure: D2-1, F2-2, F6-1, H1-1b"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f1_1b_w18x50_yielding",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.1-1B",
+       "pages": "F-8 (PDF 170)",
+       "title": "W18x50, major axis, continuously braced: yielding"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f1_2b_w18x50_inelastic_ltb_with_cb_from_the_diagram",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.1-2B",
+       "pages": "F-10 to F-11 (PDF 172-173)",
+       "title": "W18x50, major axis, braced at the ends and third points: inelastic LTB with Cb"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f1_3b_w18x50_elastic_ltb",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.1-3B",
+       "pages": "F-14 to F-15 (PDF 176-177)",
+       "title": "W18x50, major axis, braced at the ends and midspan: elastic LTB with Cb"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f3b_w21x48_noncompact_flange",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.3B",
+       "pages": "F-24 to F-25 (PDF 186-187)",
+       "title": "W21x48, major axis, continuously braced: noncompact flange local buckling"
+      }
+     ]
+    }
+   ]
+  },
+  "Table B4.1b Case 13": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f6_minor_axis"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_combined.py::test_design_example_h3_tension_and_biaxial_flexure[ASD]",
+     "level": "strength",
+     "printed": "Mny",
+     "examples": [
+      {
+       "example": "H.3",
+       "pages": "H-8 to H-11 (PDF 270-273)",
+       "title": "W14x82, tension and biaxial flexure: D2-1, F2-2, F6-1, H1-1b"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_combined.py::test_design_example_h3_tension_and_biaxial_flexure[LRFD]",
+     "level": "strength",
+     "printed": "Mny",
+     "examples": [
+      {
+       "example": "H.3",
+       "pages": "H-8 to H-11 (PDF 270-273)",
+       "title": "W14x82, tension and biaxial flexure: D2-1, F2-2, F6-1, H1-1b"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f5_w12x58_minor_axis",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.5",
+       "pages": "F-28 to F-29 (PDF 190-191)",
+       "title": "W12x58, minor axis: yielding"
+      }
+     ]
+    }
+   ]
+  },
+  "Table B4.1b Case 15": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f2_elastic_ltb_and_the_classical_formula",
+    "tests/test_design_flexure.py::test_hand_f2_inelastic_ltb",
+    "tests/test_design_flexure.py::test_hand_f2_yielding",
+    "tests/test_design_flexure.py::test_hand_f3_flange_local_buckling"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_combined.py::test_design_example_h3_tension_and_biaxial_flexure[ASD]",
+     "level": "strength",
+     "printed": "Mnx",
+     "examples": [
+      {
+       "example": "H.3",
+       "pages": "H-8 to H-11 (PDF 270-273)",
+       "title": "W14x82, tension and biaxial flexure: D2-1, F2-2, F6-1, H1-1b"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_combined.py::test_design_example_h3_tension_and_biaxial_flexure[LRFD]",
+     "level": "strength",
+     "printed": "Mnx",
+     "examples": [
+      {
+       "example": "H.3",
+       "pages": "H-8 to H-11 (PDF 270-273)",
+       "title": "W14x82, tension and biaxial flexure: D2-1, F2-2, F6-1, H1-1b"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f1_1b_w18x50_yielding",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.1-1B",
+       "pages": "F-8 (PDF 170)",
+       "title": "W18x50, major axis, continuously braced: yielding"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f1_2b_w18x50_inelastic_ltb_with_cb_from_the_diagram",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.1-2B",
+       "pages": "F-10 to F-11 (PDF 172-173)",
+       "title": "W18x50, major axis, braced at the ends and third points: inelastic LTB with Cb"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f1_3b_w18x50_elastic_ltb",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.1-3B",
+       "pages": "F-14 to F-15 (PDF 176-177)",
+       "title": "W18x50, major axis, braced at the ends and midspan: elastic LTB with Cb"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f3b_w21x48_noncompact_flange",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.3B",
+       "pages": "F-24 to F-25 (PDF 186-187)",
+       "title": "W21x48, major axis, continuously braced: noncompact flange local buckling"
+      }
+     ]
+    }
+   ]
+  },
+  "Table B4.1b Case 17": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f7_lateral_torsional_buckling",
+    "tests/test_design_flexure.py::test_hand_f7_slender_flange_effective_width",
+    "tests/test_design_flexure.py::test_hand_f7_yielding_and_local_buckling"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f7b_hss10x6_noncompact_flange_and_ltb",
+     "level": "strength",
+     "printed": "Mp",
+     "examples": [
+      {
+       "example": "F.7B",
+       "pages": "F-34 to F-36 (PDF 196-198)",
+       "title": "HSS10x6x3/16, major axis, braced at the ends: noncompact flange, LTB capped at Mp"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f8b_hss8x8_slender_flange",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.8B",
+       "pages": "F-39 to F-41 (PDF 201-203)",
+       "title": "HSS8x8x3/16, slender flange: effective width and effective section modulus"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_h5c_rectangular_hss_flexure_f7[ASD-Mn_over_Omega_kipin]",
+     "level": "strength",
+     "printed": "H.5C Mp",
+     "examples": [
+      {
+       "example": "H.5C",
+       "pages": "H-20 to H-23 (PDF 282-285)",
+       "title": "Rectangular HSS6x4x1/4: available shear (G4) and flexural (F7) strengths used in the torsion interaction"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_h5c_rectangular_hss_flexure_f7[LRFD-phiMn_kipin]",
+     "level": "strength",
+     "printed": "H.5C Mp",
+     "examples": [
+      {
+       "example": "H.5C",
+       "pages": "H-20 to H-23 (PDF 282-285)",
+       "title": "Rectangular HSS6x4x1/4: available shear (G4) and flexural (F7) strengths used in the torsion interaction"
+      }
+     ]
+    }
+   ]
+  },
+  "Table B4.1b Case 19": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f7_lateral_torsional_buckling",
+    "tests/test_design_flexure.py::test_hand_f7_slender_flange_effective_width",
+    "tests/test_design_flexure.py::test_hand_f7_yielding_and_local_buckling"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f7b_hss10x6_noncompact_flange_and_ltb",
+     "level": "strength",
+     "printed": "Mp",
+     "examples": [
+      {
+       "example": "F.7B",
+       "pages": "F-34 to F-36 (PDF 196-198)",
+       "title": "HSS10x6x3/16, major axis, braced at the ends: noncompact flange, LTB capped at Mp"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f8b_hss8x8_slender_flange",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.8B",
+       "pages": "F-39 to F-41 (PDF 201-203)",
+       "title": "HSS8x8x3/16, slender flange: effective width and effective section modulus"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_h5c_rectangular_hss_flexure_f7[ASD-Mn_over_Omega_kipin]",
+     "level": "strength",
+     "printed": "H.5C Mp",
+     "examples": [
+      {
+       "example": "H.5C",
+       "pages": "H-20 to H-23 (PDF 282-285)",
+       "title": "Rectangular HSS6x4x1/4: available shear (G4) and flexural (F7) strengths used in the torsion interaction"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_h5c_rectangular_hss_flexure_f7[LRFD-phiMn_kipin]",
+     "level": "strength",
+     "printed": "H.5C Mp",
+     "examples": [
+      {
+       "example": "H.5C",
+       "pages": "H-20 to H-23 (PDF 282-285)",
+       "title": "Rectangular HSS6x4x1/4: available shear (G4) and flexural (F7) strengths used in the torsion interaction"
+      }
+     ]
+    }
+   ]
+  },
+  "Table B4.1b Case 20": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f8_round_hss"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_flexure.py::test_design_example_f9b_pipe8_yielding",
+     "level": "strength",
+     "printed": "Mn",
+     "examples": [
+      {
+       "example": "F.9B",
+       "pages": "F-43 to F-44 (PDF 205-206)",
+       "title": "Pipe 8 x-Strong: yielding"
+      }
+     ]
+    }
+   ]
+  },
+  "Table B4.1b Case 21": {
+   "a": [
+    "tests/test_design_flexure.py::test_hand_f7_yielding_and_local_buckling"
+   ],
+   "aDetail": [
+    "tests/test_design_flexure.py::test_hand_f7_slender_flange_effective_width"
+   ],
+   "b": []
+  },
+  "Table E7.1": {
+   "a": [
+    "tests/test_design_compression.py::test_hand_e7_rectangular_hss_walls",
+    "tests/test_design_compression.py::test_hand_e7_slender_flanges_and_web_of_a_built_up_shape",
+    "tests/test_design_compression.py::test_hand_e7_slender_web_effective_width"
+   ],
+   "aDetail": [],
+   "b": [
+    {
+     "test": "tests/test_design_compression.py::test_de_e10_rectangular_hss_with_slender_walls_e7[18]",
+     "level": "strength",
+     "printed": "E.10 Pn",
+     "examples": [
+      {
+       "example": "E.10",
+       "pages": "E-62 to E-66 (PDF 126-130)",
+       "title": "Rectangular HSS compression member with slender elements (HSS12x8x3/16)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e10_rectangular_hss_with_slender_walls_e7[24]",
+     "level": "strength",
+     "printed": "E.10 Pn",
+     "examples": [
+      {
+       "example": "E.10",
+       "pages": "E-62 to E-66 (PDF 126-130)",
+       "title": "Rectangular HSS compression member with slender elements (HSS12x8x3/16)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e1e_w16x31_slender_web_e7[a]",
+     "level": "strength",
+     "printed": "E.1E Pn",
+     "examples": [
+      {
+       "example": "E.1E",
+       "pages": "E-13 to E-19 (PDF 77-83)",
+       "title": "W-shape compression member with slender elements (W16x31)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_compression.py::test_de_e2_built_up_column_slender_web_e7_and_e4_stress",
+     "level": "strength",
+     "printed": "E.2 Pn",
+     "examples": [
+      {
+       "example": "E.2",
+       "pages": "E-20 to E-24 (PDF 84-88)",
+       "title": "Built-up column with a slender web"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[ASD-Vn_over_Omega]",
+     "level": "detail",
+     "printed": "F.14 h/tw",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    },
+    {
+     "test": "tests/test_design_review.py::test_de_f14_plate_girder_shear_and_flexure_not_checked[LRFD-phiVn]",
+     "level": "detail",
+     "printed": "F.14 h/tw",
+     "examples": [
+      {
+       "example": "F.14",
+       "pages": "F-65 to F-73 (PDF 227-235)",
+       "title": "Plate girder flexural member (built-up, web 62 x 1/2, flanges 14 x 2)"
+      }
+     ]
+    }
+   ]
+  }
+ }
+}

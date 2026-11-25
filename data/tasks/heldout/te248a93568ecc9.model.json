@@ -1,0 +1,206 @@
+{
+ "formatVersion": "1.0.0",
+ "name": "portal frame model",
+ "units": {
+  "force": "kip",
+  "length": "in"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "N1": {
+   "x": 0,
+   "y": 0,
+   "z": 0
+  },
+  "N2": {
+   "x": 0,
+   "y": 312,
+   "z": 0
+  },
+  "N4": {
+   "x": 456,
+   "y": 312,
+   "z": 0
+  },
+  "N5": {
+   "x": 456,
+   "y": 0,
+   "z": 0
+  }
+ },
+ "supports": {
+  "N1": {
+   "type": "pinned",
+   "dofs": {
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "N5": {
+   "type": "pinned",
+   "dofs": {
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "N2": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "N4": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "steel": {
+   "description": "structural steel (nominal properties)",
+   "E": 29000,
+   "G": 11200,
+   "Fy": 50,
+   "Fu": 65,
+   "unitWeight": 0.000284
+  }
+ },
+ "sections": {
+  "I-14x14x0.75x0.45": {
+   "type": "I",
+   "d": 14,
+   "bf": 14,
+   "tf": 0.75,
+   "tw": 0.45,
+   "r": 0.7
+  },
+  "I-24x9x0.8x0.5": {
+   "type": "I",
+   "d": 24,
+   "bf": 9,
+   "tf": 0.8,
+   "tw": 0.5,
+   "r": 0.9
+  }
+ },
+ "members": {
+  "C1": {
+   "i": "N1",
+   "j": "N2",
+   "section": "I-14x14x0.75x0.45",
+   "material": "steel"
+  },
+  "C2": {
+   "i": "N5",
+   "j": "N4",
+   "section": "I-14x14x0.75x0.45",
+   "material": "steel"
+  },
+  "B1": {
+   "i": "N2",
+   "j": "N4",
+   "section": "I-14x14x0.75x0.45",
+   "material": "steel"
+  }
+ },
+ "loadCases": {
+  "D": {
+   "description": "dead load and self weight",
+   "loads": [
+    {
+     "type": "selfWeight"
+    },
+    {
+     "type": "memberDistributed",
+     "member": "B1",
+     "direction": "Y",
+     "w1": -0.195
+    }
+   ]
+  },
+  "L": {
+   "description": "floor live load",
+   "loads": [
+    {
+     "type": "memberDistributed",
+     "member": "B1",
+     "direction": "Y",
+     "w1": -0.09
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "ULS1": {
+   "factors": {
+    "D": 1.2,
+    "L": 1.6
+   }
+  },
+  "SLS1": {
+   "factors": {
+    "D": 1,
+    "L": 1
+   },
+   "purpose": "serviceability"
+  }
+ },
+ "analysis": {
+  "shearDeformation": false
+ },
+ "design": {
+  "defaults": {
+   "method": "LRFD"
+  },
+  "groups": {
+   "columns": {
+    "members": [
+     "C1",
+     "C2"
+    ],
+    "role": "column",
+    "Kx": 2.0,
+    "bracing": {
+     "minor": [
+      0.5
+     ],
+     "torsion": [
+      0.5
+     ]
+    }
+   },
+   "rafters": {
+    "members": [
+     "B1"
+    ],
+    "role": "beam",
+    "bracing": {
+     "topFlange": [
+      0.25,
+      0.5,
+      0.75
+     ],
+     "bottomFlange": [
+      0.25,
+      0.5,
+      0.75
+     ]
+    },
+    "deflectionLimits": [
+     {
+      "spanRatio": 300,
+      "direction": "y",
+      "combinations": [
+       "SLS1"
+      ]
+     }
+    ]
+   }
+  }
+ }
+}

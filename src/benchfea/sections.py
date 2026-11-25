@@ -25,7 +25,7 @@ Asy, Asz    rectangle 5A/6 (energy,        I: Asy = d tw, Asz = (5/6) 2 bf tf;
                                            pipe: A/2 (thin-walled energy value)
 =========== ============================== =======================================
 
-Shear areas are *simple definitions*, not Cowper (1966) coefficients; give
+Shear areas are *simple definitions*, not shear coefficients of a refined theory; give
 ``overrides.Asy/Asz`` to use a value from a refined theory.
 """
 from __future__ import annotations

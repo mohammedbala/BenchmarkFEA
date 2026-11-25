@@ -1,0 +1,94 @@
+{
+ "name": "staad/beam-column-uniform-load",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kip",
+  "length": "in"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "a": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "b": {
+   "x": 480.0,
+   "y": 0.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "a": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed",
+    "ux": "fixed",
+    "uy": "fixed"
+   }
+  },
+  "b": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed",
+    "uy": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 29000.0,
+   "nu": 0.3
+  }
+ },
+ "sections": {
+  "S": {
+   "type": "properties",
+   "A": 10.0,
+   "Iz": 341.0,
+   "Iy": 341000.0,
+   "J": 1.0
+  }
+ },
+ "members": {
+  "m": {
+   "i": "a",
+   "j": "b",
+   "section": "S",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "memberDistributed",
+     "member": "m",
+     "direction": "Y",
+     "w1": -0.008333333333333333
+    },
+    {
+     "type": "nodal",
+     "node": "b",
+     "Fx": -100.0
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.0
+   },
+   "analysisType": "secondOrder"
+  }
+ },
+ "analysis": {
+  "shearDeformation": false,
+  "resultStations": 3
+ }
+}

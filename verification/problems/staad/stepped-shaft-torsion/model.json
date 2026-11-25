@@ -1,0 +1,121 @@
+{
+ "name": "staad/stepped-shaft-torsion",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kN",
+  "length": "mm"
+ },
+ "conventions": {
+  "verticalAxis": "Z"
+ },
+ "nodes": {
+  "n1": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n2": {
+   "x": 500.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n3": {
+   "x": 1000.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n4": {
+   "x": 1500.0,
+   "y": 0.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "n1": {
+   "type": "fixed"
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 200.0,
+   "G": 80.0
+  }
+ },
+ "sections": {
+  "d80": {
+   "type": "properties",
+   "A": 5026.548245743669,
+   "Iz": 2010619.2982974676,
+   "Iy": 2010619.2982974676,
+   "J": 4021238.5965949353,
+   "description": "solid circular section, diameter 80 mm"
+  },
+  "d60": {
+   "type": "properties",
+   "A": 2827.4333882308138,
+   "Iz": 636172.512351933,
+   "Iy": 636172.512351933,
+   "J": 1272345.024703866,
+   "description": "solid circular section, diameter 60 mm"
+  },
+  "d40": {
+   "type": "properties",
+   "A": 1256.6370614359173,
+   "Iz": 125663.70614359173,
+   "Iy": 125663.70614359173,
+   "J": 251327.41228718346,
+   "description": "solid circular section, diameter 40 mm"
+  }
+ },
+ "members": {
+  "m1": {
+   "i": "n1",
+   "j": "n2",
+   "section": "d80",
+   "material": "M"
+  },
+  "m2": {
+   "i": "n2",
+   "j": "n3",
+   "section": "d60",
+   "material": "M"
+  },
+  "m3": {
+   "i": "n3",
+   "j": "n4",
+   "section": "d40",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "n2",
+     "Mx": 3000.0
+    },
+    {
+     "type": "nodal",
+     "node": "n3",
+     "Mx": 2000.0
+    },
+    {
+     "type": "nodal",
+     "node": "n4",
+     "Mx": 800.0
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.0
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": false
+ }
+}

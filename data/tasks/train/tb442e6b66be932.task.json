@@ -1,0 +1,55 @@
+{
+ "format": "benchfea-task",
+ "formatVersion": "1.0.0",
+ "id": "tb442e6b66be932",
+ "taskType": "diagnose",
+ "mode": "no-solver",
+ "family": "portal_frame",
+ "difficulty": 1,
+ "split": "train",
+ "answerFormat": {
+  "category": [
+   "constraints",
+   "offsets",
+   "releases",
+   "design",
+   "supports",
+   "members",
+   "units",
+   "loads",
+   "second_order"
+  ],
+  "entities": "{kind: [ids]}",
+  "direction": [
+   "added",
+   "removed",
+   "increased",
+   "decreased",
+   "reversed",
+   "changed"
+  ],
+  "mechanism": {
+   "kind": [
+    "node",
+    "rigid-body",
+    "distributed"
+   ],
+   "motion": [
+    "translation",
+    "rotation",
+    "translation+rotation"
+   ],
+   "nodes": "[ids]",
+   "or": null
+  }
+ },
+ "intendedDesign": "Units: force kN, length mm (every number below is in these units: moments in force x length, line loads in force / length, moduli and stresses in force / length^2, unit weights in force / length^3, rotational springs in force x length / rad).\nFormat version: 1.0.0.\nConventions: vertical axis Y.\nNodes (5), coordinates:\n  N1 at (0, 0, 0)\n  N2 at (0, 7500, 0)\n  N3 at (12000, 8500, 0)\n  N4 at (24000, 7500, 0)\n  N5 at (24000, 0, 0)\nSupports (a degree of freedom not listed is free):\n  node N1: type pinned, degrees of freedom (rx fixed, ry fixed)\n  node N5: type pinned, degrees of freedom (rx fixed, ry fixed)\n  node N2: degrees of freedom (uz fixed, rx fixed, ry fixed)\n  node N3: degrees of freedom (uz fixed, rx fixed, ry fixed)\n  node N4: degrees of freedom (uz fixed, rx fixed, ry fixed)\nMaterials:\n  steel: description structural steel (nominal properties), E 200, G 77, Fy 0.345, Fu 0.45, unit weight 7.7e-08\nCross-sections:\n  I-400x400x22x13: type I, d 400, bf 400, tf 22, tw 13, r 20\n  I-800x300x25x14: type I, d 800, bf 300, tf 25, tw 14, r 26\nMembers (4); a member end without a stated release is rigidly connected, a member without stated offsets runs from node to node:\n  C1: from node N1 to node N2, section I-400x400x22x13, material steel\n  C2: from node N5 to node N4, section I-400x400x22x13, material steel\n  R1: from node N2 to node N3, section I-800x300x25x14, material steel\n  R2: from node N3 to node N4, section I-800x300x25x14, material steel\nRigid links and diaphragms: none.\nLoad cases:\n  D (dead load and self weight):\n    load 1: self weight\n    load 2: member distributed, member R1, direction Y, intensity at start -0.01\n    load 3: member distributed, member R2, direction Y, intensity at start -0.01\n  L (roof live load):\n    load 1: member distributed, member R1, direction Y, intensity at start -0.007, projected yes\n    load 2: member distributed, member R2, direction Y, intensity at start -0.007, projected yes\nLoad combinations:\n  ULS1 = 1.2 x D + 1.6 x L\n  SLS1 = 1 x D + 1 x L; purpose serviceability\nAnalysis settings: shear deformation no.\nDesign data (AISC 360-22 member checks):\n  defaults: method LRFD\n  groups:\n    columns: members [C1, C2], role column, Kx 2.0, bracing (minor-axis buckling braced at [0.5], torsional buckling braced at [0.5])\n    rafters: members [R1, R2], role beam, bracing (top flange braced at [0.2, 0.4, 0.6, 0.8], bottom flange braced at [0.5]), deflection limits [(span /  240, direction y, combinations [SLS1])]",
+ "statement": "TASK (diagnose): the model file below was derived from the intended design described here, but something in it was changed in a way that matters. Say what is wrong and where.\nStructure: portal frame. Mode no-solver: the analysis tool is disabled; inspect the file and reason from it.\nSign conventions, axes and units are those of docs/CONVENTIONS.md; every number you give is in the units of the model file.\n\nINTENDED DESIGN:\nUnits: force kN, length mm (every number below is in these units: moments in force x length, line loads in force / length, moduli and stresses in force / length^2, unit weights in force / length^3, rotational springs in force x length / rad).\nFormat version: 1.0.0.\nConventions: vertical axis Y.\nNodes (5), coordinates:\n  N1 at (0, 0, 0)\n  N2 at (0, 7500, 0)\n  N3 at (12000, 8500, 0)\n  N4 at (24000, 7500, 0)\n  N5 at (24000, 0, 0)\nSupports (a degree of freedom not listed is free):\n  node N1: type pinned, degrees of freedom (rx fixed, ry fixed)\n  node N5: type pinned, degrees of freedom (rx fixed, ry fixed)\n  node N2: degrees of freedom (uz fixed, rx fixed, ry fixed)\n  node N3: degrees of freedom (uz fixed, rx fixed, ry fixed)\n  node N4: degrees of freedom (uz fixed, rx fixed, ry fixed)\nMaterials:\n  steel: description structural steel (nominal properties), E 200, G 77, Fy 0.345, Fu 0.45, unit weight 7.7e-08\nCross-sections:\n  I-400x400x22x13: type I, d 400, bf 400, tf 22, tw 13, r 20\n  I-800x300x25x14: type I, d 800, bf 300, tf 25, tw 14, r 26\nMembers (4); a member end without a stated release is rigidly connected, a member without stated offsets runs from node to node:\n  C1: from node N1 to node N2, section I-400x400x22x13, material steel\n  C2: from node N5 to node N4, section I-400x400x22x13, material steel\n  R1: from node N2 to node N3, section I-800x300x25x14, material steel\n  R2: from node N3 to node N4, section I-800x300x25x14, material steel\nRigid links and diaphragms: none.\nLoad cases:\n  D (dead load and self weight):\n    load 1: self weight\n    load 2: member distributed, member R1, direction Y, intensity at start -0.01\n    load 3: member distributed, member R2, direction Y, intensity at start -0.01\n  L (roof live load):\n    load 1: member distributed, member R1, direction Y, intensity at start -0.007, projected yes\n    load 2: member distributed, member R2, direction Y, intensity at start -0.007, projected yes\nLoad combinations:\n  ULS1 = 1.2 x D + 1.6 x L\n  SLS1 = 1 x D + 1 x L; purpose serviceability\nAnalysis settings: shear deformation no.\nDesign data (AISC 360-22 member checks):\n  defaults: method LRFD\n  groups:\n    columns: members [C1, C2], role column, Kx 2.0, bracing (minor-axis buckling braced at [0.5], torsional buckling braced at [0.5])\n    rafters: members [R1, R2], role beam, bracing (top flange braced at [0.2, 0.4, 0.6, 0.8], bottom flange braced at [0.5]), deflection limits [(span /  240, direction y, combinations [SLS1])]\n\nAnswer with: the category of the change (one of: constraints (rigid links and diaphragms); offsets (rigid end offsets); releases (member end releases); design (design variables (design-only)); supports (supports); members (member orientation and sections); units (units); loads (loads); second_order (second-order effects)); the ids of the entities that were changed (members, nodes, supports, load cases, constraints, sections, design members ... as they are named in the file); the direction of the change (one of: added, removed, increased, decreased, reversed, changed -- 'added' / 'removed': the file has something the intended design does not / lacks something it has; 'reversed': numbers with the opposite sign; 'increased' / 'decreased': numbers of larger / smaller magnitude; 'changed': anything else). If the model as given is a mechanism (unstable), also describe the mechanism: its kind (node, rigid-body, distributed), its motion (translation, rotation, translation+rotation) and the nodes that move; otherwise give null for 'mechanism'.\n\nSubmit your answer as JSON of this form:\n{\n \"category\": \"supports\",\n \"entities\": {\n  \"nodes\": [\n   \"N1\"\n  ]\n },\n \"direction\": \"changed\",\n \"mechanism\": null\n}",
+ "verification": {
+  "status": "verified",
+  "scope": "the reference of the given model: its analysis results (with the design results where the change is one of design data only) or, if it is unstable, its mechanism diagnosis",
+  "meaning": "'verified' means only: the reference solution passed every tier listed as applicable in this record, at the tolerances stated in it. It does not mean reviewed, approved or certified by anyone.",
+  "policy": "docs/VERIFICATION.md; the tiers passed and the tolerances are in the answers file and in the info returned when the episode ends"
+ },
+ "modelFile": "tb442e6b66be932.model.json"
+}

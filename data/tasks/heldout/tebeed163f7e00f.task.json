@@ -1,0 +1,85 @@
+{
+ "format": "benchfea-task",
+ "formatVersion": "1.0.0",
+ "id": "tebeed163f7e00f",
+ "taskType": "predict",
+ "mode": "tool-allowed",
+ "family": "multistorey_2d",
+ "difficulty": 2,
+ "split": "held-out",
+ "quantities": [
+  {
+   "kind": "displacement",
+   "combination": "ULS1",
+   "node": "B2",
+   "component": "rx",
+   "unit": "rad",
+   "id": "q1",
+   "text": "rotation rx of node B2 in combination ULS1 [rad], global axes"
+  },
+  {
+   "kind": "displacement",
+   "combination": "ULS2",
+   "node": "A2",
+   "component": "rx",
+   "unit": "rad",
+   "id": "q2",
+   "text": "rotation rx of node A2 in combination ULS2 [rad], global axes"
+  },
+  {
+   "kind": "reaction",
+   "combination": "SLS2",
+   "node": "B0",
+   "component": "Fy",
+   "unit": "kip",
+   "id": "q3",
+   "text": "reaction force Fy at node B0 in combination SLS2 [kip], global axes, acting on the structure"
+  },
+  {
+   "kind": "reaction",
+   "combination": "ULS3",
+   "node": "A0",
+   "component": "Fz",
+   "unit": "kip",
+   "id": "q4",
+   "text": "reaction force Fz at node A0 in combination ULS3 [kip], global axes, acting on the structure"
+  },
+  {
+   "kind": "memberEndForce",
+   "combination": "ULS1",
+   "member": "BA1",
+   "end": "j",
+   "component": "Fx",
+   "unit": "kip",
+   "id": "q5",
+   "text": "end force Fx at end j of member BA1 in combination ULS1 [kip], member local axes, acting on the member (docs/CONVENTIONS.md)"
+  },
+  {
+   "kind": "memberMaxMoment",
+   "combination": "ULS1",
+   "member": "CB2",
+   "component": "Mz",
+   "unit": "kip*in",
+   "id": "q6",
+   "text": "largest absolute bending moment Mz along member CB2 in combination ULS1 [kip*in] (a non-negative number; local axes)"
+  }
+ ],
+ "answerFormat": {
+  "values": {
+   "q1": "number",
+   "q2": "number",
+   "q3": "number",
+   "q4": "number",
+   "q5": "number",
+   "q6": "number"
+  }
+ },
+ "statement": "TASK (predict): give the named results of the model in the file below, exactly as it is given.\nStructure: multistorey 2d. Mode tool-allowed: you may run the analysis tool (run_analysis) and read its results.\nSign conventions, axes and units are those of docs/CONVENTIONS.md; every number you give is in the units of the model file.\n\nQuantities:\n  q1: rotation rx of node B2 in combination ULS1 [rad], global axes\n  q2: rotation rx of node A2 in combination ULS2 [rad], global axes\n  q3: reaction force Fy at node B0 in combination SLS2 [kip], global axes, acting on the structure\n  q4: reaction force Fz at node A0 in combination ULS3 [kip], global axes, acting on the structure\n  q5: end force Fx at end j of member BA1 in combination ULS1 [kip], member local axes, acting on the member (docs/CONVENTIONS.md)\n  q6: largest absolute bending moment Mz along member CB2 in combination ULS1 [kip*in] (a non-negative number; local axes)\n\nSubmit your answer as JSON of this form:\n{\n \"values\": {\n  \"q1\": 0.0,\n  \"q2\": 0.0,\n  \"q3\": 0.0,\n  \"q4\": 0.0,\n  \"q5\": 0.0,\n  \"q6\": 0.0\n }\n}",
+ "verification": {
+  "status": "verified",
+  "scope": "analysis results of the given model",
+  "meaning": "'verified' means only: the reference solution passed every tier listed as applicable in this record, at the tolerances stated in it. It does not mean reviewed, approved or certified by anyone.",
+  "policy": "docs/VERIFICATION.md; the tiers passed and the tolerances are in the answers file and in the info returned when the episode ends"
+ },
+ "modelFile": "tebeed163f7e00f.model.json"
+}

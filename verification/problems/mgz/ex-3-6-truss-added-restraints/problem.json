@@ -1,0 +1,44 @@
+{
+ "id": "ex-3-6-truss-added-restraints",
+ "title": "Five-bar plane truss with added horizontal restraints",
+ "tier": "B",
+ "source": {
+  "work": "McGuire, W., Gallagher, R. H., Ziemian, R. D., Matrix Structural Analysis",
+  "edition": "2nd edition (copyright 2014 R. D. Ziemian)",
+  "location": "Example 3.6",
+  "pages": "p. 46",
+  "notes": "input data and targets read on the cited pages; nothing of the source is reproduced"
+ },
+ "basis": "published",
+ "analysis": "Pin-jointed plane truss in the x-y plane (global Y vertical): members of type 'truss'; the out-of-plane translation of every joint is held by a support (it has no stiffness in a plane truss). Joints from the printed geometry (5 m base, inclined bars at 60 deg): a (0, 0), b (5, 0), c (5, 5 sqrt 3), d (10, 5 sqrt 3) m. A = 10e3 mm^2 (ab, cd), 15e3 mm^2 (ac, bd, bc); E = 200,000 MPa. Load at d: the source's components 282.84 kN (+x) and -282.84 kN (y) of 400 kN at 45 deg. As Example 3.5 with horizontal restraints added at b and c (a and b pinned, c held horizontally). First order.",
+ "targets": [
+  {
+   "extract": "nodeDisplacement",
+   "node": "d",
+   "dof": "ux",
+   "value": 1.114,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.00044883303411131055
+   },
+   "precisionNote": "printed \"1.114\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "d",
+   "dof": "uy",
+   "value": -1.901,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.0002630194634402946
+   },
+   "precisionNote": "printed \"1.901\"; tolerance = half a unit in the last printed digit; printed -1.901",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  }
+ ],
+ "status": "quarantined",
+ "quarantine": {
+  "diagnosis": "u_d missed by 2.7 times the tolerance: engine 1.11534 mm, printed 1.114 mm (v_d reproduced: -1.90101 against -1.901). Cause: rounding in the source's hand calculation - its stiffness coefficients are carried with three or four significant figures and later results are computed from rounded earlier ones, so the last printed digit of its results is not reliable, while the policy counts every printed digit as significant. Evidence: the source multiplies the load by an inverse matrix printed with three digits ((0.250 + 0.144) x 2.8284 = 1.114); the exact solution of its own printed stiffness equations is 1.1153 mm, the engine's value. The engine's results for this model are confirmed by the other tiers that apply (tier C: OpenSeesPy and PyNite agree with the engine; tier D: equilibrium and the other invariants pass); the difference is between the source's printed digits and the exact solution of the stated problem."
+ }
+}

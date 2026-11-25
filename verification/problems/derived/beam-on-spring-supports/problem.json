@@ -1,0 +1,86 @@
+{
+ "id": "beam-on-spring-supports",
+ "title": "Beam on translational and rotational spring supports",
+ "tier": "A",
+ "source": {
+  "work": "derived here (no publication): benchfea.oracle direct integration of the member equations / numerically solved characteristic equation",
+  "edition": "",
+  "location": "verification/derive/derive_problems.py, problem 'beam-on-spring-supports'",
+  "pages": "",
+  "notes": "regenerate with: python3 verification/derive/derive_problems.py"
+ },
+ "basis": "derived-here",
+ "analysis": "First order, no shear deformation. Nodes at 0, 4 and 9 m; a: vertical spring 5000 kN/m and rotational spring 2000 kN m/rad, b: vertical spring 8000 kN/m, c: fixed vertically. Uniform load 10 kN/m on both members and 30 kN at 0.4 of the first.",
+ "targets": [
+  {
+   "path": "/combinations/C/displacements/a/uz",
+   "value": -0.007126778128871504,
+   "unit": "m",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "path": "/combinations/C/displacements/b/uz",
+   "value": -0.007722182658444576,
+   "unit": "m",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "path": "/combinations/C/displacements/a/ry",
+   "value": 0.0012961610685003964,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "path": "/combinations/C/reactions/a/Fz",
+   "value": 35.63389064435752,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "path": "/combinations/C/reactions/a/My",
+   "value": -2.5923221370007927,
+   "unit": "kN m",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "path": "/combinations/C/reactions/b/Fz",
+   "value": 61.77746126755661,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "path": "/combinations/C/reactions/c/Fz",
+   "value": 22.588648088085858,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "extract": "memberStation",
+   "combination": "C",
+   "member": "m2",
+   "quantity": "Mz",
+   "relative": 0.0,
+   "side": "left",
+   "value": -12.056759559570708,
+   "unit": "kN m",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  }
+ ],
+ "status": "active"
+}

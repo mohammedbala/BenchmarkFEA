@@ -1,0 +1,172 @@
+{
+ "name": "staad/two-storey-frame-lateral-loads-vendor-printed",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kip",
+  "length": "ft"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "n1": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n2": {
+   "x": 20.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n3": {
+   "x": 0.0,
+   "y": 20.0,
+   "z": 0.0
+  },
+  "n4": {
+   "x": 20.0,
+   "y": 20.0,
+   "z": 0.0
+  },
+  "n5": {
+   "x": 0.0,
+   "y": 40.0,
+   "z": 0.0
+  },
+  "n6": {
+   "x": 20.0,
+   "y": 40.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "n1": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed",
+    "ux": "fixed",
+    "uy": "fixed",
+    "rz": "fixed"
+   }
+  },
+  "n2": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed",
+    "ux": "fixed",
+    "uy": "fixed",
+    "rz": "fixed"
+   }
+  },
+  "n3": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "n4": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "n5": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "n6": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 4176000.0,
+   "nu": 0.3
+  }
+ },
+ "sections": {
+  "S": {
+   "type": "properties",
+   "A": 0.2,
+   "Iz": 0.1,
+   "Iy": 0.1,
+   "J": 0.1
+  }
+ },
+ "members": {
+  "m1": {
+   "i": "n1",
+   "j": "n3",
+   "section": "S",
+   "material": "M"
+  },
+  "m2": {
+   "i": "n2",
+   "j": "n4",
+   "section": "S",
+   "material": "M"
+  },
+  "m3": {
+   "i": "n3",
+   "j": "n5",
+   "section": "S",
+   "material": "M"
+  },
+  "m4": {
+   "i": "n4",
+   "j": "n6",
+   "section": "S",
+   "material": "M"
+  },
+  "m5": {
+   "i": "n3",
+   "j": "n4",
+   "section": "S",
+   "material": "M"
+  },
+  "m6": {
+   "i": "n5",
+   "j": "n6",
+   "section": "S",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "n3",
+     "Fx": 20.0
+    },
+    {
+     "type": "nodal",
+     "node": "n5",
+     "Fx": 10.0
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.0
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": false
+ }
+}

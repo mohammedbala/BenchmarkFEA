@@ -1,0 +1,128 @@
+{
+ "id": "ex-13-11-gable-frame",
+ "title": "Symmetric gable frame under lateral and ridge loads",
+ "tier": "B",
+ "source": {
+  "work": "McGuire, W., Gallagher, R. H., Ziemian, R. D., Matrix Structural Analysis",
+  "edition": "2nd edition (copyright 2014 R. D. Ziemian)",
+  "location": "Example 13.11",
+  "pages": "pp. 407-408",
+  "notes": "input data and targets read on the cited pages; nothing of the source is reproduced"
+ },
+ "basis": "published",
+ "analysis": "Plane (x-y) problem of the source modelled in 3D with the global Y axis vertical, so that the source's x, y and theta_z are the model's X, Y and rz. In-plane bending is about local z for every member (default orientation), hence the source's I is the section's Iz. a (0, 0), b (0, 5), c (sqrt 55, 8), d (2 sqrt 55, 5), e (2 sqrt 55, 0) m (rafters 8 m long with a 3 m rise; printed run 7.416 m); a and e fixed. Columns ab, ed: A = 4e3 mm^2, I = 50e6 mm^4; rafters bc, cd: A = 6e3 mm^2, I = 200e6 mm^4; E = 200,000 MPa. Loads: 5 kN along +x at b and at d, 10 kN downward at c. The full frame is analysed (the source combines a symmetric and an antisymmetric half-model). First order, axial deformation included. Section properties the source does not give because they do not enter its plane model (Iy, J; A where stated) are placeholders that do not influence the targets. ",
+ "targets": [
+  {
+   "extract": "nodeDisplacement",
+   "node": "b",
+   "dof": "ux",
+   "value": 4.88,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.0010245901639344263
+   },
+   "precisionNote": "printed \"4.88\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "b",
+   "dof": "uy",
+   "value": -0.02,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.25
+   },
+   "precisionNote": "printed \"0.02\"; tolerance = half a unit in the last printed digit; printed -0.02",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "b",
+   "dof": "rz",
+   "value": -0.001351,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 0.0003700962250185048
+   },
+   "precisionNote": "printed \"1.351e-3\"; tolerance = half a unit in the last printed digit; printed -1.351 x 10^-3",
+   "sign": "moment / rotation about z, counter-clockwise positive in the source = rz / Mz of the engine"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "c",
+   "dof": "ux",
+   "value": 7.09,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.0007052186177715092
+   },
+   "precisionNote": "printed \"7.09\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "c",
+   "dof": "uy",
+   "value": -5.58,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.0008960573476702509
+   },
+   "precisionNote": "printed \"5.58\"; tolerance = half a unit in the last printed digit; printed -5.58",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "c",
+   "dof": "rz",
+   "value": 0.000368,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 0.001358695652173913
+   },
+   "precisionNote": "printed \"0.368e-3\"; tolerance = half a unit in the last printed digit; printed 0.368 x 10^-3",
+   "sign": "moment / rotation about z, counter-clockwise positive in the source = rz / Mz of the engine"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "d",
+   "dof": "ux",
+   "value": 9.28,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.000538793103448276
+   },
+   "precisionNote": "printed \"9.28\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "d",
+   "dof": "uy",
+   "value": -0.04,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.125
+   },
+   "precisionNote": "printed \"0.04\"; tolerance = half a unit in the last printed digit; printed -0.04",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "d",
+   "dof": "rz",
+   "value": -0.000129,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 0.003875968992248062
+   },
+   "precisionNote": "printed \"0.129e-3\"; tolerance = half a unit in the last printed digit; printed -0.129 x 10^-3",
+   "sign": "moment / rotation about z, counter-clockwise positive in the source = rz / Mz of the engine"
+  }
+ ],
+ "status": "quarantined",
+ "quarantine": {
+  "diagnosis": "7 of 9 targets missed, by 0.3 % to 0.6 % (tolerances 4e-4 to 4e-3). Engine: u_b = 4.8510, v_b = -0.02196 mm, theta_b = -1.3448e-3; u_c = 7.0575, v_c = -5.5590 mm, theta_c = 0.36612e-3; u_d = 9.2485, v_d = -0.04054 mm, theta_d = -0.12831e-3 rad. Printed: 4.88, -0.02, -1.351e-3; 7.09, -5.58, 0.368e-3; 9.28, -0.04, -0.129e-3. Cause: the source's hand solution of its own equations is not exact to the digits printed. Evidence: the exact solution of the printed symmetric-part equations is u_b = -2.198, v_c = -5.557 mm (the source prints -2.208 and -5.583) and of the printed antisymmetric-part equations u_b = 7.050, u_c = 7.058 mm (the source prints 7.085 and 7.093); combined they give 4.852, 7.058, -5.557, 9.248 mm, which agree with the engine within 0.04 %. The engine's results for this model are confirmed by the other tiers that apply (tier C: OpenSeesPy and PyNite agree with the engine; tier D: equilibrium and the other invariants pass); the difference is between the source's printed digits and the exact solution of the stated problem."
+ }
+}

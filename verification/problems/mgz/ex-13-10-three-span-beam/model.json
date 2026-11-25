@@ -1,0 +1,129 @@
+{
+ "name": "mgz/ex-13-10-three-span-beam",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kN",
+  "length": "mm"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "a": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "b": {
+   "x": 5000.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "o": {
+   "x": 7500.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "c": {
+   "x": 10000.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "d": {
+   "x": 15000.0,
+   "y": 0.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "a": {
+   "type": "fixed"
+  },
+  "d": {
+   "type": "fixed"
+  },
+  "b": {
+   "dofs": {
+    "uy": "fixed"
+   }
+  },
+  "c": {
+   "dofs": {
+    "uy": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 200.0,
+   "nu": 0.3
+  }
+ },
+ "sections": {
+  "s": {
+   "type": "properties",
+   "A": 10000.0,
+   "Iy": 50000000.0,
+   "Iz": 50000000.0,
+   "J": 50000000.0
+  }
+ },
+ "members": {
+  "ab": {
+   "i": "a",
+   "j": "b",
+   "section": "s",
+   "material": "M"
+  },
+  "bo": {
+   "i": "b",
+   "j": "o",
+   "section": "s",
+   "material": "M"
+  },
+  "oc": {
+   "i": "o",
+   "j": "c",
+   "section": "s",
+   "material": "M"
+  },
+  "cd": {
+   "i": "c",
+   "j": "d",
+   "section": "s",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "memberPoint",
+     "member": "ab",
+     "direction": "Y",
+     "value": -20.0,
+     "position": 2000.0,
+     "positionType": "absolute"
+    },
+    {
+     "type": "memberPoint",
+     "member": "bo",
+     "direction": "Y",
+     "value": -20.0,
+     "position": 2000.0,
+     "positionType": "absolute"
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.0
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": false
+ }
+}

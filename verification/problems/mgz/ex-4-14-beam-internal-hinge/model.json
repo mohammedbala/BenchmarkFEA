@@ -1,0 +1,105 @@
+{
+ "name": "mgz/ex-4-14-beam-internal-hinge",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kN",
+  "length": "mm"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "n1": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "h": {
+   "x": 4000.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n2": {
+   "x": 6000.0,
+   "y": 0.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "n1": {
+   "type": "fixed"
+  },
+  "n2": {
+   "type": "fixed"
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 200.0,
+   "nu": 0.3
+  }
+ },
+ "sections": {
+  "s": {
+   "type": "properties",
+   "A": 10000.0,
+   "Iy": 200000000.0,
+   "Iz": 200000000.0,
+   "J": 200000000.0
+  }
+ },
+ "members": {
+  "m1": {
+   "i": "n1",
+   "j": "h",
+   "section": "s",
+   "material": "M",
+   "releases": {
+    "j": {
+     "rz": true
+    }
+   }
+  },
+  "m2": {
+   "i": "h",
+   "j": "n2",
+   "section": "s",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "V": {
+   "loads": [
+    {
+     "type": "supportDisplacement",
+     "node": "n1",
+     "uy": 1.0
+    }
+   ]
+  },
+  "R": {
+   "loads": [
+    {
+     "type": "supportDisplacement",
+     "node": "n1",
+     "rz": 0.001
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "V": {
+   "factors": {
+    "V": 1.0
+   }
+  },
+  "R": {
+   "factors": {
+    "R": 1.0
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": false
+ }
+}

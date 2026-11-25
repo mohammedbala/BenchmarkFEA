@@ -1,0 +1,191 @@
+{
+ "name": "mgz/ex-13-12-spring-chain-changed",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kN",
+  "length": "mm"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "n1": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n2": {
+   "x": 1000.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n3": {
+   "x": 2000.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n4": {
+   "x": 3000.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n5": {
+   "x": 4000.0,
+   "y": 0.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "n1": {
+   "dofs": {
+    "ux": "fixed",
+    "uy": "fixed",
+    "uz": "fixed"
+   }
+  },
+  "n5": {
+   "dofs": {
+    "ux": "fixed",
+    "uy": "fixed",
+    "uz": "fixed"
+   }
+  },
+  "n2": {
+   "dofs": {
+    "uy": "fixed",
+    "uz": "fixed"
+   }
+  },
+  "n3": {
+   "dofs": {
+    "uy": "fixed",
+    "uz": "fixed"
+   }
+  },
+  "n4": {
+   "dofs": {
+    "uy": "fixed",
+    "uz": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 200.0,
+   "nu": 0.3
+  }
+ },
+ "sections": {
+  "s1": {
+   "type": "properties",
+   "description": "axial-force member: Iy, Iz, J are placeholders, not used",
+   "A": 10.0,
+   "Iy": 1.0,
+   "Iz": 1.0,
+   "J": 1.0
+  },
+  "s2": {
+   "type": "properties",
+   "description": "axial-force member: Iy, Iz, J are placeholders, not used",
+   "A": 10.0,
+   "Iy": 1.0,
+   "Iz": 1.0,
+   "J": 1.0
+  },
+  "s3": {
+   "type": "properties",
+   "description": "axial-force member: Iy, Iz, J are placeholders, not used",
+   "A": 15.0,
+   "Iy": 1.0,
+   "Iz": 1.0,
+   "J": 1.0
+  },
+  "s4": {
+   "type": "properties",
+   "description": "axial-force member: Iy, Iz, J are placeholders, not used",
+   "A": 10.0,
+   "Iy": 1.0,
+   "Iz": 1.0,
+   "J": 1.0
+  }
+ },
+ "members": {
+  "m1": {
+   "type": "truss",
+   "i": "n1",
+   "j": "n2",
+   "section": "s1",
+   "material": "M"
+  },
+  "m2": {
+   "type": "truss",
+   "i": "n2",
+   "j": "n3",
+   "section": "s2",
+   "material": "M"
+  },
+  "m3": {
+   "type": "truss",
+   "i": "n3",
+   "j": "n4",
+   "section": "s3",
+   "material": "M"
+  },
+  "m4": {
+   "type": "truss",
+   "i": "n4",
+   "j": "n5",
+   "section": "s4",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "P2": {
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "n2",
+     "Fx": 1.0
+    }
+   ]
+  },
+  "P3": {
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "n3",
+     "Fx": 1.0
+    }
+   ]
+  },
+  "P4": {
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "n4",
+     "Fx": 1.0
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "P2": {
+   "factors": {
+    "P2": 1.0
+   }
+  },
+  "P3": {
+   "factors": {
+    "P3": 1.0
+   }
+  },
+  "P4": {
+   "factors": {
+    "P4": 1.0
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": false
+ }
+}

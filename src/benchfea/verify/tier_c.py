@@ -278,6 +278,7 @@ def tier_c(raw: dict, model, results, *, cache: ForeignCache | None = None, time
     tol = Tolerances(*([pol["relative"]] * 6))
     doc_hash = document_hash(raw)
     per_combo, failed, largest, timings = {}, [], [], {}
+    disagreements, not_run = [], []
     one_sided = any(m.type in ONE_SIDED for m in model.members.values())
     for cid, cres in results.combinations.items():
         t1 = time.perf_counter()
@@ -286,6 +287,7 @@ def tier_c(raw: dict, model, results, *, cache: ForeignCache | None = None, time
         if deadline is not None and time.perf_counter() > deadline:
             info.update(crossChecked=False, reasons=["not run: the time budget of verify_model was used up"])
             failed.append(f"{cid}: not run (time budget)")
+            not_run.append(cid)
             continue
         combo = model.combinations[cid]
         options, problems = {}, []
@@ -339,6 +341,7 @@ def tier_c(raw: dict, model, results, *, cache: ForeignCache | None = None, time
                 "how": "foreign solvers get the linear model of the engine's final active set; the sign conditions "
                        "of every one-sided member are then evaluated from the foreign results"})
         if blocked:
+            disagreements += [f"{cid}: {x}" for x in problems if "differ" in x]
             info.update(crossChecked=False, reasons=problems, eligible=[])
             failed.append(f"{cid}: " + problems[0])
             continue
@@ -350,9 +353,9 @@ def tier_c(raw: dict, model, results, *, cache: ForeignCache | None = None, time
         report = cross_check(c_model, cid, benchfea_result=cres, solvers=tuple(solvers), tolerances=tol,
                              max_approximation=pol["maxApproximation"], foreign=foreign,
                              options={s: dict(options) for s in solvers})
-        # decision: crosscheck's eligibility rule; agreement within the base tolerance plus
-        # ``estimateSafety`` x the estimated errors of the two results compared (the estimates are
-        # leading-order values of the error itself, not bounds -- docs/VERIFICATION.md)
+        # decision: crosscheck's eligibility rule; agreement within the base tolerance plus the estimated
+        # errors of the two results compared (``estimateSafety`` = 1.0: exactly crosscheck's rule).  The
+        # estimates are leading-order values of the error itself, not bounds -- docs/VERIFICATION.md
         base, safety = pol["relative"], pol["estimateSafety"]
         reasons = [r for r in report.reasons if " differ: " not in r and not r.endswith("agree")
                    and "represent the model and agree" not in r] + problems
@@ -369,12 +372,14 @@ def tier_c(raw: dict, model, results, *, cache: ForeignCache | None = None, time
                     row["passed"] = False
             if not row["passed"]:
                 agree = False
+                disagreements.append(f"{cid}: {c.a} vs {c.b}")
                 reasons.append(f"{c.a} and {c.b} differ: {row['quantity']} {row['value']:.2e} at {row['where']} "
                                f"(allowed {row['tolerance']:.2e})")
             comps.append(row)
             largest.append({"what": f"{c.a} vs {c.b}", "combination": cid, "value": row["value"],
                             "tolerance": row["tolerance"], "where": row["where"]})
         ok = len(report.eligible) >= pol["requiredSolvers"] and agree and not problems
+        disagreements += [f"{cid}: {x}" for x in problems]
         if ok:
             reasons.append(" and ".join(report.eligible) + " represent the model and agree with each other and "
                            "with the engine")
@@ -382,6 +387,7 @@ def tier_c(raw: dict, model, results, *, cache: ForeignCache | None = None, time
             viol = [v for s in report.eligible for v in _complementarity(model, slack, foreign[s])]
             if viol:
                 ok, reasons = False, reasons + viol
+                disagreements += [f"{cid}: {v}" for v in viol]
             info["complementarity"] = {"violations": viol}
         info.update(
             crossChecked=bool(ok), eligible=list(report.eligible), reasons=reasons, comparisons=comps,
@@ -414,8 +420,14 @@ def tier_c(raw: dict, model, results, *, cache: ForeignCache | None = None, time
     tr = TierResult("C", True, passed, summary, largest[:6],
                     {"relative": pol["relative"], "maxApproximation": pol["maxApproximation"],
                      "requiredSolvers": pol["requiredSolvers"], "estimateSafety": pol["estimateSafety"],
-                     "rule": "relative + estimateSafety x (estimated errors of the two results compared)"},
+                     "rule": "relative + (estimated errors of the two results compared), the rule of "
+                             "benchfea.crosscheck.cross_check"},
                     {"combinations": per_combo, "buckling": buckling, "failed": failed,
                      "foreignVersions": versions}, time.perf_counter() - t0)
     tr.timings = timings
+    # why the tier is not passed: two computations differ (the reference solution is in doubt), or too few
+    # independent solvers can take the model (it is merely not cross-checked)
+    tr.category = "" if passed else ("disagreement" if disagreements else ("not-run" if not_run and len(not_run) == len(
+        [f for f in failed]) else "not-representable"))
+    tr.details["disagreements"] = disagreements
     return tr

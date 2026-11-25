@@ -1,0 +1,125 @@
+{
+ "name": "mgz/ex-13-5-truss-inclined-roller",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kN",
+  "length": "mm"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "c": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "b": {
+   "x": 9464.101615137757,
+   "y": -5464.101615137754,
+   "z": 0.0
+  },
+  "a": {
+   "x": 8000.000000000001,
+   "y": 4.547473508864641e-13,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "c": {
+   "dofs": {
+    "ux": "fixed",
+    "uy": "fixed",
+    "uz": "fixed"
+   }
+  },
+  "b": {
+   "dofs": {
+    "uy": "fixed",
+    "uz": "fixed"
+   }
+  },
+  "a": {
+   "dofs": {
+    "uz": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 200.0,
+   "nu": 0.3
+  }
+ },
+ "sections": {
+  "ac": {
+   "type": "properties",
+   "description": "axial-force member: Iy, Iz, J are placeholders, not used",
+   "A": 15000.0,
+   "Iy": 1.0,
+   "Iz": 1.0,
+   "J": 1.0
+  },
+  "ab": {
+   "type": "properties",
+   "description": "axial-force member: Iy, Iz, J are placeholders, not used",
+   "A": 20000.0,
+   "Iy": 1.0,
+   "Iz": 1.0,
+   "J": 1.0
+  },
+  "bc": {
+   "type": "properties",
+   "description": "axial-force member: Iy, Iz, J are placeholders, not used",
+   "A": 18000.0,
+   "Iy": 1.0,
+   "Iz": 1.0,
+   "J": 1.0
+  }
+ },
+ "members": {
+  "ab": {
+   "type": "truss",
+   "i": "a",
+   "j": "b",
+   "section": "ab",
+   "material": "M"
+  },
+  "bc": {
+   "type": "truss",
+   "i": "b",
+   "j": "c",
+   "section": "bc",
+   "material": "M"
+  },
+  "ac": {
+   "type": "truss",
+   "i": "a",
+   "j": "c",
+   "section": "ac",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "a",
+     "Fx": 492.38772964943996,
+     "Fy": 86.84056477631859
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.0
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": false
+ }
+}

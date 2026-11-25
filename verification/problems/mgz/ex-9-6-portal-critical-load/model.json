@@ -1,0 +1,164 @@
+{
+ "name": "mgz/ex-9-6-portal-critical-load",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kip",
+  "length": "in"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "a": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "b": {
+   "x": 0.0,
+   "y": 288.0,
+   "z": 0.0
+  },
+  "c": {
+   "x": 240.0,
+   "y": 288.0,
+   "z": 0.0
+  },
+  "d": {
+   "x": 720.0,
+   "y": 288.0,
+   "z": 0.0
+  },
+  "e": {
+   "x": 720.0,
+   "y": 0.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "a": {
+   "dofs": {
+    "ux": "fixed",
+    "uy": "fixed",
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "e": {
+   "dofs": {
+    "ux": "fixed",
+    "uy": "fixed",
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "b": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "c": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "d": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 29000.0,
+   "nu": 0.3
+  }
+ },
+ "sections": {
+  "col": {
+   "type": "properties",
+   "A": 13.3,
+   "Iy": 248000.0,
+   "Iz": 248.0,
+   "J": 248.0
+  },
+  "gir": {
+   "type": "properties",
+   "A": 24.8,
+   "Iy": 2850000.0,
+   "Iz": 2850.0,
+   "J": 2850.0
+  }
+ },
+ "members": {
+  "ab": {
+   "i": "a",
+   "j": "b",
+   "section": "col",
+   "material": "M"
+  },
+  "bc": {
+   "i": "b",
+   "j": "c",
+   "section": "gir",
+   "material": "M"
+  },
+  "cd": {
+   "i": "c",
+   "j": "d",
+   "section": "gir",
+   "material": "M"
+  },
+  "ed": {
+   "i": "e",
+   "j": "d",
+   "section": "col",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "b",
+     "Fx": 6.0
+    },
+    {
+     "type": "nodal",
+     "node": "c",
+     "Fy": -60.0
+    },
+    {
+     "type": "nodal",
+     "node": "d",
+     "Fy": -120.0
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.0
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": false,
+  "buckling": {
+   "combinations": [
+    "C"
+   ],
+   "modes": 1
+  }
+ }
+}

@@ -1,0 +1,44 @@
+{
+ "id": "case-1-us-with-shear-p450",
+ "title": "AISC benchmark Case 1 (P-delta only), US table, with shear deformation, P = 450",
+ "tier": "B",
+ "source": {
+  "work": "ANSI/AISC 360-22, Specification for Structural Steel Buildings (American Institute of Steel Construction), Commentary",
+  "edition": "August 1, 2022",
+  "pages": "p. 16.1-337 (text p. 16.1-336 to 16.1-337)",
+  "notes": "input data and targets read on the cited page; nothing of the source is reproduced. Section properties of the W14x48 are not given by the source and are not taken from any table: I_x is calibrated on the source's own P = 0 deflection without shear deformation of Case 2, the shear flexibility on the source's P = 0 deflections with and without shear deformation (see build_problems.py and README.md)",
+  "location": "Commentary Section C2.1, Fig. C-C2.2 (benchmark problem Case 1), US customary table, column P = 450, unbracketed values"
+ },
+ "basis": "published",
+ "analysis": "Case 1 of the source: simply supported beam-column (pin at the bottom, lateral roller at the loaded top) under a uniform transverse load of 0.200 kip/ft and the axial compression P; targets: moment and deflection at midspan. Axial load level P = 450 x 1 kip (load case P holds the unit axial load, the combination factor is the level). US customary table: E = 29,000 ksi, L = 28.0 ft = 336 in, I = 483.92 in^4 (calibrated, see source.notes), G A_s = 47040 kip (calibrated on the P = 0 column of this case; shear deformation included: the source's unbracketed values). Member vertical along global Z, bending in the X-Z plane about local z (the section's Iz = Iy = I). Second-order analysis; the engine's member carries the exact stability functions, so one member is the exact solution of the second-order theory. The support idealisation is read from the source's sketch.",
+ "targets": [
+  {
+   "extract": "memberStation",
+   "member": "m",
+   "quantity": "Mz",
+   "relative": 0.5,
+   "value": -380.0,
+   "unit": "kip in",
+   "tolerance": {
+    "rel": 0.03
+   },
+   "precisionNote": "stated tolerance 0.03 on printed \"380\"; acceptance criterion stated by the source on the same page (AISC 360-22 Commentary C2.1, p. 16.1-337): moments within 3 %, deflections within 5 %; value printed to 3 significant figures",
+   "sign": "magnitude in the source; in the engine's convention (member local x upward, local y = global +X, loads along +X) the midspan moment Mz of Case 1 is negative and the base moment of Case 2 positive"
+  },
+  {
+   "extract": "memberStation",
+   "member": "m",
+   "quantity": "uy",
+   "relative": 0.5,
+   "value": 0.322,
+   "unit": "in",
+   "tolerance": {
+    "rel": 0.05
+   },
+   "precisionNote": "stated tolerance 0.05 on printed \"0.322\"; acceptance criterion stated by the source on the same page (AISC 360-22 Commentary C2.1, p. 16.1-337): moments within 3 %, deflections within 5 %; value printed to 3 significant figures",
+   "sign": "magnitude in the source; the load acts along +X, deflection +X (local y)"
+  }
+ ],
+ "status": "active",
+ "limitsNote": "Section properties are calibrated on the source's own P = 0 values (the source gives none): the problem verifies the second-order amplification, not section properties. It does NOT test shear deformation: the source's acceptance tolerance (3 % on moments, 5 % on deflections) is wider than the whole effect of shear deformation in its tables (at most 1.3 % on a moment and 3.5 % on a deflection between the bracketed and unbracketed values), so these targets would also be met without shear deformation; and the shear stiffness is calibrated on a difference the source prints to one significant digit."
+}

@@ -1,0 +1,154 @@
+{
+ "name": "mgz/ex-9-5-frame-critical-load",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kN",
+  "length": "mm"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "a": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "b": {
+   "x": 0.0,
+   "y": 6000.0,
+   "z": 0.0
+  },
+  "c": {
+   "x": 0.0,
+   "y": 10000.0,
+   "z": 0.0
+  },
+  "d": {
+   "x": 4000.0,
+   "y": 6000.0,
+   "z": 0.0
+  },
+  "e": {
+   "x": 4000.0,
+   "y": 10000.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "a": {
+   "dofs": {
+    "ux": "fixed",
+    "uy": "fixed",
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "b": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "c": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "d": {
+   "dofs": {
+    "uy": "fixed",
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "e": {
+   "dofs": {
+    "uy": "fixed",
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 200.0,
+   "nu": 0.3
+  }
+ },
+ "sections": {
+  "col": {
+   "type": "properties",
+   "A": 25000.0,
+   "Iy": 636000000000.0,
+   "Iz": 636000000.0,
+   "J": 636000000.0
+  },
+  "beam": {
+   "type": "properties",
+   "A": 17600.0,
+   "Iy": 861000000000.0,
+   "Iz": 861000000.0,
+   "J": 861000000.0
+  }
+ },
+ "members": {
+  "ab": {
+   "i": "a",
+   "j": "b",
+   "section": "col",
+   "material": "M"
+  },
+  "bc": {
+   "i": "b",
+   "j": "c",
+   "section": "col",
+   "material": "M"
+  },
+  "bd": {
+   "i": "b",
+   "j": "d",
+   "section": "beam",
+   "material": "M"
+  },
+  "ce": {
+   "i": "c",
+   "j": "e",
+   "section": "beam",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "c",
+     "Fy": -1.0
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.0
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": false,
+  "buckling": {
+   "combinations": [
+    "C"
+   ],
+   "modes": 1
+  }
+ }
+}

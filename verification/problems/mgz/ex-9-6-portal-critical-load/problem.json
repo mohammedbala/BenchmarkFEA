@@ -1,0 +1,29 @@
+{
+ "id": "ex-9-6-portal-critical-load",
+ "title": "Unsymmetrically loaded pin-based portal frame: critical load factor",
+ "tier": "B",
+ "source": {
+  "work": "McGuire, W., Gallagher, R. H., Ziemian, R. D., Matrix Structural Analysis",
+  "edition": "2nd edition (copyright 2014 R. D. Ziemian)",
+  "location": "Example 9.6, part 1",
+  "pages": "p. 252",
+  "notes": "input data and targets read on the cited pages; nothing of the source is reproduced"
+ },
+ "basis": "published",
+ "analysis": "Plane (x-y) problem of the source modelled in 3D with the global Y axis vertical, so that the source's x, y and theta_z are the model's X, Y and rz. In-plane bending is about local z for every member (default orientation), hence the source's I is the section's Iz. Units kip, in. a (0, 0), b (0, 24 ft), c (20 ft, 24 ft), d (60 ft, 24 ft), e (60 ft, 0); a and e pinned. Columns ab, ed: A = 13.3 in^2, I = 248 in^4; girder bc-cd: A = 24.8 in^2, I = 2850 in^4; E = 29,000 ksi. Loads: 6 kips along +x at b, 60 kips downward at c, 120 kips downward at d. Linear buckling analysis with the applied loads as reference loading; target: the source's lambda = 2.20. The engine's members carry the exact stability functions (no discretisation error for a prismatic member with constant axial force); the source's computed values use a stated number of elements with a polynomial (approximate) geometric stiffness. The source models each column with two elements and each girder segment with one. Plane stability problem: the source's model has no out-of-plane degrees of freedom. Here the out-of-plane DOFs (uz, rx, ry) of every node are held and Iy = 1000 Iz, so that no out-of-plane buckling mode precedes the in-plane modes compared; J is a placeholder. ",
+ "targets": [
+  {
+   "extract": "bucklingFactor",
+   "combination": "C",
+   "mode": 1,
+   "value": 2.2,
+   "unit": "-",
+   "tolerance": {
+    "rel": 0.0022727272727272726
+   },
+   "precisionNote": "printed \"2.20\"; tolerance = half a unit in the last printed digit; computed by the source with two elements per column and the polynomial geometric stiffness of its Eq. 9.14: an approximation by construction, no error bound stated",
+   "sign": "positive factor on the applied loading"
+  }
+ ],
+ "status": "active"
+}

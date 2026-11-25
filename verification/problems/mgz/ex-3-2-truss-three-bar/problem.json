@@ -1,0 +1,131 @@
+{
+ "id": "ex-3-2-truss-three-bar",
+ "title": "Three-bar plane truss: displacements, reactions, bar forces",
+ "tier": "B",
+ "source": {
+  "work": "McGuire, W., Gallagher, R. H., Ziemian, R. D., Matrix Structural Analysis",
+  "edition": "2nd edition (copyright 2014 R. D. Ziemian)",
+  "location": "Example 3.2 (truss of Example 3.1)",
+  "pages": "pp. 35-38",
+  "notes": "input data and targets read on the cited pages; nothing of the source is reproduced"
+ },
+ "basis": "published",
+ "analysis": "Pin-jointed plane truss in the x-y plane (global Y vertical): members of type 'truss'; the out-of-plane translation of every joint is held by a support (it has no stiffness in a plane truss). Joints from the printed geometry (height 4 m, bar ac at 30 deg, bar ab at 45 deg to the horizontal; the source prints the resulting base length as 10.928 m): c (0, 0), a (4/tan 30 deg, 4), b (4/tan 30 deg + 4, 0) m. A_ac = 15e3, A_ab = 20e3, A_bc = 18e3 mm^2, E = 200,000 MPa. c pinned, b on a horizontal roller (vertical restraint). Load at a: the source's components 383.0 kN (+x) and 321.4 kN (+y) of 500 kN at 40 deg. First order.",
+ "targets": [
+  {
+   "extract": "nodeDisplacement",
+   "node": "a",
+   "dof": "ux",
+   "value": 0.871,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.000574052812858783
+   },
+   "precisionNote": "printed \"0.871\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "a",
+   "dof": "uy",
+   "value": 1.244,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.00040192926045016077
+   },
+   "precisionNote": "printed \"1.244\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "b",
+   "dof": "ux",
+   "value": -0.193,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.0025906735751295338
+   },
+   "precisionNote": "printed \"0.193\"; tolerance = half a unit in the last printed digit; printed -0.193",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "b",
+   "component": "Fy",
+   "value": -63.6,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.0007861635220125787
+   },
+   "precisionNote": "printed \"63.6\"; tolerance = half a unit in the last printed digit; printed -63.6",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "c",
+   "component": "Fx",
+   "value": -383.4,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.00013041210224308818
+   },
+   "precisionNote": "printed \"383.4\"; tolerance = half a unit in the last printed digit; printed -383.4",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "c",
+   "component": "Fy",
+   "value": -258.1,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.00019372336303758234
+   },
+   "precisionNote": "printed \"258.1\"; tolerance = half a unit in the last printed digit; printed -258.1",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "ab",
+   "quantity": "N",
+   "relative": 0.5,
+   "value": 90.0,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.0005555555555555556
+   },
+   "precisionNote": "printed \"90.0\"; tolerance = half a unit in the last printed digit",
+   "sign": "bar force: tension positive in the source and in the engine (N)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "bc",
+   "quantity": "N",
+   "relative": 0.5,
+   "value": -63.6,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.0007861635220125787
+   },
+   "precisionNote": "printed \"63.6\"; tolerance = half a unit in the last printed digit; printed -63.6",
+   "sign": "bar force: tension positive in the source and in the engine (N)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "ac",
+   "quantity": "N",
+   "relative": 0.5,
+   "value": 516.2,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 9.686168151879117e-05
+   },
+   "precisionNote": "printed \"516.2\"; tolerance = half a unit in the last printed digit",
+   "sign": "bar force: tension positive in the source and in the engine (N)"
+  }
+ ],
+ "status": "quarantined",
+ "quarantine": {
+  "diagnosis": "6 of 9 targets missed, by up to 1.1e-3 relative (tolerances 1e-4 to 6e-4). Engine: u_a = 0.87018, v_a = 1.24297, u_b = -0.19298 mm; reactions -63.572, -383.000, -257.828 kN; bar forces 89.904, -63.572, 515.657 kN. Printed: 0.871, 1.244, -0.193; -63.6, -383.4, -258.1; 90.0, -63.6, 516.2. Cause: rounding in the source's hand calculation - its stiffness coefficients are carried with three or four significant figures and later results are computed from rounded earlier ones, so the last printed digit of its results is not reliable, while the policy counts every printed digit as significant. Evidence: (1) the truss is statically determinate, so reactions and bar forces follow from statics alone: R_xc = -383.0 kN (the applied 383.0 kN; printed -383.4), R_yc = -257.83 kN (printed -258.1), F_ac = 2 x 257.83 = 515.66 kN (printed 516.2); the printed reactions leave residuals of 0.4 kN (x) and 0.3 kN (y). (2) The exact solution of the source's own printed 3 x 3 equations is 0.8702, 1.2431, -0.1931 mm - the engine's values, not the printed 0.871 and 1.244. The engine's results for this model are confirmed by the other tiers that apply (tier C: OpenSeesPy and PyNite agree with the engine; tier D: equilibrium and the other invariants pass); the difference is between the source's printed digits and the exact solution of the stated problem."
+ }
+}

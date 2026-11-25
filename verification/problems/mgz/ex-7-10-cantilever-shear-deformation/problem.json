@@ -1,0 +1,42 @@
+{
+ "id": "ex-7-10-cantilever-shear-deformation",
+ "title": "End-loaded cantilever of rectangular section with shear deformation",
+ "tier": "B",
+ "source": {
+  "work": "McGuire, W., Gallagher, R. H., Ziemian, R. D., Matrix Structural Analysis",
+  "edition": "2nd edition (copyright 2014 R. D. Ziemian)",
+  "location": "Example 7.10",
+  "pages": "p. 206",
+  "notes": "input data and targets read on the cited pages; nothing of the source is reproduced"
+ },
+ "basis": "published",
+ "analysis": "Plane (x-y) problem of the source modelled in 3D with the global Y axis vertical, so that the source's x, y and theta_z are the model's X, Y and rz. In-plane bending is about local z for every member (default orientation), hence the source's I is the section's Iz. The source gives the tip deflection of an end-loaded cantilever including shear deformation as gamma P L^3 / (3 E I), with I = b d^3 / 12, shear area (2/3) b d and nu = 0.3, and prints gamma = 1.039 for d/L = 1/5 and gamma = 1.010 for d/L = 1/10. Numeric instance chosen here (the example is non-dimensional): b = 100 mm, d = 200 mm, E = 200 kN/mm^2, nu = 0.3, P = 10 kN upward at the tip; member 1 with L = 1000 mm (d/L = 1/5), member 2 with L = 2000 mm (d/L = 1/10). Section given by properties with Asy = (2/3) b d (the source's shear area); analysis with shear deformation. The target is the printed gamma times P L^3/(3 E I) of the instance. First order.",
+ "targets": [
+  {
+   "extract": "nodeDisplacement",
+   "node": "b1",
+   "dof": "uy",
+   "value": 0.25975,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.00048123195380173246
+   },
+   "precisionNote": "printed \"1.039\" x 0.25 (unit conversion / common factor of the source); tolerance = half a unit in the last printed digit; gamma for d/L = 1/5; the factor is P L^3/(3 E I) of the instance",
+   "sign": "load and deflection along +y"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "b2",
+   "dof": "uy",
+   "value": 2.02,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.0004950495049504951
+   },
+   "precisionNote": "printed \"1.010\" x 2 (unit conversion / common factor of the source); tolerance = half a unit in the last printed digit; gamma for d/L = 1/10; the factor is P L^3/(3 E I) of the instance",
+   "sign": "load and deflection along +y"
+  }
+ ],
+ "status": "active",
+ "limitsNote": "The model has shear deformation: the foreign solvers of tier C cannot represent it (docs/VERIFICATION.md, Limits)."
+}

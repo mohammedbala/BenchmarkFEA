@@ -1,0 +1,83 @@
+{
+ "name": "derived/beam-self-weight",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kN",
+  "length": "m"
+ },
+ "conventions": {
+  "verticalAxis": "Z"
+ },
+ "nodes": {
+  "a": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "b": {
+   "x": 8.0,
+   "y": 0.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "a": {
+   "dofs": {
+    "ux": "fixed",
+    "uy": "fixed",
+    "uz": "fixed",
+    "rx": "fixed"
+   }
+  },
+  "b": {
+   "dofs": {
+    "uy": "fixed",
+    "uz": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 200000000.0,
+   "nu": 0.3,
+   "unitWeight": 78.5
+  }
+ },
+ "sections": {
+  "S": {
+   "type": "properties",
+   "A": 0.01,
+   "Iy": 0.0001,
+   "Iz": 0.0002,
+   "J": 0.00015
+  }
+ },
+ "members": {
+  "m": {
+   "section": "S",
+   "material": "M",
+   "i": "a",
+   "j": "b"
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "selfWeight"
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.35
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": false,
+  "resultStations": 11
+ }
+}

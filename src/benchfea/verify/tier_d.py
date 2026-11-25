@@ -12,6 +12,18 @@ reciprocity     Maxwell-Betti on a deterministic selection of DOF pairs.
 Both are properties of a LINEAR system; for a model with one-sided members they do not hold and are
 not run (recorded).  For second-order / reduced-stiffness combinations they are run on the first-order
 operator (they test the stiffness matrix, the load vectors and the recovery, not the iteration).
+
+station statics  the internal forces at EVERY result station recomputed here from statics (the station
+                forces at the member start, the load definitions, and in second order the lever of the
+                axial force on the stored deflections), and the station forces at the member ends
+                against the end forces (``benchfea.verify.stations``; no solver code).
+station         the displacements of the member axis, the bending moments and the shears at every
+integration     interior station from an integration of the member differential equations between
+                the first and the last station (initial value problems, scipy ``solve_ivp``).
+                The stored invariants are computed by the solver during the solve; these two parts
+                are computed from the finished reference solution, so that a station value that is
+                wrong in the results (and that tier C, which compares node displacements, reactions
+                and end forces, cannot see) fails the tier.
 """
 from __future__ import annotations
 
@@ -21,6 +33,7 @@ from ..solve.invariants import reciprocity_check, superposition_check
 from .common import ONE_SIDED
 from .policy import POLICY
 from .record import TierResult
+from .stations import station_deflections, station_statics
 
 __all__ = ["tier_d", "REQUIRED_INVARIANTS"]
 
@@ -73,11 +86,37 @@ def tier_d(model, results) -> TierResult:
         if not all(c.analysis_type == "firstOrder" for c in model.combinations.values()):
             extra["note"] = "superposition and reciprocity run on the first-order operator of the model"
     failed += [f"missing invariant {m}" for m in missing]
+    # ---- station forces recomputed from statics on the finished results (no solver code)
+    st = station_statics(model, results, POLICY["D"]["stationStatics"], POLICY["D"]["stationStaticsIterated"])
+    extra["stationStatics"] = st
+    # ---- station deflections, moments and shears by integrating the member equations (no solver code)
+    sd = station_deflections(model, results, POLICY["D"]["stationIntegration"])
+    extra["stationIntegration"] = sd
+    only_not_evaluated = (not failed and not st["failed"] and not sd["failed"]
+                          and bool(st["notEvaluated"] or sd["notEvaluated"]))
+    failed += ["station statics: " + f for f in st["failed"]]
+    failed += ["station statics, not evaluated: " + f for f in st["notEvaluated"]]
+    failed += ["station integration: " + f for f in sd["failed"]]
+    failed += ["station integration, not evaluated: " + f for f in sd["notEvaluated"]]
+    if sd["largest"].get("value", 0.0) > 0.0:
+        w = sd["largest"]
+        worst_by_name["station integration"] = {
+            "what": f"station integration ({w.get('quantity')}, {w.get('where')})", "combination": w.get("combination"),
+            "value": float(w["value"]), "tolerance": float(w["tolerance"]), "ratio": float(w["value"] / w["tolerance"])}
+    if st["largest"].get("value", 0.0) > 0.0:
+        w = st["largest"]
+        worst_by_name["station statics"] = {
+            "what": f"station statics ({w.get('quantity')}, {w.get('where')})", "combination": w.get("combination"),
+            "value": float(w["value"]), "tolerance": float(w["tolerance"]), "ratio": float(w["value"] / w["tolerance"])}
     largest = sorted(worst_by_name.values(), key=lambda d: -d["ratio"])[:6]
     passed = not failed
     n = sum(len(v["checks"]) for v in per_combo.values()) + len(extra.get("linearity", []))
-    summary = (f"{n} invariant check(s) over {len(per_combo)} combination(s): "
+    summary = (f"{n} invariant check(s) over {len(per_combo)} combination(s) and the statics of "
+               f"{st['stations']} result station(s): "
                + ("all passed" if passed else "FAILED: " + "; ".join(failed[:4])))
-    return TierResult("D", True, passed, summary, largest,
-                      {**POLICY["D"], "stored": "tolerance stored with each invariant (docs/THEORY.md 8, 15)"},
-                      {"combinations": per_combo, **extra, "failed": failed}, time.perf_counter() - t0)
+    tr = TierResult("D", True, passed, summary, largest,
+                    {**POLICY["D"], "stored": "tolerance stored with each invariant (docs/THEORY.md 8, 15)"},
+                    {"combinations": per_combo, **extra, "failed": failed}, time.perf_counter() - t0)
+    if only_not_evaluated:
+        tr.category = "error"                    # a check that applies could not be carried out
+    return tr

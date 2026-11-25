@@ -1,0 +1,175 @@
+{
+ "name": "mgz/eq-13-31-flexible-connections",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kN",
+  "length": "mm"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "n1": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n2": {
+   "x": 6000.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n3": {
+   "x": 0.0,
+   "y": 3000.0,
+   "z": 0.0
+  },
+  "n4": {
+   "x": 6000.0,
+   "y": 3000.0,
+   "z": 0.0
+  },
+  "n5": {
+   "x": 0.0,
+   "y": 6000.0,
+   "z": 0.0
+  },
+  "n6": {
+   "x": 6000.0,
+   "y": 6000.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "n1": {
+   "type": "fixed"
+  },
+  "n2": {
+   "type": "fixed"
+  },
+  "n3": {
+   "type": "fixed"
+  },
+  "n4": {
+   "type": "fixed"
+  },
+  "n5": {
+   "type": "fixed"
+  },
+  "n6": {
+   "type": "fixed"
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 200.0,
+   "nu": 0.3
+  }
+ },
+ "sections": {
+  "s": {
+   "type": "properties",
+   "A": 10000.0,
+   "Iy": 200000000.0,
+   "Iz": 200000000.0,
+   "J": 200000000.0
+  }
+ },
+ "members": {
+  "semi": {
+   "i": "n1",
+   "j": "n2",
+   "section": "s",
+   "material": "M",
+   "releases": {
+    "i": {
+     "rz": {
+      "spring": 20000000.0
+     }
+    },
+    "j": {
+     "rz": {
+      "spring": 40000000.0
+     }
+    }
+   }
+  },
+  "pin1": {
+   "i": "n3",
+   "j": "n4",
+   "section": "s",
+   "material": "M",
+   "releases": {
+    "i": {
+     "rz": true
+    }
+   }
+  },
+  "pin2": {
+   "i": "n5",
+   "j": "n6",
+   "section": "s",
+   "material": "M",
+   "releases": {
+    "j": {
+     "rz": true
+    }
+   }
+  }
+ },
+ "loadCases": {
+  "V": {
+   "loads": [
+    {
+     "type": "supportDisplacement",
+     "node": "n1",
+     "uy": 1.0
+    },
+    {
+     "type": "supportDisplacement",
+     "node": "n3",
+     "uy": 1.0
+    },
+    {
+     "type": "supportDisplacement",
+     "node": "n5",
+     "uy": 1.0
+    }
+   ]
+  },
+  "R": {
+   "loads": [
+    {
+     "type": "supportDisplacement",
+     "node": "n1",
+     "rz": 0.001
+    },
+    {
+     "type": "supportDisplacement",
+     "node": "n3",
+     "rz": 0.001
+    },
+    {
+     "type": "supportDisplacement",
+     "node": "n5",
+     "rz": 0.001
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "V": {
+   "factors": {
+    "V": 1.0
+   }
+  },
+  "R": {
+   "factors": {
+    "R": 1.0
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": false
+ }
+}

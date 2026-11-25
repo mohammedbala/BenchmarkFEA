@@ -1,0 +1,304 @@
+{
+ "name": "ziemian/frame-7-second-order-left",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kip",
+  "length": "in"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "n1": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n2": {
+   "x": 288.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n3": {
+   "x": 504.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n14": {
+   "x": 287.712,
+   "y": 144.0,
+   "z": 0.0
+  },
+  "n18": {
+   "x": 503.712,
+   "y": 144.0,
+   "z": 0.0
+  },
+  "n25": {
+   "x": -0.48,
+   "y": 240.0,
+   "z": 0.0
+  },
+  "n29": {
+   "x": 287.52,
+   "y": 240.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "n1": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed",
+    "ux": "fixed",
+    "uy": "fixed"
+   }
+  },
+  "n2": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed",
+    "ux": "fixed",
+    "uy": "fixed"
+   }
+  },
+  "n3": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed",
+    "ux": "fixed",
+    "uy": "fixed"
+   }
+  },
+  "n14": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "n18": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "n25": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "n29": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 23200.0,
+   "nu": 0.3,
+   "description": "0.8 x 29,000 ksi (analysis condition of the data set)"
+  }
+ },
+ "sections": {
+  "s1": {
+   "type": "properties",
+   "description": "W8X28: A, Izz and J as listed in the data set; Iy = 1000 Izz (plane problem, see problem.json)",
+   "A": 8.24,
+   "Iz": 98.0,
+   "Iy": 98000.0,
+   "J": 0.537
+  },
+  "s2": {
+   "type": "properties",
+   "description": "W18X71: A, Izz and J as listed in the data set; Iy = 1000 Izz (plane problem, see problem.json)",
+   "A": 20.8,
+   "Iz": 1170.0,
+   "Iy": 1170000.0,
+   "J": 3.49
+  },
+  "s3": {
+   "type": "properties",
+   "description": "W4X13: A, Izz and J as listed in the data set; Iy = 1000 Izz (plane problem, see problem.json)",
+   "A": 3.83,
+   "Iz": 11.3,
+   "Iy": 11300.0,
+   "J": 0.151
+  },
+  "s4": {
+   "type": "properties",
+   "description": "W12X58: A, Izz and J as listed in the data set; Iy = 1000 Izz (plane problem, see problem.json)",
+   "A": 17.0,
+   "Iz": 475.0,
+   "Iy": 475000.0,
+   "J": 2.1
+  },
+  "s5": {
+   "type": "properties",
+   "description": "W6X9: A, Izz and J as listed in the data set; Iy = 1000 Izz (plane problem, see problem.json)",
+   "A": 2.68,
+   "Iz": 16.4,
+   "Iy": 16400.0,
+   "J": 0.0405
+  }
+ },
+ "members": {
+  "m1": {
+   "i": "n25",
+   "j": "n2",
+   "section": "s3",
+   "material": "M",
+   "releases": {
+    "i": {
+     "rz": true
+    },
+    "j": {
+     "rz": true
+    }
+   }
+  },
+  "m2-21": {
+   "i": "n1",
+   "j": "n25",
+   "section": "s1",
+   "material": "M"
+  },
+  "m6-9": {
+   "i": "n2",
+   "j": "n14",
+   "section": "s1",
+   "material": "M"
+  },
+  "m10-13": {
+   "i": "n3",
+   "j": "n18",
+   "section": "s5",
+   "material": "M"
+  },
+  "m14-17": {
+   "i": "n14",
+   "j": "n18",
+   "section": "s4",
+   "material": "M",
+   "releases": {
+    "i": {
+     "rz": true
+    },
+    "j": {
+     "rz": true
+    }
+   }
+  },
+  "m22-25": {
+   "i": "n14",
+   "j": "n29",
+   "section": "s1",
+   "material": "M"
+  },
+  "m26-29": {
+   "i": "n25",
+   "j": "n29",
+   "section": "s2",
+   "material": "M",
+   "releases": {
+    "i": {
+     "rz": true
+    },
+    "j": {
+     "rz": true
+    }
+   }
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "n14",
+     "Fx": -6.5792,
+     "Fy": -7.1176
+    },
+    {
+     "type": "memberPoint",
+     "member": "m14-17",
+     "direction": "Y",
+     "value": -14.234,
+     "position": 0.25
+    },
+    {
+     "type": "memberPoint",
+     "member": "m14-17",
+     "direction": "Y",
+     "value": -14.234,
+     "position": 0.5
+    },
+    {
+     "type": "memberPoint",
+     "member": "m14-17",
+     "direction": "Y",
+     "value": -14.234,
+     "position": 0.75
+    },
+    {
+     "type": "nodal",
+     "node": "n18",
+     "Fx": -9.8693,
+     "Fy": -7.1176
+    },
+    {
+     "type": "nodal",
+     "node": "n25",
+     "Fy": -9.4894
+    },
+    {
+     "type": "memberPoint",
+     "member": "m26-29",
+     "direction": "Y",
+     "value": -18.98,
+     "position": 0.25
+    },
+    {
+     "type": "memberPoint",
+     "member": "m26-29",
+     "direction": "Y",
+     "value": -18.98,
+     "position": 0.5
+    },
+    {
+     "type": "memberPoint",
+     "member": "m26-29",
+     "direction": "Y",
+     "value": -18.98,
+     "position": 0.75
+    },
+    {
+     "type": "nodal",
+     "node": "n29",
+     "Fx": -6.5792,
+     "Fy": -9.4894
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.0
+   },
+   "analysisType": "secondOrder"
+  }
+ },
+ "analysis": {
+  "shearDeformation": false
+ }
+}

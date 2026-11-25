@@ -1,0 +1,134 @@
+{
+ "name": "ansys/vm217-portal-frame-uniform-load",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "lbf",
+  "length": "in"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "n1": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n2": {
+   "x": 0.0,
+   "y": 400.0,
+   "z": 0.0
+  },
+  "n3": {
+   "x": 800.0,
+   "y": 400.0,
+   "z": 0.0
+  },
+  "n4": {
+   "x": 800.0,
+   "y": 0.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "n1": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed",
+    "ux": "fixed",
+    "uy": "fixed",
+    "rz": "fixed"
+   }
+  },
+  "n2": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "n3": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "n4": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed",
+    "ux": "fixed",
+    "uy": "fixed",
+    "rz": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 30000000.0,
+   "nu": 0.3
+  }
+ },
+ "sections": {
+  "col": {
+   "type": "properties",
+   "A": 10000000.0,
+   "Iz": 20300.0,
+   "Iy": 20300.0,
+   "J": 20300.0
+  },
+  "span": {
+   "type": "properties",
+   "A": 10000000.0,
+   "Iz": 101500.0,
+   "Iy": 101500.0,
+   "J": 101500.0
+  }
+ },
+ "members": {
+  "c1": {
+   "i": "n1",
+   "j": "n2",
+   "section": "col",
+   "material": "M"
+  },
+  "b": {
+   "i": "n2",
+   "j": "n3",
+   "section": "span",
+   "material": "M"
+  },
+  "c2": {
+   "i": "n4",
+   "j": "n3",
+   "section": "col",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "memberDistributed",
+     "member": "b",
+     "direction": "Y",
+     "w1": -500.0
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.0
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": false,
+  "resultStations": 3
+ }
+}

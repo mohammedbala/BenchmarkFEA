@@ -1,0 +1,104 @@
+{
+ "name": "staad/space-frame-three-members",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kip",
+  "length": "in"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "n1": {
+   "x": 0.0,
+   "y": 120.0,
+   "z": 0.0
+  },
+  "n2": {
+   "x": 240.0,
+   "y": 120.0,
+   "z": 0.0
+  },
+  "n3": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n4": {
+   "x": 360.0,
+   "y": 0.0,
+   "z": 120.0
+  }
+ },
+ "supports": {
+  "n3": {
+   "type": "fixed"
+  },
+  "n4": {
+   "type": "fixed"
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 30000.0,
+   "G": 12000.0
+  }
+ },
+ "sections": {
+  "S": {
+   "type": "properties",
+   "A": 11.0,
+   "Iz": 56.0,
+   "Iy": 56.0,
+   "J": 83.0
+  }
+ },
+ "members": {
+  "m1": {
+   "i": "n1",
+   "j": "n2",
+   "section": "S",
+   "material": "M"
+  },
+  "m2": {
+   "i": "n3",
+   "j": "n1",
+   "section": "S",
+   "material": "M"
+  },
+  "m3": {
+   "i": "n2",
+   "j": "n4",
+   "section": "S",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "n1",
+     "Fx": 2.0
+    },
+    {
+     "type": "nodal",
+     "node": "n2",
+     "Fy": -1.0,
+     "Mz": -120.0
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.0
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": false,
+  "resultStations": 3
+ }
+}

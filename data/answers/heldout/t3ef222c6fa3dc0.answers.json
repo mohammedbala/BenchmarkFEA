@@ -1,0 +1,337 @@
+{
+ "format": "benchfea-task-answers",
+ "formatVersion": "1.0.0",
+ "id": "t3ef222c6fa3dc0",
+ "taskType": "diagnose",
+ "mode": "tool-allowed",
+ "key": {
+  "family": "portal_frame",
+  "curveBall": "support_removed",
+  "seed": 4,
+  "difficulty": 1,
+  "versions": {
+   "task": "1",
+   "generator": "1",
+   "curveBall": "1",
+   "engine": "0.1.0"
+  }
+ },
+ "generatorSeed": 4,
+ "skips": [],
+ "effectClass": "creates-mechanism",
+ "changeRecord": {
+  "format": "benchfea-curveball-record",
+  "formatVersion": "1.0.0",
+  "curveBall": "support_removed",
+  "title": "support removed",
+  "curveBallVersion": "1",
+  "seed": 4,
+  "category": "supports",
+  "effectClass": "creates-mechanism",
+  "target": "support N5",
+  "changes": [
+   {
+    "op": "remove",
+    "path": "/supports/N5/type",
+    "before": "pinned",
+    "index": 0
+   },
+   {
+    "op": "add",
+    "path": "/supports/N5/dofs/uz",
+    "after": "fixed",
+    "index": 0
+   }
+  ],
+  "entities": {
+   "nodes": [
+    "N5"
+   ],
+   "supports": [
+    "N5"
+   ]
+  },
+  "whyItMatters": "Every support is part of the load path. Without it the load it carried must reach the remaining supports through the members -- spans double, cantilevers appear, moments and deflections multiply -- or, if the structure was not redundant enough, there is no equilibrium at all (a mechanism).",
+  "precondition": "a support (other than the plane restraint of a plane frame)",
+  "effect": {
+   "class": "creates-mechanism",
+   "material": true,
+   "criterion": "creates-mechanism",
+   "criteria": [
+    "creates-mechanism"
+   ],
+   "thresholds": {
+    "analysisChange": 0.05,
+    "designRatioChange": 0.05
+   },
+   "base": {
+    "status": "ok",
+    "units": {
+     "force": "kip",
+     "length": "in"
+    },
+    "combinations": {
+     "ULS1": {
+      "analysisType": "firstOrder",
+      "maxTranslation": 0.03566834993467456,
+      "maxMemberDisplacement": 1.9157277607792127,
+      "maxReactionForce": 91.10295860569757,
+      "maxMemberMoment": 6901.268982608677
+     },
+     "SLS1": {
+      "analysisType": "firstOrder",
+      "maxTranslation": 0.027002705010788428,
+      "maxMemberDisplacement": 1.447963318900487,
+      "maxReactionForce": 69.07913217141459,
+      "maxMemberMoment": 5216.022086100173
+     }
+    },
+    "design": {
+     "status": "conditional",
+     "maxRatio": 0.9348425091379563,
+     "maxRatioMember": "B1",
+     "failing": []
+    }
+   },
+   "perturbed": {
+    "status": "unstable",
+    "nMechanisms": 1
+   }
+  },
+  "reference": {
+   "kind": "diagnosis",
+   "note": "the perturbed model is a mechanism: the reference solution is the solver's structured mechanism diagnosis, not a set of results",
+   "diagnosis": {
+    "stable": false,
+    "classification": "mechanism",
+    "nMechanisms": 1,
+    "nFreeDofs": 10,
+    "tolerance": 1e-10,
+    "modes": [
+     {
+      "kind": "rigid-body",
+      "description": "rigid-body rotation about an axis parallel to Z through node N1: no restraint",
+      "motion": "rotation",
+      "cause": "no-restraint",
+      "count": 1,
+      "direction": null,
+      "axis": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "through": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "nodes": [
+       {
+        "node": "N4",
+        "share": 0.333333,
+        "dofs": {
+         "ux": 0.159434,
+         "uy": 0.340566,
+         "rz": 0.5
+        }
+       },
+       {
+        "node": "N5",
+        "share": 0.280189,
+        "dofs": {
+         "uy": 0.405163,
+         "rz": 0.594837
+        }
+       },
+       {
+        "node": "N2",
+        "share": 0.219811,
+        "dofs": {
+         "ux": 0.241774,
+         "rz": 0.758226
+        }
+       },
+       {
+        "node": "N1",
+        "share": 0.166667,
+        "dofs": {
+         "rz": 1.0
+        }
+       }
+      ],
+      "members": []
+     }
+    ]
+   },
+   "problems": [
+    {
+     "code": "stability.mechanism",
+     "path": "/supports",
+     "message": "the structure is a mechanism: rigid-body rotation about an axis parallel to Z through node N1: no restraint"
+    }
+   ]
+  },
+  "verification": {
+   "reference": "diagnosis",
+   "route": "diagnosis tiers N, K, C, E of benchfea.verify (docs/VERIFICATION.md section 4): null space of an independently assembled stiffness, engine matrix, two foreign solvers under a probing load, invariance of the diagnosis"
+  },
+  "rejected": [],
+  "baseHash": "11e24940a61198f70bcb20756763ff80832cb0afc62b7454ad688cb523a19136",
+  "perturbedHash": "da8db6441d5bc70573d143df1eb282e92c23f375762662feb8f8d67744d4d3a0"
+ },
+ "verification": {
+  "format": "benchfea-verification",
+  "kind": "diagnosis",
+  "status": "verified",
+  "meaning": "'verified' means only: the reference solution passed every tier listed as applicable in this record, at the tolerances stated in it. It does not mean reviewed, approved or certified by anyone.",
+  "modelHash": "da8db6441d5bc70573d143df1eb282e92c23f375762662feb8f8d67744d4d3a0",
+  "tiersPassed": [
+   "N",
+   "K",
+   "C",
+   "E"
+  ],
+  "tiersNotPassed": [],
+  "tiersNotApplicable": [],
+  "quarantine": null,
+  "tiers": {
+   "N": {
+    "applies": true,
+    "passed": true,
+    "summary": "independent stiffness: 1 zero-stiffness motion(s) (diagnosis: 1); 1 described mode(s) tested for K phi = 0: agree",
+    "tolerances": {
+     "singular": 1e-09,
+     "nullResidual": 2e-06
+    },
+    "largestDifferences": [
+     {
+      "what": "mode 0: |K phi| / (|K| |phi|) on the independent matrix",
+      "value": 9.796108748191991e-20,
+      "tolerance": 2e-06
+     }
+    ]
+   },
+   "K": {
+    "applies": true,
+    "passed": true,
+    "summary": "engine matrix: 1 eigenvalue(s) below 1.0e-09; the described modes satisfy K phi = 0",
+    "tolerances": {
+     "singular": 1e-09,
+     "nullResidual": 2e-06
+    },
+    "largestDifferences": [
+     {
+      "what": "mode 0: |K phi| / (|K| |phi|) on the engine's matrix",
+      "value": 2.229158968477467e-17,
+      "tolerance": 2e-06
+     }
+    ]
+   },
+   "C": {
+    "applies": true,
+    "passed": true,
+    "summary": "2 foreign solver(s) find no equilibrium state under a load that does work on the mechanism(s)",
+    "tolerances": {
+     "saneDisplacement": "1000 x model size"
+    },
+    "largestDifferences": []
+   },
+   "E": {
+    "applies": true,
+    "passed": true,
+    "summary": "diagnosis identical on a second run and after changing every design variable",
+    "tolerances": {
+     "designVariables": 0.0
+    },
+    "largestDifferences": []
+   }
+  },
+  "versions": {
+   "benchfea": "0.1.0",
+   "python": "3.13.18",
+   "numpy": "2.5.3",
+   "scipy": "1.18.1",
+   "foreign:opensees": "3.8.0.0",
+   "foreign:pynite": "3.2.1"
+  },
+  "notes": [
+   "verified diagnosis: passed tier(s) N, K, C, E (docs/VERIFICATION.md, 'Unstable models')"
+  ]
+ },
+ "designVerification": null,
+ "reference": {
+  "category": "supports",
+  "entities": {
+   "nodes": [
+    "N5"
+   ],
+   "supports": [
+    "N5"
+   ]
+  },
+  "direction": "changed",
+  "target": "support N5",
+  "mechanism": {
+   "stable": false,
+   "classification": "mechanism",
+   "nMechanisms": 1,
+   "nFreeDofs": 10,
+   "tolerance": 1e-10,
+   "modes": [
+    {
+     "kind": "rigid-body",
+     "description": "rigid-body rotation about an axis parallel to Z through node N1: no restraint",
+     "motion": "rotation",
+     "cause": "no-restraint",
+     "count": 1,
+     "direction": null,
+     "axis": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "through": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "nodes": [
+      {
+       "node": "N4",
+       "share": 0.333333,
+       "dofs": {
+        "ux": 0.159434,
+        "uy": 0.340566,
+        "rz": 0.5
+       }
+      },
+      {
+       "node": "N5",
+       "share": 0.280189,
+       "dofs": {
+        "uy": 0.405163,
+        "rz": 0.594837
+       }
+      },
+      {
+       "node": "N2",
+       "share": 0.219811,
+       "dofs": {
+        "ux": 0.241774,
+        "rz": 0.758226
+       }
+      },
+      {
+       "node": "N1",
+       "share": 0.166667,
+       "dofs": {
+        "rz": 1.0
+       }
+      }
+     ],
+     "members": []
+    }
+   ]
+  }
+ }
+}

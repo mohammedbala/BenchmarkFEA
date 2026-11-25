@@ -1,0 +1,128 @@
+{
+ "id": "ex-13-3-three-storey-frame",
+ "title": "Three-storey single-bay rigid frame, axial deformation neglected",
+ "tier": "B",
+ "source": {
+  "work": "McGuire, W., Gallagher, R. H., Ziemian, R. D., Matrix Structural Analysis",
+  "edition": "2nd edition (copyright 2014 R. D. Ziemian)",
+  "location": "Example 13.3",
+  "pages": "pp. 383-385",
+  "notes": "input data and targets read on the cited pages; nothing of the source is reproduced"
+ },
+ "basis": "published",
+ "analysis": "Plane (x-y) problem of the source modelled in 3D with the global Y axis vertical, so that the source's x, y and theta_z are the model's X, Y and rz. In-plane bending is about local z for every member (default orientation), hence the source's I is the section's Iz. Bay 8 m, three storeys of 5 m: bases 7 (0, 0) and 8 (8, 0) fixed; joints 5, 6 at 5 m, 3, 4 at 10 m, 1, 2 at 15 m. Beams I = 200e6 mm^4, columns I = 50e6 mm^4, E = 200,000 MPa. Loads at each of joints 1, 3, 5: 3 kN along +x and a moment of +2 kN m (the source's load vector entries are 3 and 2 x 10^3, positive). The source neglects axial deformation. The engine always includes axial deformation; the source's assumption is represented by a member area of 1e8 mm^2 for every member (four orders of magnitude above the areas the source uses for the same members elsewhere, 4e3 and 6e3 mm^2), one value for all problems of this kind. The remaining axial flexibility changes the targets by less than 1e-5 of their value (measured by repeating the analysis with 1e9 mm^2; see README.md), far below their printed precision. First order, no shear deformation. Section properties the source does not give because they do not enter its plane model (Iy, J; A where stated) are placeholders that do not influence the targets. ",
+ "targets": [
+  {
+   "extract": "nodeDisplacement",
+   "node": "n3",
+   "dof": "ux",
+   "value": 11.36,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.00044014084507042255
+   },
+   "precisionNote": "printed \"11.36\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n3",
+   "dof": "rz",
+   "value": -0.0003141,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 0.0001591849729385546
+   },
+   "precisionNote": "printed \"3.141e-4\"; tolerance = half a unit in the last printed digit; printed -3.141 x 10^-4",
+   "sign": "moment / rotation about z, counter-clockwise positive in the source = rz / Mz of the engine"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n4",
+   "dof": "rz",
+   "value": -0.0003652,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 0.00013691128148959474
+   },
+   "precisionNote": "printed \"3.652e-4\"; tolerance = half a unit in the last printed digit; printed -3.652 x 10^-4",
+   "sign": "moment / rotation about z, counter-clockwise positive in the source = rz / Mz of the engine"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n1",
+   "dof": "ux",
+   "value": 14.05,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.0003558718861209964
+   },
+   "precisionNote": "printed \"14.05\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n1",
+   "dof": "rz",
+   "value": -5.73e-05,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 0.0008726003490401396
+   },
+   "precisionNote": "printed \"0.573e-4\"; tolerance = half a unit in the last printed digit; printed -0.573 x 10^-4",
+   "sign": "moment / rotation about z, counter-clockwise positive in the source = rz / Mz of the engine"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n2",
+   "dof": "rz",
+   "value": -0.000157,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 0.0003184713375796178
+   },
+   "precisionNote": "printed \"1.570e-4\"; tolerance = half a unit in the last printed digit; printed -1.570 x 10^-4",
+   "sign": "moment / rotation about z, counter-clockwise positive in the source = rz / Mz of the engine"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n5",
+   "dof": "ux",
+   "value": 6.04,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.0008278145695364238
+   },
+   "precisionNote": "printed \"6.04\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n5",
+   "dof": "rz",
+   "value": -0.000507,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 9.861932938856015e-05
+   },
+   "precisionNote": "printed \"5.070e-4\"; tolerance = half a unit in the last printed digit; printed -5.070 x 10^-4",
+   "sign": "moment / rotation about z, counter-clockwise positive in the source = rz / Mz of the engine"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n6",
+   "dof": "rz",
+   "value": -0.0005759,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 8.682062858135094e-05
+   },
+   "precisionNote": "printed \"5.759e-4\"; tolerance = half a unit in the last printed digit; printed -5.759 x 10^-4",
+   "sign": "moment / rotation about z, counter-clockwise positive in the source = rz / Mz of the engine"
+  }
+ ],
+ "status": "quarantined",
+ "quarantine": {
+  "diagnosis": "6 of 9 targets missed, by 2e-4 to 1.2e-3 relative (tolerances 9e-5 to 4e-4). Engine (member areas 1e8 mm^2 for the neglected axial deformation): u3 = 11.3718 mm, theta3 = -3.1419e-4, theta4 = -3.6513e-4, u1 = 14.0514 mm, theta1 = -0.5727e-4, theta2 = -1.5706e-4, u5 = 6.0426 mm, theta5 = -5.0750e-4, theta6 = -5.7658e-4 rad. Printed: 11.36, -3.141e-4, -3.652e-4, 14.05, -0.573e-4, -1.570e-4, 6.04, -5.070e-4, -5.759e-4. Cause: rounding in the source's hand calculation - its stiffness coefficients are carried with three or four significant figures and later results are computed from rounded earlier ones, so the last printed digit of its results is not reliable, while the policy counts every printed digit as significant. Evidence: the source's condensed stiffness coefficients carry three or four digits (0.00355, 4.961, 15.257e4); the exact solution of its printed assembled equations is u3 = 11.3665 mm, which the source prints truncated as 11.36. The differences are not caused by the area used here for 'axial deformation neglected': the engine's values change by less than 1e-6 relative between areas of 1e8 and 1e9 mm^2. The engine's results for this model are confirmed by the other tiers that apply (tier C: OpenSeesPy and PyNite agree with the engine; tier D: equilibrium and the other invariants pass); the difference is between the source's printed digits and the exact solution of the stated problem."
+ }
+}

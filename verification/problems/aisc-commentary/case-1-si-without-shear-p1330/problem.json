@@ -1,0 +1,47 @@
+{
+ "id": "case-1-si-without-shear-p1330",
+ "title": "AISC benchmark Case 1 (P-delta only), SI table, without shear deformation, P = 1330",
+ "tier": "B",
+ "source": {
+  "work": "ANSI/AISC 360-22, Specification for Structural Steel Buildings (American Institute of Steel Construction), Commentary",
+  "edition": "August 1, 2022",
+  "pages": "p. 16.1-337 (text p. 16.1-336 to 16.1-337)",
+  "notes": "input data and targets read on the cited page; nothing of the source is reproduced. Section properties of the W14x48 are not given by the source and are not taken from any table: I_x is calibrated on the source's own P = 0 deflection without shear deformation of Case 2, the shear flexibility on the source's P = 0 deflections with and without shear deformation (see build_problems.py and README.md)",
+  "location": "Commentary Section C2.1, Fig. C-C2.2 (benchmark problem Case 1), SI table, column P = 1330, values in brackets"
+ },
+ "basis": "published",
+ "analysis": "Case 1 of the source: simply supported beam-column (pin at the bottom, lateral roller at the loaded top) under a uniform transverse load of 2.92 kN/m and the axial compression P; targets: moment and deflection at midspan. Axial load level P = 1330 x 1000 N (load case P holds the unit axial load, the combination factor is the level). SI table: E = 200 000 MPa, L = 8.53 m, I = 2.01011e+08 mm^4 (calibrated, see source.notes), shear deformation excluded (the source's values in brackets). Member vertical along global Z, bending in the X-Z plane about local z (the section's Iz = Iy = I). Second-order analysis; the engine's member carries the exact stability functions, so one member is the exact solution of the second-order theory. The support idealisation is read from the source's sketch.",
+ "targets": [
+  {
+   "extract": "memberStation",
+   "member": "m",
+   "quantity": "Mz",
+   "relative": 0.5,
+   "value": -35400000.0,
+   "unit": "N mm",
+   "tolerance": {
+    "rel": 0.03
+   },
+   "precisionNote": "stated tolerance 0.03 on printed \"35.4\" x 1000000 (unit conversion / common factor of the source); acceptance criterion stated by the source on the same page (AISC 360-22 Commentary C2.1, p. 16.1-337): moments within 3 %, deflections within 5 %; value printed to 3 significant figures",
+   "sign": "magnitude in the source; in the engine's convention (member local x upward, local y = global +X, loads along +X) the midspan moment Mz of Case 1 is negative and the base moment of Case 2 positive"
+  },
+  {
+   "extract": "memberStation",
+   "member": "m",
+   "quantity": "uy",
+   "relative": 0.5,
+   "value": 6.63,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.05
+   },
+   "precisionNote": "stated tolerance 0.05 on printed \"6.63\"; acceptance criterion stated by the source on the same page (AISC 360-22 Commentary C2.1, p. 16.1-337): moments within 3 %, deflections within 5 %; value printed to 3 significant figures",
+   "sign": "magnitude in the source; the load acts along +X, deflection +X (local y)"
+  }
+ ],
+ "status": "quarantined",
+ "quarantine": {
+  "diagnosis": "Both targets are reproduced within the source's tolerance, and the engine agrees with the ODE oracle on this model (tier A, 1e-6 along the member). Tier C does not pass: engine and OpenSeesPy differ by 1.03e-3 in the rotation of the pinned end (allowed 1.03e-3; exceeded in the next digit). Tier C allows a difference of 1e-6 plus the ESTIMATED discretisation error of the foreign solver (OpenSeesPy with a linearised P-Delta transformation and a finite number of elements per member), which is an estimate and not a bound (docs/VERIFICATION.md, section 7); here the difference to OpenSeesPy exceeds the estimate by less than 1 %. The engine's result is the exact solution of the second-order member equations (it is the ODE oracle's), so the disagreement lies in the foreign solver's discretisation; but under the rule that nothing is published when a tier disagrees, this axial load level is quarantined. The levels below it, and all levels of the model with shear deformation (which the foreign solvers cannot represent, so that tier C does not apply), are active."
+ },
+ "limitsNote": "Section properties are calibrated on the source's own P = 0 values (the source gives none): the problem verifies the second-order amplification, not section properties."
+}

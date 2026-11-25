@@ -1,0 +1,107 @@
+{
+ "id": "space-truss-three-bars",
+ "title": "Three-bar space truss: bar forces",
+ "tier": "B",
+ "source": {
+  "work": "Bentley Systems, STAAD.Pro Help, Verification Examples (public documentation, docs.bentley.com)",
+  "edition": "STAAD.Pro Help v21 build (pages refer to the STAAD.Pro 2023 sample files), read 2026-11-22",
+  "location": "'V. Axial Stress on a Truss Model' (https://docs.bentley.com/LiveContent/web/STAAD.Pro%20Help-v21/en/GUID-ABE6D61C-8A85-4C02-A566-E2D6D9BD1942.html)",
+  "pages": "web page",
+  "notes": "problem statement taken from the vendor page (text and input listing). The page cites: Beer and Johnston, Vector Mechanics for Engineers, Statics and Dynamics, 1962, p. 47, problem 2.70 - NOT opened for this project; no number is taken from it. The page's 'theory' values are recorded as printed; the program's own results are not used."
+ },
+ "basis": "recomputed-from-published-statement",
+ "analysis": "Space truss: three bars from the pinned joints 1 (0, 0, 0), 2 (8, 0, 0), 3 (0, 6, 0) ft to the joint 4 (4, 2, 6) ft; A = 1 in^2, E = 30e6 psi; 50 lb along +Z at joint 4 (away from the plane of the supports). The page prints the bar stresses; with A = 1 in^2 they equal the bar forces in lb. Statically determinate. Units lb, in. Reference values: computed here from this statement (verification/derive/vendor_reference.py); the textbook cited by the vendor page was not opened and no number is taken from it.",
+ "targets": [
+  {
+   "extract": "memberStation",
+   "member": "m1",
+   "quantity": "N",
+   "relative": 0.5,
+   "value": 10.393492741038726,
+   "unit": "lbf",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (space truss program); tolerance = policy floor 1e-6",
+   "sign": "tension positive"
+  },
+  {
+   "extract": "memberStation",
+   "member": "m2",
+   "quantity": "N",
+   "relative": 0.5,
+   "value": 31.180478223116182,
+   "unit": "lbf",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (space truss program); tolerance = policy floor 1e-6",
+   "sign": "tension positive"
+  },
+  {
+   "extract": "memberStation",
+   "member": "m3",
+   "quantity": "N",
+   "relative": 0.5,
+   "value": 22.906142364542564,
+   "unit": "lbf",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (space truss program); tolerance = policy floor 1e-6",
+   "sign": "tension positive"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n4",
+   "dof": "uz",
+   "value": 9.928434773954971e-05,
+   "unit": "in",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (space truss program); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "m1",
+   "quantity": "N",
+   "relative": 0.5,
+   "value": 10.4,
+   "unit": "lbf",
+   "tolerance": {
+    "rel": 0.004807692307692308
+   },
+   "precisionNote": "printed \"10.4\"; tolerance = half a unit in the last printed digit; printed bar stress in psi; A = 1 in^2",
+   "sign": "tension positive"
+  },
+  {
+   "extract": "memberStation",
+   "member": "m2",
+   "quantity": "N",
+   "relative": 0.5,
+   "value": 31.2,
+   "unit": "lbf",
+   "tolerance": {
+    "rel": 0.0016025641025641027
+   },
+   "precisionNote": "printed \"31.2\"; tolerance = half a unit in the last printed digit; printed bar stress in psi; A = 1 in^2",
+   "sign": "tension positive"
+  },
+  {
+   "extract": "memberStation",
+   "member": "m3",
+   "quantity": "N",
+   "relative": 0.5,
+   "value": 22.9,
+   "unit": "lbf",
+   "tolerance": {
+    "rel": 0.0021834061135371182
+   },
+   "precisionNote": "printed \"22.9\"; tolerance = half a unit in the last printed digit; printed bar stress in psi; A = 1 in^2",
+   "sign": "tension positive"
+  }
+ ],
+ "status": "active"
+}

@@ -1,0 +1,41 @@
+{
+ "id": "ex-2-3-truss-prescribed-displacement",
+ "title": "Force needed for a prescribed joint displacement of a two-bar truss",
+ "tier": "B",
+ "source": {
+  "work": "McGuire, W., Gallagher, R. H., Ziemian, R. D., Matrix Structural Analysis",
+  "edition": "2nd edition (copyright 2014 R. D. Ziemian)",
+  "location": "Example 2.3",
+  "pages": "pp. 23-24",
+  "notes": "input data and targets read on the cited pages; nothing of the source is reproduced"
+ },
+ "basis": "published",
+ "analysis": "Pin-jointed plane truss in the x-y plane (global Y vertical): members of type 'truss'; the out-of-plane translation of every joint is held by a support (it has no stiffness in a plane truss). Joint a at the origin, pinned supports b (2, 2) m and c (-4, 2) m (printed dimensions 4 m, 2 m, 2 m). A_ab = 1000 mm^2, A_ac = 4000 mm^2, E = 200,000 MPa. Joint a is moved 5 mm vertically downward with no horizontal displacement: modelled as a support at a (ux, uy) with the imposed displacement uy = -5 mm; the force the source asks for is the reaction of that support. First order.",
+ "targets": [
+  {
+   "extract": "reaction",
+   "node": "a",
+   "component": "Fx",
+   "value": 181.0,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.00027624309392265195
+   },
+   "precisionNote": "printed \"181.0\"; tolerance = half a unit in the last printed digit",
+   "sign": "the source's required force P on joint a = the engine's reaction at a (force on the structure)"
+  },
+  {
+   "extract": "reaction",
+   "node": "a",
+   "component": "Fy",
+   "value": -355.7,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.00014056789429294352
+   },
+   "precisionNote": "printed \"355.7\"; tolerance = half a unit in the last printed digit; printed -355.7",
+   "sign": "the source's required force P on joint a = the engine's reaction at a (force on the structure)"
+  }
+ ],
+ "status": "active"
+}

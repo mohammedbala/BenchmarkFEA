@@ -1,0 +1,92 @@
+{
+ "id": "frame-9-first-order-displacements-right",
+ "title": "Ziemian frame 9 (two-storey two-bay frame, gravity loads only): first-order joint displacements, case 'right'",
+ "tier": "B",
+ "source": {
+  "work": "C. W. Ziemian, R. D. Ziemian, Steel benchmark frames for structural analysis and validation studies: Finite element models and numerical simulation data, Data in Brief 39 (2021) 107564, doi:10.1016/j.dib.2021.107564, with the data set on Mendeley Data, doi:10.17632/39sjhchwtx.1",
+  "edition": "data set version 1 (2021), licence CC BY 4.0",
+  "location": "Frame 9: 'FEA Model Details_All frames.xlsx', tab 'Frame 9'; 'Simulation Results_All frames.xlsx', tab 'Frame 9', columns LA / Right",
+  "pages": "article Tables 2 and 3 (modelling and analysis conditions); 'Description Of Frames.pdf'",
+  "notes": "C. W. Ziemian and R. D. Ziemian, 'Steel benchmark frames for structural analysis and validation studies: Finite element models and numerical simulation data', Data in Brief 39 (2021) 107564, doi:10.1016/j.dib.2021.107564; data set: Mendeley Data, doi:10.17632/39sjhchwtx.1; licence CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). The model data of this frame are reproduced from the data set under that licence, converted to this project's input format (changes: 4 elements per member merged into one member, plane model embedded in 3D, 0.8 E entered as the modulus)."
+ },
+ "basis": "published",
+ "analysis": "Frame 9 of the data set (two-storey two-bay frame, gravity loads only), units kip and inch. Plane frame in the global X-Y plane (Y vertical); the out-of-plane DOFs (uz, rx, ry) of every node are held (the data set's frames are 'fully braced out-of-plane'); in-plane bending about local z, so the data set's Izz is the section's Iz. Modulus 0.8 E = 23200 ksi (the data set's condition for all elastic analyses; its element table points to E = 29000 ksi, the published results correspond to 0.8 E - verified for this frame with the first-order displacements). No shear deformation. A straight line of the data set's elements is one member here, the loads at its interior nodes are point loads on the member. The data set's model is plane (no out-of-plane buckling of a member between joints); the engine's member is spatial, so Iy = 1000 Izz is entered for every section instead of the listed Iyy: no out-of-plane mode can precede the in-plane behaviour compared, and Iy does not enter the in-plane results. Case 'Right' of the data set: imperfect geometry with every node at x + y/500, lateral loads acting toward +x. First-order (linear) analysis: the data set's 'LA'. ",
+ "targets": [
+  {
+   "extract": "nodeDisplacement",
+   "node": "n13",
+   "dof": "ux",
+   "value": -0.269,
+   "unit": "in",
+   "tolerance": {
+    "rel": 0.0018587360594795538
+   },
+   "precisionNote": "printed \"-0.269\"; tolerance = half a unit in the last printed digit; number as displayed by the data set's spreadsheet (cell format 0.000); stored value -0.26850954499709845",
+   "sign": "same as the data set: displacement along +x (to the right) positive"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n17",
+   "dof": "ux",
+   "value": -0.268,
+   "unit": "in",
+   "tolerance": {
+    "rel": 0.0018656716417910447
+   },
+   "precisionNote": "printed \"-0.268\"; tolerance = half a unit in the last printed digit; number as displayed by the data set's spreadsheet (cell format 0.000); stored value -0.2681934000300104",
+   "sign": "same as the data set: displacement along +x (to the right) positive"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n21",
+   "dof": "ux",
+   "value": -0.238,
+   "unit": "in",
+   "tolerance": {
+    "rel": 0.002100840336134454
+   },
+   "precisionNote": "printed \"-0.238\"; tolerance = half a unit in the last printed digit; number as displayed by the data set's spreadsheet (cell format 0.000); stored value -0.23750127406485855",
+   "sign": "same as the data set: displacement along +x (to the right) positive"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n31",
+   "dof": "ux",
+   "value": -0.52,
+   "unit": "in",
+   "tolerance": {
+    "rel": 0.0009615384615384615
+   },
+   "precisionNote": "printed \"-0.520\"; tolerance = half a unit in the last printed digit; number as displayed by the data set's spreadsheet (cell format 0.000); stored value -0.519866240804161",
+   "sign": "same as the data set: displacement along +x (to the right) positive"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n35",
+   "dof": "ux",
+   "value": -0.521,
+   "unit": "in",
+   "tolerance": {
+    "rel": 0.0009596928982725527
+   },
+   "precisionNote": "printed \"-0.521\"; tolerance = half a unit in the last printed digit; number as displayed by the data set's spreadsheet (cell format 0.000); stored value -0.5206757990418354",
+   "sign": "same as the data set: displacement along +x (to the right) positive"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "n39",
+   "dof": "ux",
+   "value": -0.583,
+   "unit": "in",
+   "tolerance": {
+    "rel": 0.0008576329331046313
+   },
+   "precisionNote": "printed \"-0.583\"; tolerance = half a unit in the last printed digit; number as displayed by the data set's spreadsheet (cell format 0.000); stored value -0.583376911105245",
+   "sign": "same as the data set: displacement along +x (to the right) positive"
+  }
+ ],
+ "status": "quarantined",
+ "quarantine": {
+  "diagnosis": "One of six targets missed by 1.002 times the tolerance, at a rounding boundary: joint 21, stored value -0.2375013 in, displayed -0.238; engine -0.2374990 in. The engine differs from the stored value by 2.3e-6 in (9.5e-6 relative, the size of the rounding of the listed loads, see frame-9-first-order-moments-right), which moves it to the other side of the rounding boundary -0.2375 of the displayed number; the policy compares with the number as displayed. The other five displacements are reproduced."
+ }
+}

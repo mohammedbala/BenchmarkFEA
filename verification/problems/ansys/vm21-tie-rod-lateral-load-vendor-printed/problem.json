@@ -1,0 +1,48 @@
+{
+ "id": "vm21-tie-rod-lateral-load-vendor-printed",
+ "title": "Tie rod with uniform lateral load: deflection, end slope and moment, with and without the tensile force - values printed by the vendor that do not reproduce",
+ "tier": "B",
+ "source": {
+  "work": "ANSYS, Inc., Mechanical APDL Verification Manual (public help site ansyshelp.ansys.com)",
+  "edition": "Release 2025 R2, read 2026-11-22",
+  "location": "VM21, 'Tie Rod with Lateral Loading' (https://ansyshelp.ansys.com/public/Views/Secured/corp/v252/en/ans_vm/Hlp_V_VM21.html)",
+  "pages": "web page",
+  "notes": "problem statement taken from the vendor page (text; the sketch was not readable). The page cites: Timoshenko, Strength of Materials, Part II, 3rd ed. 1956, p. 42, article 6 - NOT opened for this project; no number is taken from it. The page's 'Target' values are recorded as printed; the program's own results are not used."
+ },
+ "basis": "published",
+ "analysis": "Plane problem in the global X-Y plane (Y vertical); the out-of-plane DOFs (uz, rx, ry) of every node are held; in-plane bending about local z. Rod of 200 in, square section 2.5 in x 2.5 in (A = 6.25 in^2, I = 3.2552 in^4), E = 30e6 psi, uniform lateral load 1.79253 lb/in, tensile force 21,972.6 lb. Supports: both ends held laterally and free to rotate, one end free to move axially - the page's text asks for the slope at the end and uses symmetry about midspan (the sketch was not readable). Combination 'stiffened': second-order analysis with the tensile force (exact stability functions for tension); 'unstiffened': first-order analysis of the lateral load alone. Same model as problem 'vm21-tie-rod-lateral-load' (whose recomputed targets are active); the targets here are the vendor's printed values only.",
+ "targets": [
+  {
+   "extract": "memberStation",
+   "member": "m",
+   "quantity": "Mz",
+   "relative": 0.5,
+   "combination": "stiffened",
+   "value": 4580.1,
+   "unit": "lbf in",
+   "tolerance": {
+    "rel": 1.091679220977708e-05
+   },
+   "precisionNote": "printed \"4580.1\"; tolerance = half a unit in the last printed digit",
+   "sign": "printed negative; sign from the reference solution, engine convention (docs/CONVENTIONS.md); the page's sign convention is not stated"
+  },
+  {
+   "extract": "memberStation",
+   "member": "m",
+   "quantity": "Mz",
+   "relative": 0.5,
+   "combination": "unstiffened",
+   "value": 8962.7,
+   "unit": "lbf in",
+   "tolerance": {
+    "rel": 5.578676068595401e-06
+   },
+   "precisionNote": "printed \"8962.7\"; tolerance = half a unit in the last printed digit",
+   "sign": "printed negative; sign from the reference solution, engine convention (docs/CONVENTIONS.md); the page's sign convention is not stated"
+  }
+ ],
+ "status": "quarantined",
+ "quarantine": {
+  "diagnosis": "Both printed moments are missed at the boundary of the tolerance (1.015 and 1.0002 times half a unit of the last printed digit). (1) Stiffened: engine 4580.1507 lb in, printed 4580.1 - the page's value is the exact value cut off after the first decimal rather than rounded (4580.15 rounds to 4580.2); difference 0.0507 against the tolerance 0.05. (2) Unstiffened: the exact value is p L^2 / 8 = 1.79253 x 200^2 / 8 = 8962.65 lb in, exactly half a unit from the printed 8962.7; the comparison in floating point (8962.7 is not representable) falls on the failing side by 2e-11 of the value. The ODE oracle and the engine agree to 1e-12 on 4580.1507 and 8962.65. The page's other four values (deflections and end slopes, five significant figures) reproduce and are targets of the active problem."
+ }
+}

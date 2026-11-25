@@ -1,0 +1,522 @@
+{
+ "formatVersion": "1.0.0",
+ "name": "pipe rack model",
+ "units": {
+  "force": "kip",
+  "length": "in"
+ },
+ "conventions": {
+  "verticalAxis": "Z"
+ },
+ "nodes": {
+  "AL0": {
+   "x": 0,
+   "y": 0,
+   "z": 0
+  },
+  "AL1": {
+   "x": 0,
+   "y": 0,
+   "z": 192
+  },
+  "AR0": {
+   "x": 0,
+   "y": 216,
+   "z": 0
+  },
+  "AR1": {
+   "x": 0,
+   "y": 216,
+   "z": 192
+  },
+  "BL0": {
+   "x": 192,
+   "y": 0,
+   "z": 0
+  },
+  "BL1": {
+   "x": 192,
+   "y": 0,
+   "z": 192
+  },
+  "BR0": {
+   "x": 192,
+   "y": 216,
+   "z": 0
+  },
+  "BR1": {
+   "x": 192,
+   "y": 216,
+   "z": 192
+  }
+ },
+ "supports": {
+  "AL0": {
+   "type": "pinned",
+   "dofs": {
+    "rz": "fixed"
+   }
+  },
+  "AR0": {
+   "type": "pinned",
+   "dofs": {
+    "rz": "fixed"
+   }
+  },
+  "BL0": {
+   "type": "pinned",
+   "dofs": {
+    "rz": "fixed"
+   }
+  },
+  "BR0": {
+   "type": "pinned",
+   "dofs": {
+    "rz": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "steel": {
+   "description": "structural steel (nominal properties)",
+   "E": 29000,
+   "G": 11200,
+   "Fy": 50,
+   "Fu": 65,
+   "unitWeight": 0.000284
+  }
+ },
+ "sections": {
+  "I-4x4x0.3x0.2": {
+   "type": "I",
+   "d": 4,
+   "bf": 4,
+   "tf": 0.3,
+   "tw": 0.2,
+   "r": 0.25
+  },
+  "I-10x5x0.35x0.25": {
+   "type": "I",
+   "d": 10,
+   "bf": 5,
+   "tf": 0.35,
+   "tw": 0.25,
+   "r": 0.4
+  },
+  "Box-2x2x0.12": {
+   "type": "box",
+   "H": 2,
+   "B": 2,
+   "t": 0.12
+  },
+  "Box-1.5x1.5x0.12": {
+   "type": "box",
+   "H": 1.5,
+   "B": 1.5,
+   "t": 0.12
+  }
+ },
+ "members": {
+  "CAL1": {
+   "i": "AL0",
+   "j": "AL1",
+   "section": "I-4x4x0.3x0.2",
+   "material": "steel",
+   "orientation": {
+    "roll": 90
+   }
+  },
+  "CAR1": {
+   "i": "AR0",
+   "j": "AR1",
+   "section": "I-4x4x0.3x0.2",
+   "material": "steel",
+   "orientation": {
+    "roll": 90
+   }
+  },
+  "TA1": {
+   "i": "AL1",
+   "j": "AR1",
+   "section": "I-10x5x0.35x0.25",
+   "material": "steel",
+   "releases": {
+    "i": {
+     "ry": true
+    },
+    "j": {
+     "ry": true
+    }
+   }
+  },
+  "CBL1": {
+   "i": "BL0",
+   "j": "BL1",
+   "section": "I-4x4x0.3x0.2",
+   "material": "steel",
+   "orientation": {
+    "roll": 90
+   },
+   "releases": {
+    "i": {
+     "ry": true,
+     "rz": true
+    }
+   }
+  },
+  "CBR1": {
+   "i": "BR0",
+   "j": "BR1",
+   "section": "I-4x4x0.3x0.2",
+   "material": "steel",
+   "orientation": {
+    "roll": 90
+   }
+  },
+  "TB1": {
+   "i": "BL1",
+   "j": "BR1",
+   "section": "I-10x5x0.35x0.25",
+   "material": "steel",
+   "releases": {
+    "i": {
+     "ry": true
+    },
+    "j": {
+     "ry": true
+    }
+   }
+  },
+  "SAL1": {
+   "i": "AL1",
+   "j": "BL1",
+   "section": "Box-2x2x0.12",
+   "material": "steel",
+   "releases": {
+    "i": {
+     "ry": true,
+     "rz": true
+    },
+    "j": {
+     "rx": true,
+     "ry": true,
+     "rz": true
+    }
+   }
+  },
+  "SAR1": {
+   "i": "AR1",
+   "j": "BR1",
+   "section": "Box-2x2x0.12",
+   "material": "steel",
+   "releases": {
+    "i": {
+     "ry": true,
+     "rz": true
+    },
+    "j": {
+     "rx": true,
+     "ry": true,
+     "rz": true
+    }
+   }
+  },
+  "XL1": {
+   "type": "truss",
+   "i": "AL0",
+   "j": "BL1",
+   "section": "Box-1.5x1.5x0.12",
+   "material": "steel"
+  },
+  "XR1": {
+   "type": "truss",
+   "i": "AR0",
+   "j": "BR1",
+   "section": "Box-1.5x1.5x0.12",
+   "material": "steel"
+  }
+ },
+ "loadCases": {
+  "D": {
+   "description": "self weight and empty pipes",
+   "loads": [
+    {
+     "type": "selfWeight"
+    },
+    {
+     "type": "memberPoint",
+     "member": "TA1",
+     "direction": "Z",
+     "value": -0.9,
+     "position": 0.25
+    },
+    {
+     "type": "memberPoint",
+     "member": "TA1",
+     "direction": "Z",
+     "value": -0.9,
+     "position": 0.5
+    },
+    {
+     "type": "memberPoint",
+     "member": "TA1",
+     "direction": "Z",
+     "value": -0.9,
+     "position": 0.75
+    },
+    {
+     "type": "memberPoint",
+     "member": "TB1",
+     "direction": "Z",
+     "value": -0.9,
+     "position": 0.25
+    },
+    {
+     "type": "memberPoint",
+     "member": "TB1",
+     "direction": "Z",
+     "value": -0.9,
+     "position": 0.5
+    },
+    {
+     "type": "memberPoint",
+     "member": "TB1",
+     "direction": "Z",
+     "value": -0.9,
+     "position": 0.75
+    }
+   ]
+  },
+  "O": {
+   "description": "pipe contents (operating)",
+   "loads": [
+    {
+     "type": "memberPoint",
+     "member": "TA1",
+     "direction": "Z",
+     "value": -1.4,
+     "position": 0.25
+    },
+    {
+     "type": "memberPoint",
+     "member": "TA1",
+     "direction": "Z",
+     "value": -1.4,
+     "position": 0.5
+    },
+    {
+     "type": "memberPoint",
+     "member": "TA1",
+     "direction": "Z",
+     "value": -1.4,
+     "position": 0.75
+    },
+    {
+     "type": "memberPoint",
+     "member": "TB1",
+     "direction": "Z",
+     "value": -1.4,
+     "position": 0.25
+    },
+    {
+     "type": "memberPoint",
+     "member": "TB1",
+     "direction": "Z",
+     "value": -1.4,
+     "position": 0.5
+    },
+    {
+     "type": "memberPoint",
+     "member": "TB1",
+     "direction": "Z",
+     "value": -1.4,
+     "position": 0.75
+    }
+   ]
+  },
+  "F": {
+   "description": "pipe friction along the rack",
+   "loads": [
+    {
+     "type": "memberPoint",
+     "member": "TA1",
+     "direction": "X",
+     "value": 0.7,
+     "position": 0.25
+    },
+    {
+     "type": "memberPoint",
+     "member": "TA1",
+     "direction": "X",
+     "value": 0.7,
+     "position": 0.5
+    },
+    {
+     "type": "memberPoint",
+     "member": "TA1",
+     "direction": "X",
+     "value": 0.7,
+     "position": 0.75
+    },
+    {
+     "type": "memberPoint",
+     "member": "TB1",
+     "direction": "X",
+     "value": 0.7,
+     "position": 0.25
+    },
+    {
+     "type": "memberPoint",
+     "member": "TB1",
+     "direction": "X",
+     "value": 0.7,
+     "position": 0.5
+    },
+    {
+     "type": "memberPoint",
+     "member": "TB1",
+     "direction": "X",
+     "value": 0.7,
+     "position": 0.75
+    }
+   ]
+  },
+  "W": {
+   "description": "transverse wind",
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "AL1",
+     "Fy": 0.5
+    },
+    {
+     "type": "memberDistributed",
+     "member": "CAL1",
+     "direction": "Y",
+     "w1": 0
+    },
+    {
+     "type": "memberDistributed",
+     "member": "CAR1",
+     "direction": "Y",
+     "w1": 0
+    },
+    {
+     "type": "nodal",
+     "node": "BL1",
+     "Fy": 0.5
+    },
+    {
+     "type": "memberDistributed",
+     "member": "CBL1",
+     "direction": "Y",
+     "w1": 0
+    },
+    {
+     "type": "memberDistributed",
+     "member": "CBR1",
+     "direction": "Y",
+     "w1": 0
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "ULS1": {
+   "factors": {
+    "D": 1.4,
+    "O": 1.4,
+    "F": 1.4
+   }
+  },
+  "SLS1": {
+   "factors": {
+    "D": 1,
+    "O": 1
+   },
+   "purpose": "serviceability"
+  },
+  "ULS2": {
+   "factors": {
+    "D": 1.2,
+    "O": 1.2,
+    "W": 1
+   }
+  },
+  "ULS3": {
+   "factors": {
+    "D": 0.9,
+    "W": 1
+   }
+  },
+  "SLS2": {
+   "factors": {
+    "D": 1,
+    "O": 1,
+    "W": 0.6
+   },
+   "purpose": "serviceability"
+  }
+ },
+ "analysis": {
+  "shearDeformation": false
+ },
+ "design": {
+  "defaults": {
+   "method": "LRFD"
+  },
+  "groups": {
+   "columns": {
+    "members": [
+     "CAL1",
+     "CAR1",
+     "CBL1",
+     "CBR1"
+    ],
+    "role": "column",
+    "Kx": 1.5,
+    "Ky": 1.0
+   },
+   "tierBeams": {
+    "members": [
+     "TA1",
+     "TB1"
+    ],
+    "role": "beam",
+    "bracing": {
+     "topFlange": [
+      0.25,
+      0.5,
+      0.75
+     ],
+     "bottomFlange": [
+      0.5
+     ]
+    },
+    "deflectionLimits": [
+     {
+      "spanRatio": 240,
+      "direction": "y",
+      "combinations": [
+       "SLS1"
+      ]
+     }
+    ]
+   },
+   "struts": {
+    "members": [
+     "SAL1",
+     "SAR1"
+    ],
+    "role": "beam"
+   },
+   "braces": {
+    "members": [
+     "XL1",
+     "XR1"
+    ],
+    "role": "brace"
+   }
+  }
+ }
+}

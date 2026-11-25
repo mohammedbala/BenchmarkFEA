@@ -1,0 +1,88 @@
+{
+ "id": "continuous-beam-settlement",
+ "title": "Two-span continuous beam: support settlement and uniform load",
+ "tier": "A",
+ "source": {
+  "work": "derived here (no publication): benchfea.oracle direct integration of the member equations / numerically solved characteristic equation",
+  "edition": "",
+  "location": "verification/derive/derive_problems.py, problem 'continuous-beam-settlement'",
+  "pages": "",
+  "notes": "regenerate with: python3 verification/derive/derive_problems.py"
+ },
+ "basis": "derived-here",
+ "analysis": "First order, no shear deformation. Spans 5 m + 5 m on three supports; the middle support settles 10 mm; uniform load 6 kN/m on the first span.",
+ "targets": [
+  {
+   "path": "/combinations/C/reactions/a/Fz",
+   "value": 22.724999999999998,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "path": "/combinations/C/reactions/b/Fz",
+   "value": -0.45000000000000284,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "path": "/combinations/C/reactions/c/Fz",
+   "value": 7.725,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "path": "/combinations/C/displacements/b/ry",
+   "value": -0.0003906249999999999,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "extract": "memberStation",
+   "combination": "C",
+   "member": "m1",
+   "quantity": "Mz",
+   "relative": 1.0,
+   "side": "left",
+   "value": 38.62500000000001,
+   "unit": "kN m",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "extract": "memberStation",
+   "combination": "C",
+   "member": "m1",
+   "quantity": "uy",
+   "relative": 0.5,
+   "side": "left",
+   "value": -0.0077294921875,
+   "unit": "m",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  },
+  {
+   "extract": "memberStation",
+   "combination": "C",
+   "member": "m2",
+   "quantity": "uy",
+   "relative": 0.5,
+   "side": "left",
+   "value": -0.0065087890625,
+   "unit": "m",
+   "tolerance": {
+    "rel": 1e-06
+   }
+  }
+ ],
+ "status": "active"
+}

@@ -1,0 +1,226 @@
+{
+ "name": "staad/two-bay-frame-beam-forces",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kip",
+  "length": "in"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "n1": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n2": {
+   "x": 216.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n3": {
+   "x": 432.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n4": {
+   "x": 0.0,
+   "y": 120.0,
+   "z": 0.0
+  },
+  "n5": {
+   "x": 216.0,
+   "y": 120.0,
+   "z": 0.0
+  },
+  "n6": {
+   "x": 432.0,
+   "y": 120.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "n1": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed",
+    "ux": "fixed",
+    "uy": "fixed",
+    "rz": "fixed"
+   }
+  },
+  "n2": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed",
+    "ux": "fixed",
+    "uy": "fixed"
+   }
+  },
+  "n3": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed",
+    "ux": "fixed",
+    "uy": "fixed",
+    "rz": "fixed"
+   }
+  },
+  "n4": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "n5": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "n6": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 30000.0,
+   "nu": 0.3
+  }
+ },
+ "sections": {
+  "col": {
+   "type": "properties",
+   "A": 10000000.0,
+   "Iz": 13824.0,
+   "Iy": 13824.0,
+   "J": 13824.0
+  },
+  "beam": {
+   "type": "properties",
+   "A": 10000000.0,
+   "Iz": 27000.0,
+   "Iy": 27000.0,
+   "J": 27000.0
+  }
+ },
+ "members": {
+  "c1": {
+   "i": "n1",
+   "j": "n4",
+   "section": "col",
+   "material": "M"
+  },
+  "c2": {
+   "i": "n2",
+   "j": "n5",
+   "section": "col",
+   "material": "M"
+  },
+  "c3": {
+   "i": "n3",
+   "j": "n6",
+   "section": "col",
+   "material": "M"
+  },
+  "a": {
+   "i": "n4",
+   "j": "n5",
+   "section": "beam",
+   "material": "M",
+   "releases": {
+    "i": {
+     "rz": true
+    }
+   }
+  },
+  "b": {
+   "i": "n5",
+   "j": "n6",
+   "section": "beam",
+   "material": "M",
+   "releases": {
+    "j": {
+     "rz": true
+    }
+   }
+  }
+ },
+ "loadCases": {
+  "P": {
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "n4",
+     "Fy": -50.0
+    },
+    {
+     "type": "nodal",
+     "node": "n6",
+     "Fy": -50.0
+    },
+    {
+     "type": "nodal",
+     "node": "n5",
+     "Fy": -100.0
+    },
+    {
+     "type": "memberPoint",
+     "member": "a",
+     "direction": "Y",
+     "value": -100.0,
+     "position": 0.5
+    },
+    {
+     "type": "memberPoint",
+     "member": "b",
+     "direction": "Y",
+     "value": -100.0,
+     "position": 0.5
+    }
+   ]
+  },
+  "W": {
+   "loads": [
+    {
+     "type": "memberDistributed",
+     "member": "a",
+     "direction": "Y",
+     "w1": -0.8333333333333334
+    },
+    {
+     "type": "memberDistributed",
+     "member": "b",
+     "direction": "Y",
+     "w1": -0.8333333333333334
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "LC1": {
+   "factors": {
+    "P": 1.0
+   }
+  },
+  "LC2": {
+   "factors": {
+    "W": 1.0
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": false,
+  "resultStations": 3
+ }
+}

@@ -1,0 +1,33 @@
+{
+ "id": "two-storey-frame-lateral-loads-vendor-printed",
+ "title": "One-bay two-storey frame under lateral joint loads - values printed by the vendor that do not reproduce",
+ "tier": "B",
+ "source": {
+  "work": "Bentley Systems, STAAD.Pro Help, Verification Examples (public documentation, docs.bentley.com)",
+  "edition": "STAAD.Pro Help v21 build (pages refer to the STAAD.Pro 2023 sample files), read 2026-11-22",
+  "location": "'V. 1x2 Plane Frame Lateral Load' (https://docs.bentley.com/LiveContent/web/STAAD.Pro%20Help-v21/en/GUID-F24F1D5A-40F6-410E-91EA-A9F842327F1F.html)",
+  "pages": "web page",
+  "notes": "problem statement taken from the vendor page (text and input listing). The page cites: McCormac, Structural Analysis, 3rd ed. 1975, p. 388, example 22-7 - NOT opened for this project; no number is taken from it. The page's 'theory' values are recorded as printed; the program's own results are not used."
+ },
+ "basis": "published",
+ "analysis": "Plane problem in the global X-Y plane (Y vertical); the out-of-plane DOFs (uz, rx, ry) of every node are held; in-plane bending about local z. Bay 20 ft, two storeys of 20 ft, fixed bases, all members A = 0.2 ft^2, I = 0.1 ft^4, E = 4.176e6 kip/ft^2; 20 kip at the first level and 10 kip at the roof, on the left column line, toward +X. Units kip, ft. First-order analysis with axial deformation. Target of the page: the largest moment, in the lower left column (member 1 of the listing). Same model as problem 'two-storey-frame-lateral-loads' (whose recomputed targets are active); the targets here are the vendor's printed values only.",
+ "targets": [
+  {
+   "extract": "memberExtreme",
+   "member": "m1",
+   "quantity": "Mz",
+   "kind": "absmax",
+   "value": 176.4,
+   "unit": "kip ft",
+   "tolerance": {
+    "rel": 2.8344671201814057e-05
+   },
+   "precisionNote": "printed \"176.40\"; tolerance = half a unit in the last printed digit; the page's 'theory' value of the largest moment (lower left column)",
+   "sign": "magnitude"
+  }
+ ],
+ "status": "quarantined",
+ "quarantine": {
+  "diagnosis": "Missed by 9.1e-3 relative: engine 178.007 kip ft, printed 176.40. The page's 'theory' value is a hand calculation that neglects axial deformation: the reference program with EA x 1e6 gives 176.364 kip ft, which rounds to the printed value; with the axial stiffness of the statement (A = 0.2 ft^2) it gives 178.007 kip ft = engine to 1e-9. The program result printed on the same page is 178.01 (the page itself reports a difference of 0.9 %)."
+ }
+}

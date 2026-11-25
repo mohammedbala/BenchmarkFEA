@@ -1,0 +1,89 @@
+{
+ "id": "ex-5-11-beam-settlement",
+ "title": "Two-span beam: settlement of the interior support",
+ "tier": "B",
+ "source": {
+  "work": "McGuire, W., Gallagher, R. H., Ziemian, R. D., Matrix Structural Analysis",
+  "edition": "2nd edition (copyright 2014 R. D. Ziemian)",
+  "location": "Example 5.11",
+  "pages": "pp. 124-125",
+  "notes": "input data and targets read on the cited pages; nothing of the source is reproduced"
+ },
+ "basis": "published",
+ "analysis": "Plane (x-y) problem of the source modelled in 3D with the global Y axis vertical, so that the source's x, y and theta_z are the model's X, Y and rz. In-plane bending is about local z for every member (default orientation), hence the source's I is the section's Iz. Beam of Example 4.8 along x: a (0), b (8 m), c (13 m). ab: A = 6e3 mm^2, Iz = 200e6 mm^4, J = 300e3 mm^4; bc: A = 4e3 mm^2, Iz = 50e6 mm^4, J = 100e3 mm^4; E = 200,000 MPa, nu = 0.3. The source omits bending normal to the plane: Iy is a placeholder (= Iz) that does not influence the targets. Supports as Example 5.6 (a pin, b roller, c fixed). Support b settles 15 mm (imposed uy = -15 mm); no other load. First order.",
+ "targets": [
+  {
+   "extract": "nodeDisplacement",
+   "node": "a",
+   "dof": "rz",
+   "value": -0.002984,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 0.00016756032171581767
+   },
+   "precisionNote": "printed \"0.002984\"; tolerance = half a unit in the last printed digit; printed -0.002984",
+   "sign": "moment / rotation about z, counter-clockwise positive in the source = rz / Mz of the engine"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "b",
+   "dof": "rz",
+   "value": 0.000342,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 0.0014619883040935672
+   },
+   "precisionNote": "printed \"0.000342\"; tolerance = half a unit in the last printed digit",
+   "sign": "moment / rotation about z, counter-clockwise positive in the source = rz / Mz of the engine"
+  },
+  {
+   "extract": "reaction",
+   "node": "a",
+   "component": "Fy",
+   "value": 4.16,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.001201923076923077
+   },
+   "precisionNote": "printed \"4.16\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "b",
+   "component": "Fy",
+   "value": -17.74,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.00028184892897406994
+   },
+   "precisionNote": "printed \"17.74\"; tolerance = half a unit in the last printed digit; printed -17.74",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "c",
+   "component": "Fy",
+   "value": 13.58,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.0003681885125184094
+   },
+   "precisionNote": "printed \"13.58\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "c",
+   "component": "Mz",
+   "value": -34630.0,
+   "unit": "kN mm",
+   "tolerance": {
+    "rel": 0.00014438348252959862
+   },
+   "precisionNote": "printed \"34.63e3\"; tolerance = half a unit in the last printed digit; printed -34.63 x 10^3 kNmm",
+   "sign": "moment / rotation about z, counter-clockwise positive in the source = rz / Mz of the engine"
+  }
+ ],
+ "status": "active"
+}

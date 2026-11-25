@@ -1,0 +1,56 @@
+{
+ "id": "ex-9-6-portal-first-order",
+ "title": "Unsymmetrically loaded pin-based portal frame: first-order moments",
+ "tier": "B",
+ "source": {
+  "work": "McGuire, W., Gallagher, R. H., Ziemian, R. D., Matrix Structural Analysis",
+  "edition": "2nd edition (copyright 2014 R. D. Ziemian)",
+  "location": "Example 9.6, part 2, moment diagram for Eq. 8.1",
+  "pages": "p. 252",
+  "notes": "input data and targets read on the cited pages; nothing of the source is reproduced"
+ },
+ "basis": "published",
+ "analysis": "Plane (x-y) problem of the source modelled in 3D with the global Y axis vertical, so that the source's x, y and theta_z are the model's X, Y and rz. In-plane bending is about local z for every member (default orientation), hence the source's I is the section's Iz. Units kip, in. a (0, 0), b (0, 24 ft), c (20 ft, 24 ft), d (60 ft, 24 ft), e (60 ft, 0); a and e pinned. Columns ab, ed: A = 13.3 in^2, I = 248 in^4; girder bc-cd: A = 24.8 in^2, I = 2850 in^4; E = 29,000 ksi. Loads: 6 kips along +x at b, 60 kips downward at c, 120 kips downward at d. First-order analysis. Targets: the first-order values of the source's moment diagram (figure labels, in-kips): 316 at b, 8708 at c, 2044 at d. Which label of each pair is the first-order one follows from statics (the column-top moments divided by the 288 in column height are the base shears, and 2044/288 - 316/288 = 6.00 kips = the applied lateral load). Section properties the source does not give because they do not enter its plane model (Iy, J; A where stated) are placeholders that do not influence the targets. ",
+ "targets": [
+  {
+   "extract": "memberStation",
+   "member": "ab",
+   "quantity": "Mz",
+   "relative": 1.0,
+   "value": 316.0,
+   "unit": "kip in",
+   "tolerance": {
+    "rel": 0.0015822784810126582
+   },
+   "precisionNote": "printed \"316\"; tolerance = half a unit in the last printed digit; figure label (in. kips)",
+   "sign": "magnitude in the source; statics: the base reaction at a acts along +X (gravity thrust 4.1 kips inward minus the share of the lateral load), giving Mz = +R_x L at the top of ab (local y = +X)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "bc",
+   "quantity": "Mz",
+   "relative": 1.0,
+   "value": 8708.0,
+   "unit": "kip in",
+   "tolerance": {
+    "rel": 5.7418465778594396e-05
+   },
+   "precisionNote": "printed \"8708\"; tolerance = half a unit in the last printed digit; figure label (in. kips)",
+   "sign": "magnitude in the source; sagging under the 60 kip load = positive Mz (y up)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "ed",
+   "quantity": "Mz",
+   "relative": 1.0,
+   "value": -2044.0,
+   "unit": "kip in",
+   "tolerance": {
+    "rel": 0.0002446183953033268
+   },
+   "precisionNote": "printed \"2044\"; tolerance = half a unit in the last printed digit; figure label (in. kips)",
+   "sign": "magnitude in the source; statics: the base reaction at e acts along -X, giving a negative Mz at the top of ed (local y = +X)"
+  }
+ ],
+ "status": "active"
+}

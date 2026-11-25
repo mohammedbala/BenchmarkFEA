@@ -1,0 +1,97 @@
+{
+ "name": "mgz/ex-7-10-cantilever-shear-deformation",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kN",
+  "length": "mm"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "a1": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "b1": {
+   "x": 1000.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "a2": {
+   "x": 0.0,
+   "y": 5000.0,
+   "z": 0.0
+  },
+  "b2": {
+   "x": 2000.0,
+   "y": 5000.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "a1": {
+   "type": "fixed"
+  },
+  "a2": {
+   "type": "fixed"
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 200.0,
+   "nu": 0.3
+  }
+ },
+ "sections": {
+  "s": {
+   "type": "properties",
+   "A": 20000.0,
+   "Iy": 66666666.666666664,
+   "Iz": 66666666.666666664,
+   "J": 66666666.666666664,
+   "Asy": 13333.333333333334
+  }
+ },
+ "members": {
+  "m1": {
+   "i": "a1",
+   "j": "b1",
+   "section": "s",
+   "material": "M"
+  },
+  "m2": {
+   "i": "a2",
+   "j": "b2",
+   "section": "s",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "b1",
+     "Fy": 10.0
+    },
+    {
+     "type": "nodal",
+     "node": "b2",
+     "Fy": 10.0
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.0
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": true
+ }
+}

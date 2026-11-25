@@ -1,0 +1,131 @@
+{
+ "id": "ex-5-6-beam-member-loads",
+ "title": "Two-span beam with a distributed load and a point load between nodes",
+ "tier": "B",
+ "source": {
+  "work": "McGuire, W., Gallagher, R. H., Ziemian, R. D., Matrix Structural Analysis",
+  "edition": "2nd edition (copyright 2014 R. D. Ziemian)",
+  "location": "Example 5.6",
+  "pages": "pp. 113-114",
+  "notes": "input data and targets read on the cited pages; nothing of the source is reproduced"
+ },
+ "basis": "published",
+ "analysis": "Plane (x-y) problem of the source modelled in 3D with the global Y axis vertical, so that the source's x, y and theta_z are the model's X, Y and rz. In-plane bending is about local z for every member (default orientation), hence the source's I is the section's Iz. Beam of Example 4.8 along x: a (0), b (8 m), c (13 m). ab: A = 6e3 mm^2, Iz = 200e6 mm^4, J = 300e3 mm^4; bc: A = 4e3 mm^2, Iz = 50e6 mm^4, J = 100e3 mm^4; E = 200,000 MPa, nu = 0.3. The source omits bending normal to the plane: Iy is a placeholder (= Iz) that does not influence the targets. a: pin (the source has no axial degree of freedom; ux is held at a), b: roller, c: fixed. Loads: 2 kN/m downward on ab; 20 kN downward on bc at 2 m from b. First order, no shear deformation.",
+ "targets": [
+  {
+   "extract": "nodeDisplacement",
+   "node": "a",
+   "dof": "rz",
+   "value": -0.0005684,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 8.796622097114707e-05
+   },
+   "precisionNote": "printed \"5.684e-4\"; tolerance = half a unit in the last printed digit; printed -5.684 x 10^-4",
+   "sign": "moment / rotation about z, counter-clockwise positive in the source = rz / Mz of the engine"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "b",
+   "dof": "rz",
+   "value": 6.98e-05,
+   "unit": "rad",
+   "tolerance": {
+    "rel": 0.0007163323782234957
+   },
+   "precisionNote": "printed \"0.698e-4\"; tolerance = half a unit in the last printed digit; printed 0.698 x 10^-4",
+   "sign": "moment / rotation about z, counter-clockwise positive in the source = rz / Mz of the engine"
+  },
+  {
+   "extract": "reaction",
+   "node": "a",
+   "component": "Fy",
+   "value": 6.13,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.0008156606851549756
+   },
+   "precisionNote": "printed \"6.13\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "b",
+   "component": "Fy",
+   "value": 23.0,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.0002173913043478261
+   },
+   "precisionNote": "printed \"23.00\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "c",
+   "component": "Fy",
+   "value": 6.87,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.000727802037845706
+   },
+   "precisionNote": "printed \"6.87\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "c",
+   "component": "Mz",
+   "value": -9320.0,
+   "unit": "kN mm",
+   "tolerance": {
+    "rel": 0.000536480686695279
+   },
+   "precisionNote": "printed \"9.32e3\"; tolerance = half a unit in the last printed digit; printed -9.32 x 10^3 kNmm",
+   "sign": "moment / rotation about z, counter-clockwise positive in the source = rz / Mz of the engine"
+  },
+  {
+   "extract": "memberEndForce",
+   "member": "ab",
+   "end": "j",
+   "component": "Mz",
+   "value": -14960.0,
+   "unit": "kN mm",
+   "tolerance": {
+    "rel": 0.00033422459893048126
+   },
+   "precisionNote": "printed \"14.96e3\"; tolerance = half a unit in the last printed digit; printed -14.96 x 10^3 kNmm",
+   "sign": "member end moment on ab at b, element convention = endForces of the engine"
+  },
+  {
+   "extract": "memberEndForce",
+   "member": "bc",
+   "end": "i",
+   "component": "Mz",
+   "value": 14960.0,
+   "unit": "kN mm",
+   "tolerance": {
+    "rel": 0.00033422459893048126
+   },
+   "precisionNote": "printed \"14.96e3\"; tolerance = half a unit in the last printed digit; printed 14.96 x 10^3 kNmm",
+   "sign": "member end moment on bc at b, element convention = endForces of the engine"
+  },
+  {
+   "extract": "memberStation",
+   "member": "bc",
+   "quantity": "Mz",
+   "x": 2000.0,
+   "value": 11290.0,
+   "unit": "kN mm",
+   "tolerance": {
+    "rel": 0.0004428697962798938
+   },
+   "precisionNote": "printed \"11.29\" x 1000 (unit conversion / common factor of the source); tolerance = half a unit in the last printed digit; moment-diagram label 11.29 (kNm) under the 20 kN load (magnitude)",
+   "sign": "sagging under the load: positive Mz in the engine (y up)"
+  }
+ ],
+ "status": "quarantined",
+ "quarantine": {
+  "diagnosis": "6 of 9 targets reproduced (reactions, support moment, end moments at b). Missed: theta_a (engine -5.6812e-4 rad, printed -5.684e-4), theta_b (0.69565e-4, printed 0.698e-4) and the moment under the 20 kN load (11297 kN mm, figure label 11.29 kN m), by 5.7, 4.7 and 1.5 times the tolerance. Cause: rounding in the source's hand calculation - its stiffness coefficients are carried with three or four significant figures and later results are computed from rounded earlier ones, so the last printed digit of its results is not reliable, while the policy counts every printed digit as significant. Evidence: the source solves with the fixed-end moments rounded to 10.67 and 3.73 kN m (exact 10.6667 and 3.7333): (-1.4 x 10.67 + 0.5 x 3.73)/1.15 x 5e-5 = -5.684e-4 and (0.5 x 10.67 - 3.73)/1.15 x 5e-5 = 0.698e-4; with the unrounded moments the same expressions give -5.6812e-4 and 0.6957e-4, the engine's values. The label 11.29 is 6.87 x 3 - 9.32 computed from the rounded reactions. The engine's results for this model are confirmed by the other tiers that apply (tier C: OpenSeesPy and PyNite agree with the engine; tier D: equilibrium and the other invariants pass); the difference is between the source's printed digits and the exact solution of the stated problem."
+ }
+}

@@ -1,0 +1,116 @@
+{
+ "name": "staad/space-truss-three-bars",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "lbf",
+  "length": "in"
+ },
+ "conventions": {
+  "verticalAxis": "Z"
+ },
+ "nodes": {
+  "n1": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n2": {
+   "x": 96.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "n3": {
+   "x": 0.0,
+   "y": 72.0,
+   "z": 0.0
+  },
+  "n4": {
+   "x": 48.0,
+   "y": 24.0,
+   "z": 72.0
+  }
+ },
+ "supports": {
+  "n1": {
+   "dofs": {
+    "ux": "fixed",
+    "uy": "fixed",
+    "uz": "fixed"
+   }
+  },
+  "n2": {
+   "dofs": {
+    "ux": "fixed",
+    "uy": "fixed",
+    "uz": "fixed"
+   }
+  },
+  "n3": {
+   "dofs": {
+    "ux": "fixed",
+    "uy": "fixed",
+    "uz": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 30000000.0,
+   "nu": 0.3
+  }
+ },
+ "sections": {
+  "S": {
+   "type": "properties",
+   "description": "axial-force member: Iy, Iz, J are placeholders, not used",
+   "A": 1.0,
+   "Iy": 1.0,
+   "Iz": 1.0,
+   "J": 1.0
+  }
+ },
+ "members": {
+  "m1": {
+   "type": "truss",
+   "i": "n1",
+   "j": "n4",
+   "section": "S",
+   "material": "M"
+  },
+  "m2": {
+   "type": "truss",
+   "i": "n2",
+   "j": "n4",
+   "section": "S",
+   "material": "M"
+  },
+  "m3": {
+   "type": "truss",
+   "i": "n3",
+   "j": "n4",
+   "section": "S",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "n4",
+     "Fz": 50.0
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.0
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": false
+ }
+}

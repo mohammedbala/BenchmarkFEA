@@ -1,0 +1,80 @@
+{
+ "id": "vm2-beam-with-overhangs",
+ "title": "Beam with two loaded overhangs: moment in the middle portion and midspan deflection",
+ "tier": "B",
+ "source": {
+  "work": "ANSYS, Inc., Mechanical APDL Verification Manual (public help site ansyshelp.ansys.com)",
+  "edition": "Release 2025 R2, read 2026-11-22",
+  "location": "VM2, 'Beam Stresses and Deflections' (https://ansyshelp.ansys.com/public/Views/Secured/corp/v252/en/ans_vm/Hlp_V_VM2.html)",
+  "pages": "web page",
+  "notes": "problem statement taken from the vendor page (text; the sketch was not readable). The page cites: Timoshenko, Strength of Materials, Part I, 3rd ed. 1955, p. 98, problem 4 - NOT opened for this project; no number is taken from it. The page's 'Target' values are recorded as printed; the program's own results are not used."
+ },
+ "basis": "recomputed-from-published-statement",
+ "analysis": "Plane problem in the global X-Y plane (Y vertical); the out-of-plane DOFs (uz, rx, ry) of every node are held; in-plane bending about local z. Beam of 480 in on two supports 240 in apart, with two overhangs of 120 in; 10,000 lb/ft downward on both overhangs only; A = 50.65 in^2, Iz = 7892 in^4, depth 30 in, E = 30e6 psi. First-order analysis without shear deformation. The page prints the bending stress in the middle portion (compression at the bottom); the target here is the bending moment = stress x Iz / (depth / 2) = stress x 526.1333 in^3. Reference values: computed here from this statement (verification/derive/vendor_reference.py); the textbook cited by the vendor page was not opened and no number is taken from it.",
+ "targets": [
+  {
+   "extract": "memberStation",
+   "member": "s",
+   "quantity": "Mz",
+   "relative": 0.5,
+   "value": -6000000.0,
+   "unit": "lbf in",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (ODE oracle); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "s",
+   "quantity": "uy",
+   "relative": 0.5,
+   "value": 0.18246325392802834,
+   "unit": "in",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (ODE oracle); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "a",
+   "dof": "uy",
+   "value": -0.45615813482007095,
+   "unit": "in",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (ODE oracle); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "reaction",
+   "node": "b",
+   "component": "Fy",
+   "value": 100000.0,
+   "unit": "lbf",
+   "tolerance": {
+    "rel": 1e-06
+   },
+   "precisionNote": "evaluated here in double precision (ODE oracle); tolerance = policy floor 1e-6",
+   "sign": "engine convention (docs/CONVENTIONS.md)"
+  },
+  {
+   "extract": "memberStation",
+   "member": "s",
+   "quantity": "uy",
+   "relative": 0.5,
+   "value": 0.182,
+   "unit": "in",
+   "tolerance": {
+    "rel": 0.0027472527472527475
+   },
+   "precisionNote": "printed \"0.182\"; tolerance = half a unit in the last printed digit",
+   "sign": "upward (the middle portion bends upward)"
+  }
+ ],
+ "status": "active"
+}

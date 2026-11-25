@@ -1,0 +1,85 @@
+{
+ "format": "benchfea-task",
+ "formatVersion": "1.0.0",
+ "id": "t3a52b51dd902ea",
+ "taskType": "predict",
+ "mode": "no-solver",
+ "family": "stair_frame",
+ "difficulty": 1,
+ "split": "train",
+ "quantities": [
+  {
+   "kind": "displacement",
+   "combination": "SLS1",
+   "node": "N3",
+   "component": "ry",
+   "unit": "rad",
+   "id": "q1",
+   "text": "rotation ry of node N3 in combination SLS1 [rad], global axes"
+  },
+  {
+   "kind": "displacement",
+   "combination": "ULS1",
+   "node": "N2",
+   "component": "ry",
+   "unit": "rad",
+   "id": "q2",
+   "text": "rotation ry of node N2 in combination ULS1 [rad], global axes"
+  },
+  {
+   "kind": "memberEndForce",
+   "combination": "SLS1",
+   "member": "S3",
+   "end": "i",
+   "component": "My",
+   "unit": "kip*in",
+   "id": "q3",
+   "text": "end force My at end i of member S3 in combination SLS1 [kip*in], member local axes, acting on the member (docs/CONVENTIONS.md)"
+  },
+  {
+   "kind": "memberMaxMoment",
+   "combination": "SLS1",
+   "member": "S3",
+   "component": "My",
+   "unit": "kip*in",
+   "id": "q4",
+   "text": "largest absolute bending moment My along member S3 in combination SLS1 [kip*in] (a non-negative number; local axes)"
+  },
+  {
+   "kind": "displacement",
+   "combination": "SLS1",
+   "node": "N4",
+   "component": "ry",
+   "unit": "rad",
+   "id": "q5",
+   "text": "rotation ry of node N4 in combination SLS1 [rad], global axes"
+  },
+  {
+   "kind": "displacement",
+   "combination": "SLS1",
+   "node": "N1",
+   "component": "ry",
+   "unit": "rad",
+   "id": "q6",
+   "text": "rotation ry of node N1 in combination SLS1 [rad], global axes"
+  }
+ ],
+ "answerFormat": {
+  "values": {
+   "q1": "number",
+   "q2": "number",
+   "q3": "number",
+   "q4": "number",
+   "q5": "number",
+   "q6": "number"
+  }
+ },
+ "statement": "TASK (predict): give the named results of the model in the file below, exactly as it is given.\nStructure: stair frame. Mode no-solver: the analysis tool is disabled; inspect the file and reason from it.\nSign conventions, axes and units are those of docs/CONVENTIONS.md; every number you give is in the units of the model file.\n\nQuantities:\n  q1: rotation ry of node N3 in combination SLS1 [rad], global axes\n  q2: rotation ry of node N2 in combination ULS1 [rad], global axes\n  q3: end force My at end i of member S3 in combination SLS1 [kip*in], member local axes, acting on the member (docs/CONVENTIONS.md)\n  q4: largest absolute bending moment My along member S3 in combination SLS1 [kip*in] (a non-negative number; local axes)\n  q5: rotation ry of node N4 in combination SLS1 [rad], global axes\n  q6: rotation ry of node N1 in combination SLS1 [rad], global axes\n\nSubmit your answer as JSON of this form:\n{\n \"values\": {\n  \"q1\": 0.0,\n  \"q2\": 0.0,\n  \"q3\": 0.0,\n  \"q4\": 0.0,\n  \"q5\": 0.0,\n  \"q6\": 0.0\n }\n}",
+ "verification": {
+  "status": "verified",
+  "scope": "analysis results of the given model",
+  "meaning": "'verified' means only: the reference solution passed every tier listed as applicable in this record, at the tolerances stated in it. It does not mean reviewed, approved or certified by anyone.",
+  "policy": "docs/VERIFICATION.md; the tiers passed and the tolerances are in the answers file and in the info returned when the episode ends"
+ },
+ "modelFile": "t3a52b51dd902ea.model.json"
+}

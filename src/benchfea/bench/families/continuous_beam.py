@@ -23,6 +23,7 @@ FEATURES = {
 
 def build(draw, level: int, unit_system: str, vertical: str, features: dict) -> Builder:
     B = Builder(unit_system, vertical, NAME)
+    B.stability_combination = None                           # no axial force: nothing to buckle
     plane = draw.choice(("xv", "yv"))
     n_spans = {1: draw.integer(1, 2), 2: draw.integer(2, 4), 3: draw.integer(6, 7)}[level]
     base_span = draw.step(4.0, 10.0, 0.5)
@@ -64,7 +65,7 @@ def build(draw, level: int, unit_system: str, vertical: str, features: dict) -> 
     for length in lengths:
         x += length
         stations.append(x)
-    g = B.group("beam", "beam", 4)
+    g = B.group("beam", "beam", 8)
     members, chains = [], {}
     for k in range(n_spans + 1):
         B.node(f"N{k + 1}", *xyv(stations[k]))

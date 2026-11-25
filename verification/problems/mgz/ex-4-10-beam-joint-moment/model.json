@@ -1,0 +1,98 @@
+{
+ "name": "mgz/ex-4-10-beam-joint-moment",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "kN",
+  "length": "mm"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "a": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "b": {
+   "x": 8000.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "c": {
+   "x": 13000.0,
+   "y": 0.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "a": {
+   "type": "fixed"
+  },
+  "b": {
+   "dofs": {
+    "uy": "fixed"
+   }
+  },
+  "c": {
+   "type": "fixed"
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 200.0,
+   "nu": 0.3
+  }
+ },
+ "sections": {
+  "ab": {
+   "type": "properties",
+   "A": 6000.0,
+   "Iy": 200000000.0,
+   "Iz": 200000000.0,
+   "J": 300000.0
+  },
+  "bc": {
+   "type": "properties",
+   "A": 4000.0,
+   "Iy": 50000000.0,
+   "Iz": 50000000.0,
+   "J": 100000.0
+  }
+ },
+ "members": {
+  "ab": {
+   "i": "a",
+   "j": "b",
+   "section": "ab",
+   "material": "M"
+  },
+  "bc": {
+   "i": "b",
+   "j": "c",
+   "section": "bc",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "nodal",
+     "node": "b",
+     "Mz": 50000.0
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.0
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": false
+ }
+}

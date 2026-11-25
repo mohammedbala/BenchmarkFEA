@@ -1,0 +1,33 @@
+{
+ "id": "portal-fixed-uniform-load-vendor-printed",
+ "title": "Fixed-base square portal frame with a uniform load on the beam - values printed by the vendor that do not reproduce",
+ "tier": "B",
+ "source": {
+  "work": "Bentley Systems, STAAD.Pro Help, Verification Examples (public documentation, docs.bentley.com)",
+  "edition": "STAAD.Pro Help v21 build (pages refer to the STAAD.Pro 2023 sample files), read 2026-11-22",
+  "location": "'V. 2D Portal Reactions 2' (https://docs.bentley.com/LiveContent/web/STAAD.Pro%20Help-v21/en/GUID-A208EC6A-C93D-44C7-A0A7-DFF5ED10E8F9.html)",
+  "pages": "web page",
+  "notes": "problem statement taken from the vendor page (text and input listing). The page cites: McCormac, Structural Analysis, 3rd ed. 1975, p. 383, example 22-5 - NOT opened for this project; no number is taken from it. The page's 'theory' values are recorded as printed; the program's own results are not used."
+ },
+ "basis": "published",
+ "analysis": "Plane problem in the global X-Y plane (Y vertical); the out-of-plane DOFs (uz, rx, ry) of every node are held; in-plane bending about local z. Portal 20 ft x 20 ft, fixed bases, all members A = 1 ft^2, I = 0.05 ft^4, E = 4.132e6 kip/ft^2 (the page's listing); 2 kip/ft downward on the beam. Units kip, ft. First-order analysis with axial deformation. The page's 'maximum moment' (44.40 kip ft) is the largest member END moment, at the beam-column joints; the midspan moment of the beam is larger (55.6 kip ft, also a target here). Same model as problem 'portal-fixed-uniform-load' (whose recomputed targets are active); the targets here are the vendor's printed values only.",
+ "targets": [
+  {
+   "extract": "memberStation",
+   "member": "b",
+   "quantity": "Mz",
+   "relative": 0.0,
+   "value": -44.4,
+   "unit": "kip ft",
+   "tolerance": {
+    "rel": 0.00011261261261261261
+   },
+   "precisionNote": "printed \"44.40\"; tolerance = half a unit in the last printed digit; the page's 'maximum moment': member end moment at the beam-column joint",
+   "sign": "the page prints a magnitude; sign from the reference solution, engine convention (docs/CONVENTIONS.md)"
+  }
+ ],
+ "status": "quarantined",
+ "quarantine": {
+  "diagnosis": "Missed by 8.1e-4 relative (7 times the tolerance): engine -44.436 kip ft, printed 44.40. The page's 'theory' value is a hand calculation (the page cites an example of a textbook on approximate / iterative frame analysis) carried to three figures. The exact value for members without axial deformation is w L^2 / 18 = 44.444 kip ft (reference program with EA x 1e6); with the axial stiffness of the statement 44.436 kip ft (reference program = engine to 1e-9). The program result printed on the same page is 44.44."
+ }
+}

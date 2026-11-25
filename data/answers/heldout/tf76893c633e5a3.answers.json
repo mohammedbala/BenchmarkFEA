@@ -1,0 +1,331 @@
+{
+ "format": "benchfea-task-answers",
+ "formatVersion": "1.0.0",
+ "id": "tf76893c633e5a3",
+ "taskType": "diagnose",
+ "mode": "no-solver",
+ "key": {
+  "family": "braced_frame",
+  "curveBall": "release_mechanism",
+  "seed": 4,
+  "difficulty": 3,
+  "versions": {
+   "task": "1",
+   "generator": "1",
+   "curveBall": "1",
+   "engine": "0.1.0"
+  }
+ },
+ "generatorSeed": 4,
+ "skips": [],
+ "effectClass": "creates-mechanism",
+ "changeRecord": {
+  "format": "benchfea-curveball-record",
+  "formatVersion": "1.0.0",
+  "curveBall": "release_mechanism",
+  "title": "releases that create a mechanism",
+  "curveBallVersion": "1",
+  "seed": 4,
+  "category": "releases",
+  "effectClass": "creates-mechanism",
+  "target": "node C3: bending rotations released at every member end (CC3.j, BB3.j)",
+  "changes": [
+   {
+    "op": "add",
+    "path": "/members/CC3/releases",
+    "after": {
+     "j": {
+      "ry": true,
+      "rz": true
+     }
+    },
+    "index": 5
+   },
+   {
+    "op": "add",
+    "path": "/members/BB3/releases/j/ry",
+    "after": true,
+    "index": 1
+   }
+  ],
+  "entities": {
+   "nodes": [
+    "C3"
+   ],
+   "members": [
+    "BB3",
+    "CC3"
+   ]
+  },
+  "whyItMatters": "Releases belong to member ends, the rotation belongs to the node. If every member end at a node is released, nothing holds the node's rotation: the stiffness matrix is singular. The structure may still look sensible (each member is pinned), but there is no solution; the correct answer is the diagnosis of the mechanism, and the fix is to keep one member end connected.",
+  "precondition": "a node with frame member ends whose rotations are still connected and whose own rotations are not all held by a support",
+  "effect": {
+   "class": "creates-mechanism",
+   "material": true,
+   "criterion": "creates-mechanism",
+   "criteria": [
+    "creates-mechanism"
+   ],
+   "thresholds": {
+    "analysisChange": 0.05,
+    "designRatioChange": 0.05
+   },
+   "base": {
+    "status": "ok",
+    "units": {
+     "force": "kN",
+     "length": "mm"
+    },
+    "combinations": {
+     "ULS1": {
+      "analysisType": "secondOrder",
+      "maxTranslation": 4.094476120395063,
+      "maxMemberDisplacement": 19.26756339100364,
+      "maxReactionForce": 714.189543617701,
+      "maxMemberMoment": 176199.21119277112
+     },
+     "SLS1": {
+      "analysisType": "firstOrder",
+      "maxTranslation": 3.0167360084378645,
+      "maxMemberDisplacement": 13.859706063725792,
+      "maxReactionForce": 518.8145365469666,
+      "maxMemberMoment": 126519.36588647505
+     },
+     "ULS2": {
+      "analysisType": "secondOrder",
+      "maxTranslation": 5.093546348979779,
+      "maxMemberDisplacement": 14.129440194898896,
+      "maxReactionForce": 586.7947722246952,
+      "maxMemberMoment": 109166.84252214497
+     },
+     "ULS3": {
+      "analysisType": "secondOrder",
+      "maxTranslation": 4.39263380114623,
+      "maxMemberDisplacement": 9.498359551035144,
+      "maxReactionForce": 386.8321556222445,
+      "maxMemberMoment": 59040.23034081008
+     },
+     "SLS2": {
+      "analysisType": "firstOrder",
+      "maxTranslation": 3.1124421449972575,
+      "maxMemberDisplacement": 9.772717022465047,
+      "maxReactionForce": 365.6345365469662,
+      "maxMemberMoment": 65581.86588647508
+     },
+     "ULS4": {
+      "analysisType": "secondOrder",
+      "maxTranslation": 2.383473943613314,
+      "maxMemberDisplacement": 13.026001890554936,
+      "maxReactionForce": 359.6474558092555,
+      "maxMemberMoment": 109168.10837362471
+     },
+     "ULS5": {
+      "analysisType": "secondOrder",
+      "maxTranslation": 2.522935519667827,
+      "maxMemberDisplacement": 8.56116283432476,
+      "maxReactionForce": 258.7767332819979,
+      "maxMemberMoment": 59024.10026960238
+     }
+    },
+    "design": {
+     "status": "pass",
+     "maxRatio": 0.8110792654766623,
+     "maxRatioMember": "X1b",
+     "failing": []
+    }
+   },
+   "perturbed": {
+    "status": "unstable",
+    "nMechanisms": 1
+   },
+   "releasedDofs": [
+    "ry",
+    "rz"
+   ]
+  },
+  "reference": {
+   "kind": "diagnosis",
+   "note": "the perturbed model is a mechanism: the reference solution is the solver's structured mechanism diagnosis, not a set of results",
+   "diagnosis": {
+    "stable": false,
+    "classification": "mechanism",
+    "nMechanisms": 1,
+    "nFreeDofs": 30,
+    "tolerance": 1e-10,
+    "modes": [
+     {
+      "kind": "node",
+      "description": "node C3 rotation about X unrestrained: all connected member ends released",
+      "motion": "rotation",
+      "cause": "all-member-ends-released",
+      "count": 1,
+      "direction": null,
+      "axis": [
+       1.0,
+       0.0,
+       0.0
+      ],
+      "through": null,
+      "nodes": [
+       {
+        "node": "C3",
+        "share": 1.0,
+        "dofs": {
+         "rx": 1.0
+        }
+       }
+      ],
+      "members": [
+       "CC3",
+       "BB3"
+      ]
+     }
+    ]
+   },
+   "problems": [
+    {
+     "code": "stability.mechanism",
+     "path": "/nodes/C3",
+     "message": "the structure is a mechanism: node C3 rotation about X unrestrained: all connected member ends released"
+    }
+   ]
+  },
+  "verification": {
+   "reference": "diagnosis",
+   "route": "diagnosis tiers N, K, C, E of benchfea.verify (docs/VERIFICATION.md section 4): null space of an independently assembled stiffness, engine matrix, two foreign solvers under a probing load, invariance of the diagnosis"
+  },
+  "rejected": [],
+  "baseHash": "15625070972752ee318664fc25df11a79f7678d19d8d7d11a25107acdb773301",
+  "perturbedHash": "083a59724c0acd04c5e543fe3edec69bac93c2316ca729f02a3fa1495911bc8c"
+ },
+ "verification": {
+  "format": "benchfea-verification",
+  "kind": "diagnosis",
+  "status": "verified",
+  "meaning": "'verified' means only: the reference solution passed every tier listed as applicable in this record, at the tolerances stated in it. It does not mean reviewed, approved or certified by anyone.",
+  "modelHash": "083a59724c0acd04c5e543fe3edec69bac93c2316ca729f02a3fa1495911bc8c",
+  "tiersPassed": [
+   "N",
+   "K",
+   "C",
+   "E"
+  ],
+  "tiersNotPassed": [],
+  "tiersNotApplicable": [],
+  "quarantine": null,
+  "tiers": {
+   "N": {
+    "applies": true,
+    "passed": true,
+    "summary": "independent stiffness: 1 zero-stiffness motion(s) (diagnosis: 1); 1 described mode(s) tested for K phi = 0: agree",
+    "tolerances": {
+     "singular": 1e-09,
+     "nullResidual": 2e-06
+    },
+    "largestDifferences": [
+     {
+      "what": "mode 0: |K phi| / (|K| |phi|) on the independent matrix",
+      "value": 0.0,
+      "tolerance": 2e-06
+     }
+    ]
+   },
+   "K": {
+    "applies": true,
+    "passed": true,
+    "summary": "engine matrix: 1 eigenvalue(s) below 1.0e-09; the described modes satisfy K phi = 0",
+    "tolerances": {
+     "singular": 1e-09,
+     "nullResidual": 2e-06
+    },
+    "largestDifferences": [
+     {
+      "what": "mode 0: |K phi| / (|K| |phi|) on the engine's matrix",
+      "value": 0.0,
+      "tolerance": 2e-06
+     }
+    ]
+   },
+   "C": {
+    "applies": true,
+    "passed": true,
+    "summary": "2 foreign solver(s) find no equilibrium state under a load that does work on the mechanism(s)",
+    "tolerances": {
+     "saneDisplacement": "1000 x model size"
+    },
+    "largestDifferences": []
+   },
+   "E": {
+    "applies": true,
+    "passed": true,
+    "summary": "diagnosis identical on a second run and after changing every design variable",
+    "tolerances": {
+     "designVariables": 0.0
+    },
+    "largestDifferences": []
+   }
+  },
+  "versions": {
+   "benchfea": "0.1.0",
+   "python": "3.13.18",
+   "numpy": "2.5.3",
+   "scipy": "1.18.1",
+   "foreign:opensees": "3.8.0.0",
+   "foreign:pynite": "3.2.1"
+  },
+  "notes": [
+   "verified diagnosis: passed tier(s) N, K, C, E (docs/VERIFICATION.md, 'Unstable models')"
+  ]
+ },
+ "designVerification": null,
+ "reference": {
+  "category": "releases",
+  "entities": {
+   "nodes": [
+    "C3"
+   ],
+   "members": [
+    "BB3",
+    "CC3"
+   ]
+  },
+  "direction": "added",
+  "target": "node C3: bending rotations released at every member end (CC3.j, BB3.j)",
+  "mechanism": {
+   "stable": false,
+   "classification": "mechanism",
+   "nMechanisms": 1,
+   "nFreeDofs": 30,
+   "tolerance": 1e-10,
+   "modes": [
+    {
+     "kind": "node",
+     "description": "node C3 rotation about X unrestrained: all connected member ends released",
+     "motion": "rotation",
+     "cause": "all-member-ends-released",
+     "count": 1,
+     "direction": null,
+     "axis": [
+      1.0,
+      0.0,
+      0.0
+     ],
+     "through": null,
+     "nodes": [
+      {
+       "node": "C3",
+       "share": 1.0,
+       "dofs": {
+        "rx": 1.0
+       }
+      }
+     ],
+     "members": [
+      "CC3",
+      "BB3"
+     ]
+    }
+   ]
+  }
+ }
+}

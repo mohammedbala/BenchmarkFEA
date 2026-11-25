@@ -1,0 +1,104 @@
+{
+ "id": "ex-3-3-truss-with-tie",
+ "title": "Three-bar plane truss with an added horizontal tie",
+ "tier": "B",
+ "source": {
+  "work": "McGuire, W., Gallagher, R. H., Ziemian, R. D., Matrix Structural Analysis",
+  "edition": "2nd edition (copyright 2014 R. D. Ziemian)",
+  "location": "Example 3.3",
+  "pages": "pp. 38-39",
+  "notes": "input data and targets read on the cited pages; nothing of the source is reproduced"
+ },
+ "basis": "published",
+ "analysis": "Pin-jointed plane truss in the x-y plane (global Y vertical): members of type 'truss'; the out-of-plane translation of every joint is held by a support (it has no stiffness in a plane truss). Joints from the printed geometry (height 4 m, bar ac at 30 deg, bar ab at 45 deg to the horizontal; the source prints the resulting base length as 10.928 m): c (0, 0), a (4/tan 30 deg, 4), b (4/tan 30 deg + 4, 0) m. A_ac = 15e3, A_ab = 20e3, A_bc = 18e3 mm^2, E = 200,000 MPa. Added: horizontal tie ad, A = 20e3 mm^2 (the figure prints the unit as 'mm'), length 6.928 m, d held by a wall. Supports and load as Example 3.2. First order.",
+ "targets": [
+  {
+   "extract": "nodeDisplacement",
+   "node": "a",
+   "dof": "ux",
+   "value": 0.383,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.0013054830287206266
+   },
+   "precisionNote": "printed \"0.383\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "a",
+   "dof": "uy",
+   "value": 1.228,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.00040716612377850165
+   },
+   "precisionNote": "printed \"1.228\"; tolerance = half a unit in the last printed digit",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "nodeDisplacement",
+   "node": "b",
+   "dof": "ux",
+   "value": -0.437,
+   "unit": "mm",
+   "tolerance": {
+    "rel": 0.0011441647597254005
+   },
+   "precisionNote": "printed \"0.437\"; tolerance = half a unit in the last printed digit; printed -0.437",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "b",
+   "component": "Fy",
+   "value": -144.3,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.0003465003465003465
+   },
+   "precisionNote": "printed \"144.3\"; tolerance = half a unit in the last printed digit; printed -144.3",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "c",
+   "component": "Fx",
+   "value": -163.2,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.0003063725490196079
+   },
+   "precisionNote": "printed \"163.2\"; tolerance = half a unit in the last printed digit; printed -163.2",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "c",
+   "component": "Fy",
+   "value": -177.4,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.0002818489289740699
+   },
+   "precisionNote": "printed \"177.4\"; tolerance = half a unit in the last printed digit; printed -177.4",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  },
+  {
+   "extract": "reaction",
+   "node": "d",
+   "component": "Fx",
+   "value": -221.1,
+   "unit": "kN",
+   "tolerance": {
+    "rel": 0.00022614201718679333
+   },
+   "precisionNote": "printed \"221.1\"; tolerance = half a unit in the last printed digit; printed -221.1",
+   "sign": "same sign convention as the source (global axes, right-hand rule)"
+  }
+ ],
+ "status": "quarantined",
+ "quarantine": {
+  "diagnosis": "5 of 7 targets missed, by up to 4.2e-3 relative (tolerances 2e-4 to 1.3e-3). Engine: 0.38188, 1.22791, -0.43796 mm; reactions -144.273, -162.519, -177.127, -220.481 kN. Printed: 0.383, 1.228, -0.437; -144.3, -163.2, -177.4, -221.1. Cause: rounding in the source's hand calculation - its stiffness coefficients are carried with three or four significant figures and later results are computed from rounded earlier ones, so the last printed digit of its results is not reliable, while the policy counts every printed digit as significant. Evidence: the printed reactions leave residuals of 1.3 kN in x (383.0 - 163.2 - 221.1) and 0.3 kN in y; the exact solution of the source's own printed equations is 0.3819, 1.2281, -0.4381 mm - the engine's values to the digits shown, not the printed 0.383 and -0.437. The engine's results for this model are confirmed by the other tiers that apply (tier C: OpenSeesPy and PyNite agree with the engine; tier D: equilibrium and the other invariants pass); the difference is between the source's printed digits and the exact solution of the stated problem."
+ }
+}

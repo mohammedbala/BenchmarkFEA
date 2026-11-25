@@ -1,0 +1,130 @@
+{
+ "name": "ansys/vm2-beam-with-overhangs",
+ "formatVersion": "1.0.0",
+ "units": {
+  "force": "lbf",
+  "length": "in"
+ },
+ "conventions": {
+  "verticalAxis": "Y"
+ },
+ "nodes": {
+  "a": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "b": {
+   "x": 120.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "c": {
+   "x": 360.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "d": {
+   "x": 480.0,
+   "y": 0.0,
+   "z": 0.0
+  }
+ },
+ "supports": {
+  "a": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  },
+  "b": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed",
+    "ux": "fixed",
+    "uy": "fixed"
+   }
+  },
+  "c": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed",
+    "uy": "fixed"
+   }
+  },
+  "d": {
+   "dofs": {
+    "uz": "fixed",
+    "rx": "fixed",
+    "ry": "fixed"
+   }
+  }
+ },
+ "materials": {
+  "M": {
+   "E": 30000000.0,
+   "nu": 0.3
+  }
+ },
+ "sections": {
+  "S": {
+   "type": "properties",
+   "A": 50.65,
+   "Iz": 7892.0,
+   "Iy": 7892.0,
+   "J": 7892.0
+  }
+ },
+ "members": {
+  "o1": {
+   "i": "a",
+   "j": "b",
+   "section": "S",
+   "material": "M"
+  },
+  "s": {
+   "i": "b",
+   "j": "c",
+   "section": "S",
+   "material": "M"
+  },
+  "o2": {
+   "i": "c",
+   "j": "d",
+   "section": "S",
+   "material": "M"
+  }
+ },
+ "loadCases": {
+  "L": {
+   "loads": [
+    {
+     "type": "memberDistributed",
+     "member": "o1",
+     "direction": "Y",
+     "w1": -833.3333333333334
+    },
+    {
+     "type": "memberDistributed",
+     "member": "o2",
+     "direction": "Y",
+     "w1": -833.3333333333334
+    }
+   ]
+  }
+ },
+ "combinations": {
+  "C": {
+   "factors": {
+    "L": 1.0
+   }
+  }
+ },
+ "analysis": {
+  "shearDeformation": false,
+  "resultStations": 3
+ }
+}

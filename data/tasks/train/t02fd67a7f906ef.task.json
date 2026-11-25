@@ -1,0 +1,55 @@
+{
+ "format": "benchfea-task",
+ "formatVersion": "1.0.0",
+ "id": "t02fd67a7f906ef",
+ "taskType": "diagnose",
+ "mode": "tool-allowed",
+ "family": "multistorey_2d",
+ "difficulty": 2,
+ "split": "train",
+ "answerFormat": {
+  "category": [
+   "constraints",
+   "offsets",
+   "releases",
+   "design",
+   "supports",
+   "members",
+   "units",
+   "loads",
+   "second_order"
+  ],
+  "entities": "{kind: [ids]}",
+  "direction": [
+   "added",
+   "removed",
+   "increased",
+   "decreased",
+   "reversed",
+   "changed"
+  ],
+  "mechanism": {
+   "kind": [
+    "node",
+    "rigid-body",
+    "distributed"
+   ],
+   "motion": [
+    "translation",
+    "rotation",
+    "translation+rotation"
+   ],
+   "nodes": "[ids]",
+   "or": null
+  }
+ },
+ "intendedDesign": "Units: force kN, length m (every number below is in these units: moments in force x length, line loads in force / length, moduli and stresses in force / length^2, unit weights in force / length^3, rotational springs in force x length / rad).\nFormat version: 1.0.0.\nConventions: vertical axis Z.\nNodes (6), coordinates:\n  A0 at (0, 0, 0)\n  A1 at (0, 0, 5)\n  A2 at (0, 0, 8.5)\n  B0 at (0, 6.5, 0)\n  B1 at (0, 6.5, 5)\n  B2 at (0, 6.5, 8.5)\nSupports (a degree of freedom not listed is free):\n  node A0: type fixed\n  node B0: type fixed\n  node A1: degrees of freedom (ux fixed, ry fixed, rz fixed)\n  node A2: degrees of freedom (ux fixed, ry fixed, rz fixed)\n  node B1: degrees of freedom (ux fixed, ry fixed, rz fixed)\n  node B2: degrees of freedom (ux fixed, ry fixed, rz fixed)\nMaterials:\n  steel: description structural steel (nominal properties), E 200000000, G 77000000, Fy 345000, Fu 450000, unit weight 77\nCross-sections:\n  I-250x250x14x9: type I, d 0.25, bf 0.25, tf 0.014, tw 0.009, r 0.014\n  I-400x180x13x8: type I, d 0.4, bf 0.18, tf 0.013, tw 0.008, r 0.016\n  I-350x175x11x7: type I, d 0.35, bf 0.175, tf 0.011, tw 0.007, r 0.014\nMembers (6); a member end without a stated release is rigidly connected, a member without stated offsets runs from node to node:\n  CA1: from node A0 to node A1, section I-250x250x14x9, material steel; orientation (roll 90)\n  CA2: from node A1 to node A2, section I-250x250x14x9, material steel; orientation (roll 90)\n  CB1: from node B0 to node B1, section I-250x250x14x9, material steel; orientation (roll 90)\n  CB2: from node B1 to node B2, section I-250x250x14x9, material steel; orientation (roll 90)\n  BA1: from node A1 to node B1, section I-400x180x13x8, material steel\n  BA2: from node A2 to node B2, section I-350x175x11x7, material steel\nRigid links and diaphragms: none.\nLoad cases:\n  D (dead load and self weight):\n    load 1: self weight\n    load 2: member distributed, member BA1, direction Z, intensity at start -33.5\n    load 3: member distributed, member BA2, direction Z, intensity at start -23.5\n  L1 (live load, bays 1, 3, ...):\n    load 1: member distributed, member BA1, direction Z, intensity at start -33\n    load 2: member distributed, member BA2, direction Z, intensity at start -8\n  W (wind):\n    load 1: nodal, node A1, Fy 22\n    load 2: nodal, node A2, Fy 11\nLoad combinations:\n  ULS1 = 1.2 x D + 1.6 x L1\n  SLS1 = 1 x D + 1 x L1; purpose serviceability\n  ULS2 = 1.2 x D + 0.5 x L1 + 1 x W\n  ULS3 = 0.9 x D + 1 x W\nAnalysis settings: shear deformation no.\nDesign data (AISC 360-22 member checks):\n  defaults: method LRFD\n  groups:\n    columns: members [CA1, CA2, CB1, CB2], role column, Kx 1.5\n    beams: members [BA1], role beam, bracing (top flange braced at [0.3333, 0.6667], bottom flange braced at [0.3333, 0.6667]), deflection limits [(span /  300, direction y, combinations [SLS1])]\n    roofBeams: members [BA2], role beam, bracing (top flange braced at [0.3333, 0.6667], bottom flange braced at [0.3333, 0.6667]), deflection limits [(span /  300, direction y, combinations [SLS1])]",
+ "statement": "TASK (diagnose): the model file below was derived from the intended design described here, but something in it was changed in a way that matters. Say what is wrong and where.\nStructure: multistorey 2d. Mode tool-allowed: you may run the analysis tool (run_analysis) and read its results.\nSign conventions, axes and units are those of docs/CONVENTIONS.md; every number you give is in the units of the model file.\n\nINTENDED DESIGN:\nUnits: force kN, length m (every number below is in these units: moments in force x length, line loads in force / length, moduli and stresses in force / length^2, unit weights in force / length^3, rotational springs in force x length / rad).\nFormat version: 1.0.0.\nConventions: vertical axis Z.\nNodes (6), coordinates:\n  A0 at (0, 0, 0)\n  A1 at (0, 0, 5)\n  A2 at (0, 0, 8.5)\n  B0 at (0, 6.5, 0)\n  B1 at (0, 6.5, 5)\n  B2 at (0, 6.5, 8.5)\nSupports (a degree of freedom not listed is free):\n  node A0: type fixed\n  node B0: type fixed\n  node A1: degrees of freedom (ux fixed, ry fixed, rz fixed)\n  node A2: degrees of freedom (ux fixed, ry fixed, rz fixed)\n  node B1: degrees of freedom (ux fixed, ry fixed, rz fixed)\n  node B2: degrees of freedom (ux fixed, ry fixed, rz fixed)\nMaterials:\n  steel: description structural steel (nominal properties), E 200000000, G 77000000, Fy 345000, Fu 450000, unit weight 77\nCross-sections:\n  I-250x250x14x9: type I, d 0.25, bf 0.25, tf 0.014, tw 0.009, r 0.014\n  I-400x180x13x8: type I, d 0.4, bf 0.18, tf 0.013, tw 0.008, r 0.016\n  I-350x175x11x7: type I, d 0.35, bf 0.175, tf 0.011, tw 0.007, r 0.014\nMembers (6); a member end without a stated release is rigidly connected, a member without stated offsets runs from node to node:\n  CA1: from node A0 to node A1, section I-250x250x14x9, material steel; orientation (roll 90)\n  CA2: from node A1 to node A2, section I-250x250x14x9, material steel; orientation (roll 90)\n  CB1: from node B0 to node B1, section I-250x250x14x9, material steel; orientation (roll 90)\n  CB2: from node B1 to node B2, section I-250x250x14x9, material steel; orientation (roll 90)\n  BA1: from node A1 to node B1, section I-400x180x13x8, material steel\n  BA2: from node A2 to node B2, section I-350x175x11x7, material steel\nRigid links and diaphragms: none.\nLoad cases:\n  D (dead load and self weight):\n    load 1: self weight\n    load 2: member distributed, member BA1, direction Z, intensity at start -33.5\n    load 3: member distributed, member BA2, direction Z, intensity at start -23.5\n  L1 (live load, bays 1, 3, ...):\n    load 1: member distributed, member BA1, direction Z, intensity at start -33\n    load 2: member distributed, member BA2, direction Z, intensity at start -8\n  W (wind):\n    load 1: nodal, node A1, Fy 22\n    load 2: nodal, node A2, Fy 11\nLoad combinations:\n  ULS1 = 1.2 x D + 1.6 x L1\n  SLS1 = 1 x D + 1 x L1; purpose serviceability\n  ULS2 = 1.2 x D + 0.5 x L1 + 1 x W\n  ULS3 = 0.9 x D + 1 x W\nAnalysis settings: shear deformation no.\nDesign data (AISC 360-22 member checks):\n  defaults: method LRFD\n  groups:\n    columns: members [CA1, CA2, CB1, CB2], role column, Kx 1.5\n    beams: members [BA1], role beam, bracing (top flange braced at [0.3333, 0.6667], bottom flange braced at [0.3333, 0.6667]), deflection limits [(span /  300, direction y, combinations [SLS1])]\n    roofBeams: members [BA2], role beam, bracing (top flange braced at [0.3333, 0.6667], bottom flange braced at [0.3333, 0.6667]), deflection limits [(span /  300, direction y, combinations [SLS1])]\n\nAnswer with: the category of the change (one of: constraints (rigid links and diaphragms); offsets (rigid end offsets); releases (member end releases); design (design variables (design-only)); supports (supports); members (member orientation and sections); units (units); loads (loads); second_order (second-order effects)); the ids of the entities that were changed (members, nodes, supports, load cases, constraints, sections, design members ... as they are named in the file); the direction of the change (one of: added, removed, increased, decreased, reversed, changed -- 'added' / 'removed': the file has something the intended design does not / lacks something it has; 'reversed': numbers with the opposite sign; 'increased' / 'decreased': numbers of larger / smaller magnitude; 'changed': anything else). If the model as given is a mechanism (unstable), also describe the mechanism: its kind (node, rigid-body, distributed), its motion (translation, rotation, translation+rotation) and the nodes that move; otherwise give null for 'mechanism'.\n\nSubmit your answer as JSON of this form:\n{\n \"category\": \"supports\",\n \"entities\": {\n  \"nodes\": [\n   \"N1\"\n  ]\n },\n \"direction\": \"changed\",\n \"mechanism\": null\n}",
+ "verification": {
+  "status": "verified",
+  "scope": "the reference of the given model: its analysis results (with the design results where the change is one of design data only) or, if it is unstable, its mechanism diagnosis",
+  "meaning": "'verified' means only: the reference solution passed every tier listed as applicable in this record, at the tolerances stated in it. It does not mean reviewed, approved or certified by anyone.",
+  "policy": "docs/VERIFICATION.md; the tiers passed and the tolerances are in the answers file and in the info returned when the episode ends"
+ },
+ "modelFile": "t02fd67a7f906ef.model.json"
+}

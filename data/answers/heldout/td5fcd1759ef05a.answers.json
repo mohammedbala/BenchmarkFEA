@@ -1,0 +1,1125 @@
+{
+ "format": "benchfea-task-answers",
+ "formatVersion": "1.0.0",
+ "id": "td5fcd1759ef05a",
+ "taskType": "repair",
+ "mode": "tool-allowed",
+ "key": {
+  "family": "pipe_rack",
+  "curveBall": "support_removed",
+  "seed": 4,
+  "difficulty": 3,
+  "versions": {
+   "task": "1",
+   "generator": "1",
+   "curveBall": "1",
+   "engine": "0.1.0"
+  }
+ },
+ "generatorSeed": 4,
+ "skips": [],
+ "effectClass": "creates-mechanism",
+ "changeRecord": {
+  "format": "benchfea-curveball-record",
+  "formatVersion": "1.0.0",
+  "curveBall": "support_removed",
+  "title": "support removed",
+  "curveBallVersion": "1",
+  "seed": 4,
+  "category": "supports",
+  "effectClass": "creates-mechanism",
+  "target": "support AL0",
+  "changes": [
+   {
+    "op": "remove",
+    "path": "/supports/AL0",
+    "before": {
+     "type": "fixed"
+    },
+    "index": 0
+   }
+  ],
+  "entities": {
+   "nodes": [
+    "AL0"
+   ],
+   "supports": [
+    "AL0"
+   ]
+  },
+  "whyItMatters": "Every support is part of the load path. Without it the load it carried must reach the remaining supports through the members -- spans double, cantilevers appear, moments and deflections multiply -- or, if the structure was not redundant enough, there is no equilibrium at all (a mechanism).",
+  "precondition": "a support (other than the plane restraint of a plane frame)",
+  "effect": {
+   "class": "creates-mechanism",
+   "material": true,
+   "criterion": "creates-mechanism",
+   "criteria": [
+    "creates-mechanism"
+   ],
+   "thresholds": {
+    "analysisChange": 0.05,
+    "designRatioChange": 0.05
+   },
+   "base": {
+    "status": "ok",
+    "units": {
+     "force": "kN",
+     "length": "mm"
+    },
+    "combinations": {
+     "ULS1": {
+      "analysisType": "firstOrder",
+      "maxTranslation": 1.173132951786478,
+      "maxMemberDisplacement": 141.04125036442898,
+      "maxReactionForce": 17.27585262152201,
+      "maxMemberMoment": 17390.52416473642
+     },
+     "SLS1": {
+      "analysisType": "firstOrder",
+      "maxTranslation": 0.08762850454917927,
+      "maxMemberDisplacement": 100.58515499674456,
+      "maxReactionForce": 9.68393532154071,
+      "maxMemberMoment": 12421.802974811728
+     },
+     "ULS2": {
+      "analysisType": "firstOrder",
+      "maxTranslation": 18.72249704710745,
+      "maxMemberDisplacement": 121.07304646989476,
+      "maxReactionForce": 13.320604431068654,
+      "maxMemberMoment": 16206.53147268096
+     }
+    },
+    "design": {
+     "status": "conditional",
+     "maxRatio": 0.7264829436392044,
+     "maxRatioMember": "SAL1",
+     "failing": []
+    }
+   },
+   "perturbed": {
+    "status": "unstable",
+    "nMechanisms": 1
+   }
+  },
+  "reference": {
+   "kind": "diagnosis",
+   "note": "the perturbed model is a mechanism: the reference solution is the solver's structured mechanism diagnosis, not a set of results",
+   "diagnosis": {
+    "stable": false,
+    "classification": "mechanism",
+    "nMechanisms": 1,
+    "nFreeDofs": 30,
+    "tolerance": 1e-10,
+    "modes": [
+     {
+      "kind": "distributed",
+      "description": "1 mechanism(s) involving several nodes; largest participation: AL0 (ry), AL1 (ry)",
+      "motion": "rotation",
+      "cause": "no-stiffness",
+      "count": 1,
+      "direction": null,
+      "axis": null,
+      "through": null,
+      "nodes": [
+       {
+        "node": "AL0",
+        "share": 0.5,
+        "dofs": {
+         "ry": 1.0
+        }
+       },
+       {
+        "node": "AL1",
+        "share": 0.5,
+        "dofs": {
+         "ry": 1.0
+        }
+       }
+      ],
+      "members": [
+       "CAL1",
+       "TA1",
+       "SAL1",
+       "XL1"
+      ]
+     }
+    ]
+   },
+   "problems": [
+    {
+     "code": "stability.mechanism",
+     "path": "/nodes/AL0",
+     "message": "the structure is a mechanism: 1 mechanism(s) involving several nodes; largest participation: AL0 (ry), AL1 (ry)"
+    }
+   ]
+  },
+  "verification": {
+   "reference": "diagnosis",
+   "route": "diagnosis tiers N, K, C, E of benchfea.verify (docs/VERIFICATION.md section 4): null space of an independently assembled stiffness, engine matrix, two foreign solvers under a probing load, invariance of the diagnosis; NOT expected to pass: the diagnosis reports a loaded node without any member (cause no-stiffness), and the diagnosis tiers have been measured not to confirm this kind of mechanism (docs/CURVEBALLS.md section 4) -- the pipeline quarantines it",
+   "expectedVerifiable": false
+  },
+  "rejected": [],
+  "baseHash": "e60f84bc38313fc88e049fbf08128c6b1df78bd53eb6807a1faa46df77864ad5",
+  "perturbedHash": "5bdb11d3d40d467dbe391a3bcad8fd908b24be4593647451a43a888c1a471f37"
+ },
+ "verification": {
+  "format": "benchfea-verification",
+  "kind": "diagnosis",
+  "status": "verified",
+  "meaning": "'verified' means only: the reference solution passed every tier listed as applicable in this record, at the tolerances stated in it. It does not mean reviewed, approved or certified by anyone.",
+  "modelHash": "5bdb11d3d40d467dbe391a3bcad8fd908b24be4593647451a43a888c1a471f37",
+  "tiersPassed": [
+   "N",
+   "K",
+   "C",
+   "E"
+  ],
+  "tiersNotPassed": [],
+  "tiersNotApplicable": [],
+  "quarantine": null,
+  "tiers": {
+   "N": {
+    "applies": true,
+    "passed": true,
+    "summary": "independent stiffness: 1 zero-stiffness motion(s) (diagnosis: 1); 0 described mode(s) tested for K phi = 0: agree",
+    "tolerances": {
+     "singular": 1e-09,
+     "nullResidual": 2e-06
+    },
+    "largestDifferences": []
+   },
+   "K": {
+    "applies": true,
+    "passed": true,
+    "summary": "engine matrix: 1 eigenvalue(s) below 1.0e-09; the described modes satisfy K phi = 0",
+    "tolerances": {
+     "singular": 1e-09,
+     "nullResidual": 2e-06
+    },
+    "largestDifferences": []
+   },
+   "C": {
+    "applies": true,
+    "passed": true,
+    "summary": "2 foreign solver(s) find no equilibrium state under a load that does work on the mechanism(s)",
+    "tolerances": {
+     "saneDisplacement": "1000 x model size"
+    },
+    "largestDifferences": []
+   },
+   "E": {
+    "applies": true,
+    "passed": true,
+    "summary": "diagnosis identical on a second run and after changing every design variable",
+    "tolerances": {
+     "designVariables": 0.0
+    },
+    "largestDifferences": []
+   }
+  },
+  "versions": {
+   "benchfea": "0.1.0",
+   "python": "3.13.18",
+   "numpy": "2.5.3",
+   "scipy": "1.18.1",
+   "foreign:opensees": "3.8.0.0",
+   "foreign:pynite": "3.2.1"
+  },
+  "notes": [
+   "verified diagnosis: passed tier(s) N, K, C, E (docs/VERIFICATION.md, 'Unstable models')"
+  ]
+ },
+ "designVerification": null,
+ "reference": {
+  "values": {
+   "q1": {
+    "value": 1.173132951786478,
+    "floor": 0.0011731329517864779,
+    "unit": "mm",
+    "kind": "displacement",
+    "dimension": "length"
+   },
+   "q2": {
+    "value": -0.15753006342544998,
+    "floor": 0.0011731329517864779,
+    "unit": "mm",
+    "kind": "displacement",
+    "dimension": "length"
+   },
+   "q3": {
+    "value": 2.6928563365417557,
+    "floor": 0.013320604431068655,
+    "unit": "kN",
+    "kind": "reaction",
+    "dimension": "force"
+   },
+   "q4": {
+    "value": 1256.2027216808187,
+    "floor": 17.39052416473642,
+    "unit": "kN*mm",
+    "kind": "reaction",
+    "dimension": "moment"
+   },
+   "q5": {
+    "value": 7.99905596855997,
+    "floor": 0.01727585262152201,
+    "unit": "kN",
+    "kind": "memberEndForce",
+    "dimension": "force"
+   },
+   "q6": {
+    "value": 6826.052863039097,
+    "floor": 16.20653147268096,
+    "unit": "kN*mm",
+    "kind": "memberMaxMoment",
+    "dimension": "moment"
+   }
+  },
+  "quantities": [
+   {
+    "kind": "displacement",
+    "combination": "ULS1",
+    "node": "AL1",
+    "component": "ux",
+    "unit": "mm",
+    "id": "q1",
+    "text": "translation ux of node AL1 in combination ULS1 [mm], global axes"
+   },
+   {
+    "kind": "displacement",
+    "combination": "ULS1",
+    "node": "BR1",
+    "component": "uy",
+    "unit": "mm",
+    "id": "q2",
+    "text": "translation uy of node BR1 in combination ULS1 [mm], global axes"
+   },
+   {
+    "kind": "reaction",
+    "combination": "ULS2",
+    "node": "BL0",
+    "component": "Fz",
+    "unit": "kN",
+    "id": "q3",
+    "text": "reaction force Fz at node BL0 in combination ULS2 [kN], global axes, acting on the structure"
+   },
+   {
+    "kind": "reaction",
+    "combination": "ULS1",
+    "node": "AR0",
+    "component": "Mx",
+    "unit": "kN*mm",
+    "id": "q4",
+    "text": "reaction moment Mx at node AR0 in combination ULS1 [kN*mm], global axes, acting on the structure"
+   },
+   {
+    "kind": "memberEndForce",
+    "combination": "ULS1",
+    "member": "XL1",
+    "end": "j",
+    "component": "Fx",
+    "unit": "kN",
+    "id": "q5",
+    "text": "end force Fx at end j of member XL1 in combination ULS1 [kN], member local axes, acting on the member (docs/CONVENTIONS.md)"
+   },
+   {
+    "kind": "memberMaxMoment",
+    "combination": "ULS2",
+    "member": "CAR1",
+    "component": "Mz",
+    "unit": "kN*mm",
+    "id": "q6",
+    "text": "largest absolute bending moment Mz along member CAR1 in combination ULS2 [kN*mm] (a non-negative number; local axes)"
+   }
+  ],
+  "designCriterion": false,
+  "units": {
+   "force": "kN",
+   "length": "mm"
+  },
+  "intendedModel": {
+   "formatVersion": "1.0.0",
+   "name": "pipe rack model",
+   "units": {
+    "force": "kN",
+    "length": "mm"
+   },
+   "conventions": {
+    "verticalAxis": "Y"
+   },
+   "nodes": {
+    "AL0": {
+     "x": 0,
+     "y": 0,
+     "z": 0
+    },
+    "AL1": {
+     "x": 0,
+     "y": 4000,
+     "z": 0
+    },
+    "AR0": {
+     "x": 0,
+     "y": 0,
+     "z": -5000
+    },
+    "AR1": {
+     "x": 0,
+     "y": 4000,
+     "z": -5000
+    },
+    "BL0": {
+     "x": 7500,
+     "y": 0,
+     "z": 0
+    },
+    "BL1": {
+     "x": 7500,
+     "y": 4000,
+     "z": 0
+    },
+    "BR0": {
+     "x": 7500,
+     "y": 0,
+     "z": -5000
+    },
+    "BR1": {
+     "x": 7500,
+     "y": 4000,
+     "z": -5000
+    }
+   },
+   "supports": {
+    "AL0": {
+     "type": "fixed"
+    },
+    "AR0": {
+     "type": "fixed"
+    },
+    "BL0": {
+     "type": "fixed"
+    },
+    "BR0": {
+     "type": "fixed"
+    }
+   },
+   "materials": {
+    "steel": {
+     "description": "structural steel (nominal properties)",
+     "E": 200,
+     "G": 77,
+     "Fy": 0.345,
+     "Fu": 0.45,
+     "unitWeight": 7.7e-08
+    }
+   },
+   "sections": {
+    "I-100x100x8x6": {
+     "type": "I",
+     "d": 100,
+     "bf": 100,
+     "tf": 8,
+     "tw": 6,
+     "r": 6
+    },
+    "I-250x125x9x6": {
+     "type": "I",
+     "d": 250,
+     "bf": 125,
+     "tf": 9,
+     "tw": 6,
+     "r": 10
+    },
+    "Box-50x50x3": {
+     "type": "box",
+     "H": 50,
+     "B": 50,
+     "t": 3
+    },
+    "Box-40x40x3": {
+     "type": "box",
+     "H": 40,
+     "B": 40,
+     "t": 3
+    }
+   },
+   "members": {
+    "CAL1": {
+     "i": "AL0",
+     "j": "AL1",
+     "section": "I-100x100x8x6",
+     "material": "steel",
+     "orientation": {
+      "roll": 90
+     }
+    },
+    "CAR1": {
+     "i": "AR0",
+     "j": "AR1",
+     "section": "I-100x100x8x6",
+     "material": "steel",
+     "orientation": {
+      "roll": 90
+     }
+    },
+    "TA1": {
+     "i": "AL1",
+     "j": "AR1",
+     "section": "I-250x125x9x6",
+     "material": "steel",
+     "releases": {
+      "i": {
+       "ry": true
+      },
+      "j": {
+       "ry": true
+      }
+     }
+    },
+    "CBL1": {
+     "i": "BL0",
+     "j": "BL1",
+     "section": "I-100x100x8x6",
+     "material": "steel",
+     "orientation": {
+      "roll": 90
+     }
+    },
+    "CBR1": {
+     "i": "BR0",
+     "j": "BR1",
+     "section": "I-100x100x8x6",
+     "material": "steel",
+     "orientation": {
+      "roll": 90
+     }
+    },
+    "TB1": {
+     "i": "BL1",
+     "j": "BR1",
+     "section": "I-250x125x9x6",
+     "material": "steel",
+     "releases": {
+      "i": {
+       "ry": true
+      },
+      "j": {
+       "ry": true
+      }
+     }
+    },
+    "SAL1": {
+     "i": "AL1",
+     "j": "BL1",
+     "section": "Box-50x50x3",
+     "material": "steel",
+     "releases": {
+      "i": {
+       "ry": true,
+       "rz": true
+      },
+      "j": {
+       "rx": true,
+       "ry": true,
+       "rz": true
+      }
+     }
+    },
+    "SAR1": {
+     "i": "AR1",
+     "j": "BR1",
+     "section": "Box-50x50x3",
+     "material": "steel",
+     "releases": {
+      "i": {
+       "ry": true,
+       "rz": true
+      },
+      "j": {
+       "rx": true,
+       "ry": true,
+       "rz": true
+      }
+     }
+    },
+    "XL1": {
+     "type": "truss",
+     "i": "AL0",
+     "j": "BL1",
+     "section": "Box-40x40x3",
+     "material": "steel"
+    },
+    "XR1": {
+     "type": "truss",
+     "i": "AR0",
+     "j": "BR1",
+     "section": "Box-40x40x3",
+     "material": "steel"
+    }
+   },
+   "loadCases": {
+    "D": {
+     "description": "self weight and empty pipes",
+     "loads": [
+      {
+       "type": "selfWeight"
+      },
+      {
+       "type": "memberPoint",
+       "member": "TA1",
+       "direction": "Y",
+       "value": -3,
+       "position": 0.333
+      },
+      {
+       "type": "memberPoint",
+       "member": "TA1",
+       "direction": "Y",
+       "value": -3,
+       "position": 0.667
+      },
+      {
+       "type": "memberPoint",
+       "member": "TB1",
+       "direction": "Y",
+       "value": -3,
+       "position": 0.333
+      },
+      {
+       "type": "memberPoint",
+       "member": "TB1",
+       "direction": "Y",
+       "value": -3,
+       "position": 0.667
+      }
+     ]
+    },
+    "O": {
+     "description": "pipe contents (operating)",
+     "loads": [
+      {
+       "type": "memberPoint",
+       "member": "TA1",
+       "direction": "Y",
+       "value": -5,
+       "position": 0.333
+      },
+      {
+       "type": "memberPoint",
+       "member": "TA1",
+       "direction": "Y",
+       "value": -5,
+       "position": 0.667
+      },
+      {
+       "type": "memberPoint",
+       "member": "TB1",
+       "direction": "Y",
+       "value": -5,
+       "position": 0.333
+      },
+      {
+       "type": "memberPoint",
+       "member": "TB1",
+       "direction": "Y",
+       "value": -5,
+       "position": 0.667
+      }
+     ]
+    },
+    "F": {
+     "description": "pipe friction along the rack",
+     "loads": [
+      {
+       "type": "memberPoint",
+       "member": "TA1",
+       "direction": "X",
+       "value": 2.5,
+       "position": 0.333
+      },
+      {
+       "type": "memberPoint",
+       "member": "TA1",
+       "direction": "X",
+       "value": 2.5,
+       "position": 0.667
+      },
+      {
+       "type": "memberPoint",
+       "member": "TB1",
+       "direction": "X",
+       "value": 2.5,
+       "position": 0.333
+      },
+      {
+       "type": "memberPoint",
+       "member": "TB1",
+       "direction": "X",
+       "value": 2.5,
+       "position": 0.667
+      }
+     ]
+    },
+    "W": {
+     "description": "transverse wind",
+     "loads": [
+      {
+       "type": "nodal",
+       "node": "AL1",
+       "Fz": -3
+      },
+      {
+       "type": "memberDistributed",
+       "member": "CAL1",
+       "direction": "Z",
+       "w1": -0.0005
+      },
+      {
+       "type": "memberDistributed",
+       "member": "CAR1",
+       "direction": "Z",
+       "w1": -0.0005
+      },
+      {
+       "type": "nodal",
+       "node": "BL1",
+       "Fz": -3
+      },
+      {
+       "type": "memberDistributed",
+       "member": "CBL1",
+       "direction": "Z",
+       "w1": -0.0005
+      },
+      {
+       "type": "memberDistributed",
+       "member": "CBR1",
+       "direction": "Z",
+       "w1": -0.0005
+      }
+     ]
+    }
+   },
+   "combinations": {
+    "ULS1": {
+     "factors": {
+      "D": 1.4,
+      "O": 1.4,
+      "F": 1.4
+     }
+    },
+    "SLS1": {
+     "factors": {
+      "D": 1,
+      "O": 1
+     },
+     "purpose": "serviceability"
+    },
+    "ULS2": {
+     "factors": {
+      "D": 1.2,
+      "O": 1.2,
+      "W": 1
+     }
+    }
+   },
+   "analysis": {
+    "shearDeformation": false
+   },
+   "design": {
+    "defaults": {
+     "method": "LRFD"
+    },
+    "groups": {
+     "columns": {
+      "members": [
+       "CAL1",
+       "CAR1",
+       "CBL1",
+       "CBR1"
+      ],
+      "role": "column",
+      "Kx": 1.5,
+      "Ky": 1.0
+     },
+     "tierBeams": {
+      "members": [
+       "TA1",
+       "TB1"
+      ],
+      "role": "beam",
+      "bracing": {
+       "topFlange": [
+        0.333,
+        0.667
+       ],
+       "bottomFlange": [
+        0.5
+       ]
+      },
+      "deflectionLimits": [
+       {
+        "spanRatio": 240,
+        "direction": "y",
+        "combinations": [
+         "SLS1"
+        ]
+       }
+      ]
+     },
+     "struts": {
+      "members": [
+       "SAL1",
+       "SAR1"
+      ],
+      "role": "beam"
+     },
+     "braces": {
+      "members": [
+       "XL1",
+       "XR1"
+      ],
+      "role": "brace"
+     }
+    }
+   }
+  },
+  "resultsHash": "e852d601fd541a29aa7dcf4b44a55abe0be60f994de85a4736e889b2e29f3efb",
+  "tolerance": {
+   "full": 0.02,
+   "zero": 0.1
+  }
+ },
+ "baseVerification": {
+  "format": "benchfea-verification",
+  "kind": "results",
+  "status": "verified",
+  "meaning": "'verified' means only: the reference solution passed every tier listed as applicable in this record, at the tolerances stated in it. It does not mean reviewed, approved or certified by anyone.",
+  "modelHash": "e60f84bc38313fc88e049fbf08128c6b1df78bd53eb6807a1faa46df77864ad5",
+  "tiersPassed": [
+   "C",
+   "D",
+   "E"
+  ],
+  "tiersNotPassed": [],
+  "tiersNotApplicable": [
+   "A",
+   "B",
+   "F"
+  ],
+  "quarantine": null,
+  "tiers": {
+   "A": {
+    "applies": false,
+    "passed": null,
+    "summary": "not a model the ODE oracle can represent: the members are not collinear with identical local axes",
+    "tolerances": {},
+    "largestDifferences": []
+   },
+   "B": {
+    "applies": false,
+    "passed": null,
+    "summary": "not a registered published problem (see verify_problem)",
+    "tolerances": {},
+    "largestDifferences": []
+   },
+   "C": {
+    "applies": true,
+    "passed": true,
+    "summary": "3 combination(s) cross-checked by OpenSeesPy and PyNite",
+    "tolerances": {
+     "relative": 1e-06,
+     "maxApproximation": 0.005,
+     "requiredSolvers": 2,
+     "estimateSafety": 1.0,
+     "rule": "relative + (estimated errors of the two results compared), the rule of benchfea.crosscheck.cross_check"
+    },
+    "largestDifferences": [
+     {
+      "what": "benchfea vs pynite",
+      "combination": "ULS2",
+      "value": 5.405613045580116e-13,
+      "tolerance": 1e-06,
+      "where": "member TB1 end i Mz"
+     },
+     {
+      "what": "opensees vs pynite",
+      "combination": "ULS2",
+      "value": 5.001761086596846e-13,
+      "tolerance": 1e-06,
+      "where": "member TB1 end i Mz"
+     },
+     {
+      "what": "benchfea vs opensees",
+      "combination": "ULS2",
+      "value": 5.597813863231801e-14,
+      "tolerance": 1e-06,
+      "where": "node BL1 uz"
+     }
+    ]
+   },
+   "D": {
+    "applies": true,
+    "passed": true,
+    "summary": "34 invariant check(s) over 3 combination(s) and the statics of 354 result station(s): all passed",
+    "tolerances": {
+     "superposition": 1e-09,
+     "reciprocity": 1e-09,
+     "stationStatics": 1e-09,
+     "stationStaticsIterated": 1e-06,
+     "stationIntegration": 1e-06,
+     "stored": "tolerance stored with each invariant (docs/THEORY.md 8, 15)"
+    },
+    "largestDifferences": [
+     {
+      "what": "superposition: ULS2",
+      "value": 1.0099865908591472e-13,
+      "tolerance": 1e-09,
+      "ratio": 0.00010099865908591472
+     },
+     {
+      "what": "station statics (end, member TB1 station forces at the ends against the end forces)",
+      "combination": "ULS1",
+      "value": 1.3923897123873406e-15,
+      "tolerance": 1e-09,
+      "ratio": 1.3923897123873405e-06
+     },
+     {
+      "what": "linear solve residual",
+      "combination": "ULS2",
+      "value": 7.764950144362387e-17,
+      "tolerance": 1e-09,
+      "ratio": 7.764950144362386e-08
+     }
+    ]
+   },
+   "E": {
+    "applies": true,
+    "passed": true,
+    "summary": "4 check(s) applied (designVariables, memberSplit, fullReleases, fixedEnds); all passed",
+    "tolerances": {
+     "limit": 1e-05,
+     "splitFirstOrder": 1e-08,
+     "splitNonlinear": 1e-06,
+     "designVariables": 0.0,
+     "seriesRatio": 10.0,
+     "observedOrder": [
+      0.5,
+      1.5
+     ]
+    },
+    "largestDifferences": [
+     {
+      "what": "fullReleases",
+      "value": 2.0661643999841322e-11,
+      "tolerance": 1e-05,
+      "where": "node BL1 ry",
+      "combination": "ULS1"
+     },
+     {
+      "what": "fixedEnds",
+      "value": 2.0988893495658831e-13,
+      "tolerance": 1e-05,
+      "where": "node AR1 rx",
+      "combination": "ULS2"
+     },
+     {
+      "what": "memberSplit",
+      "value": 1.5256414732333485e-13,
+      "tolerance": 1e-08,
+      "where": "node AL1 uz",
+      "combination": "ULS2"
+     }
+    ]
+   },
+   "F": {
+    "applies": false,
+    "passed": null,
+    "summary": "design results are not part of this reference solution",
+    "tolerances": {},
+    "largestDifferences": []
+   }
+  },
+  "versions": {
+   "benchfea": "0.1.0",
+   "python": "3.13.18",
+   "numpy": "2.5.3",
+   "scipy": "1.18.1",
+   "foreign:opensees": "3.8.0.0",
+   "foreign:pynite": "3.2.1"
+  },
+  "notes": [
+   "verified: passed tier(s) C, D, E at the tolerances stated in the record"
+  ]
+ },
+ "baseDesignVerification": {
+  "format": "benchfea-verification",
+  "kind": "results",
+  "status": "quarantined",
+  "meaning": "'verified' means only: the reference solution passed every tier listed as applicable in this record, at the tolerances stated in it. It does not mean reviewed, approved or certified by anyone.",
+  "modelHash": "e60f84bc38313fc88e049fbf08128c6b1df78bd53eb6807a1faa46df77864ad5",
+  "tiersPassed": [
+   "C",
+   "D",
+   "E"
+  ],
+  "tiersNotPassed": [
+   "F"
+  ],
+  "tiersNotApplicable": [
+   "A",
+   "B"
+  ],
+  "quarantine": {
+   "category": "not-covered",
+   "meaning": "a design limit state used by the reference solution lacks tier-F coverage",
+   "tiers": [
+    "F"
+   ],
+   "diagnosis": "tier F: NOT publishable: 7 clause item(s) without full coverage, 0 used check(s) notChecked / refused: Eq. E4-1: Design Examples reproduce only an intermediate value (b partial: E.2, E.3) -- used by 16 check(s), e.g. member CAL1, combination ULS1: compression: torsional buckling; Eq. E4-2: Design Examples reproduce only an intermediate value (b partial: E.2, E.3) -- used by 16 check(s), e.g. member CAL1, combination ULS1: compression: torsional buckling; Eq. F2-7: no Design Examples reproduction (b) -- used by 12 check(s), e.g. member CAL1, combination ULS1: flexure, major axis: lateral-torsional buckling"
+  },
+  "tiers": {
+   "A": {
+    "applies": false,
+    "passed": null,
+    "summary": "not a model the ODE oracle can represent: the members are not collinear with identical local axes",
+    "tolerances": {},
+    "largestDifferences": []
+   },
+   "B": {
+    "applies": false,
+    "passed": null,
+    "summary": "not a registered published problem (see verify_problem)",
+    "tolerances": {},
+    "largestDifferences": []
+   },
+   "C": {
+    "applies": true,
+    "passed": true,
+    "summary": "3 combination(s) cross-checked by OpenSeesPy and PyNite",
+    "tolerances": {
+     "relative": 1e-06,
+     "maxApproximation": 0.005,
+     "requiredSolvers": 2,
+     "estimateSafety": 1.0,
+     "rule": "relative + (estimated errors of the two results compared), the rule of benchfea.crosscheck.cross_check"
+    },
+    "largestDifferences": [
+     {
+      "what": "benchfea vs pynite",
+      "combination": "ULS2",
+      "value": 5.405613045580116e-13,
+      "tolerance": 1e-06,
+      "where": "member TB1 end i Mz"
+     },
+     {
+      "what": "opensees vs pynite",
+      "combination": "ULS2",
+      "value": 5.001761086596846e-13,
+      "tolerance": 1e-06,
+      "where": "member TB1 end i Mz"
+     },
+     {
+      "what": "benchfea vs opensees",
+      "combination": "ULS2",
+      "value": 5.597813863231801e-14,
+      "tolerance": 1e-06,
+      "where": "node BL1 uz"
+     }
+    ]
+   },
+   "D": {
+    "applies": true,
+    "passed": true,
+    "summary": "34 invariant check(s) over 3 combination(s) and the statics of 354 result station(s): all passed",
+    "tolerances": {
+     "superposition": 1e-09,
+     "reciprocity": 1e-09,
+     "stationStatics": 1e-09,
+     "stationStaticsIterated": 1e-06,
+     "stationIntegration": 1e-06,
+     "stored": "tolerance stored with each invariant (docs/THEORY.md 8, 15)"
+    },
+    "largestDifferences": [
+     {
+      "what": "superposition: ULS2",
+      "value": 1.0099865908591472e-13,
+      "tolerance": 1e-09,
+      "ratio": 0.00010099865908591472
+     },
+     {
+      "what": "station statics (end, member TB1 station forces at the ends against the end forces)",
+      "combination": "ULS1",
+      "value": 1.3923897123873406e-15,
+      "tolerance": 1e-09,
+      "ratio": 1.3923897123873405e-06
+     },
+     {
+      "what": "linear solve residual",
+      "combination": "ULS2",
+      "value": 7.764950144362387e-17,
+      "tolerance": 1e-09,
+      "ratio": 7.764950144362386e-08
+     }
+    ]
+   },
+   "E": {
+    "applies": true,
+    "passed": true,
+    "summary": "4 check(s) applied (designVariables, memberSplit, fullReleases, fixedEnds); all passed",
+    "tolerances": {
+     "limit": 1e-05,
+     "splitFirstOrder": 1e-08,
+     "splitNonlinear": 1e-06,
+     "designVariables": 0.0,
+     "seriesRatio": 10.0,
+     "observedOrder": [
+      0.5,
+      1.5
+     ]
+    },
+    "largestDifferences": [
+     {
+      "what": "fullReleases",
+      "value": 2.0661643999841322e-11,
+      "tolerance": 1e-05,
+      "where": "node BL1 ry",
+      "combination": "ULS1"
+     },
+     {
+      "what": "fixedEnds",
+      "value": 2.0988893495658831e-13,
+      "tolerance": 1e-05,
+      "where": "node AR1 rx",
+      "combination": "ULS2"
+     },
+     {
+      "what": "memberSplit",
+      "value": 1.5256414732333485e-13,
+      "tolerance": 1e-08,
+      "where": "node AL1 uz",
+      "combination": "ULS2"
+     }
+    ]
+   },
+   "F": {
+    "applies": true,
+    "passed": false,
+    "summary": "NOT publishable: 7 clause item(s) without full coverage, 0 used check(s) notChecked / refused: Eq. E4-1: Design Examples reproduce only an intermediate value (b partial: E.2, E.3) -- used by 16 check(s), e.g. member CAL1, combination ULS1: compression: torsional buckling; Eq. E4-2: Design Examples reproduce only an intermediate value (b partial: E.2, E.3) -- used by 16 check(s), e.g. member CAL1, combination ULS1: compression: torsional buckling; Eq. F2-7: no Design Examples reproduction (b) -- used by 12 check(s), e.g. member CAL1, combination ULS1: flexure, major axis: lateral-torsional buckling",
+    "tolerances": {
+     "negligibleUtilisation": 1e-09
+    },
+    "largestDifferences": []
+   }
+  },
+  "versions": {
+   "benchfea": "0.1.0",
+   "python": "3.13.18",
+   "numpy": "2.5.3",
+   "scipy": "1.18.1",
+   "foreign:opensees": "3.8.0.0",
+   "foreign:pynite": "3.2.1"
+  },
+  "notes": []
+ }
+}

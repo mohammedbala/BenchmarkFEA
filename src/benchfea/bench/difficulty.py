@@ -16,7 +16,7 @@ features        kinds present among: member end releases; rigid end offsets;    
                 springs or imposed support displacements (at most 3 counted)
 secondOrder     no second-order combination 0; some 1; and the largest          0..2
                 amplification (second-order / first-order largest
-                translation) >= 1.10: 2
+                horizontal translation) >= 1.10: 2
 combinations    number of combinations: <=2, 3-5, more                           0..2
 =============== ================================================================ ============
 
@@ -38,6 +38,7 @@ SIZE_LIMITS = (12, 30, 72, 150)            # free DOFs: points = number of limit
 INDETERMINACY_LIMITS = (0, 3, 12, 48)
 LEVEL_LIMITS = (2, 5, 8, 11)               # score: level = 1 + number of limits exceeded
 AMPLIFICATION_BAND = 1.10
+HORIZONTAL_SHARE = 0.01                    # see ``amplification``
 FEATURE_CAP = 3
 _TOL = 1e-9
 
@@ -270,8 +271,12 @@ def _feature_kinds(flags: dict) -> list:
 
 # ------------------------------------------------------------------------------------- amplification
 def amplification(document: dict, results=None, first_order=None) -> dict:
-    """Second-order amplification of every second-order combination: largest nodal translation
-    of the combination as analysed / the same with the combination switched to first order.
+    """Second-order amplification of every second-order combination: largest HORIZONTAL nodal
+    translation of the combination as analysed / the same with the combination switched to first
+    order (the sway amplification; vertical deflections, which second-order effects hardly change,
+    would dilute it).  A combination whose first-order horizontal translations are negligible --
+    below ``HORIZONTAL_SHARE`` of its largest translation, e.g. symmetric gravity loading -- uses the
+    largest translation of any direction instead.
     Returns {combination id: factor}; empty when no combination is second order.
     ``results``: results of ``document`` if already computed; ``first_order``: results of the
     same model with every combination first order, if already computed."""
@@ -289,11 +294,19 @@ def amplification(document: dict, results=None, first_order=None) -> dict:
         first.setdefault("analysis", {}).pop("buckling", None)
         first.pop("design", None)
         lin = analyze(build_model(first))
+    vertical = "XYZ".index(document["conventions"]["verticalAxis"])
+    horizontal = [k for k in range(3) if k != vertical]
     out = {}
     for cid in so:
-        u2 = float(np.max(np.linalg.norm(results.combinations[cid].displacements[:, :3], axis=1)))
-        u1 = float(np.max(np.linalg.norm(lin.combinations[cid].displacements[:, :3], axis=1)))
-        out[cid] = u2 / u1 if u1 > 0 else 1.0
+        d2, d1 = results.combinations[cid].displacements, lin.combinations[cid].displacements
+        u2 = float(np.max(np.linalg.norm(d2[:, :3], axis=1)))
+        u1 = float(np.max(np.linalg.norm(d1[:, :3], axis=1)))
+        h2 = float(np.max(np.linalg.norm(d2[:, horizontal], axis=1)))
+        h1 = float(np.max(np.linalg.norm(d1[:, horizontal], axis=1)))
+        if h1 > HORIZONTAL_SHARE * u1:
+            out[cid] = h2 / h1
+        else:
+            out[cid] = u2 / u1 if u1 > 0 else 1.0
     return out
 
 
