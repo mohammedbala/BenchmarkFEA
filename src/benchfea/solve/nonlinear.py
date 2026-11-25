@@ -761,10 +761,11 @@ def second_order_checks(structure, K_members, factor, loads: LoadSet, solution, 
     fscale = max(float(A[:3].max()), float(Ar[:3].max()))
     mscale = max(float(A[3:].max()), float(Ar[3:].max()), float(geo_abs.max()))
     fscale, mscale = max(fscale, mscale / Lc), max(mscale, fscale * Lc)
-    v = inv._ratio(float(np.abs(tot[:3]).max()), fscale)
+    Sf, Sm, Se = inv.stiffness_displacement_scale(K_members, u, Lc)             # round-off floors (invariants.py)
+    v = inv._ratio(float(np.abs(tot[:3]).max()), fscale, Sf, tol)
     out.append(InvariantCheck("global force equilibrium", v, tol, v <= tol,
                               "sum of applied loads + reactions (components in the undeformed axes)"))
-    v = inv._ratio(float(np.abs(tot[3:]).max()), mscale)
+    v = inv._ratio(float(np.abs(tot[3:]).max()), mscale, Sm, tol)
     out.append(InvariantCheck(
         "global moment equilibrium", v, tol, v <= tol,
         "second-order: applied loads + reactions about the global origin at the undeformed positions, minus the "
@@ -772,8 +773,8 @@ def second_order_checks(structure, K_members, factor, loads: LoadSet, solution, 
         "(integral of N x slope over every piece) and of the rigid end offsets"))
     fmax, mmax = float(absum[trans].max(initial=0.0)), float(absum[~trans].max(initial=0.0))
     fmax, mmax = max(fmax, mmax / Lc), max(mmax, fmax * Lc)
-    jf = inv._ratio(float(np.abs(g[trans]).max(initial=0.0)), fmax)
-    jm = inv._ratio(float(np.abs(g[~trans]).max(initial=0.0)), mmax)
+    jf = inv._ratio(float(np.abs(g[trans]).max(initial=0.0)), fmax, Sf, tol)
+    jm = inv._ratio(float(np.abs(g[~trans]).max(initial=0.0)), mmax, Sm, tol)
     worst = int(np.argmax(np.abs(g) / np.where(trans, max(fmax, 1e-300), max(mmax, 1e-300)))) if n else 0
     v = max(jf, jm)
     out.append(InvariantCheck("joint equilibrium", v, tol, v <= tol,
@@ -782,14 +783,14 @@ def second_order_checks(structure, K_members, factor, loads: LoadSet, solution, 
                               f"at node {structure.node_ids[worst // 6] if n else '-'}"))
     fs, ms = max(fs, ms / Lc), max(ms, fs * Lc)
     ds, rs = max(ds, rs * Lc), max(rs, ds / Lc)
-    v = max(inv._ratio(fc, fs), inv._ratio(mc, ms))
+    v = max(inv._ratio(fc, fs, Sf, tol), inv._ratio(mc, ms, Sm, tol))
     out.append(InvariantCheck("member equilibrium", v, tol, v <= tol,
                               "resultants carried from end i to end j of every piece by the beam-column transfer "
                               "minus the end forces at j"))
     v = max(inv._ratio(dc, ds), inv._ratio(rc, rs))
     out.append(InvariantCheck("member compatibility", v, tol, v <= tol,
                               "displacements carried from end i to end j of every piece minus the displacement of end j"))
-    v = inv._ratio(dres, max(dscale, ms * 1.0e-300))
+    v = inv._ratio(dres, max(dscale, ms * 1.0e-300), Sm, tol)
     out.append(InvariantCheck("member equilibrium on the deformed axis", v, tol, v <= tol,
                               "moment equilibrium of every piece with its axial force acting on the deflected axis: "
                               "end moments + end shears x length + load moments - integral of N x slope, the "
@@ -797,7 +798,7 @@ def second_order_checks(structure, K_members, factor, loads: LoadSet, solution, 
     U = float(u @ (K_members @ u))
     terms = (solution.F + solution.reactions + solution.constraint_forces) * u
     W = float(terms.sum())
-    v = inv._ratio(abs(U - W), max(abs(U), float(np.abs(terms).sum())))
+    v = inv._ratio(abs(U - W), max(abs(U), float(np.abs(terms).sum())), Se, tol)
     out.append(InvariantCheck("work = strain energy", v, tol, v <= tol,
                               "u^T K_T u versus (equivalent nodal loads + reactions) . u, K_T = tangent stiffness: "
                               "strain energy plus the second-order work of the axial forces"))

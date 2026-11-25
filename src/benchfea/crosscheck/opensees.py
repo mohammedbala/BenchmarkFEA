@@ -36,9 +36,16 @@ reproduced by tests/test_crosscheck_measured.py; see docs/CROSSCHECK.md):
   the fixed-end forces of :mod:`benchfea.crosscheck.fef`, which are added back to the element end forces.
 * second order: ``geomTransf('PDelta')`` (chord-rotation geometric stiffness only, no P-delta inside
   an element), Newton iterations on the current axial forces, every frame member divided into
-  ``subdivisions`` elements; the discretisation error is O(1/n^2) and is estimated by the runner from
-  two subdivision levels.  Member end forces are reported along the UNDEFORMED local axes (forces from
-  the global element forces, moments from the element ends).
+  ``subdivisions`` elements.  The discretisation error is O(1/n^2) provided the axial force the
+  transformation uses is the mean axial force of the element.  Measured: with an AXIAL component in
+  an ``eleLoad`` the transformation takes the axial force of element end j (the basic force without
+  the element-load part), which is off by half the load on the element and lowers the convergence
+  to O(1/n).  In a second-order combination the axial component of every member load is therefore
+  applied as equivalent nodal loads (the axial force of each element is then constant and equal to
+  the mean of the exact one for a uniform load); the transverse components stay native.  The error
+  is bounded by the runner from three subdivision levels (``runner.estimate_from_levels``), with no
+  order assumed beyond "at least first".  Member end forces are reported along the UNDEFORMED local
+  axes (forces from the global element forces, moments from the element ends).
 * linear solver: ``UmfPack`` (measured: far less round-off with penalty springs than the dense
   solvers, but it does not report a singular matrix -- the self-check below does).
 * reactions are NOT read from ``nodeReaction`` (measured: zero at a fixed node that retains a
@@ -55,16 +62,21 @@ import numpy as np
 
 from .fef import bending_split, clip_loads, fixed_end_forces
 from .fidelity import APPROXIMATE, EXACT, UNSUPPORTED, Fidelity
-from .foreign import ForeignResult, Translation
+from .foreign import ForeignResult, Translation, refinement_levels
 from .prepare import Prepared, prepare
 
 SOLVER = "opensees"
 TINY = 1e-15                           # relative stiffness of a direction an element must not carry
 NO_SHEAR_AREA_FACTOR = 1e10            # shear area standing for "no shear deformation in this direction"
-DEFAULT_SUBDIVISIONS = (8, 16)         # coarse, fine (second order)
+DEFAULT_SUBDIVISIONS = (8, 16, 32)     # three levels, ratio 2; the last is the delivered run (second order)
+SUBDIVISION_ORDERS = (1.0, 2.0)        # convergence orders the error bound allows for: at least first (assumed
+                                       # for the future levels), at most second (chord-rotation geometric stiffness)
 DEFAULT_PENALTY = (1e5, 1e6)           # coarse, fine
 
 __all__ = ["translate", "execute", "SOLVER"]
+
+_LINEAR_NOTE = (" (second order: a linear kinematic relation, like benchfea's -- the second-order effect of the "
+                "forces the constraint transmits is in neither)")
 
 
 def _aligned(R, tol=1e-12) -> bool:
@@ -148,7 +160,7 @@ def translate(model, combination: str, *, subdivisions: int | None = None, penal
         fid.add(feature, level, note)
     b = _Builder(p)
     cmds = b.model_cmds
-    n_sub = int(subdivisions) if subdivisions else (DEFAULT_SUBDIVISIONS[1] if p.second_order else 1)
+    n_sub = int(subdivisions) if subdivisions else (DEFAULT_SUBDIVISIONS[-1] if p.second_order else 1)
     pen = float(penalty) if penalty else DEFAULT_PENALTY[1]
     controls = {}
     transf_name = "PDelta" if p.second_order else "Linear"
@@ -184,12 +196,13 @@ def translate(model, combination: str, *, subdivisions: int | None = None, penal
     for c in p.constraints:
         m_tag = b.tag(c.master)
         if c.type == "rigidLink":
-            fid.add("constraints.rigidLink", EXACT, "rigidLink('beam'), Transformation handler")
+            fid.add("constraints.rigidLink", EXACT, "rigidLink('beam'), Transformation handler" + _LINEAR_NOTE * p.second_order)
             for s in c.slaves:
                 cmds.append(["rigidLink", "beam", m_tag, b.tag(s)])
                 b.constrain("rigid", m_tag, b.tag(s), range(6))
         else:
-            fid.add("constraints.rigidDiaphragm", EXACT, "rigidDiaphragm, Transformation handler")
+            fid.add("constraints.rigidDiaphragm", EXACT,
+                    "rigidDiaphragm, Transformation handler" + _LINEAR_NOTE * p.second_order)
             a = "XYZ".index(c.normal)
             dofs = [d for d in range(3) if d != a] + [3 + a]
             direct = []
@@ -304,17 +317,29 @@ def translate(model, combination: str, *, subdivisions: int | None = None, penal
             ends.append((D, np.zeros(3)))
 
         # ---- sub-elements along the flexible length
-        n = 1 if m.truss else n_sub
-        if p.second_order and not m.truss:
+        bows = m.bows(p.second_order)
+        if bows and not (m.EIy > 0.0 and m.EIz > 0.0):
+            fid.add("members.truss", UNSUPPORTED,
+                    f"second order: the truss-type member {mid!r} carries an axial member load (it is a pin-ended "
+                    "beam-column in benchfea) but its section has no bending stiffness to model it with")
+            bows = False
+        n = n_sub if (bows or not m.truss) else 1
+        if bows:
+            fid.add("secondOrder", APPROXIMATE,
+                    "truss-type member with an axial member load: pin-ended beam-column, subdivided like a frame "
+                    "member (bending hinges at its two ends, torsion stiffness x 1e-15)", control="subdivisions")
+            controls["subdivisions"] = refinement_levels(n_sub, SUBDIVISION_ORDERS,
+                                                         DEFAULT_SUBDIVISIONS if subdivisions is None else None)
+        elif p.second_order and not m.truss:
             fid.add("secondOrder", APPROXIMATE,
                     "PDelta transformation (chord-rotation geometric stiffness, no P-delta inside an element), "
-                    "Newton iterations on the axial forces; error O(1/n^2) in the number of elements per member",
+                    "Newton iterations on the axial forces; error bounded from three subdivision levels",
                     control="subdivisions")
-            controls["subdivisions"] = {"coarse": DEFAULT_SUBDIVISIONS[0] if subdivisions is None
-                                        else max(1, n_sub // 2), "fine": n_sub, "order": 2}
+            controls["subdivisions"] = refinement_levels(n_sub, SUBDIVISION_ORDERS,
+                                                         DEFAULT_SUBDIVISIONS if subdivisions is None else None)
         elif p.second_order:
-            fid.add("secondOrder", EXACT, "truss-type member: chord-rotation geometric stiffness is the complete "
-                                          "geometric stiffness of a pin-ended bar")
+            fid.add("secondOrder", EXACT, "truss-type member with a constant axial force: the chord-rotation "
+                                          "geometric stiffness is the complete geometric stiffness of a pin-ended bar")
         chain = [ends[0][0]]
         for s in range(1, n):
             pos = m.start + (m.end - m.start) * (s / n)
@@ -328,7 +353,9 @@ def translate(model, combination: str, *, subdivisions: int | None = None, penal
         if m.truss:                               # a truss section may come without bending properties
             Iy_eff = Iy_eff or m.A ** 2 / 12.0
             Iz_eff = Iz_eff or m.A ** 2 / 12.0
-        J = (m.J or m.A ** 2 / 6.0) * (TINY if m.truss else 1.0)
+        J_full = m.J or m.A ** 2 / 6.0
+        # (a pin-ended bar gets no bending stiffness from ``bending_split`` with both ends hinged; a bowing
+        # truss member is a chain whose first and last element carry one hinge each)
         gay, gaz = (m.GAy, m.GAz) if timo else (None, None)
         groups, fefs = [], []
         for s in range(n):
@@ -355,6 +382,10 @@ def translate(model, combination: str, *, subdivisions: int | None = None, penal
 
             e = transf()
             Iy_c, Iz_c = Iy_eff * max(ay, TINY), Iz_eff * max(az, TINY)
+            # a truss-type member transmits no torque: twist released at end j (docs/THEORY.md 1.5), i.e. no
+            # torsion stiffness in its last element; the other elements of a chain hold the twist of the
+            # internal nodes, which no torque can reach
+            J = J_full * (TINY if (m.truss and last) else 1.0)
             if timo:
                 Avy = (gay / m.G) * (az if az > TINY else 1.0) if gay else NO_SHEAR_AREA_FACTOR * m.A
                 Avz = (gaz / m.G) * (ay if ay > TINY else 1.0) if gaz else NO_SHEAR_AREA_FACTOR * m.A
@@ -377,22 +408,36 @@ def translate(model, combination: str, *, subdivisions: int | None = None, penal
             pts, ds = clip_loads(m.points, m.dists, s * Ls, (s + 1) * Ls, last, tol=1e-12 * m.L)
             native = native_loads and not timo and not released
             rest_p, rest_d = [], []
+            # second order: the PDelta transformation takes the axial force of element end j, which does
+            # not contain the axial part of an element load (measured) -> axial components go to the nodes
+            split = p.second_order
             for kind, vec, x in pts:
                 if native and kind == "force" and 1e-9 * Ls < x < Ls * (1 - 1e-9):
-                    b.ele_loads.append(["eleLoad", "-ele", tags[0], "-type", "-beamPoint", float(vec[1]),
-                                        float(vec[2]), x / Ls, float(vec[0])])
-                    fid.add("loads.memberPoint", EXACT, "eleLoad -beamPoint")
+                    ax = float(vec[0]) if split else 0.0
+                    if vec[1] != 0.0 or vec[2] != 0.0 or not ax:
+                        b.ele_loads.append(["eleLoad", "-ele", tags[0], "-type", "-beamPoint", float(vec[1]),
+                                            float(vec[2]), x / Ls, float(vec[0]) - ax])
+                        fid.add("loads.memberPoint", EXACT, "eleLoad -beamPoint")
+                    if ax:
+                        rest_p.append((kind, np.array([ax, 0.0, 0.0]), x))
+                        fid.add("loads.memberPoint", EXACT, "second order: axial component as equivalent nodal loads")
                 else:
                     rest_p.append((kind, vec, x))
                     fid.add("loads.memberPoint", EXACT, "equivalent nodal loads from exact fixed-end forces")
             for w1, w2, x1, x2 in ds:
                 if native and np.array_equal(w1, w2):
-                    args = ["eleLoad", "-ele", tags[0], "-type", "-beamUniform", float(w1[1]), float(w1[2]),
-                            float(w1[0])]
-                    if x1 > 1e-12 * Ls or x2 < Ls * (1 - 1e-12):
-                        args += [x1 / Ls, x2 / Ls]
-                    b.ele_loads.append(args)
-                    fid.add("loads.memberDistributed", EXACT, "eleLoad -beamUniform")
+                    ax = float(w1[0]) if split else 0.0
+                    if w1[1] != 0.0 or w1[2] != 0.0 or not ax:
+                        args = ["eleLoad", "-ele", tags[0], "-type", "-beamUniform", float(w1[1]), float(w1[2]),
+                                float(w1[0]) - ax]
+                        if x1 > 1e-12 * Ls or x2 < Ls * (1 - 1e-12):
+                            args += [x1 / Ls, x2 / Ls]
+                        b.ele_loads.append(args)
+                        fid.add("loads.memberDistributed", EXACT, "eleLoad -beamUniform")
+                    if ax:
+                        rest_d.append((np.array([ax, 0.0, 0.0]), np.array([ax, 0.0, 0.0]), x1, x2))
+                        fid.add("loads.memberDistributed", EXACT,
+                                "second order: axial component as equivalent nodal loads")
                 else:
                     rest_d.append((w1, w2, x1, x2))
                     fid.add("loads.memberDistributed", EXACT, "equivalent nodal loads from exact fixed-end forces")

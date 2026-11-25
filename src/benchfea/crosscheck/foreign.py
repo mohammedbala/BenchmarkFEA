@@ -7,7 +7,25 @@ import numpy as np
 
 from .fidelity import Fidelity
 
-__all__ = ["ForeignResult", "Translation", "TranslationError"]
+__all__ = ["ForeignResult", "Translation", "TranslationError", "refinement_levels"]
+
+
+def refinement_levels(fine: int, orders, default=None) -> dict:
+    """The ``controls`` entry of a refinement parameter (elements per member): the levels the runner
+    solves, coarsest first, the last being the delivered run.  Three levels with the constant ratio 2
+    (``default``, or fine/4, fine/2, fine when ``fine`` is a multiple of 4); two levels when ``fine``
+    is only even (no order can be observed: the bound then assumes the lowest order of ``orders``);
+    one level otherwise (no estimate: the solver is not eligible)."""
+    fine = int(fine)
+    if default is not None and int(default[-1]) == fine:
+        levels = [int(v) for v in default]
+    elif fine % 4 == 0:
+        levels = [fine // 4, fine // 2, fine]
+    elif fine % 2 == 0:
+        levels = [fine // 2, fine]
+    else:
+        levels = [fine]
+    return {"levels": levels, "fine": fine, "orders": [float(orders[0]), float(orders[1])]}
 
 
 class TranslationError(ValueError):
@@ -44,9 +62,11 @@ class ForeignResult:
 class Translation:
     """A foreign model ready to run: ``job`` is plain JSON data (the list of library calls and the
     outputs to read) executed by ``benchfea.crosscheck.runner`` in a subprocess; ``controls`` names the
-    refinement parameters of approximate features: ``{name: {"coarse": value, "fine": value,
-    "order": p}}`` (error assumed proportional to value**-p); ``results(raw)`` maps the raw output of
-    the worker to a :class:`ForeignResult`."""
+    refinement parameters of approximate features.  A discretisation parameter:
+    ``{name: {"levels": [n/4, n/2, n], "fine": n, "orders": [p_min, p_max]}}`` (:func:`refinement_levels`;
+    the error bound of ``runner.estimate_from_levels``).  A penalty / emulation stiffness:
+    ``{name: {"coarse": value, "fine": value, "order": None}}`` (round-off competes: twice the
+    difference).  ``results(raw)`` maps the raw output of the worker to a :class:`ForeignResult`."""
     solver: str
     combination: str
     job: dict

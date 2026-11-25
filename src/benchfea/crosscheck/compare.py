@@ -13,7 +13,8 @@ and the list of the largest differences overall.  ``cross_check`` runs the forei
 whether the model counts as cross-checked: at least two foreign solvers must represent it (fidelity
 "exact", or "approximate" with an estimated error not above ``max_approximation``) and agree with each
 other -- and with the benchfea result, if one is given -- within the tolerance plus the estimated
-errors of the two results being compared.
+errors of the two results being compared.  The estimates are bounds computed from runs of the foreign
+solver alone (``runner.estimate_from_levels``); the benchfea result never enters them.
 
 ``equilibrium`` is the hand check that needs no solver: applied loads (from their definition) plus
 reactions must vanish.
@@ -280,8 +281,14 @@ def cross_check(model, combination: str, benchfea_result=None, solvers=("opensee
             continue
         err = r.fidelity.estimated_error
         if err is None:
+            why = [f"{name}: {c.get('status')}" + (f" (level-to-level differences {c['differences'][-2]:.2e}, "
+                                                   f"{c['differences'][-1]:.2e} do not contract)"
+                                                   if c.get("status") == "not-asymptotic" else "")
+                   for name, c in (r.info.get("convergence") or {}).items()
+                   if c.get("estimatedError") is None and "levels" in c]
             reasons.append(f"{s}: approximation without an error estimate: " +
-                           "; ".join(i.feature for i in r.fidelity.approximate if i.error is None))
+                           "; ".join(i.feature for i in r.fidelity.approximate if i.error is None) +
+                           (" [" + "; ".join(why) + "]" if why else ""))
             continue
         if err > max_approximation:
             reasons.append(f"{s}: estimated approximation error {err:.2e} exceeds {max_approximation:.1e}")

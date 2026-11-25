@@ -66,6 +66,20 @@ class PMember:
     def loaded(self) -> bool:
         return bool(self.points or self.dists)
 
+    @property
+    def axially_loaded(self) -> bool:
+        """A member load with a component along the member axis (the axial force then varies)."""
+        return any(kind == "force" and v[0] != 0.0 for kind, v, _ in self.points) or \
+            any(w1[0] != 0.0 or w2[0] != 0.0 for w1, w2, _, _ in self.dists)
+
+    def bows(self, second_order: bool) -> bool:
+        """A truss-type member that is a pin-ended BEAM-COLUMN in the foreign model too: second order
+        with an axial member load.  The mean axial force times the chord rotation is the complete
+        geometric effect of a pin-ended member only while its axial force is constant; with a varying
+        axial force the member bends (and an axial load acts on the bowed axis), which is part of the
+        engine's analysis (docs/THEORY.md 10.6) and needs the member's own bending stiffness."""
+        return self.truss and second_order and self.axially_loaded
+
 
 @dataclass
 class Prepared:

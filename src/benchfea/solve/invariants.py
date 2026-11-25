@@ -12,16 +12,25 @@ Per load vector (tolerance = analysis.equilibriumTolerance unless stated).  Forc
 relative to the largest force-type quantity in the check (at least moment scale / model size), moment
 residuals to the largest moment-type quantity (at least force scale x model size), so that quantities
 that are zero by symmetry do not produce a 0/0 ratio; "model size" = diagonal of the bounding box of the nodes.
-    linear solve residual           max |K_ff u_f - rhs| / max (|K_ff| |u_f| + |rhs|)      <= 1e-9
-    global force equilibrium        applied loads (from their definition) + reactions
-    global moment equilibrium       the same, moments about the global origin
-    joint equilibrium               at every node: nodal loads + reactions + constraint forces
-                                    - member end forces (recovered element by element)
-    member equilibrium              resultants integrated along each member from end i reproduce
-                                    the end forces at j
-    member compatibility            displacements integrated along each member from end i
-                                    (through the end springs) reproduce the displacement of end j
-    work = strain energy            u^T K_members u = (loads + reactions) . u
+
+Round-off floor of the force scales (:data:`ROUND_OFF`, :func:`stiffness_displacement_scale`).  Every
+force of a solution is evaluated as a sum of products stiffness x displacement (minus fixed-end forces).
+When the true forces vanish -- a statically determinate structure under a support settlement moves as a
+rigid body -- the computed "forces" are the rounding errors of that sum, and a residual divided by them
+is a ratio of two rounding errors, not a measure of equilibrium.  The quantity that stays meaningful is
+S = max (|K| |u|), the largest sum of the absolute products the forces are evaluated from (force rows
+and moment rows separately; moment scale at least force scale x model size, because the moment sums
+contain force x lever arm).  A residual is therefore accepted when it is
+
+    <= tolerance x (force scale of the check, as above)     or     <= ROUND_OFF x S,
+
+i.e. it is divided by max(force scale, ROUND_OFF x S / tolerance).  ROUND_OFF = 16 x machine epsilon
+(3.6e-15) is the bound taken for the rounding error of one recovered force relative to the sum of the
+absolute products it is made of: a sum of n products evaluated in floating point is in error by at most
+about n x epsilon x (sum of the absolute products), and one row of an element stiffness has n = 12
+terms.  (Largest residual measured on a rigid-body settlement case: 0.6 epsilon x S.)  With the default
+tolerance 1e-6 the floor is 3.6e-9 S: it replaces the force scale only when the forces of the whole
+check are below 3.6e-9 of stiffness x displacement, and it never makes a scale smaller.
 """
 from __future__ import annotations
 
@@ -30,15 +39,36 @@ import numpy as np
 from ..results import InvariantCheck
 
 __all__ = ["model_checks", "solution_checks", "superposition_check", "reciprocity_check",
-           "SYMMETRY_TOL", "RIGID_BODY_TOL", "RESIDUAL_TOL"]
+           "stiffness_displacement_scale", "SYMMETRY_TOL", "RIGID_BODY_TOL", "RESIDUAL_TOL", "ROUND_OFF"]
 
 SYMMETRY_TOL = 1.0e-10
 RIGID_BODY_TOL = 1.0e-9
 RESIDUAL_TOL = 1.0e-9
+#: rounding error taken for one recovered force, relative to the sum of the absolute products
+#: stiffness x displacement it is evaluated from (module docstring)
+ROUND_OFF = 16.0 * float(np.finfo(float).eps)
 
 
-def _ratio(err: float, scale: float) -> float:
+def _ratio(err: float, scale: float, floor: float = 0.0, tol: float = 0.0) -> float:
+    """``err / scale``; with ``floor`` (a stiffness x displacement scale) and the tolerance ``tol`` of the
+    check, ``err / max(scale, ROUND_OFF * floor / tol)`` (module docstring: round-off floor)."""
+    if floor > 0.0 and tol > 0.0:
+        scale = max(scale, ROUND_OFF * floor / tol)
     return float(err / scale) if scale > 0.0 else (0.0 if err == 0.0 else float("inf"))
+
+
+def stiffness_displacement_scale(K: np.ndarray, u: np.ndarray, size: float) -> tuple[float, float, float]:
+    """(force, moment, energy) scales of the products stiffness x displacement of one solution:
+    max of |K| |u| over the force rows; the same over the moment rows, at least force scale x ``size``;
+    and |u|^T |K| |u|.  They bound the terms the forces (and the strain energy) are summed from, so
+    ``ROUND_OFF`` times them bounds the rounding error of those sums."""
+    if not K.size:
+        return 0.0, 0.0, 0.0
+    au = np.abs(u)
+    ku = np.abs(K) @ au
+    trans = (np.arange(len(u)) % 6) < 3
+    sf, sm = float(ku[trans].max(initial=0.0)), float(ku[~trans].max(initial=0.0))
+    return sf, max(sm, sf * size), float(au @ ku)
 
 
 def rigid_body_modes(xyz: np.ndarray) -> np.ndarray:
@@ -105,9 +135,10 @@ def solution_checks(structure, K_members, loads, solution, recoveries, applied) 
     fscale = max(float(A[:3].max()), float(Ar[:3].max()))
     mscale = max(float(A[3:].max()), float(Ar[3:].max()))
     fscale, mscale = max(fscale, mscale / Lc), max(mscale, fscale * Lc)
+    Sf, Sm, Se = stiffness_displacement_scale(K_members, solution.u, Lc)       # round-off floors
     for name, sl in (("global force equilibrium", slice(0, 3)), ("global moment equilibrium", slice(3, 6))):
         scale = mscale if sl.start else fscale
-        v = _ratio(float(np.abs(tot[sl]).max()), scale)
+        v = _ratio(float(np.abs(tot[sl]).max()), scale, Sm if sl.start else Sf, tol)
         out.append(InvariantCheck(name, v, tol, v <= tol,
                                   "sum of applied loads + reactions" + (" about the global origin" if sl.start else "")
                                   + ", relative to the largest sum of absolute contributions"
@@ -125,7 +156,8 @@ def solution_checks(structure, K_members, loads, solution, recoveries, applied) 
     trans = (np.arange(n) % 6) < 3
     fmax, mmax = float(absum[trans].max(initial=0.0)), float(absum[~trans].max(initial=0.0))
     fmax, mmax = max(fmax, mmax / Lc), max(mmax, fmax * Lc)
-    jf, jm = _ratio(float(np.abs(g[trans]).max(initial=0.0)), fmax), _ratio(float(np.abs(g[~trans]).max(initial=0.0)), mmax)
+    jf = _ratio(float(np.abs(g[trans]).max(initial=0.0)), fmax, Sf, tol)
+    jm = _ratio(float(np.abs(g[~trans]).max(initial=0.0)), mmax, Sm, tol)
     worst = int(np.argmax(np.abs(g) / np.where(trans, max(fmax, 1e-300), max(mmax, 1e-300)))) if n else 0
     v = max(jf, jm)
     out.append(InvariantCheck("joint equilibrium", v, tol, v <= tol,
@@ -141,7 +173,7 @@ def solution_checks(structure, K_members, loads, solution, recoveries, applied) 
         ds, rs = max(ds, float(np.abs(rec.displacements[:, :3]).max())), max(rs, float(np.abs(rec.displacements[:, 3:]).max()))
     fs, ms = max(fs, ms / Lc), max(ms, fs * Lc)
     ds, rs = max(ds, rs * Lc), max(rs, ds / Lc)
-    v = max(_ratio(fc, fs), _ratio(mc, ms))
+    v = max(_ratio(fc, fs, Sf, tol), _ratio(mc, ms, Sm, tol))
     out.append(InvariantCheck("member equilibrium", v, tol, v <= tol,
                               "resultants integrated from end i to end j minus the end forces at j"))
     v = max(_ratio(dc, ds), _ratio(rc, rs))
@@ -153,33 +185,101 @@ def solution_checks(structure, K_members, loads, solution, recoveries, applied) 
     U = float(u @ (K_members @ u))
     terms = (solution.F + solution.reactions + solution.constraint_forces) * u
     W = float(terms.sum())
-    v = _ratio(abs(U - W), max(abs(U), float(np.abs(terms).sum())))
+    v = _ratio(abs(U - W), max(abs(U), float(np.abs(terms).sum())), Se, tol)
     out.append(InvariantCheck("work = strain energy", v, tol, v <= tol,
                               "u^T K_members u versus (equivalent nodal loads + reactions) . u"))
     return out
 
 
-def superposition_check(model, tolerance: float = 1.0e-9) -> list[InvariantCheck]:
-    """Linearity: for every first-order combination, the factored sum of the separately solved load
-    cases equals the directly solved combination (displacements, reactions, station forces and station
-    displacements).  One check per combination."""
+def _member_scales(la, u: np.ndarray, loads) -> dict:
+    """{member id: (force, moment)}: stiffness x displacement scales of the member forces of one solution,
+    max over the 12 end DOFs of |k| |u_ends| + |fixed-end forces| in local axes (k = the member stiffness
+    and, with end releases, also the stiffness before the releases are condensed, which the recovery
+    multiplies with); moment scale at least force scale x member length (station moments contain
+    shear x distance)."""
+    from .beam import SpanLoads
+    empty = SpanLoads()
+    out = {}
+    for mid, e in la.elements.items():
+        ue = np.abs(e.G @ u[e.dofs])
+        t = np.abs(e.k_local) @ ue + np.abs(e.fixed_end(loads.member.get(mid, empty)))
+        if "K0_12" in e.parts:
+            t = t + np.abs(e.parts["K0_12"]) @ ue
+        sf = float(t[[0, 1, 2, 6, 7, 8]].max())
+        out[mid] = (sf, max(float(t[[3, 4, 5, 9, 10, 11]].max()), sf * e.length))
+    return out
+
+
+def superposition_arrays(model) -> dict:
+    """The comparisons behind :func:`superposition_check` -> {combination id: [(name, error, own scale,
+    stiffness x displacement scale or None), ...]} with error = max |sum of factor x case - direct|,
+    own scale = max |direct| of that array."""
     from .analysis import LinearAnalysis
     la = LinearAnalysis(model)
-    out = []
+    st = la.structure
+    Lc = st.size if st.size > 0.0 else 1.0
+    trans = (np.arange(st.n) % 6) < 3
+
+    def solve(loads, combination=None):
+        sol, rec = la.solve_loads(loads) if combination is None else la.solve_combination(combination)
+        parts = {"displacements": sol.u, "reactions (forces)": sol.reactions[trans],
+                 "reactions (moments)": sol.reactions[~trans]}
+        for mid, r in rec.items():
+            parts[f"member {mid}: station forces"] = r.forces[:, :3]
+            parts[f"member {mid}: station moments"] = r.forces[:, 3:]
+            parts[f"member {mid}: station displacements"] = r.displacements
+        gf, gm, _ = stiffness_displacement_scale(la.K, sol.u, Lc)
+        floors = {"reactions (forces)": gf, "reactions (moments)": gm}
+        for mid, (sf, sm) in _member_scales(la, sol.u, loads).items():
+            floors[f"member {mid}: station forces"] = sf
+            floors[f"member {mid}: station moments"] = sm
+        return parts, floors
+
+    out = {}
     for cid, combo in model.combinations.items():
-        direct = la.solve_combination(combo)
-        acc = None
+        ref, floor = solve(la.combination_loads(combo), combo)
+        acc = {k: np.zeros_like(v) for k, v in ref.items()}
         for case_id, f in combo.factors.items():
-            sol, rec = la.solve_loads(la.case(case_id))
-            parts = [sol.u, sol.reactions] + [x for r in rec.values() for x in (r.forces.ravel(), r.displacements.ravel())]
-            acc = [f * p for p in parts] if acc is None else [a + f * p for a, p in zip(acc, parts)]
-        sol, rec = direct
-        ref = [sol.u, sol.reactions] + [x for r in rec.values() for x in (r.forces.ravel(), r.displacements.ravel())]
-        v = 0.0
-        for a, b in zip(acc or [], ref):
-            v = max(v, _ratio(float(np.abs(a - b).max(initial=0.0)), float(np.abs(b).max(initial=0.0))))
+            parts, fl = solve(la.case(case_id))
+            for k in acc:
+                acc[k] = acc[k] + f * parts[k]
+            for k in floor:
+                floor[k] += abs(f) * fl[k]
+        out[cid] = [(k, float(np.abs(acc[k] - b).max(initial=0.0)), float(np.abs(b).max(initial=0.0)), floor.get(k))
+                    for k, b in ref.items()]
+    return out
+
+
+def superposition_check(model, tolerance: float = 1.0e-9) -> list[InvariantCheck]:
+    """Linearity: for every combination, the factored sum of the separately solved load cases equals
+    the combination solved directly on the first-order operator (displacements, reactions, station
+    forces, station moments and station displacements of every member).  One check per combination.
+
+    Each array is compared on its own: value = largest of max |sum - direct| / scale over the arrays.
+    For displacement arrays the scale is max |direct| of the array.  For force arrays (reaction forces,
+    reaction moments, and per member the station forces N, Vy, Vz and the station moments T, My, Mz,
+    separately because their units differ) the scale is
+
+        max( max |direct| of the array,  ROUND_OFF x S / tolerance ),
+
+    S = the stiffness x displacement scale of that array (:func:`_member_scales` for a member,
+    :func:`stiffness_displacement_scale` for the reactions), summed over the direct solution and
+    |factor| x each case.  Reason (module docstring, round-off floor): a member that carries no force in
+    a combination (or whose case forces cancel) has "forces" that are rounding errors of
+    stiffness x displacement in both results; their difference divided by either of them is a ratio of
+    two rounding errors.  The floor accepts a difference only up to ROUND_OFF x S, the rounding error of
+    the evaluations compared; an array whose own forces exceed ROUND_OFF x S / tolerance is measured
+    against its own size, as before."""
+    out = []
+    for cid, rows in superposition_arrays(model).items():
+        v, worst = 0.0, ""
+        for name, err, own, floor in rows:
+            r = _ratio(err, own, floor or 0.0, tolerance)
+            if r > v:
+                v, worst = r, name
         out.append(InvariantCheck(f"superposition: {cid}", v, tolerance, v <= tolerance,
-                                  "sum of factor x case results versus the combination solved directly"))
+                                  "sum of factor x case results versus the combination solved directly"
+                                  + (f"; largest difference in: {worst}" if worst else "")))
     return out
 
 

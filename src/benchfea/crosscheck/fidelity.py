@@ -66,13 +66,18 @@ class Fidelity:
 
     @property
     def estimated_error(self) -> float | None:
-        """Sum of the estimated errors of the approximate items; ``None`` if one has no estimate."""
-        total = 0.0
+        """Sum of the estimated errors of the approximate items; ``None`` if one has no estimate.
+        Items that share a refinement parameter (``control``) share ONE estimate -- the runner measures
+        the error of the whole result per parameter -- and are counted once."""
+        total, seen = 0.0, {}
         for i in self.approximate:
             if i.error is None:
                 return None
-            total += i.error
-        return total
+            if i.control is None:
+                total += i.error
+            else:
+                seen[i.control] = max(seen.get(i.control, 0.0), i.error)
+        return total + sum(seen.values())
 
     def set_error(self, control: str, error: float) -> None:
         for i in self.items.values():

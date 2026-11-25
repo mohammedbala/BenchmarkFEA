@@ -28,8 +28,12 @@ How each feature is represented:
 * second order: ``analyze_PDelta`` = ONE solve with the consistent geometric stiffness built from the
   FIRST-ORDER axial forces (no iteration on N), members subdivided into explicit sub-members (PyNite's
   own splitting of a member at intermediate nodes mishandles linearly varying loads, measured).  Besides the
-  discretisation error (two subdivision levels) the fidelity record carries two estimates computed
-  from the run itself: the effect of not iterating N and of PyNite's axial term in Kg.
+  discretisation error (bounded from three subdivision levels) the fidelity record carries two
+  estimates computed from the run itself: the effect of not iterating N and of PyNite's axial term
+  in Kg.  A truss-type member with an axial member load is a pin-ended beam-column in benchfea and is
+  subdivided like a frame member.  Rigid links / diaphragms / offsets in second order: the stiff
+  members take part in PyNite's geometric stiffness, which the exact constraint does not have ->
+  "unsupported" when a stiff member carries axial force (see ``translate``).
 """
 from __future__ import annotations
 
@@ -39,12 +43,15 @@ import numpy as np
 
 from .fef import bending_split, clip_loads, fixed_end_forces
 from .fidelity import APPROXIMATE, EXACT, UNSUPPORTED, Fidelity
-from .foreign import ForeignResult, Translation
+from .foreign import ForeignResult, Translation, refinement_levels
 from .prepare import Prepared, prepare
 
 SOLVER = "pynite"
 TINY = 1e-15
-DEFAULT_SUBDIVISIONS = (2, 4)          # coarse, fine (second order)
+DEFAULT_SUBDIVISIONS = (2, 4, 8)       # three levels, ratio 2; the last is the delivered run (second order)
+SUBDIVISION_ORDERS = (1.0, 4.0)        # at least first order (end forces and reactions post-processed with
+                                       # recomputed axial forces, measured), at most fourth (nodal displacements
+                                       # of the cubic element with consistent geometric stiffness)
 DEFAULT_STIFFNESS = (1e5, 1e6)         # coarse, fine multiplier of the stiff emulation members.  Measured: the
                                        # emulation error falls like 1/multiplier while the round-off error of
                                        # PyNite's solve grows with it; short offset stubs are best near 1e5,
@@ -72,7 +79,7 @@ def translate(model, combination: str, *, subdivisions: int | None = None, stiff
     for feature, level, note in p.issues:
         fid.add(feature, level, note)
     fid.add("localAxes", EXACT, "rotation computed from PyNite's own triad and verified in the worker")
-    n_sub = int(subdivisions) if subdivisions else (DEFAULT_SUBDIVISIONS[1] if p.second_order else 1)
+    n_sub = int(subdivisions) if subdivisions else (DEFAULT_SUBDIVISIONS[-1] if p.second_order else 1)
     stiff = float(stiffness) if stiffness else DEFAULT_STIFFNESS[1]
     controls = {}
     cmds: list = []
@@ -119,6 +126,15 @@ def translate(model, combination: str, *, subdivisions: int | None = None, stiff
     # ------------------------------------------------------------------ constraints
     for c in p.constraints:
         mn = name_of(c.master)
+        if p.second_order:
+            # measured (bank model S08) and derived (docs/CROSSCHECK.md 3.5): the stiff members that stand for
+            # the constraint take part in PyNite's geometric stiffness with the forces they transmit (first-
+            # order values, not iterated; released directions condensed separately), which the linear
+            # constraint of benchfea does not have.  Not the same problem and no estimate of the difference.
+            fid.add("constraints." + c.type + ".secondOrder", UNSUPPORTED,
+                    "second order: the stiff members emulating the constraint carry geometric stiffness from the "
+                    "forces they transmit (first-order values); benchfea's constraint is a linear kinematic "
+                    "relation without it -- a different problem, not an approximation of the same one")
         for s in c.slaves:
             sn = name_of(s)
             d = xyz[sn] - xyz[mn]
@@ -185,15 +201,27 @@ def translate(model, combination: str, *, subdivisions: int | None = None, stiff
             fid.add("releases.partial", EXACT, "rotational springs about local y / z: parallel members (exact "
                     "decomposition) with member loads as exact equivalent nodal loads")
         # sub-division (second order): explicit sub-members between intermediate nodes
-        nsub = 1 if (m.truss or not p.second_order) else n_sub
-        if p.second_order and not m.truss:
+        bows = m.bows(p.second_order)
+        if bows and not (m.EIy > 0.0 and m.EIz > 0.0):
+            fid.add("members.truss", UNSUPPORTED,
+                    f"second order: the truss-type member {mid!r} carries an axial member load (it is a pin-ended "
+                    "beam-column in benchfea) but its section has no bending stiffness to model it with")
+            bows = False
+        nsub = n_sub if (p.second_order and (bows or not m.truss)) else 1
+        if bows:
+            fid.add("secondOrder", APPROXIMATE,
+                    "truss-type member with an axial member load: pin-ended beam-column, subdivided like a frame "
+                    "member (analyze_PDelta, first-order axial forces)", control="subdivisions")
+            controls["subdivisions"] = refinement_levels(n_sub, SUBDIVISION_ORDERS,
+                                                         DEFAULT_SUBDIVISIONS if subdivisions is None else None)
+        elif p.second_order and not m.truss:
             fid.add("secondOrder", APPROXIMATE,
                     "analyze_PDelta: consistent geometric stiffness, one solve with first-order axial forces; "
-                    "discretisation error estimated from two subdivision levels (first-order law: the end "
-                    "forces and reactions, post-processed with recomputed axial forces, converge like 1/n)",
+                    "discretisation error bounded from three subdivision levels (the end forces and "
+                    "reactions, post-processed with recomputed axial forces, converge like 1/n)",
                     control="subdivisions")
-            controls["subdivisions"] = {"coarse": DEFAULT_SUBDIVISIONS[0] if subdivisions is None
-                                        else max(1, n_sub // 2), "fine": n_sub, "order": 1}
+            controls["subdivisions"] = refinement_levels(n_sub, SUBDIVISION_ORDERS,
+                                                         DEFAULT_SUBDIVISIONS if subdivisions is None else None)
             if any(k != math.inf for k in k_i + k_j):
                 fid.add("releases.full", APPROXIMATE, "second order: PyNite condenses the geometric stiffness of a "
                         "released member separately from the elastic stiffness (difference vanishes with "
@@ -201,8 +229,8 @@ def translate(model, combination: str, *, subdivisions: int | None = None, stiff
         elif p.second_order:
             fid.add("secondOrder", APPROXIMATE, "truss-type member in analyze_PDelta (first-order axial force)",
                     control="subdivisions")
-            controls.setdefault("subdivisions", {"coarse": DEFAULT_SUBDIVISIONS[0] if subdivisions is None
-                                                 else max(1, n_sub // 2), "fine": n_sub, "order": 1})
+            controls.setdefault("subdivisions", refinement_levels(
+                n_sub, SUBDIVISION_ORDERS, DEFAULT_SUBDIVISIONS if subdivisions is None else None))
         chain = [ends[0]] + [new_node(m.start + (m.end - m.start) * (s / nsub)) for s in range(1, nsub)] + [ends[1]]
         Ls = m.L / nsub
         Iy, Iz = m.EIy / m.E, m.EIz / m.E

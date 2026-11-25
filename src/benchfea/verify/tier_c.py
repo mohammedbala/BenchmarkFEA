@@ -258,8 +258,11 @@ def _complementarity(model, slack, result: ForeignResult) -> list:
 
 
 # ====================================================================================== the tier
+TRANSLATOR_REVISION = 2      # part of the cache key: results of an earlier translator / estimator are not reused
+
+
 def _foreign(doc_hash, model, cid, solver, options, cache, timeout, versions):
-    key = cache.key(doc_hash, cid, solver, options, versions.get(solver))
+    key = cache.key(doc_hash, cid, solver, options, [versions.get(solver), TRANSLATOR_REVISION])
     hit = cache.get(key)
     if hit is not None:
         return hit, True
