@@ -508,6 +508,8 @@ Limits of this part (for LIMITS.md):
 
 ## Output documents
 
+Key-by-key description for users: [OUTPUT_REFERENCE.md](OUTPUT_REFERENCE.md).
+
 `Results.to_document(model)` → format `benchfea-results` 1.0.0;
 `DesignResults.to_document(model)` → `benchfea-design` 1.0.0. Both are plain
 JSON data in the **file's units** with `units`, `defaultsUsed` and `warnings`.

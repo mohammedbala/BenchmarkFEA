@@ -19,11 +19,16 @@ references   every distinct STABLE model is solved again by the engine and every
              properties from ``benchfea.sections``) and compared with the engine on node displacements,
              reactions, end forces and station values, every combination.  A difference in a
              first-order combination is a finding.  For a second-order combination the tableau takes
-             the axial force piecewise constant along a member (its documented limit), so the
-             difference is reported separately and is not a finding.
+             the axial force constant over a piece of a member, so it is run with 4 and 16 pieces per
+             member, and with 64 and 256 while the difference to the engine is still above 1e-3 (a
+             very slender tie in tension is not in the asymptotic range of the tableau with few
+             pieces).  It is a finding if, between the last two counts run, the difference has not
+             fallen to a quarter or less (the tableau must approach the engine at first order or
+             better), unless it is below 1e-8.  The difference at the last count run is reported.
 mechanisms   every distinct UNSTABLE model: the number of independent mechanisms of the reference
              diagnosis against the tableau (null space of its matrix + the degrees of freedom it finds
-             without any stiffness at nodes that carry frame members).
+             without any stiffness at nodes that carry frame members + the degrees of freedom without
+             any stiffness, at nodes without frame members, that a nodal load of the file acts on).
 scoring      the answer built from the hidden reference scores 1.0, a wrong one less than 1.0
              (predict and diagnose tasks; repair and design tasks run the pipeline and are left to
              ``tests/test_dataset.py`` and the build's own check).
@@ -55,6 +60,9 @@ sys.path.insert(0, str(ROOT / "tools"))
 
 TABLEAU_TOLERANCE = 1.0e-8          # engine against the independent tableau solver (first order; round-off)
 SINGULAR = 1.0e-9                   # singular value of the equilibrated tableau counted as zero
+SECOND_ORDER_PIECES = (4, 16, 64, 256)   # pieces per member of the tableau in a second-order combination
+REFINE_UNTIL = 1.0e-3               # ... refined until the difference to the engine is below this (effort, not a tolerance)
+ROUND_OFF = 1.0e-8                  # second-order differences below this are not tested for convergence
 
 
 def explicit_sections(raw: dict):
@@ -75,6 +83,45 @@ def explicit_sections(raw: dict):
     return doc, model
 
 
+STATION_KEYS = ("x", "N", "Vy", "Vz", "T", "My", "Mz", "ux", "uy", "uz")
+
+
+def merge_station_clusters(combination: dict, lengths: dict) -> list:
+    """A regular result station that falls within round-off of a point load gives three (or more)
+    stations at one point: the two limits at the load and the regular station next to it.  The tableau
+    comparison expects two (left limit, right limit), so the stations in between are taken out of
+    ``combination`` here -- after checking that each of them shows one of the two limits.  Returns the
+    violations of that check."""
+    import numpy as np
+    bad = []
+    for mid, m in combination["members"].items():
+        st = m["stations"]
+        x = st["x"]
+        tol = 1.0e-9 * lengths[mid]
+        keep, k = [], 0
+        while k < len(x):
+            j = k
+            while j + 1 < len(x) and abs(x[j + 1] - x[k]) <= tol:
+                j += 1
+            keep.append(k)
+            if j > k:
+                keep.append(j)
+                x[j] = x[k]                                 # one point: (left limit, right limit)
+            for q in range(k + 1, j):                       # stations between the two limits
+                row = np.array([st[key][q] for key in STATION_KEYS[1:] if key in st])
+                lo = np.array([st[key][k] for key in STATION_KEYS[1:] if key in st])
+                hi = np.array([st[key][j] for key in STATION_KEYS[1:] if key in st])
+                scale = max(np.abs(lo).max(), np.abs(hi).max(), 1e-300)
+                if min(np.abs(row - lo).max(), np.abs(row - hi).max()) > 1.0e-9 * scale:
+                    bad.append(f"member {mid}: the station at x = {x[q]!r} shows neither limit of the point")
+            k = j + 1
+        if len(keep) < len(x):
+            for key, values in st.items():
+                if isinstance(values, list) and len(values) == len(x):
+                    st[key] = [values[q] for q in keep]
+    return bad
+
+
 def audit_stable(model_path: str, tasks: list) -> dict:
     """Engine re-solve + tableau comparison of one stable model; ``tasks``: [(task, answers)]."""
     import harness
@@ -82,7 +129,8 @@ def audit_stable(model_path: str, tasks: list) -> dict:
     from benchfea.bench.tasks import extract
     from benchfea.solve import analyze
     out = {"model": model_path, "findings": [], "combinations": 0, "tableauWorst": 0.0, "secondOrder": 0,
-           "referenceWorst": 0.0, "quantities": 0, "tableauWorstSecondOrder": 0.0}
+           "referenceWorst": 0.0, "quantities": 0, "tableauWorstSecondOrder": 0.0, "secondOrderReduction": float("inf"),
+           "secondOrderRefinedFurther": 0}
     raw = json.loads(Path(model_path).read_text(encoding="utf-8"))
     doc, model = explicit_sections(raw)
     results = analyze(model, strict=True)
@@ -102,20 +150,48 @@ def audit_stable(model_path: str, tasks: list) -> dict:
             out["quantities"] += 1
             if d > 1e-9:
                 out["findings"].append(f"{task['id']} {qid}: reference {rv['value']!r}, fresh engine solve {value!r}")
+    lengths = {mid: model.units.from_internal(m.length, "length") for mid, m in model.members.items()}
+    cdoc = copy.deepcopy(rdoc)
+    for cid in model.combinations:
+        out["findings"] += [f"combination {cid}: {b}" for b in
+                            merge_station_clusters(cdoc["combinations"][cid], lengths)]
     for cid, c in model.combinations.items():
         second = c.analysis_type == "secondOrder"
         out["secondOrder"] += second
         try:
-            diff = harness.compare(copy.deepcopy(doc), cid, second_order=second, doc=rdoc)
+            if second:
+                # the tableau takes the axial force constant over a piece of a member: its difference to the
+                # engine must fall as the pieces are refined.  The piece count is raised until the difference
+                # is below REFINE_UNTIL (or the counts run out); between the last two counts run it must have
+                # fallen by at least the ratio of the counts (a method of first order or better, in its
+                # asymptotic range), unless it is at round-off.
+                d = []
+                for n in SECOND_ORDER_PIECES:
+                    d.append(max(float(v) for k, v in harness.compare(copy.deepcopy(doc), cid, second_order=True,
+                                                                      doc=cdoc, nsub=n).items()
+                                 if not k.startswith("_")))
+                    if len(d) > 1 and d[-1] <= REFINE_UNTIL:
+                        break
+                ratio = SECOND_ORDER_PIECES[len(d) - 1] / SECOND_ORDER_PIECES[len(d) - 2]
+                converged = d[-1] <= ROUND_OFF or d[-1] <= d[-2] / ratio
+            else:
+                diff = harness.compare(copy.deepcopy(doc), cid, second_order=False, doc=cdoc)
+                worst = float(max(v for k, v in diff.items() if not k.startswith("_")))
         except Exception as e:                                   # the tableau cannot take the model
             out["findings"].append(f"combination {cid}: tableau solver failed ({type(e).__name__}: {str(e)[:120]})")
             continue
-        worst = max(v for k, v in diff.items() if not k.startswith("_"))
         out["combinations"] += 1
         if second:
-            out["tableauWorstSecondOrder"] = max(out["tableauWorstSecondOrder"], float(worst))
+            out["tableauWorstSecondOrder"] = max(out["tableauWorstSecondOrder"], d[-1])
+            out["secondOrderRefinedFurther"] += len(d) > 2
+            if d[-2] > ROUND_OFF:
+                out["secondOrderReduction"] = min(out["secondOrderReduction"], d[-2] / max(d[-1], 1e-300))
+            if not converged:
+                out["findings"].append(f"combination {cid} (second order): the tableau does not approach the engine as "
+                                       f"it is refined (differences " + ", ".join(f"{x:.2e}" for x in d) + " with "
+                                       + ", ".join(str(n) for n in SECOND_ORDER_PIECES[:len(d)]) + " pieces per member)")
             continue
-        out["tableauWorst"] = max(out["tableauWorst"], float(worst))
+        out["tableauWorst"] = max(out["tableauWorst"], worst)
         if worst > TABLEAU_TOLERANCE:
             out["findings"].append(f"combination {cid}: engine and tableau differ by {worst:.2e}")
     return out
@@ -141,10 +217,27 @@ def audit_mechanism(model_path: str, n_reference: int) -> dict:
     # DOFs the tableau took out because nothing gives them stiffness, at nodes that carry frame members
     idle = sum(1 for g in range(n_u) if M[g, g] == 1.0 and np.count_nonzero(M[g, :]) == 1
                and np.count_nonzero(M[:, g]) == 1 and not t.fixed[g] and t.node_ids[g // 6] in frame_nodes)
-    out = {"model": model_path, "reference": n_reference, "nullSpace": null, "withoutStiffness": idle, "findings": []}
-    if null + idle != n_reference:
+    # ... and at nodes without frame members, the DOFs without stiffness that a nodal load acts on (a loaded
+    # node that nothing holds).  The engine reports the first combination, in the order of the file, that
+    # loads such a DOF (docs/VERIFICATION.md); the same rule is evaluated here from the load definitions.
+    free = [g for g in range(n_u) if M[g, g] == 1.0 and np.count_nonzero(M[g, :]) == 1
+            and np.count_nonzero(M[:, g]) == 1 and not t.fixed[g] and t.node_ids[g // 6] not in frame_nodes]
+    idle_loaded = 0
+    for combination in raw.get("combinations", {}).values():
+        loaded = set()
+        for cid, factor in combination.get("factors", {}).items():
+            for load in raw["loadCases"][cid].get("loads", []) if factor else []:
+                if load.get("type") == "nodal":
+                    loaded |= {(load["node"], k) for k, f in enumerate(("Fx", "Fy", "Fz", "Mx", "My", "Mz"))
+                               if load.get(f)}
+        idle_loaded = sum(1 for g in free if (t.node_ids[g // 6], g % 6) in loaded)
+        if idle_loaded:
+            break
+    out = {"model": model_path, "reference": n_reference, "nullSpace": null, "withoutStiffness": idle,
+           "loadedWithoutStiffness": idle_loaded, "findings": []}
+    if null + idle + idle_loaded != n_reference:
         out["findings"].append(f"reference diagnosis has {n_reference} mechanism(s), the tableau finds "
-                               f"{null} + {idle}")
+                               f"{null} + {idle} + {idle_loaded}")
     return out
 
 
@@ -206,18 +299,28 @@ def main(argv=None) -> int:
             stable.setdefault(h, (mp, []))[1].append((task, ans))
     items = list(stable.values())[:limit]
     worst_tab = worst_ref = worst_second = 0.0
+    worst_second_model = None
+    reduction, refined = float("inf"), 0
     n_comb = n_q = n_second = 0
     for k, (mp, tl) in enumerate(items):
         r = audit_stable(mp, tl)
         findings += [f"{Path(mp).name}: {f}" for f in r["findings"]]
         worst_tab, worst_ref = max(worst_tab, r["tableauWorst"]), max(worst_ref, r["referenceWorst"])
-        worst_second = max(worst_second, r["tableauWorstSecondOrder"])
+        reduction = min(reduction, r["secondOrderReduction"])
+        refined += r["secondOrderRefinedFurther"]
+        if r["tableauWorstSecondOrder"] > worst_second:
+            worst_second, worst_second_model = r["tableauWorstSecondOrder"], Path(mp).name
         n_comb, n_q, n_second = n_comb + r["combinations"], n_q + r["quantities"], n_second + r["secondOrder"]
         if (k + 1) % 20 == 0:
             print(f"  {k + 1} / {len(items)} stable models", flush=True)
     summary["stableModels"] = {"models": len(items), "combinationsComparedWithTheTableau": n_comb,
                                "ofThoseSecondOrder": n_second, "largestDifferenceEngineTableau": worst_tab,
                                "largestDifferenceEngineTableauSecondOrder": worst_second,
+                               "modelOfThatDifference": worst_second_model,
+                               "secondOrderPiecesPerMember": list(SECOND_ORDER_PIECES),
+                               "secondOrderCombinationsRefinedBeyondTheFirstPair": refined,
+                               "smallestReductionOfTheSecondOrderDifference": None if reduction == float("inf")
+                               else reduction,
                                "predictQuantitiesRecomputed": n_q, "largestDifferenceReferenceFreshSolve": worst_ref}
     mech = list(unstable.values())[:limit]
     agree = 0

@@ -1,0 +1,84 @@
+# Weekly, and on request: the slow checks that are not run on every push.
+#
+#  * a sample of the cells of the committed dataset is rebuilt from nothing (generation, curve ball
+#    and the whole verification pipeline) and compared with the committed files byte for byte;
+#  * docs/CURVEBALLS.md is regenerated from actual runs and compared.
+#
+# The sample comparison installs the versions of numpy, scipy and the two foreign solvers that the
+# committed dataset records, because the answers files record them.
+name: Dataset sample and curve-ball document
+
+on:
+  workflow_dispatch:
+    inputs:
+      families:
+        description: Families of the sample, comma separated
+        default: continuous_beam,portal_frame
+      curve_balls:
+        description: Curve balls of the sample, comma separated
+        default: section_lighter,support_removed,load_sign_flipped,release_added
+      seeds:
+        description: Instance seeds of the sample, comma separated
+        default: "0,4"
+  schedule:
+    - cron: "17 3 * * 1"
+
+permissions:
+  contents: read
+
+env:
+  OMP_NUM_THREADS: "1"
+  OPENBLAS_NUM_THREADS: "1"
+
+jobs:
+  dataset-sample:
+    name: rebuild a sample of dataset cells and compare bytes
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Constraints from the versions recorded in the dataset
+        run: |
+          python - <<'EOF' > dataset-constraints.txt
+          import json
+          v = json.load(open("data/tasks/manifest.json"))["versions"]
+          print(f"numpy=={v['numpy']}")
+          print(f"scipy=={v['scipy']}")
+          print(f"openseespy=={v['foreign:opensees']}")
+          print(f"PyNiteFEA=={v['foreign:pynite']}")
+          EOF
+          cat dataset-constraints.txt
+      - name: Install
+        run: python -m pip install -e ".[dev,env,crosscheck]" -c dataset-constraints.txt
+      - name: Rebuild the sample and compare
+        env:
+          SAMPLE_FAMILIES: ${{ inputs.families || 'continuous_beam,portal_frame' }}
+          SAMPLE_CURVE_BALLS: ${{ inputs.curve_balls || 'section_lighter,support_removed,load_sign_flipped,release_added' }}
+          SAMPLE_SEEDS: ${{ inputs.seeds || '0,4' }}
+        run: >
+          python tools/compare_dataset_sample.py
+          --families "$SAMPLE_FAMILIES"
+          --curve-balls "$SAMPLE_CURVE_BALLS"
+          --seeds "$SAMPLE_SEEDS"
+          --workers 2
+
+  curveball-document:
+    name: docs/CURVEBALLS.md is current
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install
+        run: python -m pip install -e ".[dev,env,crosscheck]"
+      - name: Curve-ball document
+        run: python tools/build_curveball_docs.py --check

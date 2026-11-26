@@ -274,6 +274,10 @@
   ],
   [
    "braced_frame",
+   "release_added"
+  ],
+  [
+   "braced_frame",
    "release_mechanism"
   ],
   [
@@ -370,7 +374,15 @@
   ],
   [
    "diaphragm_frame",
+   "constraint_removed"
+  ],
+  [
+   "diaphragm_frame",
    "constraint_slaves_dropped"
+  ],
+  [
+   "diaphragm_frame",
+   "constraint_wrong_master"
   ],
   [
    "diaphragm_frame",
@@ -446,6 +458,10 @@
   ],
   [
    "multistorey_2d",
+   "load_moved"
+  ],
+  [
+   "multistorey_2d",
    "load_sign_flipped"
   ],
   [
@@ -458,7 +474,7 @@
   ],
   [
    "multistorey_2d",
-   "offset_wrong_axis"
+   "release_added"
   ],
   [
    "multistorey_2d",
@@ -470,6 +486,10 @@
   ],
   [
    "multistorey_2d",
+   "release_removed"
+  ],
+  [
+   "multistorey_2d",
    "second_order_off"
   ],
   [
@@ -478,11 +498,31 @@
   ],
   [
    "multistorey_2d",
+   "section_lighter"
+  ],
+  [
+   "multistorey_2d",
    "sections_swapped"
   ],
   [
    "multistorey_2d",
+   "support_fixed_to_pinned"
+  ],
+  [
+   "multistorey_2d",
+   "support_pinned_to_fixed"
+  ],
+  [
+   "multistorey_2d",
    "support_removed"
+  ],
+  [
+   "multistorey_2d",
+   "support_spring_stiffness"
+  ],
+  [
+   "multistorey_2d",
+   "units_relabelled"
   ],
   [
    "multistorey_3d",
@@ -554,11 +594,23 @@
   ],
   [
    "multistorey_3d",
+   "support_spring_stiffness"
+  ],
+  [
+   "multistorey_3d",
    "units_relabelled"
   ],
   [
    "pipe_rack",
+   "constraint_added"
+  ],
+  [
+   "pipe_rack",
    "load_direction_changed"
+  ],
+  [
+   "pipe_rack",
+   "load_moved"
   ],
   [
    "pipe_rack",
@@ -571,6 +623,10 @@
   [
    "pipe_rack",
    "offset_added"
+  ],
+  [
+   "pipe_rack",
+   "release_added"
   ],
   [
    "pipe_rack",
@@ -594,11 +650,31 @@
   ],
   [
    "pipe_rack",
+   "section_lighter"
+  ],
+  [
+   "pipe_rack",
    "sections_swapped"
   ],
   [
    "pipe_rack",
+   "support_fixed_to_pinned"
+  ],
+  [
+   "pipe_rack",
+   "support_pinned_to_fixed"
+  ],
+  [
+   "pipe_rack",
    "support_removed"
+  ],
+  [
+   "pipe_rack",
+   "support_spring_stiffness"
+  ],
+  [
+   "pipe_rack",
+   "units_relabelled"
   ],
   [
    "portal_frame",
@@ -626,7 +702,7 @@
   ],
   [
    "portal_frame",
-   "offset_sign_reversed"
+   "offset_wrong_axis"
   ],
   [
    "portal_frame",
@@ -667,6 +743,10 @@
   [
    "portal_frame",
    "support_removed"
+  ],
+  [
+   "portal_frame",
+   "support_spring_stiffness"
   ],
   [
    "portal_frame",
@@ -731,6 +811,10 @@
   [
    "stair_frame",
    "support_removed"
+  ],
+  [
+   "stair_frame",
+   "support_spring_stiffness"
   ],
   [
    "stair_frame",

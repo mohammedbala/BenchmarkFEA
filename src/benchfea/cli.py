@@ -28,10 +28,10 @@ _COMMANDS = {
                "  benchfea verify verification/problems/derived/beam-point-load\n  benchfea verify --all"),
     "score": ("Score an answer file against a task of the benchmark and its verified reference (the hidden "
               "answers file). Prints the score in [0, 1] and the machine-readable reasons (docs/BENCHMARK.md).",
-              "benchfea score answer.json --task data/tasks/train/<id>.task.json\n"
+              "benchfea score examples/answers/te6bac428ea3e9b.answer.json --task data/tasks/train/te6bac428ea3e9b.task.json\n"
               "  benchfea score answer.json --task my.task.json --answers my.answers.json --json"),
     "bench": ("Benchmark helpers: build the dataset of verified tasks, run an agent in the environment.",
-              "benchfea bench make-dataset --out data --seeds 0,1,4 --workers 4 --cache /tmp/benchfea-cache\n"
+              "benchfea bench make-dataset --out my-dataset --seeds 0,1,4 --workers 4 --cache /tmp/benchfea-cache\n"
               "  benchfea bench run-agent examples/agents/oracle_agent.py --dataset data --episodes 3 --seed 1\n"
               "  benchfea bench run-agent examples/agents/random_agent.py --task-type predict --mode tool-allowed"),
     "generate": ("Generate a benchmark model of a family for a seed and a difficulty level (deterministic; "
@@ -707,7 +707,12 @@ def build_parser() -> argparse.ArgumentParser:
             b = bsub.add_parser("make-dataset", help="build verified tasks on disk (docs/BENCHMARK.md section 8)",
                                 description="Build the tasks of every (family, curve ball) pair for the given seeds: "
                                             "only tasks with a verified reference are written; everything else "
-                                            "goes to the quarantine log of the manifest.")
+                                            "goes to the quarantine log of the manifest.",
+                                epilog="example:\n  benchfea bench make-dataset --out data --seeds 0,4 --workers 4 "
+                                       "--cache /tmp/benchfea-cache\n"
+                                       "  benchfea bench make-dataset --out /tmp/sample --seeds 0 "
+                                       "--families continuous_beam --curve-balls section_lighter",
+                                formatter_class=argparse.RawDescriptionHelpFormatter)
             b.add_argument("--out", default="data", help="root directory (tasks/ and answers/ are written under it)")
             b.add_argument("--seeds", default="0,1,4", help="instance seeds, comma separated (seed %% 5 == 4: held out)")
             b.add_argument("--families", help="only these families, comma separated")
@@ -719,21 +724,28 @@ def build_parser() -> argparse.ArgumentParser:
             b.add_argument("--quiet", action="store_true", help="no progress lines")
             b = bsub.add_parser("run-agent", help="run an agent in the Gymnasium environment",
                                 description="Run episodes of BenchFEA-v0 with the agent built by make_agent(env) of "
-                                            "a Python file (see examples/agents).")
+                                            "a Python file (see examples/agents).",
+                                epilog="example:\n  benchfea bench run-agent examples/agents/oracle_agent.py "
+                                       "--dataset data --episodes 3 --seed 1\n"
+                                       "  benchfea bench run-agent examples/agents/random_agent.py "
+                                       "--task-type predict --mode tool-allowed",
+                                formatter_class=argparse.RawDescriptionHelpFormatter)
             b.add_argument("agent", help="Python file, optionally FILE.py:factory (default factory: make_agent)")
-            b.add_argument("--episodes", type=int, default=1)
+            b.add_argument("--episodes", type=int, default=1, help="number of episodes (default 1)")
             b.add_argument("--seed", type=int, default=0, help="seed of the first episode (then seed + 1, ...)")
-            b.add_argument("--split", default="train", choices=["train", "held-out"])
-            b.add_argument("--family")
-            b.add_argument("--curve-ball")
-            b.add_argument("--difficulty", type=int)
-            b.add_argument("--task-type", choices=["predict", "diagnose", "repair", "design"])
-            b.add_argument("--mode", choices=["tool-allowed", "no-solver"])
-            b.add_argument("--max-steps", type=int, default=30)
+            b.add_argument("--split", default="train", choices=["train", "held-out"],
+                           help="split the tasks are drawn from (default train)")
+            b.add_argument("--family", help="only this model family (benchfea generate --list)")
+            b.add_argument("--curve-ball", help="only this curve ball (benchfea perturb --list)")
+            b.add_argument("--difficulty", type=int, help="only this difficulty level (1-5)")
+            b.add_argument("--task-type", choices=["predict", "diagnose", "repair", "design"],
+                           help="only this task type")
+            b.add_argument("--mode", choices=["tool-allowed", "no-solver"], help="only this mode")
+            b.add_argument("--max-steps", type=int, default=30, help="tool calls allowed per episode (default 30)")
             b.add_argument("--cache", help="directory for the cache of generated and verified cases")
             b.add_argument("--dataset", help="serve the stored tasks of this dataset directory (e.g. data) instead of "
                                              "generating and verifying instances at each reset")
-            b.add_argument("--json", action="store_true")
+            b.add_argument("--json", action="store_true", help="print the episode records as JSON")
         else:
             p.add_argument("args", nargs=argparse.REMAINDER, help="command arguments")
             p.set_defaults(func=_not_implemented)

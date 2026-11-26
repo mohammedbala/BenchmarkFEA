@@ -1,0 +1,85 @@
+{
+ "format": "benchfea-task",
+ "formatVersion": "1.0.0",
+ "id": "td695ac716c6364",
+ "taskType": "repair",
+ "mode": "no-solver",
+ "family": "stair_frame",
+ "difficulty": 4,
+ "split": "train",
+ "quantities": [
+  {
+   "kind": "displacement",
+   "combination": "ULS4",
+   "node": "P1",
+   "component": "ry",
+   "unit": "rad",
+   "id": "q1",
+   "text": "rotation ry of node P1 in combination ULS4 [rad], global axes"
+  },
+  {
+   "kind": "displacement",
+   "combination": "ULS3",
+   "node": "P3",
+   "component": "ux",
+   "unit": "m",
+   "id": "q2",
+   "text": "translation ux of node P3 in combination ULS3 [m], global axes"
+  },
+  {
+   "kind": "reaction",
+   "combination": "ULS1",
+   "node": "F1",
+   "component": "Fx",
+   "unit": "kN",
+   "id": "q3",
+   "text": "reaction force Fx at node F1 in combination ULS1 [kN], global axes, acting on the structure"
+  },
+  {
+   "kind": "reaction",
+   "combination": "ULS3",
+   "node": "BP0",
+   "component": "Fy",
+   "unit": "kN",
+   "id": "q4",
+   "text": "reaction force Fy at node BP0 in combination ULS3 [kN], global axes, acting on the structure"
+  },
+  {
+   "kind": "memberEndForce",
+   "combination": "ULS2",
+   "member": "LF1",
+   "end": "j",
+   "component": "Mz",
+   "unit": "kN*m",
+   "id": "q5",
+   "text": "end force Mz at end j of member LF1 in combination ULS2 [kN*m], member local axes, acting on the member (docs/CONVENTIONS.md)"
+  },
+  {
+   "kind": "memberMaxMoment",
+   "combination": "ULS4",
+   "member": "LF0",
+   "component": "My",
+   "unit": "kN*m",
+   "id": "q6",
+   "text": "largest absolute bending moment My along member LF0 in combination ULS4 [kN*m] (a non-negative number; local axes)"
+  }
+ ],
+ "criteria": {
+  "stable": "the submitted model is accepted by the validator and analysed by the engine",
+  "verified": "the reference of the submitted model passes the verification pipeline (benchfea verify: every applicable tier)",
+  "quantities": "each named quantity of the submitted model is within 2% of its value in the intended design (partial credit up to 10%)",
+  "design": "not a criterion of this task: the design results of the intended model are not verified (tier F), so nothing is scored on them"
+ },
+ "intendedDesign": "Units: force kN, length m (every number below is in these units: moments in force x length, line loads in force / length, moduli and stresses in force / length^2, unit weights in force / length^3, rotational springs in force x length / rad).\nFormat version: 1.0.0.\nConventions: vertical axis Y.\nNodes (14), coordinates:\n  P0 at (3, 1.5, 0)\n  P1 at (3, 1.5, -1.25)\n  P2 at (3, 1.5, -1.5)\n  P3 at (3, 1.5, -2.75)\n  F0 at (0, 0, 0)\n  F1 at (0, 0, -1.25)\n  T2 at (0, 3, -1.5)\n  T3 at (0, 3, -2.75)\n  Q0 at (5, 1.5, 0)\n  Q3 at (5, 1.5, -2.75)\n  BQ0 at (5, 0, 0)\n  BQ3 at (5, 0, -2.75)\n  BP0 at (3, 0, 0)\n  BP3 at (3, 0, -2.75)\nSupports (a degree of freedom not listed is free):\n  node F0: degrees of freedom (ux fixed, uy (spring 8600), uz fixed)\n  node F1: degrees of freedom (ux fixed, uy (spring 8600), uz fixed)\n  node T2: type pinned\n  node T3: type pinned\n  node BQ0: type pinned\n  node BQ3: type pinned\n  node BP0: type pinned\n  node BP3: type pinned\nMaterials:\n  steel: description structural steel (nominal properties), E 200000000, G 77000000, Fy 345000, Fu 450000, unit weight 77\nCross-sections:\n  I-150x75x7x5: type I, d 0.15, bf 0.075, tf 0.007, tw 0.005, r 0.007\n  Box-50x50x3: type box, H 0.05, B 0.05, t 0.003\nMembers (14); a member end without a stated release is rigidly connected, a member without stated offsets runs from node to node:\n  S0: from node F0 to node P0, section I-150x75x7x5, material steel\n  S1: from node F1 to node P1, section I-150x75x7x5, material steel\n  S2: from node T2 to node P2, section I-150x75x7x5, material steel\n  S3: from node T3 to node P3, section I-150x75x7x5, material steel\n  LF0: from node P0 to node P1, section I-150x75x7x5, material steel\n  LF1: from node P1 to node P2, section I-150x75x7x5, material steel\n  LF2: from node P2 to node P3, section I-150x75x7x5, material steel\n  LS0: from node P0 to node Q0, section I-150x75x7x5, material steel\n  LS3: from node P3 to node Q3, section I-150x75x7x5, material steel\n  LB: from node Q0 to node Q3, section I-150x75x7x5, material steel\n  CQ0: from node BQ0 to node Q0, section Box-50x50x3, material steel\n  CQ3: from node BQ3 to node Q3, section Box-50x50x3, material steel\n  CP0: from node BP0 to node P0, section Box-50x50x3, material steel\n  CP3: from node BP3 to node P3, section Box-50x50x3, material steel\nRigid links and diaphragms: none.\nLoad cases:\n  D (dead load and self weight):\n    load 1: self weight\n    load 2: member distributed, member S0, direction Y, intensity at start -2, projected yes\n    load 3: member distributed, member S1, direction Y, intensity at start -2, projected yes\n    load 4: member distributed, member S2, direction Y, intensity at start -2, projected yes\n    load 5: member distributed, member S3, direction Y, intensity at start -2, projected yes\n    load 6: member distributed, member LF0, direction Y, intensity at start -3\n    load 7: member distributed, member LF1, direction Y, intensity at start -3\n    load 8: member distributed, member LF2, direction Y, intensity at start -3\n    load 9: member distributed, member LB, direction Y, intensity at start -3\n  L1 (live load on the flights):\n    load 1: member distributed, member S0, direction Y, intensity at start -2.5, projected yes\n    load 2: member distributed, member S1, direction Y, intensity at start -2.5, projected yes\n    load 3: member distributed, member S2, direction Y, intensity at start -2.5, projected yes\n    load 4: member distributed, member S3, direction Y, intensity at start -2.5, projected yes\n  L2 (live load on the landing):\n    load 1: member distributed, member LF0, direction Y, intensity at start -4.5\n    load 2: member distributed, member LF1, direction Y, intensity at start -4.5\n    load 3: member distributed, member LF2, direction Y, intensity at start -4.5\n    load 4: member distributed, member LB, direction Y, intensity at start -4.5\nLoad combinations:\n  ULS1 = 1.2 x D + 1.6 x L1 + 1.6 x L2\n  SLS1 = 1 x D + 1 x L1 + 1 x L2; purpose serviceability\n  ULS2 = 1.4 x D\n  ULS3 = 1.2 x D + 1.6 x L1\n  ULS4 = 1.2 x D + 1.6 x L2\n  SLS2 = 1 x L1 + 1 x L2; purpose serviceability\nAnalysis settings: shear deformation no.\nDesign data (AISC 360-22 member checks):\n  defaults: method LRFD\n  groups:\n    stringers: members [S0, S1, S2, S3], role beam, bracing (top flange braced at [0.25, 0.5, 0.75], bottom flange braced at [0.25, 0.5, 0.75]), deflection limits [(span /  360, direction y, combinations [SLS1])]\n    landingBeams: members [LF0, LF1, LF2, LS0, LS3, LB], role beam, deflection limits [(span /  360, direction y, combinations [SLS1])]\n    posts: members [CQ0, CQ3, CP0, CP3], role column, Kx 1.2, Ky 1.2",
+ "answerFormat": {
+  "model": "the complete repaired model document (in the environment: omit it to submit the working copy)"
+ },
+ "statement": "TASK (repair): the model file below was derived from the intended design described here, but something in it was changed in a way that matters. Repair the model.\nStructure: stair frame. Mode no-solver: the analysis tool is disabled; inspect the file and reason from it.\nSign conventions, axes and units are those of docs/CONVENTIONS.md; every number you give is in the units of the model file.\n\nINTENDED DESIGN:\nUnits: force kN, length m (every number below is in these units: moments in force x length, line loads in force / length, moduli and stresses in force / length^2, unit weights in force / length^3, rotational springs in force x length / rad).\nFormat version: 1.0.0.\nConventions: vertical axis Y.\nNodes (14), coordinates:\n  P0 at (3, 1.5, 0)\n  P1 at (3, 1.5, -1.25)\n  P2 at (3, 1.5, -1.5)\n  P3 at (3, 1.5, -2.75)\n  F0 at (0, 0, 0)\n  F1 at (0, 0, -1.25)\n  T2 at (0, 3, -1.5)\n  T3 at (0, 3, -2.75)\n  Q0 at (5, 1.5, 0)\n  Q3 at (5, 1.5, -2.75)\n  BQ0 at (5, 0, 0)\n  BQ3 at (5, 0, -2.75)\n  BP0 at (3, 0, 0)\n  BP3 at (3, 0, -2.75)\nSupports (a degree of freedom not listed is free):\n  node F0: degrees of freedom (ux fixed, uy (spring 8600), uz fixed)\n  node F1: degrees of freedom (ux fixed, uy (spring 8600), uz fixed)\n  node T2: type pinned\n  node T3: type pinned\n  node BQ0: type pinned\n  node BQ3: type pinned\n  node BP0: type pinned\n  node BP3: type pinned\nMaterials:\n  steel: description structural steel (nominal properties), E 200000000, G 77000000, Fy 345000, Fu 450000, unit weight 77\nCross-sections:\n  I-150x75x7x5: type I, d 0.15, bf 0.075, tf 0.007, tw 0.005, r 0.007\n  Box-50x50x3: type box, H 0.05, B 0.05, t 0.003\nMembers (14); a member end without a stated release is rigidly connected, a member without stated offsets runs from node to node:\n  S0: from node F0 to node P0, section I-150x75x7x5, material steel\n  S1: from node F1 to node P1, section I-150x75x7x5, material steel\n  S2: from node T2 to node P2, section I-150x75x7x5, material steel\n  S3: from node T3 to node P3, section I-150x75x7x5, material steel\n  LF0: from node P0 to node P1, section I-150x75x7x5, material steel\n  LF1: from node P1 to node P2, section I-150x75x7x5, material steel\n  LF2: from node P2 to node P3, section I-150x75x7x5, material steel\n  LS0: from node P0 to node Q0, section I-150x75x7x5, material steel\n  LS3: from node P3 to node Q3, section I-150x75x7x5, material steel\n  LB: from node Q0 to node Q3, section I-150x75x7x5, material steel\n  CQ0: from node BQ0 to node Q0, section Box-50x50x3, material steel\n  CQ3: from node BQ3 to node Q3, section Box-50x50x3, material steel\n  CP0: from node BP0 to node P0, section Box-50x50x3, material steel\n  CP3: from node BP3 to node P3, section Box-50x50x3, material steel\nRigid links and diaphragms: none.\nLoad cases:\n  D (dead load and self weight):\n    load 1: self weight\n    load 2: member distributed, member S0, direction Y, intensity at start -2, projected yes\n    load 3: member distributed, member S1, direction Y, intensity at start -2, projected yes\n    load 4: member distributed, member S2, direction Y, intensity at start -2, projected yes\n    load 5: member distributed, member S3, direction Y, intensity at start -2, projected yes\n    load 6: member distributed, member LF0, direction Y, intensity at start -3\n    load 7: member distributed, member LF1, direction Y, intensity at start -3\n    load 8: member distributed, member LF2, direction Y, intensity at start -3\n    load 9: member distributed, member LB, direction Y, intensity at start -3\n  L1 (live load on the flights):\n    load 1: member distributed, member S0, direction Y, intensity at start -2.5, projected yes\n    load 2: member distributed, member S1, direction Y, intensity at start -2.5, projected yes\n    load 3: member distributed, member S2, direction Y, intensity at start -2.5, projected yes\n    load 4: member distributed, member S3, direction Y, intensity at start -2.5, projected yes\n  L2 (live load on the landing):\n    load 1: member distributed, member LF0, direction Y, intensity at start -4.5\n    load 2: member distributed, member LF1, direction Y, intensity at start -4.5\n    load 3: member distributed, member LF2, direction Y, intensity at start -4.5\n    load 4: member distributed, member LB, direction Y, intensity at start -4.5\nLoad combinations:\n  ULS1 = 1.2 x D + 1.6 x L1 + 1.6 x L2\n  SLS1 = 1 x D + 1 x L1 + 1 x L2; purpose serviceability\n  ULS2 = 1.4 x D\n  ULS3 = 1.2 x D + 1.6 x L1\n  ULS4 = 1.2 x D + 1.6 x L2\n  SLS2 = 1 x L1 + 1 x L2; purpose serviceability\nAnalysis settings: shear deformation no.\nDesign data (AISC 360-22 member checks):\n  defaults: method LRFD\n  groups:\n    stringers: members [S0, S1, S2, S3], role beam, bracing (top flange braced at [0.25, 0.5, 0.75], bottom flange braced at [0.25, 0.5, 0.75]), deflection limits [(span /  360, direction y, combinations [SLS1])]\n    landingBeams: members [LF0, LF1, LF2, LS0, LS3, LB], role beam, deflection limits [(span /  360, direction y, combinations [SLS1])]\n    posts: members [CQ0, CQ3, CP0, CP3], role column, Kx 1.2, Ky 1.2\n\nCriteria:\n  stable: the submitted model is accepted by the validator and analysed by the engine\n  verified: the reference of the submitted model passes the verification pipeline (benchfea verify: every applicable tier)\n  quantities: each named quantity of the submitted model is within 2% of its value in the intended design (partial credit up to 10%)\n  design: not a criterion of this task: the design results of the intended model are not verified (tier F), so nothing is scored on them\nNamed quantities (their values in the intended design are not given; they are compared physically, whatever units your model declares):\n  q1: rotation ry of node P1 in combination ULS4 [rad], global axes\n  q2: translation ux of node P3 in combination ULS3 [m], global axes\n  q3: reaction force Fx at node F1 in combination ULS1 [kN], global axes, acting on the structure\n  q4: reaction force Fy at node BP0 in combination ULS3 [kN], global axes, acting on the structure\n  q5: end force Mz at end j of member LF1 in combination ULS2 [kN*m], member local axes, acting on the member (docs/CONVENTIONS.md)\n  q6: largest absolute bending moment My along member LF0 in combination ULS4 [kN*m] (a non-negative number; local axes)\n\nSubmit your answer as JSON of this form:\n{\n \"model\": {\n  \"formatVersion\": \"...\",\n  \"...\": \"...\"\n }\n}",
+ "verification": {
+  "status": "verified",
+  "scope": "analysis results of the intended design",
+  "meaning": "'verified' means only: the reference solution passed every tier listed as applicable in this record, at the tolerances stated in it. It does not mean reviewed, approved or certified by anyone.",
+  "policy": "docs/VERIFICATION.md; the tiers passed and the tolerances are in the answers file and in the info returned when the episode ends"
+ },
+ "modelFile": "td695ac716c6364.model.json"
+}

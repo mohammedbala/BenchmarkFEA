@@ -70,11 +70,15 @@ def _skipped(tier: str, applies: bool = True) -> TierResult:
 def tableau_evidence(raw: dict, model, results_document: dict) -> dict | None:
     """EXTRA EVIDENCE ONLY (never one of the two solvers tier C requires): the independent "tableau"
     reference solver of ``tests/independent`` (a different method written for the review of the engine:
-    no stiffness matrix; see its docstring), when this is a repository checkout.  Returns
+    no stiffness matrix; see its docstring), when it can be found: next to the package in a repository
+    checkout (editable install), or under the current directory when the command is run from the root of
+    a checkout with the package installed normally.  Returns
     ``{combination: {"largestRelativeDifference", "quantity"}}`` or None when it is not available."""
     import importlib
-    root = Path(__file__).resolve().parents[3] / "tests" / "independent"
-    if not (root / "harness.py").exists():
+    candidates = (Path(__file__).resolve().parents[3] / "tests" / "independent",
+                  Path.cwd() / "tests" / "independent")
+    root = next((c for c in candidates if (c / "harness.py").exists() and (c / "tableau.py").exists()), None)
+    if root is None:
         return None
     added = str(root) not in sys.path
     if added:

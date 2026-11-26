@@ -20,8 +20,11 @@
   "properties": {
     "$schema": {
       "type": "string",
-      "description": "Optional pointer to this schema for editors.",
-      "x-unit": "n/a"
+      "description": "Optional pointer to this schema for editors. Absent: nothing changes (the engine does not read it).",
+      "x-unit": "n/a",
+      "examples": [
+        "urn:benchfea:schema:input:1.0"
+      ]
     },
     "formatVersion": {
       "type": "string",
@@ -31,12 +34,12 @@
     },
     "name": {
       "type": "string",
-      "description": "Short model name.",
+      "description": "Short model name. Absent: no name.",
       "x-unit": "n/a"
     },
     "description": {
       "type": "string",
-      "description": "Free text.",
+      "description": "Free text. Absent: no text.",
       "x-unit": "n/a"
     },
     "units": {
@@ -282,7 +285,7 @@
     },
     "analysis": {
       "type": "object",
-      "description": "Analysis options. Everything here AFFECTS ANALYSIS.",
+      "description": "Analysis options. Everything here AFFECTS ANALYSIS. Absent: every option takes its default.",
       "x-unit": "n/a",
       "properties": {
         "type": {
@@ -383,7 +386,7 @@
         },
         "stiffnessReduction": {
           "type": "object",
-          "description": "Stiffness reduction for stability design (AISC 360-22 C2.3). Used only in combinations with stiffnessReduction = true.",
+          "description": "Stiffness reduction for stability design (AISC 360-22 C2.3). Used only in combinations with stiffnessReduction = true. Absent: `factor` and `tauB` take their defaults and every member is reduced.",
           "x-unit": "n/a",
           "properties": {
             "factor": {
@@ -423,10 +426,21 @@
                 "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.\\-]*$",
                 "description": "An id.",
                 "x-unit": "n/a"
-              }
+              },
+              "examples": [
+                [
+                  "C1",
+                  "C2"
+                ]
+              ]
             }
           },
-          "additionalProperties": false
+          "additionalProperties": false,
+          "examples": [
+            {
+              "tauB": "computed"
+            }
+          ]
         }
       },
       "additionalProperties": false
@@ -434,7 +448,7 @@
     "design": {
       "type": "object",
       "x-unit": "n/a",
-      "description": "Design input. Design-only data: nothing in this block can change analysis results.",
+      "description": "Design input. Design-only data: nothing in this block can change analysis results. Absent: every analysis member is a design member with the built-in defaults.",
       "additionalProperties": false,
       "properties": {
         "autoMembers": {
@@ -445,13 +459,13 @@
         },
         "defaults": {
           "$ref": "#/$defs/designVariables",
-          "description": "Design variables applied to every design member unless overridden by a group or the member.",
+          "description": "Design variables applied to every design member unless overridden by a group or the member. Absent: the built-in defaults.",
           "x-unit": "n/a",
           "unevaluatedProperties": false
         },
         "groups": {
           "type": "object",
-          "description": "Design groups: variables shared by several design members.",
+          "description": "Design groups: variables shared by several design members. Absent: no groups.",
           "x-unit": "n/a",
           "propertyNames": {
             "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.\\-]*$",
@@ -495,7 +509,7 @@
         },
         "members": {
           "type": "object",
-          "description": "Design members. A design member is one analysis member or a chain of collinear analysis members (a physical member split at nodes).",
+          "description": "Design members. A design member is one analysis member or a chain of collinear analysis members (a physical member split at nodes). Absent: only the automatic design members of `autoMembers`.",
           "x-unit": "n/a",
           "propertyNames": {
             "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.\\-]*$",
@@ -543,17 +557,23 @@
             "pinned",
             "roller"
           ],
-          "description": "Shorthand: fixed = all six DOFs fixed; pinned = ux, uy, uz fixed; roller = only the translation along the vertical axis fixed.",
+          "description": "Shorthand: fixed = all six DOFs fixed; pinned = ux, uy, uz fixed; roller = only the translation along the vertical axis fixed. Absent: only the entries of `dofs` apply.",
           "x-unit": "n/a"
         },
         "dofs": {
           "type": "object",
-          "description": "Per-DOF restraint in global axes.",
+          "description": "Per-DOF restraint in global axes. Absent: only the shorthand `type` applies.",
           "x-unit": "n/a",
           "properties": {
             "ux": {
-              "description": "Restraint of this translational DOF: \"fixed\", \"free\", or {\"spring\": k} (linear elastic spring to ground).",
+              "description": "Restraint of this translational DOF: \"fixed\", \"free\", or {\"spring\": k} (linear elastic spring to ground). Absent: free, unless the shorthand `type` fixes this DOF.",
               "x-unit": "n/a",
+              "examples": [
+                "fixed",
+                {
+                  "spring": 5000
+                }
+              ],
               "x-hint": "Use \"fixed\", \"free\" or {\"spring\": <stiffness > 0>}.",
               "anyOf": [
                 {
@@ -571,7 +591,10 @@
                       "type": "number",
                       "description": "Spring stiffness to ground.",
                       "x-unit": "force/length",
-                      "exclusiveMinimum": 0
+                      "exclusiveMinimum": 0,
+                      "examples": [
+                        5000
+                      ]
                     }
                   },
                   "required": [
@@ -582,8 +605,14 @@
               ]
             },
             "uy": {
-              "description": "Restraint of this translational DOF: \"fixed\", \"free\", or {\"spring\": k} (linear elastic spring to ground).",
+              "description": "Restraint of this translational DOF: \"fixed\", \"free\", or {\"spring\": k} (linear elastic spring to ground). Absent: free, unless the shorthand `type` fixes this DOF.",
               "x-unit": "n/a",
+              "examples": [
+                "fixed",
+                {
+                  "spring": 5000
+                }
+              ],
               "x-hint": "Use \"fixed\", \"free\" or {\"spring\": <stiffness > 0>}.",
               "anyOf": [
                 {
@@ -601,7 +630,10 @@
                       "type": "number",
                       "description": "Spring stiffness to ground.",
                       "x-unit": "force/length",
-                      "exclusiveMinimum": 0
+                      "exclusiveMinimum": 0,
+                      "examples": [
+                        5000
+                      ]
                     }
                   },
                   "required": [
@@ -612,8 +644,14 @@
               ]
             },
             "uz": {
-              "description": "Restraint of this translational DOF: \"fixed\", \"free\", or {\"spring\": k} (linear elastic spring to ground).",
+              "description": "Restraint of this translational DOF: \"fixed\", \"free\", or {\"spring\": k} (linear elastic spring to ground). Absent: free, unless the shorthand `type` fixes this DOF.",
               "x-unit": "n/a",
+              "examples": [
+                "fixed",
+                {
+                  "spring": 5000
+                }
+              ],
               "x-hint": "Use \"fixed\", \"free\" or {\"spring\": <stiffness > 0>}.",
               "anyOf": [
                 {
@@ -631,7 +669,10 @@
                       "type": "number",
                       "description": "Spring stiffness to ground.",
                       "x-unit": "force/length",
-                      "exclusiveMinimum": 0
+                      "exclusiveMinimum": 0,
+                      "examples": [
+                        5000
+                      ]
                     }
                   },
                   "required": [
@@ -642,8 +683,14 @@
               ]
             },
             "rx": {
-              "description": "Restraint of this rotational DOF: \"fixed\", \"free\", or {\"spring\": k} (linear elastic spring to ground).",
+              "description": "Restraint of this rotational DOF: \"fixed\", \"free\", or {\"spring\": k} (linear elastic spring to ground). Absent: free, unless the shorthand `type` fixes this DOF.",
               "x-unit": "n/a",
+              "examples": [
+                "fixed",
+                {
+                  "spring": 5000
+                }
+              ],
               "x-hint": "Use \"fixed\", \"free\" or {\"spring\": <stiffness > 0>}.",
               "anyOf": [
                 {
@@ -661,7 +708,10 @@
                       "type": "number",
                       "description": "Spring stiffness to ground.",
                       "x-unit": "moment/rotation",
-                      "exclusiveMinimum": 0
+                      "exclusiveMinimum": 0,
+                      "examples": [
+                        5000
+                      ]
                     }
                   },
                   "required": [
@@ -672,8 +722,14 @@
               ]
             },
             "ry": {
-              "description": "Restraint of this rotational DOF: \"fixed\", \"free\", or {\"spring\": k} (linear elastic spring to ground).",
+              "description": "Restraint of this rotational DOF: \"fixed\", \"free\", or {\"spring\": k} (linear elastic spring to ground). Absent: free, unless the shorthand `type` fixes this DOF.",
               "x-unit": "n/a",
+              "examples": [
+                "fixed",
+                {
+                  "spring": 5000
+                }
+              ],
               "x-hint": "Use \"fixed\", \"free\" or {\"spring\": <stiffness > 0>}.",
               "anyOf": [
                 {
@@ -691,7 +747,10 @@
                       "type": "number",
                       "description": "Spring stiffness to ground.",
                       "x-unit": "moment/rotation",
-                      "exclusiveMinimum": 0
+                      "exclusiveMinimum": 0,
+                      "examples": [
+                        5000
+                      ]
                     }
                   },
                   "required": [
@@ -702,8 +761,14 @@
               ]
             },
             "rz": {
-              "description": "Restraint of this rotational DOF: \"fixed\", \"free\", or {\"spring\": k} (linear elastic spring to ground).",
+              "description": "Restraint of this rotational DOF: \"fixed\", \"free\", or {\"spring\": k} (linear elastic spring to ground). Absent: free, unless the shorthand `type` fixes this DOF.",
               "x-unit": "n/a",
+              "examples": [
+                "fixed",
+                {
+                  "spring": 5000
+                }
+              ],
               "x-hint": "Use \"fixed\", \"free\" or {\"spring\": <stiffness > 0>}.",
               "anyOf": [
                 {
@@ -721,7 +786,10 @@
                       "type": "number",
                       "description": "Spring stiffness to ground.",
                       "x-unit": "moment/rotation",
-                      "exclusiveMinimum": 0
+                      "exclusiveMinimum": 0,
+                      "examples": [
+                        5000
+                      ]
                     }
                   },
                   "required": [
@@ -757,7 +825,7 @@
       "properties": {
         "description": {
           "type": "string",
-          "description": "Free text, e.g. the steel grade designation.",
+          "description": "Free text, e.g. the steel grade designation. Absent: no text.",
           "x-unit": "n/a"
         },
         "E": {
@@ -774,10 +842,13 @@
         },
         "nu": {
           "type": "number",
-          "description": "Poisson's ratio, used only to derive G when G is absent.",
+          "description": "Poisson's ratio, used only to derive G when G is absent. Absent: G must be given.",
           "x-unit": "dimensionless",
           "minimum": 0,
-          "exclusiveMaximum": 0.5
+          "exclusiveMaximum": 0.5,
+          "examples": [
+            0.3
+          ]
         },
         "unitWeight": {
           "type": "number",
@@ -788,13 +859,13 @@
         },
         "Fy": {
           "type": "number",
-          "description": "Specified minimum yield stress. Required for design checks and for computed tau_b.",
+          "description": "Specified minimum yield stress. Required for design checks and for computed tau_b. Absent: no value.",
           "x-unit": "force/length^2",
           "exclusiveMinimum": 0
         },
         "Fu": {
           "type": "number",
-          "description": "Specified minimum tensile strength. Required for design checks.",
+          "description": "Specified minimum tensile strength. Required for design checks. Absent: no value.",
           "x-unit": "force/length^2",
           "exclusiveMinimum": 0
         }
@@ -839,8 +910,11 @@
         },
         "description": {
           "type": "string",
-          "description": "Free text.",
-          "x-unit": "n/a"
+          "description": "Free text. Absent: no text.",
+          "x-unit": "n/a",
+          "examples": [
+            "floor beam"
+          ]
         }
       },
       "allOf": [
@@ -861,57 +935,86 @@
                 "type": "string",
                 "description": "Shape designation exactly as in the AISC Shapes Database v16.0 (e.g. \"W14X90\"). Needs the user-supplied database file.",
                 "x-unit": "n/a",
-                "minLength": 1
+                "minLength": 1,
+                "examples": [
+                  "W14X90"
+                ]
               },
               "overrides": {
                 "type": "object",
-                "description": "Explicit values that replace the computed/looked-up section properties (e.g. a tabulated J or a shear area from a refined theory).",
+                "description": "Explicit values that replace the computed/looked-up section properties (e.g. a tabulated J or a shear area from a refined theory). Absent: every property is the computed or looked-up one.",
                 "x-unit": "n/a",
                 "properties": {
                   "A": {
                     "type": "number",
-                    "description": "Cross-sectional area.",
+                    "description": "Cross-sectional area. Absent: the computed or looked-up value is kept.",
                     "x-unit": "length^2",
-                    "exclusiveMinimum": 0
+                    "exclusiveMinimum": 0,
+                    "examples": [
+                      0.0125
+                    ]
                   },
                   "Iy": {
                     "type": "number",
-                    "description": "Second moment of area about local y.",
+                    "description": "Second moment of area about local y. Absent: the computed or looked-up value is kept.",
                     "x-unit": "length^4",
-                    "exclusiveMinimum": 0
+                    "exclusiveMinimum": 0,
+                    "examples": [
+                      2.1e-05
+                    ]
                   },
                   "Iz": {
                     "type": "number",
-                    "description": "Second moment of area about local z.",
+                    "description": "Second moment of area about local z. Absent: the computed or looked-up value is kept.",
                     "x-unit": "length^4",
-                    "exclusiveMinimum": 0
+                    "exclusiveMinimum": 0,
+                    "examples": [
+                      0.00042
+                    ]
                   },
                   "J": {
                     "type": "number",
-                    "description": "Saint-Venant torsion constant.",
+                    "description": "Saint-Venant torsion constant. Absent: the computed or looked-up value is kept.",
                     "x-unit": "length^4",
-                    "exclusiveMinimum": 0
+                    "exclusiveMinimum": 0,
+                    "examples": [
+                      6.5e-07
+                    ]
                   },
                   "Asy": {
                     "type": "number",
-                    "description": "Shear area for shear force along local y.",
+                    "description": "Shear area for shear force along local y. Absent: the computed or looked-up value is kept.",
                     "x-unit": "length^2",
-                    "exclusiveMinimum": 0
+                    "exclusiveMinimum": 0,
+                    "examples": [
+                      0.004
+                    ]
                   },
                   "Asz": {
                     "type": "number",
-                    "description": "Shear area for shear force along local z.",
+                    "description": "Shear area for shear force along local z. Absent: the computed or looked-up value is kept.",
                     "x-unit": "length^2",
-                    "exclusiveMinimum": 0
+                    "exclusiveMinimum": 0,
+                    "examples": [
+                      0.0065
+                    ]
                   },
                   "Cw": {
                     "type": "number",
-                    "description": "Warping constant.",
+                    "description": "Warping constant. Absent: the computed or looked-up value is kept.",
                     "x-unit": "length^6",
-                    "minimum": 0
+                    "minimum": 0,
+                    "examples": [
+                      1.9e-06
+                    ]
                   }
                 },
-                "additionalProperties": false
+                "additionalProperties": false,
+                "examples": [
+                  {
+                    "J": 6.5e-07
+                  }
+                ]
               }
             },
             "required": [
@@ -936,36 +1039,54 @@
                 "type": "number",
                 "description": "Cross-sectional area.",
                 "x-unit": "length^2",
+                "examples": [
+                  0.0125
+                ],
                 "exclusiveMinimum": 0
               },
               "Iy": {
                 "type": "number",
                 "description": "Second moment of area about local y (AISC minor axis for an I-shape).",
                 "x-unit": "length^4",
+                "examples": [
+                  2.1e-05
+                ],
                 "exclusiveMinimum": 0
               },
               "Iz": {
                 "type": "number",
                 "description": "Second moment of area about local z (AISC major axis for an I-shape).",
                 "x-unit": "length^4",
+                "examples": [
+                  0.00042
+                ],
                 "exclusiveMinimum": 0
               },
               "J": {
                 "type": "number",
                 "description": "Saint-Venant torsion constant.",
                 "x-unit": "length^4",
+                "examples": [
+                  6.5e-07
+                ],
                 "exclusiveMinimum": 0
               },
               "Asy": {
                 "type": "number",
                 "description": "Shear area for shear along local y. Absent: no shear deformation in that direction.",
                 "x-unit": "length^2",
+                "examples": [
+                  0.004
+                ],
                 "exclusiveMinimum": 0
               },
               "Asz": {
                 "type": "number",
                 "description": "Shear area for shear along local z. Absent: no shear deformation in that direction.",
                 "x-unit": "length^2",
+                "examples": [
+                  0.0065
+                ],
                 "exclusiveMinimum": 0
               },
               "Cw": {
@@ -977,26 +1098,38 @@
               },
               "Sy": {
                 "type": "number",
-                "description": "Elastic section modulus about local y (design only).",
+                "description": "Elastic section modulus about local y (design only). Absent: no value.",
                 "x-unit": "length^3",
+                "examples": [
+                  0.00021
+                ],
                 "exclusiveMinimum": 0
               },
               "Sz": {
                 "type": "number",
-                "description": "Elastic section modulus about local z (design only).",
+                "description": "Elastic section modulus about local z (design only). Absent: no value.",
                 "x-unit": "length^3",
+                "examples": [
+                  0.00187
+                ],
                 "exclusiveMinimum": 0
               },
               "Zy": {
                 "type": "number",
-                "description": "Plastic section modulus about local y (design only).",
+                "description": "Plastic section modulus about local y (design only). Absent: no value.",
                 "x-unit": "length^3",
+                "examples": [
+                  0.00033
+                ],
                 "exclusiveMinimum": 0
               },
               "Zz": {
                 "type": "number",
-                "description": "Plastic section modulus about local z (design only).",
+                "description": "Plastic section modulus about local z (design only). Absent: no value.",
                 "x-unit": "length^3",
+                "examples": [
+                  0.0021
+                ],
                 "exclusiveMinimum": 0
               }
             },
@@ -1054,53 +1187,79 @@
               },
               "overrides": {
                 "type": "object",
-                "description": "Explicit values that replace the computed/looked-up section properties (e.g. a tabulated J or a shear area from a refined theory).",
+                "description": "Explicit values that replace the computed/looked-up section properties (e.g. a tabulated J or a shear area from a refined theory). Absent: every property is the computed or looked-up one.",
                 "x-unit": "n/a",
                 "properties": {
                   "A": {
                     "type": "number",
-                    "description": "Cross-sectional area.",
+                    "description": "Cross-sectional area. Absent: the computed or looked-up value is kept.",
                     "x-unit": "length^2",
-                    "exclusiveMinimum": 0
+                    "exclusiveMinimum": 0,
+                    "examples": [
+                      0.0125
+                    ]
                   },
                   "Iy": {
                     "type": "number",
-                    "description": "Second moment of area about local y.",
+                    "description": "Second moment of area about local y. Absent: the computed or looked-up value is kept.",
                     "x-unit": "length^4",
-                    "exclusiveMinimum": 0
+                    "exclusiveMinimum": 0,
+                    "examples": [
+                      2.1e-05
+                    ]
                   },
                   "Iz": {
                     "type": "number",
-                    "description": "Second moment of area about local z.",
+                    "description": "Second moment of area about local z. Absent: the computed or looked-up value is kept.",
                     "x-unit": "length^4",
-                    "exclusiveMinimum": 0
+                    "exclusiveMinimum": 0,
+                    "examples": [
+                      0.00042
+                    ]
                   },
                   "J": {
                     "type": "number",
-                    "description": "Saint-Venant torsion constant.",
+                    "description": "Saint-Venant torsion constant. Absent: the computed or looked-up value is kept.",
                     "x-unit": "length^4",
-                    "exclusiveMinimum": 0
+                    "exclusiveMinimum": 0,
+                    "examples": [
+                      6.5e-07
+                    ]
                   },
                   "Asy": {
                     "type": "number",
-                    "description": "Shear area for shear force along local y.",
+                    "description": "Shear area for shear force along local y. Absent: the computed or looked-up value is kept.",
                     "x-unit": "length^2",
-                    "exclusiveMinimum": 0
+                    "exclusiveMinimum": 0,
+                    "examples": [
+                      0.004
+                    ]
                   },
                   "Asz": {
                     "type": "number",
-                    "description": "Shear area for shear force along local z.",
+                    "description": "Shear area for shear force along local z. Absent: the computed or looked-up value is kept.",
                     "x-unit": "length^2",
-                    "exclusiveMinimum": 0
+                    "exclusiveMinimum": 0,
+                    "examples": [
+                      0.0065
+                    ]
                   },
                   "Cw": {
                     "type": "number",
-                    "description": "Warping constant.",
+                    "description": "Warping constant. Absent: the computed or looked-up value is kept.",
                     "x-unit": "length^6",
-                    "minimum": 0
+                    "minimum": 0,
+                    "examples": [
+                      1.9e-06
+                    ]
                   }
                 },
-                "additionalProperties": false
+                "additionalProperties": false,
+                "examples": [
+                  {
+                    "J": 6.5e-07
+                  }
+                ]
               }
             },
             "required": [
@@ -1128,69 +1287,104 @@
                 "type": "number",
                 "description": "Overall depth (along local y).",
                 "x-unit": "length",
+                "examples": [
+                  0.3
+                ],
                 "exclusiveMinimum": 0
               },
               "B": {
                 "type": "number",
                 "description": "Overall width (along local z).",
                 "x-unit": "length",
+                "examples": [
+                  0.2
+                ],
                 "exclusiveMinimum": 0
               },
               "t": {
                 "type": "number",
                 "description": "Wall thickness (uniform, sharp corners).",
                 "x-unit": "length",
+                "examples": [
+                  0.01
+                ],
                 "exclusiveMinimum": 0
               },
               "overrides": {
                 "type": "object",
-                "description": "Explicit values that replace the computed/looked-up section properties (e.g. a tabulated J or a shear area from a refined theory).",
+                "description": "Explicit values that replace the computed/looked-up section properties (e.g. a tabulated J or a shear area from a refined theory). Absent: every property is the computed or looked-up one.",
                 "x-unit": "n/a",
                 "properties": {
                   "A": {
                     "type": "number",
-                    "description": "Cross-sectional area.",
+                    "description": "Cross-sectional area. Absent: the computed or looked-up value is kept.",
                     "x-unit": "length^2",
-                    "exclusiveMinimum": 0
+                    "exclusiveMinimum": 0,
+                    "examples": [
+                      0.0125
+                    ]
                   },
                   "Iy": {
                     "type": "number",
-                    "description": "Second moment of area about local y.",
+                    "description": "Second moment of area about local y. Absent: the computed or looked-up value is kept.",
                     "x-unit": "length^4",
-                    "exclusiveMinimum": 0
+                    "exclusiveMinimum": 0,
+                    "examples": [
+                      2.1e-05
+                    ]
                   },
                   "Iz": {
                     "type": "number",
-                    "description": "Second moment of area about local z.",
+                    "description": "Second moment of area about local z. Absent: the computed or looked-up value is kept.",
                     "x-unit": "length^4",
-                    "exclusiveMinimum": 0
+                    "exclusiveMinimum": 0,
+                    "examples": [
+                      0.00042
+                    ]
                   },
                   "J": {
                     "type": "number",
-                    "description": "Saint-Venant torsion constant.",
+                    "description": "Saint-Venant torsion constant. Absent: the computed or looked-up value is kept.",
                     "x-unit": "length^4",
-                    "exclusiveMinimum": 0
+                    "exclusiveMinimum": 0,
+                    "examples": [
+                      6.5e-07
+                    ]
                   },
                   "Asy": {
                     "type": "number",
-                    "description": "Shear area for shear force along local y.",
+                    "description": "Shear area for shear force along local y. Absent: the computed or looked-up value is kept.",
                     "x-unit": "length^2",
-                    "exclusiveMinimum": 0
+                    "exclusiveMinimum": 0,
+                    "examples": [
+                      0.004
+                    ]
                   },
                   "Asz": {
                     "type": "number",
-                    "description": "Shear area for shear force along local z.",
+                    "description": "Shear area for shear force along local z. Absent: the computed or looked-up value is kept.",
                     "x-unit": "length^2",
-                    "exclusiveMinimum": 0
+                    "exclusiveMinimum": 0,
+                    "examples": [
+                      0.0065
+                    ]
                   },
                   "Cw": {
                     "type": "number",
-                    "description": "Warping constant.",
+                    "description": "Warping constant. Absent: the computed or looked-up value is kept.",
                     "x-unit": "length^6",
-                    "minimum": 0
+                    "minimum": 0,
+                    "examples": [
+                      1.9e-06
+                    ]
                   }
                 },
-                "additionalProperties": false
+                "additionalProperties": false,
+                "examples": [
+                  {
+                    "J": 6.5e-07
+                  }
+                ]
               }
             },
             "required": [
@@ -1227,53 +1421,79 @@
               },
               "overrides": {
                 "type": "object",
-                "description": "Explicit values that replace the computed/looked-up section properties (e.g. a tabulated J or a shear area from a refined theory).",
+                "description": "Explicit values that replace the computed/looked-up section properties (e.g. a tabulated J or a shear area from a refined theory). Absent: every property is the computed or looked-up one.",
                 "x-unit": "n/a",
                 "properties": {
                   "A": {
                     "type": "number",
-                    "description": "Cross-sectional area.",
+                    "description": "Cross-sectional area. Absent: the computed or looked-up value is kept.",
                     "x-unit": "length^2",
-                    "exclusiveMinimum": 0
+                    "exclusiveMinimum": 0,
+                    "examples": [
+                      0.0125
+                    ]
                   },
                   "Iy": {
                     "type": "number",
-                    "description": "Second moment of area about local y.",
+                    "description": "Second moment of area about local y. Absent: the computed or looked-up value is kept.",
                     "x-unit": "length^4",
-                    "exclusiveMinimum": 0
+                    "exclusiveMinimum": 0,
+                    "examples": [
+                      2.1e-05
+                    ]
                   },
                   "Iz": {
                     "type": "number",
-                    "description": "Second moment of area about local z.",
+                    "description": "Second moment of area about local z. Absent: the computed or looked-up value is kept.",
                     "x-unit": "length^4",
-                    "exclusiveMinimum": 0
+                    "exclusiveMinimum": 0,
+                    "examples": [
+                      0.00042
+                    ]
                   },
                   "J": {
                     "type": "number",
-                    "description": "Saint-Venant torsion constant.",
+                    "description": "Saint-Venant torsion constant. Absent: the computed or looked-up value is kept.",
                     "x-unit": "length^4",
-                    "exclusiveMinimum": 0
+                    "exclusiveMinimum": 0,
+                    "examples": [
+                      6.5e-07
+                    ]
                   },
                   "Asy": {
                     "type": "number",
-                    "description": "Shear area for shear force along local y.",
+                    "description": "Shear area for shear force along local y. Absent: the computed or looked-up value is kept.",
                     "x-unit": "length^2",
-                    "exclusiveMinimum": 0
+                    "exclusiveMinimum": 0,
+                    "examples": [
+                      0.004
+                    ]
                   },
                   "Asz": {
                     "type": "number",
-                    "description": "Shear area for shear force along local z.",
+                    "description": "Shear area for shear force along local z. Absent: the computed or looked-up value is kept.",
                     "x-unit": "length^2",
-                    "exclusiveMinimum": 0
+                    "exclusiveMinimum": 0,
+                    "examples": [
+                      0.0065
+                    ]
                   },
                   "Cw": {
                     "type": "number",
-                    "description": "Warping constant.",
+                    "description": "Warping constant. Absent: the computed or looked-up value is kept.",
                     "x-unit": "length^6",
-                    "minimum": 0
+                    "minimum": 0,
+                    "examples": [
+                      1.9e-06
+                    ]
                   }
                 },
-                "additionalProperties": false
+                "additionalProperties": false,
+                "examples": [
+                  {
+                    "J": 6.5e-07
+                  }
+                ]
               }
             },
             "required": [
@@ -1299,63 +1519,95 @@
                 "type": "number",
                 "description": "Depth (along local y).",
                 "x-unit": "length",
+                "examples": [
+                  0.4
+                ],
                 "exclusiveMinimum": 0
               },
               "b": {
                 "type": "number",
                 "description": "Width (along local z).",
                 "x-unit": "length",
+                "examples": [
+                  0.25
+                ],
                 "exclusiveMinimum": 0
               },
               "overrides": {
                 "type": "object",
-                "description": "Explicit values that replace the computed/looked-up section properties (e.g. a tabulated J or a shear area from a refined theory).",
+                "description": "Explicit values that replace the computed/looked-up section properties (e.g. a tabulated J or a shear area from a refined theory). Absent: every property is the computed or looked-up one.",
                 "x-unit": "n/a",
                 "properties": {
                   "A": {
                     "type": "number",
-                    "description": "Cross-sectional area.",
+                    "description": "Cross-sectional area. Absent: the computed or looked-up value is kept.",
                     "x-unit": "length^2",
-                    "exclusiveMinimum": 0
+                    "exclusiveMinimum": 0,
+                    "examples": [
+                      0.0125
+                    ]
                   },
                   "Iy": {
                     "type": "number",
-                    "description": "Second moment of area about local y.",
+                    "description": "Second moment of area about local y. Absent: the computed or looked-up value is kept.",
                     "x-unit": "length^4",
-                    "exclusiveMinimum": 0
+                    "exclusiveMinimum": 0,
+                    "examples": [
+                      2.1e-05
+                    ]
                   },
                   "Iz": {
                     "type": "number",
-                    "description": "Second moment of area about local z.",
+                    "description": "Second moment of area about local z. Absent: the computed or looked-up value is kept.",
                     "x-unit": "length^4",
-                    "exclusiveMinimum": 0
+                    "exclusiveMinimum": 0,
+                    "examples": [
+                      0.00042
+                    ]
                   },
                   "J": {
                     "type": "number",
-                    "description": "Saint-Venant torsion constant.",
+                    "description": "Saint-Venant torsion constant. Absent: the computed or looked-up value is kept.",
                     "x-unit": "length^4",
-                    "exclusiveMinimum": 0
+                    "exclusiveMinimum": 0,
+                    "examples": [
+                      6.5e-07
+                    ]
                   },
                   "Asy": {
                     "type": "number",
-                    "description": "Shear area for shear force along local y.",
+                    "description": "Shear area for shear force along local y. Absent: the computed or looked-up value is kept.",
                     "x-unit": "length^2",
-                    "exclusiveMinimum": 0
+                    "exclusiveMinimum": 0,
+                    "examples": [
+                      0.004
+                    ]
                   },
                   "Asz": {
                     "type": "number",
-                    "description": "Shear area for shear force along local z.",
+                    "description": "Shear area for shear force along local z. Absent: the computed or looked-up value is kept.",
                     "x-unit": "length^2",
-                    "exclusiveMinimum": 0
+                    "exclusiveMinimum": 0,
+                    "examples": [
+                      0.0065
+                    ]
                   },
                   "Cw": {
                     "type": "number",
-                    "description": "Warping constant.",
+                    "description": "Warping constant. Absent: the computed or looked-up value is kept.",
                     "x-unit": "length^6",
-                    "minimum": 0
+                    "minimum": 0,
+                    "examples": [
+                      1.9e-06
+                    ]
                   }
                 },
-                "additionalProperties": false
+                "additionalProperties": false,
+                "examples": [
+                  {
+                    "J": 6.5e-07
+                  }
+                ]
               }
             },
             "required": [
@@ -1390,7 +1642,10 @@
                   "type": "number",
                   "description": "Connection spring stiffness (0 = fully released).",
                   "x-unit": "force/length",
-                  "minimum": 0
+                  "minimum": 0,
+                  "examples": [
+                    20000
+                  ]
                 }
               },
               "required": [
@@ -1418,7 +1673,10 @@
                   "type": "number",
                   "description": "Connection spring stiffness (0 = fully released).",
                   "x-unit": "force/length",
-                  "minimum": 0
+                  "minimum": 0,
+                  "examples": [
+                    20000
+                  ]
                 }
               },
               "required": [
@@ -1446,7 +1704,10 @@
                   "type": "number",
                   "description": "Connection spring stiffness (0 = fully released).",
                   "x-unit": "force/length",
-                  "minimum": 0
+                  "minimum": 0,
+                  "examples": [
+                    20000
+                  ]
                 }
               },
               "required": [
@@ -1474,7 +1735,10 @@
                   "type": "number",
                   "description": "Connection spring stiffness (0 = fully released).",
                   "x-unit": "moment/rotation",
-                  "minimum": 0
+                  "minimum": 0,
+                  "examples": [
+                    20000
+                  ]
                 }
               },
               "required": [
@@ -1502,7 +1766,10 @@
                   "type": "number",
                   "description": "Connection spring stiffness (0 = fully released).",
                   "x-unit": "moment/rotation",
-                  "minimum": 0
+                  "minimum": 0,
+                  "examples": [
+                    20000
+                  ]
                 }
               },
               "required": [
@@ -1530,7 +1797,10 @@
                   "type": "number",
                   "description": "Connection spring stiffness (0 = fully released).",
                   "x-unit": "moment/rotation",
-                  "minimum": 0
+                  "minimum": 0,
+                  "examples": [
+                    20000
+                  ]
                 }
               },
               "required": [
@@ -1585,12 +1855,12 @@
         },
         "orientation": {
           "type": "object",
-          "description": "Orientation of the local y and z axes about local x. Default rule: local y lies in the plane of local x and the global vertical axis and points to the +vertical side; for a vertical member local y = global +X. See docs/CONVENTIONS.md.",
+          "description": "Orientation of the local y and z axes about local x. Default rule: local y lies in the plane of local x and the global vertical axis and points to the +vertical side; for a vertical member local y = global +X. See docs/CONVENTIONS.md. Absent: the default rule, no roll.",
           "x-unit": "n/a",
           "properties": {
             "referenceVector": {
               "type": "array",
-              "description": "Global vector replacing the vertical axis in the default rule: local y lies in the plane of local x and this vector, on the vector's side. Must not be parallel to the member.",
+              "description": "Global vector replacing the vertical axis in the default rule: local y lies in the plane of local x and this vector, on the vector's side. Must not be parallel to the member. Absent: the vertical axis is used.",
               "x-unit": "dimensionless",
               "minItems": 3,
               "maxItems": 3,
@@ -1598,7 +1868,14 @@
                 "type": "number",
                 "description": "Vector component (X, Y, Z order).",
                 "x-unit": "dimensionless"
-              }
+              },
+              "examples": [
+                [
+                  0,
+                  1,
+                  0
+                ]
+              ]
             },
             "roll": {
               "type": "number",
@@ -1607,21 +1884,26 @@
               "default": 0.0
             }
           },
-          "additionalProperties": false
+          "additionalProperties": false,
+          "examples": [
+            {
+              "roll": 90
+            }
+          ]
         },
         "releases": {
           "type": "object",
-          "description": "End releases in member local axes.",
+          "description": "End releases in member local axes. Absent: both ends rigidly connected.",
           "x-unit": "n/a",
           "properties": {
             "i": {
               "$ref": "#/$defs/endRelease",
-              "description": "Releases at end i.",
+              "description": "Releases at end i. Absent: end i rigidly connected.",
               "x-unit": "n/a"
             },
             "j": {
               "$ref": "#/$defs/endRelease",
-              "description": "Releases at end j.",
+              "description": "Releases at end j. Absent: end j rigidly connected.",
               "x-unit": "n/a"
             }
           },
@@ -1629,7 +1911,7 @@
         },
         "offsets": {
           "type": "object",
-          "description": "Rigid end offsets: vectors from each node to the corresponding end of the flexible length.",
+          "description": "Rigid end offsets: vectors from each node to the corresponding end of the flexible length. Absent: no offsets.",
           "x-unit": "n/a",
           "properties": {
             "axes": {
@@ -1944,7 +2226,10 @@
               "w2": {
                 "type": "number",
                 "description": "Intensity at `end`; linear variation between. Default: w1 (uniform).",
-                "x-unit": "force/length"
+                "x-unit": "force/length",
+                "examples": [
+                  -6
+                ]
               },
               "start": {
                 "type": "number",
@@ -1957,7 +2242,10 @@
                 "type": "number",
                 "description": "End of the loaded length. Default: the member end.",
                 "x-unit": "position",
-                "minimum": 0
+                "minimum": 0,
+                "examples": [
+                  0.5
+                ]
               },
               "positionType": {
                 "enum": [
@@ -2011,7 +2299,14 @@
                   "type": "number",
                   "description": "Vector component (X, Y, Z order).",
                   "x-unit": "dimensionless"
-                }
+                },
+                "examples": [
+                  [
+                    0,
+                    0,
+                    -1
+                  ]
+                ]
               },
               "members": {
                 "type": "array",
@@ -2023,7 +2318,13 @@
                   "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.\\-]*$",
                   "description": "An id.",
                   "x-unit": "n/a"
-                }
+                },
+                "examples": [
+                  [
+                    "B1",
+                    "B2"
+                  ]
+                ]
               }
             }
           }
@@ -2049,33 +2350,51 @@
               },
               "ux": {
                 "type": "number",
-                "description": "Imposed translation along global X.",
-                "x-unit": "length"
+                "description": "Imposed translation along global X. Absent: this DOF is not imposed.",
+                "x-unit": "length",
+                "examples": [
+                  -0.01
+                ]
               },
               "uy": {
                 "type": "number",
-                "description": "Imposed translation along global Y.",
-                "x-unit": "length"
+                "description": "Imposed translation along global Y. Absent: this DOF is not imposed.",
+                "x-unit": "length",
+                "examples": [
+                  -0.01
+                ]
               },
               "uz": {
                 "type": "number",
-                "description": "Imposed translation along global Z.",
-                "x-unit": "length"
+                "description": "Imposed translation along global Z. Absent: this DOF is not imposed.",
+                "x-unit": "length",
+                "examples": [
+                  -0.01
+                ]
               },
               "rx": {
                 "type": "number",
-                "description": "Imposed rotation about global X.",
-                "x-unit": "rotation"
+                "description": "Imposed rotation about global X. Absent: this DOF is not imposed.",
+                "x-unit": "rotation",
+                "examples": [
+                  0.002
+                ]
               },
               "ry": {
                 "type": "number",
-                "description": "Imposed rotation about global Y.",
-                "x-unit": "rotation"
+                "description": "Imposed rotation about global Y. Absent: this DOF is not imposed.",
+                "x-unit": "rotation",
+                "examples": [
+                  0.002
+                ]
               },
               "rz": {
                 "type": "number",
-                "description": "Imposed rotation about global Z.",
-                "x-unit": "rotation"
+                "description": "Imposed rotation about global Z. Absent: this DOF is not imposed.",
+                "x-unit": "rotation",
+                "examples": [
+                  0.002
+                ]
               }
             },
             "required": [
@@ -2116,7 +2435,7 @@
       "properties": {
         "description": {
           "type": "string",
-          "description": "Free text.",
+          "description": "Free text. Absent: no text.",
           "x-unit": "n/a"
         },
         "loads": {
@@ -2138,7 +2457,7 @@
       "properties": {
         "description": {
           "type": "string",
-          "description": "Free text.",
+          "description": "Free text. Absent: no text.",
           "x-unit": "n/a"
         },
         "factors": {
@@ -2200,13 +2519,29 @@
                 "type": "number",
                 "description": "Vector component (X, Y, Z order).",
                 "x-unit": "dimensionless"
-              }
+              },
+              "examples": [
+                [
+                  1,
+                  0,
+                  0
+                ]
+              ]
             }
           },
           "required": [
             "direction"
           ],
-          "additionalProperties": false
+          "additionalProperties": false,
+          "examples": [
+            {
+              "direction": [
+                1,
+                0,
+                0
+              ]
+            }
+          ]
         }
       },
       "required": [
@@ -2249,48 +2584,72 @@
           "type": "number",
           "description": "Modulus of elasticity used by the design checks. Default: E of the member's material. An override is DESIGN ONLY: the analysis always uses the material's E.",
           "x-unit": "force/length^2",
+          "examples": [
+            200000000
+          ],
           "exclusiveMinimum": 0
         },
         "G": {
           "type": "number",
           "description": "Shear modulus used by the design checks. Default: G of the member's material. An override is DESIGN ONLY: the analysis always uses the material's G.",
           "x-unit": "force/length^2",
+          "examples": [
+            77000000
+          ],
           "exclusiveMinimum": 0
         },
         "Fy": {
           "type": "number",
           "description": "Specified minimum yield stress used by the design checks. Default: Fy of the member's material. DESIGN ONLY: a computed tau_b (analysis.stiffnessReduction) always uses the material's Fy.",
           "x-unit": "force/length^2",
+          "examples": [
+            345000
+          ],
           "exclusiveMinimum": 0
         },
         "Fu": {
           "type": "number",
           "description": "Specified minimum tensile strength used by the design checks. Default: Fu of the member's material.",
           "x-unit": "force/length^2",
+          "examples": [
+            450000
+          ],
           "exclusiveMinimum": 0
         },
         "Lx": {
           "type": "number",
           "description": "Unbraced length for flexural buckling about the major (x) axis. Default: from bracing.major, else the design member length.",
           "x-unit": "length",
+          "examples": [
+            4.0
+          ],
           "exclusiveMinimum": 0
         },
         "Ly": {
           "type": "number",
           "description": "Unbraced length for flexural buckling about the minor (y) axis. Default: from bracing.minor, else the design member length.",
           "x-unit": "length",
+          "examples": [
+            2.0
+          ],
           "exclusiveMinimum": 0
         },
         "Lz": {
           "type": "number",
           "description": "Unbraced length for torsional buckling. Default: from bracing.torsion, else the design member length.",
           "x-unit": "length",
+          "examples": [
+            4.0
+          ],
           "exclusiveMinimum": 0
         },
         "Lb": {
           "type": "number",
           "description": "Unbraced length for lateral-torsional buckling. Default: from bracing.topFlange / bracing.bottomFlange, else the design member length.",
           "x-unit": "length",
+          "examples": [
+            2.0
+          ],
           "exclusiveMinimum": 0
         },
         "Kx": {
@@ -2316,7 +2675,7 @@
         },
         "bracing": {
           "type": "object",
-          "description": "Intermediate bracing points along the design member. Within one level (member, group or defaults) an unbraced length and the matching bracing list must not both be given.",
+          "description": "Intermediate bracing points along the design member. Within one level (member, group or defaults) an unbraced length and the matching bracing list must not both be given. Absent: no intermediate brace points at this level.",
           "x-unit": "n/a",
           "properties": {
             "positionType": {
@@ -2332,60 +2691,100 @@
               "type": "array",
               "x-unit": "position",
               "uniqueItems": true,
-              "description": "Locations of intermediate points braced against major-axis (x) flexural buckling, measured from the start of the design member (its ends are always braced points).",
+              "description": "Locations of intermediate points braced against major-axis (x) flexural buckling, measured from the start of the design member (its ends are always braced points). Absent: no intermediate brace point of this kind at this level.",
+              "examples": [
+                [
+                  0.5
+                ]
+              ],
               "items": {
                 "type": "number",
                 "minimum": 0,
                 "x-unit": "position",
-                "description": "Brace location."
+                "description": "Brace location.",
+                "examples": [
+                  0.5
+                ]
               }
             },
             "minor": {
               "type": "array",
               "x-unit": "position",
               "uniqueItems": true,
-              "description": "Locations of intermediate points braced against minor-axis (y) flexural buckling, measured from the start of the design member (its ends are always braced points).",
+              "description": "Locations of intermediate points braced against minor-axis (y) flexural buckling, measured from the start of the design member (its ends are always braced points). Absent: no intermediate brace point of this kind at this level.",
+              "examples": [
+                [
+                  0.5
+                ]
+              ],
               "items": {
                 "type": "number",
                 "minimum": 0,
                 "x-unit": "position",
-                "description": "Brace location."
+                "description": "Brace location.",
+                "examples": [
+                  0.5
+                ]
               }
             },
             "torsion": {
               "type": "array",
               "x-unit": "position",
               "uniqueItems": true,
-              "description": "Locations of intermediate points braced against twist (torsional buckling), measured from the start of the design member (its ends are always braced points).",
+              "description": "Locations of intermediate points braced against twist (torsional buckling), measured from the start of the design member (its ends are always braced points). Absent: no intermediate brace point of this kind at this level.",
+              "examples": [
+                [
+                  0.5
+                ]
+              ],
               "items": {
                 "type": "number",
                 "minimum": 0,
                 "x-unit": "position",
-                "description": "Brace location."
+                "description": "Brace location.",
+                "examples": [
+                  0.5
+                ]
               }
             },
             "topFlange": {
               "type": "array",
               "x-unit": "position",
               "uniqueItems": true,
-              "description": "Locations of intermediate points braced against lateral movement of the top flange (the flange on the +local y side), for lateral-torsional buckling, measured from the start of the design member (its ends are always braced points).",
+              "description": "Locations of intermediate points braced against lateral movement of the top flange (the flange on the +local y side), for lateral-torsional buckling, measured from the start of the design member (its ends are always braced points). Absent: no intermediate brace point of this kind at this level.",
+              "examples": [
+                [
+                  0.5
+                ]
+              ],
               "items": {
                 "type": "number",
                 "minimum": 0,
                 "x-unit": "position",
-                "description": "Brace location."
+                "description": "Brace location.",
+                "examples": [
+                  0.5
+                ]
               }
             },
             "bottomFlange": {
               "type": "array",
               "x-unit": "position",
               "uniqueItems": true,
-              "description": "Locations of intermediate points braced against lateral movement of the bottom flange (the flange on the -local y side), for lateral-torsional buckling, measured from the start of the design member (its ends are always braced points).",
+              "description": "Locations of intermediate points braced against lateral movement of the bottom flange (the flange on the -local y side), for lateral-torsional buckling, measured from the start of the design member (its ends are always braced points). Absent: no intermediate brace point of this kind at this level.",
+              "examples": [
+                [
+                  0.5
+                ]
+              ],
               "items": {
                 "type": "number",
                 "minimum": 0,
                 "x-unit": "position",
-                "description": "Brace location."
+                "description": "Brace location.",
+                "examples": [
+                  0.5
+                ]
               }
             }
           },
@@ -2446,6 +2845,9 @@
           "type": "number",
           "description": "Net area for tension rupture. Default: the gross area (no holes).",
           "x-unit": "length^2",
+          "examples": [
+            0.0105
+          ],
           "exclusiveMinimum": 0
         },
         "U": {
@@ -2482,14 +2884,17 @@
             "properties": {
               "spanRatio": {
                 "type": "number",
-                "description": "n in the limit L/n, L = design member length.",
+                "description": "n in the limit L/n, L = design member length. Absent: only `absolute` limits.",
                 "x-unit": "dimensionless",
                 "exclusiveMinimum": 0
               },
               "absolute": {
                 "type": "number",
-                "description": "Limit as a length.",
+                "description": "Limit as a length. Absent: only `spanRatio` limits.",
                 "x-unit": "length",
+                "examples": [
+                  0.025
+                ],
                 "exclusiveMinimum": 0
               },
               "direction": {

@@ -18,10 +18,6 @@ defined (a source file or a document of this repository), so that it can be chec
 * When the engine cannot do something it is meant to refuse or to report "not checked", never to
   guess. If you find a case where it silently does something else, that is a defect.
 
-Statements marked with an HTML comment `<!-- RECHECK -->` in the source of this file describe
-behaviour that was being corrected while the file was written; they describe the code as found and
-must be checked again.
-
 Terms used below, in one line each:
 
 * *First-order analysis*: equilibrium is written on the undeformed structure (ordinary linear
@@ -84,10 +80,12 @@ Defined in: `docs/THEORY.md` 10.1 and 16.
 
 Consequence measured in this project: published second-order results obtained with a
 large-displacement program differ from this engine. On the six frames of the Ziemian & Ziemian
-data set that were encoded, joint displacements differ by **0.4 % to 2.7 %** (largest on a frame
-under gravity load only and on the gabled frame), while the engine agrees with another
-small-displacement solver to about 10⁻⁴. Those twelve problems are quarantined, not passed.
-Defined in: `verification/problems/ziemian/README.md`.
+data set that were encoded, the largest difference between the engine and a published
+second-order value is **0.3 % to 3.0 %** per problem (joint displacements and member moments,
+relative to the largest target of the problem; `docs/VERIFICATION_REPORT.md`), while the engine
+agrees with another small-displacement solver to between 3·10⁻⁵ and 3·10⁻⁴ on the five frames
+compared. Those twelve problems are quarantined, not passed; one of them is refused by the engine
+(1.4). Defined in: `verification/problems/ziemian/README.md`.
 
 Other second-order limits:
 
@@ -159,8 +157,8 @@ A member of type `truss`, `tensionOnly` or `compressionOnly` carries axial force
   When several such mechanisms exist the engine refuses rather than decide. Defined in:
   `docs/THEORY.md` 13.
 * Tension-only members together with second-order analysis: an earlier build refused a braced
-  frame at its own loads that has a buckling factor of 7.65; the build examined for this file
-  analyses the same case. <!-- RECHECK --> Treat this combination with care and compare with a
+  frame at its own loads that has a buckling factor of 7.65; the present code analyses that case
+  (`tests/test_solve_roundoff_scales.py`). Treat this combination with care and compare with a
   first-order run. Defined in: `src/benchfea/solve/nonlinear.py`.
 
 ### 1.5 Refusals that concern stable or nearly stable models
@@ -179,8 +177,9 @@ A member of type `truss`, `tensionOnly` or `compressionOnly` carries axial force
   refused as a mechanism. Defined in: `docs/THEORY.md` 6.
 * **A load case in which every force is exactly zero** (a statically determinate frame under a
   support settlement moves as a rigid body) was refused by an earlier build because its
-  equilibrium checks divided one rounding error by another. The build examined for this file
-  analyses that case. <!-- RECHECK --> Defined in: `docs/THEORY.md` 8.1.
+  equilibrium checks divided one rounding error by another. The present code analyses that case:
+  the force scales of the checks have a round-off floor (`tests/test_solve_roundoff_scales.py`).
+  Defined in: `docs/THEORY.md` 8.1.
 * Member ends whose rigid offsets overlap, so that the flexible length is reversed, are accepted
   without a warning. Defined in: `docs/THEORY.md` 17.
 
@@ -376,7 +375,7 @@ The rules are listed in [docs/OPEN_QUESTIONS.md](docs/OPEN_QUESTIONS.md); the on
   built-in support is checked (warping there is assumed prevented); overhangs are `notChecked`
   unless you give Cb. An earlier build chose the wrong unbraced segment when a moment at a pinned
   end was a rounding error instead of exactly zero; forces below 10⁻⁹ of the member's force scale
-  are now treated as zero. <!-- RECHECK -->
+  are now treated as zero (`src/benchfea/design/demands.py`).
 * **Combined forces (H1)** use the forces at each point with the *lowest* strengths of the whole
   member. This is on the safe side and can overstate the ratio of a long member with several
   unbraced segments.
@@ -384,7 +383,8 @@ The rules are listed in [docs/OPEN_QUESTIONS.md](docs/OPEN_QUESTIONS.md); the on
   member (safe side).
 * **Torsional buckling (E4)** is evaluated where the first paragraph of E4 calls for it or leaves
   it open, and not for a rolled I-shape or hollow section whose torsional unbraced length does not
-  exceed the lateral ones. An earlier build evaluated it for every member. <!-- RECHECK -->
+  exceed the lateral ones. An earlier build evaluated it for every member. Defined in:
+  `src/benchfea/design/aisc360_22/e_compression.py` (`e4_scope`).
 * **Slenderness** (KL/r ≤ 200, L/r ≤ 300) is advisory, as in the Specification; exceeding it never
   fails a member.
 * **Values between stations.** Moments are interpolated between stations (exact for first-order
@@ -448,8 +448,11 @@ There is no majority vote. Defined in: `docs/VERIFICATION.md` 1–2.
 
 * Not reviewed, approved or certified by any person or body.
 * Not that the model is a good model of anything.
-* Not exact: linear results agree to about 10⁻⁶; second-order results agree only to the
-  discretisation error of the other programs, 10⁻⁵ to 10⁻³. <!-- RECHECK -->
+* Not exact: linear results agree to about 10⁻⁶; second-order results agree only within the
+  error bounds of the two other programs for that model (each bound may be as large as 5·10⁻³
+  before the program stops being eligible). In the second-order tasks of the dataset in `data/`
+  the largest difference recorded between two programs is 1.8·10⁻⁴, and the largest difference
+  that would have been accepted is 5.4·10⁻⁴.
 * Not that the capacity of an unused design check is right: tier F covers only limit states with a
   nonzero demand.
 * A model with no loads verifies trivially.
@@ -470,18 +473,18 @@ own test suite, but that is not the same thing.
 | Second order with members close to their buckling load | the other programs' error bound exceeds the limit of 5·10⁻³ | `docs/VERIFICATION.md` 7 |
 | Second order with shear deformation | no program | `docs/CROSSCHECK.md` 4 |
 | A mechanism that exists only because tension-only members are slack | no independent computation of which members are slack | `docs/VERIFICATION.md` 4 |
-| Most design results | tier F coverage is incomplete: at the time of writing 61 of 80 clause items are fully covered <!-- RECHECK -->; not covered are, among others, torsional buckling (E4), the computed r_ts of Eq. F2-7, box sections, slender flanges in flexure, round-section local buckling, web shear with reduced strength, deflection limits and the torsion screening rule. Most columns and unbraced I-beams use one of these | `docs/VERIFICATION.md` 2 (tier F); `src/benchfea/verify/design_coverage.json` |
+| Most design results | tier F coverage is incomplete: 61 of the 80 clause items of the registry are fully covered; not fully covered are Eq. E4-1 and E4-2 (torsional buckling), Eq. E7-7, Eq. F2-7 (the computed r_ts), Eq. F3-2 and Section F3.1, Eq. F6-2 to F6-4, Eq. F7-5 and F7-6, Eq. F8-2 to F8-4, Eq. G2-3, G2-10 and G2-11, Table B4.1a Case 8 and Table B4.1b Case 21. A member whose torsion makes the engine answer `notChecked` also fails the tier. The lateral-torsional buckling check of the I-beams in the generated models uses Eq. F2-7, and the dataset in `data/` holds no task with a design reference | `docs/VERIFICATION.md` 2 (tier F); `src/benchfea/verify/design_coverage.json` |
 | Anything, when OpenSeesPy and PyNite are not installed | tier C cannot run | `docs/VERIFICATION.md` 7 |
 
-Second-order frames in general: with the rule used when the dataset was built, most second-order
-models missed tier C by a small margin and were quarantined, so **no stable second-order result is
-served as a reference in the dataset**. The rule has since been replaced by an error bound from
-three refinement levels. <!-- RECHECK -->
+Second-order frames in general: each of the two other programs discretises the second-order
+problem, and its result carries an error bound computed from three refinement levels of that
+program alone (`docs/CROSSCHECK.md` 1.3). With this rule 249 of the 748 tasks of the dataset in
+`data/` are on second-order models. An earlier rule quarantined nearly all of them.
 
 ### 4.4 The published problems
 
-173 problems are in `verification/problems/`. At the time of writing 109 are active and 64 are
-quarantined with a written diagnosis. <!-- RECHECK --> Current numbers are in
+173 problems are in `verification/problems/`: 109 are active and pass, 64 are quarantined with a
+written diagnosis. Current numbers are in
 `docs/VERIFICATION_REPORT.md`. What a sceptical reader should know:
 
 * **"Passed" is not always the reproduction of a printed number.** For the vendor problems (STAAD,
@@ -553,15 +556,19 @@ Defined in: `docs/BENCHMARK.md` 7–9, `data/DATA_CARD.md`, `docs/DIFFICULTY.md`
 `docs/CURVEBALLS.md`.
 
 * **Only verified references are served, so the dataset is biased towards what can be verified.**
-  At the time of the last build: 534 tasks from 192 verified cells of 528. <!-- RECHECK -->
-  * All stable reference solutions are **first-order** analyses. Second-order models appear only
-    as mechanism diagnoses.
+  The numbers of the stored dataset are generated on `data/DATA_CARD.md` (at the last build: 748
+  tasks from 263 verified cells of 528).
+  * About a third of the tasks are on models with a **second-order** combination; they are the
+    ones for which both outside programs give an eligible error bound. Second order together with
+    rigid offsets or rigid constraints, and frames with crossing truss braces under self weight in
+    second order, are not served (4.3; `data/QUARANTINE_NOTES.md`).
   * No task asks for a buckling factor.
   * Models with shear deformation, partial releases and similar features (4.3) are absent.
-  * Eight of the 33 curve balls have no served task at all: the five design-variable curve balls
-    and three of the constraint curve balls. Several others have one or two served cells.
-* **Design tasks are nearly absent**: 2 design tasks, 5 prediction tasks that ask for a design
-  ratio and 4 repair tasks with a design criterion, all on continuous beams. A benchmark score
+  * Seven of the 33 curve balls have no served task at all: the five design-variable curve balls,
+    `constraint_wrong_slave` and `offset_sign_reversed`. Three others have one served cell.
+* **Design tasks are absent** from the stored dataset: no design task, no prediction task that
+  asks for a design ratio and no repair task with a design-ratio quantity, because every generated
+  model of this build uses at least one limit state without full tier-F coverage. A benchmark score
   says almost nothing about an agent's ability to design or check steel members.
 * **The models are generated, not real.** Eight families of regular frames with a generic
   catalogue of round-dimension sections (no shape table), loads and combination factors that are
@@ -577,14 +584,17 @@ Defined in: `docs/BENCHMARK.md` 7–9, `data/DATA_CARD.md`, `docs/DIFFICULTY.md`
 * **The held-out split is a convention, not a secret.** Generators, curve balls and the split rule
   are public code; anyone can generate the held-out instances. The environment only refuses to
   serve them unless asked.
-* **Held-out overlap.** In the stored dataset, 12 held-out instances (34 tasks) are built on base
-  models that train tasks also use, and for 10 repair tasks the reference answer is also a train
-  reference answer. The seed rule has since been changed so that base models are not shared, but
-  the stored dataset is that of the earlier rule until it is rebuilt. <!-- RECHECK -->
+* **Held-out overlap.** The generator seed carries the split, so base models are not shared
+  between the splits; on the stored dataset `tools/audit_dataset.py` compares the hashes of the
+  base and curve-balled models of the two splits and counts none in both (`data/CHECKS.json`).
+  Four of the 16 held-out combinations have no verified instance and are not served.
 * **Small sample.** Two seeds per (family, curve ball) cell; each train pair has one seed.
 * **Tied to this code.** The dataset is reproducible only with the generator, curve-ball and
   verification code of the same version; a change in any of them changes the tasks.
-* **No licence has been granted** for the code or the data: the repository has no licence file.
+* **Licence.** The code and the generated dataset are under the MIT licence (`LICENSE`). That
+  licence does not cover the references the project cites, none of which is in the repository, and
+  the six frames under `verification/problems/ziemian/` carry their own attribution requirement
+  (CC BY 4.0; `verification/problems/ziemian/README.md`).
 * The benchmark measures agreement with this engine's verified results. An agent that disagrees
   with the engine for a good reason (section 1.2, for example) is scored as wrong.
 

@@ -1,0 +1,68 @@
+{
+ "audit": {
+  "findings": [],
+  "leaks": {
+   "found": 0,
+   "tasksProbed": 25
+  },
+  "manifestSha256": "c87dd884255cdd43a1957008fff4c6519d9cfbd396440bf9377a7f43fe7f4d24",
+  "mechanisms": {
+   "countConfirmedByTheTableau": 27,
+   "models": 27
+  },
+  "scoring": {
+   "predictAndDiagnoseTasks": 499
+  },
+  "split": {
+   "baseModels": 86,
+   "curveBalledModelsInBothSplits": 0,
+   "heldOutTasksOnABaseModelOfTheTrainSplit": 0,
+   "ofThoseByTaskType": {}
+  },
+  "stableModels": {
+   "combinationsComparedWithTheTableau": 1219,
+   "largestDifferenceEngineTableau": 7.292260981945506e-12,
+   "largestDifferenceEngineTableauSecondOrder": 0.00012238273241712774,
+   "largestDifferenceReferenceFreshSolve": 0.0,
+   "modelOfThatDifference": "t394b223a924b39.model.json",
+   "models": 236,
+   "ofThoseSecondOrder": 331,
+   "predictQuantitiesRecomputed": 1392,
+   "secondOrderCombinationsRefinedBeyondTheFirstPair": 7,
+   "secondOrderPiecesPerMember": [
+    4,
+    16,
+    64,
+    256
+   ],
+   "smallestReductionOfTheSecondOrderDifference": 6.7423624588501765
+  },
+  "tasks": 748
+ },
+ "scores": {
+  "byTaskType": {
+   "diagnose": {
+    "referenceScores1": 263,
+    "tasks": 263
+   },
+   "predict": {
+    "referenceScores1": 236,
+    "tasks": 236
+   },
+   "repair": {
+    "referenceScores1": 249,
+    "tasks": 249
+   }
+  },
+  "findings": [],
+  "manifestSha256": "c87dd884255cdd43a1957008fff4c6519d9cfbd396440bf9377a7f43fe7f4d24",
+  "referenceAnswerScores1": 748,
+  "repair": {
+   "givenModelScoresBelowReference": 249,
+   "givenModelScoresZero": 249,
+   "largestScoreOfAGivenModel": 0.0,
+   "tasks": 249
+  },
+  "tasks": 748
+ }
+}

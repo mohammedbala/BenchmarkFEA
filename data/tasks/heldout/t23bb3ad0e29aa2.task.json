@@ -1,0 +1,85 @@
+{
+ "format": "benchfea-task",
+ "formatVersion": "1.0.0",
+ "id": "t23bb3ad0e29aa2",
+ "taskType": "predict",
+ "mode": "tool-allowed",
+ "family": "stair_frame",
+ "difficulty": 4,
+ "split": "held-out",
+ "quantities": [
+  {
+   "kind": "displacement",
+   "combination": "ULS3",
+   "node": "F0",
+   "component": "uz",
+   "unit": "in",
+   "id": "q1",
+   "text": "translation uz of node F0 in combination ULS3 [in], global axes"
+  },
+  {
+   "kind": "displacement",
+   "combination": "ULS5",
+   "node": "P2",
+   "component": "ux",
+   "unit": "in",
+   "id": "q2",
+   "text": "translation ux of node P2 in combination ULS5 [in], global axes"
+  },
+  {
+   "kind": "reaction",
+   "combination": "ULS4",
+   "node": "BQ3",
+   "component": "My",
+   "unit": "kip*in",
+   "id": "q3",
+   "text": "reaction moment My at node BQ3 in combination ULS4 [kip*in], global axes, acting on the structure"
+  },
+  {
+   "kind": "reaction",
+   "combination": "ULS5",
+   "node": "F1",
+   "component": "Fz",
+   "unit": "kip",
+   "id": "q4",
+   "text": "reaction force Fz at node F1 in combination ULS5 [kip], global axes, acting on the structure"
+  },
+  {
+   "kind": "memberEndForce",
+   "combination": "ULS1",
+   "member": "CQ3",
+   "end": "j",
+   "component": "My",
+   "unit": "kip*in",
+   "id": "q5",
+   "text": "end force My at end j of member CQ3 in combination ULS1 [kip*in], member local axes, acting on the member (docs/CONVENTIONS.md)"
+  },
+  {
+   "kind": "memberMaxMoment",
+   "combination": "ULS3",
+   "member": "LF1",
+   "component": "My",
+   "unit": "kip*in",
+   "id": "q6",
+   "text": "largest absolute bending moment My along member LF1 in combination ULS3 [kip*in] (a non-negative number; local axes)"
+  }
+ ],
+ "answerFormat": {
+  "values": {
+   "q1": "number",
+   "q2": "number",
+   "q3": "number",
+   "q4": "number",
+   "q5": "number",
+   "q6": "number"
+  }
+ },
+ "statement": "TASK (predict): give the named results of the model in the file below, exactly as it is given.\nStructure: stair frame. Mode tool-allowed: you may run the analysis tool (run_analysis) and read its results.\nSign conventions, axes and units are those of docs/CONVENTIONS.md; every number you give is in the units of the model file.\n\nQuantities:\n  q1: translation uz of node F0 in combination ULS3 [in], global axes\n  q2: translation ux of node P2 in combination ULS5 [in], global axes\n  q3: reaction moment My at node BQ3 in combination ULS4 [kip*in], global axes, acting on the structure\n  q4: reaction force Fz at node F1 in combination ULS5 [kip], global axes, acting on the structure\n  q5: end force My at end j of member CQ3 in combination ULS1 [kip*in], member local axes, acting on the member (docs/CONVENTIONS.md)\n  q6: largest absolute bending moment My along member LF1 in combination ULS3 [kip*in] (a non-negative number; local axes)\n\nSubmit your answer as JSON of this form:\n{\n \"values\": {\n  \"q1\": 0.0,\n  \"q2\": 0.0,\n  \"q3\": 0.0,\n  \"q4\": 0.0,\n  \"q5\": 0.0,\n  \"q6\": 0.0\n }\n}",
+ "verification": {
+  "status": "verified",
+  "scope": "analysis results of the given model",
+  "meaning": "'verified' means only: the reference solution passed every tier listed as applicable in this record, at the tolerances stated in it. It does not mean reviewed, approved or certified by anyone.",
+  "policy": "docs/VERIFICATION.md; the tiers passed and the tolerances are in the answers file and in the info returned when the episode ends"
+ },
+ "modelFile": "t23bb3ad0e29aa2.model.json"
+}

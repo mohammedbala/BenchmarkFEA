@@ -1,0 +1,138 @@
+# Continuous integration.
+#
+# A green run means: the test suite passed, every ACTIVE problem of the verification library passed
+# (quarantined problems are evaluated and reported, never counted as passed), the generated files are
+# what their tools write, and the dataset audit found nothing. It does not mean that anybody has
+# checked, approved or certified a result.
+name: CI
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  # Small dense matrices: a multi-threaded linear algebra library is far slower here.
+  OMP_NUM_THREADS: "1"
+  OPENBLAS_NUM_THREADS: "1"
+
+jobs:
+  # Known, and not suppressed (docs/OPEN_QUESTIONS.md, Q120): on Python 3.11 the installer selects
+  # numpy 2.4 / scipy 1.17, whose linear algebra library differs from the one the committed dataset was
+  # built with; one test that requires the stored references to equal a fresh solve bit for bit then
+  # fails by 4e-12. The job is left as it is until that question is decided.
+  tests:
+    name: tests (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      # "shapes" (openpyxl) only so that the one test of the .xlsx reader is not skipped.
+      - name: Install
+        run: python -m pip install -e ".[dev,env,crosscheck,shapes]"
+      - name: Full test suite
+        run: python -m pytest -q -p no:cacheprovider
+
+  verify-library:
+    name: verification library (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install
+        run: python -m pip install -e ".[dev,env,crosscheck]"
+      # Exit code 0: every active problem passed. Quarantined problems are in the record with their
+      # differences; they do not fail the job and are not counted as passed.
+      - name: benchfea verify --all
+        run: benchfea verify --all --json > verify-library.json
+      - name: Summary of the record
+        if: always()
+        run: |
+          python - <<'EOF'
+          import collections, json
+          record = json.load(open("verify-library.json"))
+          counts = collections.Counter(p["outcome"] for p in record["problems"])
+          print(f"{len(record['problems'])} problem(s):", dict(sorted(counts.items())))
+          EOF
+      - name: Upload the verification record
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: verify-library-py${{ matrix.python-version }}
+          path: verify-library.json
+          if-no-files-found: error
+
+  generated-files:
+    name: generated files are current
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install
+        run: python -m pip install -e ".[dev,env,crosscheck]"
+      - name: JSON Schema of the input format
+        run: python -m benchfea.schema.build_schema --check
+      - name: Input reference
+        run: python tools/build_input_reference.py --check
+      - name: Tier-F coverage registry
+        run: python tools/build_design_coverage.py --check
+      - name: Dataset numbers in the documents
+        run: python tools/build_dataset_docs.py --check
+      - name: Generated parts of the examples
+        run: python tools/build_examples.py --check
+      - name: Held-out combinations of the split
+        run: python tools/apply_split_rule.py --check
+      - name: Links of the documents
+        run: python tools/check_links.py
+
+  dataset-audit:
+    name: dataset audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install
+        run: python -m pip install -e ".[dev,env,crosscheck]"
+      - name: Audit of the dataset with means that are not the pipeline that built it
+        run: python tools/audit_dataset.py data --json dataset-audit.json
+      - name: Upload the audit record
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dataset-audit
+          path: dataset-audit.json
+          if-no-files-found: warn

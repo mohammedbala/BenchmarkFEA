@@ -27,4 +27,12 @@ publication. `expected.json`, the "Key results" and "Design summary" tables and 
 written by `python3 tools/build_examples.py` (`--check` tells whether they are up to date).
 
 More models of the same kinds, in any number, come from the generators:
-`benchfea generate --list` (docs/DIFFICULTY.md).
+`benchfea generate --list` ([docs/DIFFICULTY.md](../docs/DIFFICULTY.md)). Every field of an input
+file is listed in [docs/INPUT_REFERENCE.md](../docs/INPUT_REFERENCE.md).
+
+Also in this directory:
+
+* `answers/` — an answer file for one task of the benchmark's training set, used by the scoring
+  example of the [README](../README.md#6-score-one-agent-answer). One of its six values has the
+  wrong sign on purpose, so that the score shows what a sign slip costs.
+* `agents/` — example agents for the Gymnasium environment ([agents/README.md](agents/README.md)).

@@ -18,10 +18,8 @@ publisher of any reference.
 Each entry gives: the question; **Where** it arises; what the software does **Now**; and what an answer would
 **Change**. Source paths that begin with `design/`, `solve/`, `verify/`, `crosscheck/`, `bench/`, `oracle/` or
 `schema/`, and bare module names such as `shapes.py`, are under `src/benchfea/`; document names are under `docs/`.
-An HTML comment `<!-- RECHECK -->` in the source of this file marks a statement about behaviour that was being
-changed while the file was written; it describes the code as found and must be checked again.
 
-119 questions in 6 groups.
+120 questions in 7 groups.
 
 ## Decisions needed
 
@@ -42,8 +40,8 @@ The most consequential first. Each line points to the full entry.
 13. **Q87** — Large-displacement published results (Ziemian): accept the engine's small-displacement theory with these 12 problems quarantined, or ask for a large-displacement option.
 14. **Q42** — The shear formulation in second order (Engesser, as implemented, or Haringx).
 15. **Q72** — Buckling factors: publishable without a second independent solver, or not at all.
-16. **Q101** — Rebuild the dataset under the new split rule.
-17. **Q107** — A licence for the code and the data.
+16. **Q101** — The split rule: the dataset was rebuilt under the new rule; confirm the rule.
+17. **Q107** — The licence: an MIT licence file was added and no decision of the owner on it is recorded; confirm it or choose another.
 
 ## A. AISC 360-22 interpretation
 
@@ -112,7 +110,7 @@ C2.2a gives no magnitude or pattern for modelled imperfections (1/500 appears on
 **Q11. E4: when does torsional buckling apply to doubly symmetric members?**
 E4 applies "when the torsional unbraced length exceeds the lateral unbraced length" without naming which lateral length, and names "certain" built-up members without saying which. The User Note table of E1 lists flexural buckling only for hollow sections, but the text of E4 does not exclude closed sections.
 - **Where:** E4 first paragraph, Table User Note E1.1, E3 User Note; `design/aisc360_22/e_compression.py` (`e4_scope`).
-- **Now:** Evaluated for built-up I-shapes and boxes always; for rolled I-shapes and hollow sections only when L_z exceeds the smaller of L_x, L_y or K_z L_z exceeds a lateral effective length; skipped otherwise, with the reason recorded. An earlier build evaluated it for every member, which made it govern by up to 0.35 % for some column proportions and blocked tier F for every I-shaped column. <!-- RECHECK -->
+- **Now:** Evaluated for built-up I-shapes and boxes always; for rolled I-shapes and hollow sections only when L_z exceeds the smaller of L_x, L_y or K_z L_z exceeds a lateral effective length; skipped otherwise, with the reason recorded. An earlier build evaluated it for every member, which made it govern by up to 0.35 % for some column proportions and blocked tier F for every I-shaped column.
 - **Change:** The governing compression limit state and P_c in H1 for short columns; how many generated models can have a verified design reference.
 
 **Q12. E3: which branch test is normative?**
@@ -190,7 +188,7 @@ L_b is defined by braces against lateral displacement of the compression flange 
 **Q24. C_b where the Specification gives no rule.**
 (a) L_b given as a length without brace positions; (b) moment reversal inside a segment braced on one flange; (c) a segment with zero moment (Eq. F1-1 is 0/0); (d) free ends and overhangs other than the one cantilever case of F1.
 - **Where:** F1, Eq. F1-1.
-- **Now:** (a) C_b = 1.0 unless given, with the largest member moment; (b) fall back to the segment between points where both flanges are braced; (c) a segment without moment is not checked; (d) only a cantilever with a built-in support is checked (C_b = 1.0, warping restraint there *assumed*), any other free end is `notChecked` unless C_b is given. These are engine rules. An earlier build took a rounding-error moment at a pinned end as a sign change in (b); forces below 10⁻⁹ of the member's scale are now zero. <!-- RECHECK -->
+- **Now:** (a) C_b = 1.0 unless given, with the largest member moment; (b) fall back to the segment between points where both flanges are braced; (c) a segment without moment is not checked; (d) only a cantilever with a built-in support is checked (C_b = 1.0, warping restraint there *assumed*), any other free end is `notChecked` unless C_b is given. These are engine rules. An earlier build took a rounding-error moment at a pinned end as a sign change in (b); forces below 10⁻⁹ of the member's scale are now zero (`design/demands.py`).
 - **Change:** Whether (a) and (b) should be `notChecked` instead; LTB ratios of braced beams.
 
 **Q25. Load height.**
@@ -350,7 +348,7 @@ They are removed from the solution, reported as zero and listed in a warning. Sh
 **Q50. A loaded node without members.**
 Is it a validation error with its own code, or a mechanism?
 - **Where:** `solve/stability.py`; VERIFICATION.md 4.
-- **Now:** A mechanism of kind "node", cause `no-stiffness`. When the dataset was built the diagnosis tiers could not confirm it (12 attempts quarantined, the two curve balls that produce it never served); the diagnosis tiers have since been extended to keep loaded degrees of freedom. <!-- RECHECK -->
+- **Now:** A mechanism of kind "node", cause `no-stiffness`. An earlier build of the diagnosis tiers could not confirm it (12 attempts quarantined, the two curve balls that produce it never served). The tiers now keep loaded degrees of freedom, and in the dataset in `data/` both curve balls, `constraint_removed` and `constraint_wrong_master`, have tasks.
 - **Change:** Whether `constraint_removed` and `constraint_wrong_master` can be served.
 
 **Q51. Mechanisms that are neither rigid-body nor single-node.**
@@ -404,13 +402,13 @@ It carries its loads to its ends as a simply supported beam in first order, incl
 **Q59. Tension-only members with second-order analysis.**
 A braced frame with a linear buckling factor of 7.65 was refused at its own loads as beyond critical (reported factor about 0.38) when its strength combination was switched to second order. Intended or a defect?
 - **Where:** `solve/nonlinear.py`; `examples/05_braced_frame.json`.
-- **Now:** The build examined for this file analyses that case (three iterations, three slack braces). The generators still never combine the two. <!-- RECHECK -->
+- **Now:** The present code analyses that case, with three slack braces (`tests/test_solve_roundoff_scales.py`). The generators still never combine the two (`bench/families/braced_frame.py` switches second order off when tension-only bracing is drawn).
 - **Change:** Whether generated braced frames may use second order with tension-only bracing.
 
 **Q60. States in which all forces vanish.**
 A rigid-body response to a support settlement gives forces that are rounding errors; ratios of two rounding errors made the engine refuse a valid solution and made the superposition check quarantine correct models.
 - **Where:** THEORY.md 8.1, 8.2.
-- **Now:** A round-off floor on the force scales has since been added to the invariants and to the superposition check; the settlement frame now runs. <!-- RECHECK --> The station checks of tier D have their own floor.
+- **Now:** A round-off floor on the force scales has since been added to the invariants and to the superposition check; the settlement frame now runs (`tests/test_solve_roundoff_scales.py`). The station checks of tier D have their own floor.
 - **Change:** Confirm the floor (16 machine epsilons × the stiffness-times-displacement scale) as policy.
 
 **Q61. Several mechanisms with idle one-sided members.**
@@ -432,7 +430,7 @@ Rules of the verification pipeline that decide what may be called verified.
 **Q63. Tier C in second order: how is the error of the outside solvers bounded?**
 Both outside solvers discretise the beam-column problem, so the comparison must allow for their error. The first rule used a leading-order (Richardson) estimate, which equals the error itself when the engine is exact; correct models then missed by under 1 % to a factor 2, and most second-order models were quarantined (261 attempts in the dataset build, 10 AISC and vendor problems). Options were: keep it; a stated safety factor; compare with the extrapolated result; a different estimate.
 - **Where:** VERIFICATION.md 2 (tier C); CROSSCHECK.md 1.3, 3.4; `crosscheck/runner.py`; `verify/policy.py`.
-- **Now:** Replaced, while this file was written, by a bound from three refinement levels of each outside solver (the last level-to-level difference, enlarged when the contraction is poor; no estimate when the levels do not contract); `estimateSafety` stays 1.0; the translators were corrected for a first-order term. A verified second-order record now means agreement within about three times the OpenSees discretisation error. <!-- RECHECK --> The stored dataset predates this.
+- **Now:** Replaced, while this file was written, by a bound from three refinement levels of each outside solver (the last level-to-level difference, enlarged when the contraction is poor; no estimate when the levels do not contract); `estimateSafety` stays 1.0; the translators were corrected for a first-order term. A verified second-order record now means agreement within the bounds of the two outside solvers; for OpenSees the bound is about three times its discretisation error (acceptance table of CROSSCHECK.md 1.3). The dataset in `data/` was built with this rule. One attempt of that build shows the bound of PyNite too small by a factor 1.4 on an extreme model (`data/QUARANTINE_NOTES.md`, case 1); it was quarantined.
 - **Change:** The owner should confirm the new rule, or choose another. It decides whether second-order references exist at all, and how loose "verified" is for them (10⁻⁵ to 10⁻³).
 
 **Q64. Printed precision against hand-rounded textbook values.**
@@ -456,7 +454,7 @@ The data set stores doubles and displays three or two decimals. Is the displayed
 **Q67. Tier F: what must be covered, and at what granularity?**
 (a) Should classification cases and advisory checks (slenderness, torsion screening) block a design reference? (b) Should a `notChecked` item with zero demand block, or only limit states with a demand ("used" = utilisation above 10⁻⁹, as implemented)? (c) A reproduced strength credits every clause item of its check, including classification cases reached with ratios the test invented. (d) Side (a) is recognised by a test naming convention. (e) Is coverage per equation the right unit, or per limit state and shape?
 - **Where:** VERIFICATION.md 2 (tier F), 7; `verify/tier_f.py`; `tools/build_design_coverage.py`.
-- **Now:** As in (b) and (c); at the time of writing 61 of 80 items are fully covered <!-- RECHECK -->; uncovered items include E4-1/E4-2, F2-7, F3-2, F6-2 to F6-4, F7-5, F7-6, F8-2 to F8-4, G2-3, G2-10, G2-11, Table B4.1a Case 8, Table B4.1b Cases 11 and 21, Sections L1/L2 and the torsion screening rule.
+- **Now:** As in (b) and (c); 61 of the 80 items of the registry are fully covered; not fully covered are E4-1/E4-2, E7-7, F2-7, F3-2 and Section F3.1, F6-2 to F6-4, F7-5, F7-6, F8-2 to F8-4, G2-3, G2-10, G2-11, Table B4.1a Case 8 and Table B4.1b Case 21. Sections L1/L2 (deflection limits) are covered.
 - **Change:** Whether most generated models can have a verified design reference; today almost none can, so design tasks are nearly absent from the benchmark.
 
 **Q68. How are the tier-F gaps to be closed?**
@@ -498,13 +496,13 @@ Shear deformation and partial axial/shear/torsion releases have one eligible sol
 **Q74. Slack members that carry member loads, in tier C.**
 The outside solvers get the linear model of the engine's active set; loads on removed slack members must reach the nodes by the engine's rule.
 - **Where:** VERIFICATION.md 2 (tier C substitutions).
-- **Now:** When the examples were written this case was refused by tier C; the loads of slack members are now computed from the load definitions and passed as nodal loads. <!-- RECHECK -->
+- **Now:** When the examples were written this case was refused by tier C; the loads of slack members are now computed from the load definitions and passed as nodal loads (`tests/test_crosscheck_estimate.py`).
 - **Change:** Whether tension-only models with self weight can be verified; confirm the lumping rule as part of the contract.
 
 **Q75. Tolerance of the superposition and reciprocity checks.**
 10⁻⁹ was missed at about 1.6·10⁻⁹ by one first-order model. Is the tolerance meant to be that tight?
 - **Where:** `verify/policy.py` (tier D).
-- **Now:** Unchanged; the attempt stays quarantined. <!-- RECHECK -->
+- **Now:** The tolerance is unchanged (10⁻⁹). The build of the dataset in `data/` logs no attempt that misses it.
 - **Change:** A handful of quarantines.
 
 **Q76. Design Examples: rounded chains and internal inconsistencies.**
@@ -662,14 +660,14 @@ A design-variable curve ball changes no analysis result. Its *diagnose* answer i
 **Q100. Second order in generated models.**
 Second order is drawn by default at levels 3–5, and with the earlier tier-C rule nearly all such models were quarantined. Should it be default-off until Q63 is settled?
 - **Where:** `bench/generate.py`; DIFFICULTY.md.
-- **Now:** Default on; the stored dataset therefore has no stable second-order reference. <!-- RECHECK -->
+- **Now:** Default on. With the present tier-C rule (Q63) 249 of the 748 tasks of the dataset in `data/` are on second-order models.
 - **Change:** Composition of the dataset.
 
 **Q101. Base models shared between train and held-out.**
 In the stored dataset 12 held-out instances (34 tasks) use base models that train tasks also use; for 10 repair tasks the reference answer is also a train reference answer.
 - **Where:** BENCHMARK.md 7; `bench/splits.py`.
-- **Now:** The generator seed now carries the split, and the held-out pairs are chosen by a rule on names only; the stored dataset is that of the earlier rule until rebuilt. <!-- RECHECK -->
-- **Change:** A rebuild (about two hours) and refreshed numbers.
+- **Now:** The generator seed now carries the split, and the held-out pairs are chosen by a rule on names only; the dataset in `data/` was rebuilt with this rule, and its audit finds no base model and no curve-balled model in both splits (`data/CHECKS.json`).
+- **Change:** Nothing further if the owner accepts the rule. Another rule means a rebuild (hours on four cores) and refreshed numbers.
 
 **Q102. `invalid-model` curve balls.**
 A curve ball that makes the model invalid has no analysis to verify. Should a diagnose task against the validator's problem list be served?
@@ -702,10 +700,10 @@ It is rigorous but takes seconds to minutes per candidate.
 - **Change:** Scores; none of the references.
 
 **Q107. Licence.**
-The repository has no licence file, so no licence is granted for code or data; the Ziemian-derived problem files carry CC BY 4.0 obligations.
-- **Where:** `data/DATA_CARD.md`; REFERENCES.md R4.
-- **Now:** None.
-- **Change:** Whether anyone else may use the benchmark.
+Under which licence are the code and the generated dataset published? The Ziemian-derived problem files carry CC BY 4.0 obligations whatever the answer.
+- **Where:** `LICENSE`; `pyproject.toml`; `data/DATA_CARD.md`; README.md "Licence"; REFERENCES.md R4.
+- **Now:** A `LICENSE` file with the MIT licence ("BenchmarkFEA contributors") was added when the repository was prepared for publication, and `pyproject.toml`, the README and the data card name it. No decision of the owner on the licence is recorded in the project notes, so the file stands until the owner confirms or replaces it.
+- **Change:** Whether, and on which terms, anyone else may use the engine and the benchmark. Another licence means replacing the file and the four places that name it.
 
 **Q108. Dataset in the repository.**
 24 MB of JSON, built from seeds 0 and 4 only, so each train pair has one seed. Keep it in the repository, compact it, or build more seeds (about an hour each)?
@@ -728,7 +726,7 @@ Buckling factor at least 2, sway amplification at most 1.5, half the members wit
 **Q111. Generator defects found by downstream users.**
 Three seeds of one family raised an invalid-model error (an empty design group) instead of rejecting the draw; generated documents shared one object between a member's two end releases.
 - **Where:** `bench/families/`.
-- **Now:** Logged as `generator-error` in the stored dataset (24 attempts). The build examined for this file generates the first of those seeds without error and without the shared object. <!-- RECHECK -->
+- **Now:** An earlier dataset build logged 24 attempts as `generator-error`. The build of the dataset in `data/` logs none.
 - **Change:** A rebuild changes which base models are used.
 
 **Q112. Numbers in the documents after a rebuild.**
@@ -782,3 +780,11 @@ Should it also read tabulated width-to-thickness ratios, r_ts and h_o?
 - **Where:** `shapes.py`.
 - **Now:** Only the columns listed in the module, and the design fillet dimension if present.
 - **Change:** Agreement with the Design Examples for database shapes.
+
+## G. Packaging and continuous integration
+
+**Q120. Is the committed dataset meant to be reproduced bit for bit on every supported Python?**
+`tests/test_verify_stations.py::test_dataset_audit_tool_finds_nothing_on_the_first_models_of_the_dataset` requires the stored reference values to equal a fresh solve exactly (difference 0.0). The dataset in `data/` was built with Python 3.13, numpy 2.5.3 and scipy 1.18.1. On Python 3.11 the package installer selects numpy 2.4.6 and scipy 1.17.1, which carry another build of the linear algebra library, and the fresh solve then differs from the stored value by 4.4·10⁻¹² relative; the test fails there (measured; with numpy 2.5.5 on Python 3.13 it passes). The answers files also record the versions they were built with, so a rebuild with other versions differs in those entries.
+- **Where:** `tests/test_verify_stations.py`; `tools/audit_dataset.py`; `tools/compare_dataset_sample.py`; `.github/workflows/ci.yml`.
+- **Now:** The test is unchanged and nothing is skipped: the Python 3.11 job of the continuous integration fails on this one test. `tools/compare_dataset_sample.py` counts a file that differs only in the recorded versions separately, and the weekly workflow installs the recorded versions before it compares bytes.
+- **Change:** Either the exact comparison is required only where the installed versions are those recorded in the manifest (and a stated round-off tolerance applies elsewhere), or Python 3.11 is supported for the engine but not for reproducing the dataset. Whether the continuous integration is green on Python 3.11.

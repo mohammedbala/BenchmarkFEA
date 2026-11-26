@@ -216,7 +216,8 @@ def quarantine_section(report, bank) -> list:
 def bank_section(bank) -> list:
     L = ["## 4. Model bank of the independent review (`tests/independent`) through `verify_model`", "",
          "These models were written to review the solver (every modelling feature, alone and combined); they "
-         "have no published targets. The table shows what the pipeline decides for each: `verified` = every "
+         "have no published targets. \"Independent\" means separate code written within this project; nobody outside "
+         "the project has reviewed the solver. The table shows what the pipeline decides for each: `verified` = every "
          "applicable tier passed. `tableau` = largest relative difference to the independent tableau solver of "
          "`tests/independent` (EXTRA EVIDENCE ONLY: it is not one of the two foreign solvers tier C requires and "
          "does not influence the status).", "",
@@ -240,6 +241,18 @@ def bank_section(bank) -> list:
                 p.get("message", "") for p in (rec.refusal or {}).get("problems", [])[:2])
             details.append(f"* `{name}` — {rec.status}"
                            + (f" ({rec.quarantine['category']})" if rec.quarantine else "") + f": {esc(why)}")
+    refined = {name: r for name, r in REFINED.items() if r}
+    if refined:
+        L += ["", "The tableau solver takes the axial force constant over a piece of a member, and the column above is "
+              "its run with one piece per member. In a second-order model whose axial force varies along a member "
+              "(self weight of columns, loads along a member) that number is the tableau's own discretisation error. "
+              f"Every second-order model with a difference above {REFINE_ABOVE:g} was therefore run again with more "
+              "pieces per member (extra evidence only; it changes no status):", "",
+              "| model | 1 piece | " + " | ".join(f"{n} pieces" for n in REFINED_PIECES) + " |",
+              "|---|---|" + "---|" * len(REFINED_PIECES)]
+        for name, r in refined.items():
+            L.append(f"| `{name}` | " + (r["error"] if "error" in r else
+                                         " | ".join(num(r.get(n)) for n in (1,) + REFINED_PIECES)) + " |")
     n = len(bank)
     counts = {}
     for _, rec in bank:
@@ -271,6 +284,29 @@ def coverage_section() -> list:
     return L
 
 
+REFINED: dict = {}          # second-order bank model -> {pieces per member: largest difference tableau - engine}
+REFINED_PIECES = (8, 32)
+REFINE_ABOVE = 1e-6         # a difference above this, with one piece per member, is shown refined
+
+
+def tableau_refined(builder) -> dict:
+    """The tableau solver takes the axial force constant over a piece of a member.  Where the axial force
+    varies along a member the one-piece result of the table is therefore the tableau's own discretisation
+    error; this reruns the comparison with more pieces per member (extra evidence only)."""
+    import harness
+    raw, cid = builder()
+    out = {}
+    try:
+        for n in (1,) + REFINED_PIECES:
+            d = harness.compare(raw, cid, second_order=True, nsub=n)
+            out[n] = max(v for k, v in d.items() if not k.startswith("_"))
+            if n == 1 and out[n] <= REFINE_ABOVE:
+                return {}
+    except Exception as e:                                 # extra evidence must never break the report
+        return {"error": f"{type(e).__name__}: {str(e)[:120]}"}
+    return out
+
+
 def run_bank(budget):
     sys.path.insert(0, str(ROOT / "tests" / "independent"))
     try:
@@ -283,6 +319,8 @@ def run_bank(budget):
         raw = f()
         raw = raw[0] if isinstance(raw, tuple) else raw
         rec = V.verify_model(raw, budget=budget, extra_evidence=True, name=name)
+        if name in SECOND:
+            REFINED[name] = tableau_refined(f)
         out.append((name, rec))
         print(f"  bank {name}: {rec.status} [{''.join(rec.tiers_passed)}] {rec.timings.get('total', 0):.1f} s", flush=True)
     return out

@@ -1,0 +1,85 @@
+{
+ "format": "benchfea-task",
+ "formatVersion": "1.0.0",
+ "id": "t465b1c8c516bfb",
+ "taskType": "predict",
+ "mode": "tool-allowed",
+ "family": "diaphragm_frame",
+ "difficulty": 5,
+ "split": "train",
+ "quantities": [
+  {
+   "kind": "displacement",
+   "combination": "SLS2",
+   "node": "A2.1",
+   "component": "uz",
+   "unit": "in",
+   "id": "q1",
+   "text": "translation uz of node A2.1 in combination SLS2 [in], global axes"
+  },
+  {
+   "kind": "displacement",
+   "combination": "SLS2",
+   "node": "A3.1",
+   "component": "ux",
+   "unit": "in",
+   "id": "q2",
+   "text": "translation ux of node A3.1 in combination SLS2 [in], global axes"
+  },
+  {
+   "kind": "reaction",
+   "combination": "SLS2",
+   "node": "A2.0",
+   "component": "Mz",
+   "unit": "kip*in",
+   "id": "q3",
+   "text": "reaction moment Mz at node A2.0 in combination SLS2 [kip*in], global axes, acting on the structure"
+  },
+  {
+   "kind": "reaction",
+   "combination": "ULS3",
+   "node": "C3.0",
+   "component": "Mz",
+   "unit": "kip*in",
+   "id": "q4",
+   "text": "reaction moment Mz at node C3.0 in combination ULS3 [kip*in], global axes, acting on the structure"
+  },
+  {
+   "kind": "memberEndForce",
+   "combination": "SLS2",
+   "member": "CC3.1",
+   "end": "i",
+   "component": "Mz",
+   "unit": "kip*in",
+   "id": "q5",
+   "text": "end force Mz at end i of member CC3.1 in combination SLS2 [kip*in], member local axes, acting on the member (docs/CONVENTIONS.md)"
+  },
+  {
+   "kind": "memberMaxMoment",
+   "combination": "ULS2",
+   "member": "CB3.1",
+   "component": "My",
+   "unit": "kip*in",
+   "id": "q6",
+   "text": "largest absolute bending moment My along member CB3.1 in combination ULS2 [kip*in] (a non-negative number; local axes)"
+  }
+ ],
+ "answerFormat": {
+  "values": {
+   "q1": "number",
+   "q2": "number",
+   "q3": "number",
+   "q4": "number",
+   "q5": "number",
+   "q6": "number"
+  }
+ },
+ "statement": "TASK (predict): give the named results of the model in the file below, exactly as it is given.\nStructure: diaphragm frame. Mode tool-allowed: you may run the analysis tool (run_analysis) and read its results.\nSign conventions, axes and units are those of docs/CONVENTIONS.md; every number you give is in the units of the model file.\n\nQuantities:\n  q1: translation uz of node A2.1 in combination SLS2 [in], global axes\n  q2: translation ux of node A3.1 in combination SLS2 [in], global axes\n  q3: reaction moment Mz at node A2.0 in combination SLS2 [kip*in], global axes, acting on the structure\n  q4: reaction moment Mz at node C3.0 in combination ULS3 [kip*in], global axes, acting on the structure\n  q5: end force Mz at end i of member CC3.1 in combination SLS2 [kip*in], member local axes, acting on the member (docs/CONVENTIONS.md)\n  q6: largest absolute bending moment My along member CB3.1 in combination ULS2 [kip*in] (a non-negative number; local axes)\n\nSubmit your answer as JSON of this form:\n{\n \"values\": {\n  \"q1\": 0.0,\n  \"q2\": 0.0,\n  \"q3\": 0.0,\n  \"q4\": 0.0,\n  \"q5\": 0.0,\n  \"q6\": 0.0\n }\n}",
+ "verification": {
+  "status": "verified",
+  "scope": "analysis results of the given model",
+  "meaning": "'verified' means only: the reference solution passed every tier listed as applicable in this record, at the tolerances stated in it. It does not mean reviewed, approved or certified by anyone.",
+  "policy": "docs/VERIFICATION.md; the tiers passed and the tolerances are in the answers file and in the info returned when the episode ends"
+ },
+ "modelFile": "t465b1c8c516bfb.model.json"
+}

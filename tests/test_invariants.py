@@ -1,4 +1,4 @@
-"""Invariants reported on every solve, the linearity checks (superposition, Maxwell-Betti), proof that
+"""Invariants reported on every solve, the linearity checks (superposition, Maxwell-Betti), tests that
 the checks have teeth (injected faults are caught), determinism, and the separation of design-only data
 from the solver."""
 import json

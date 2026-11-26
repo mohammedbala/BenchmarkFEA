@@ -876,6 +876,10 @@ exactly the couples of the member axial forces.
 
 ## 17. Independent review of the solver (`tests/independent/`)
 
+"Independent" here means independent code, not an independent person or body:
+this review was made within the project that wrote the engine, and nobody
+outside the project has reviewed the solver.
+
 A second implementation, written without reading the engine's tests and sharing
 no code with it (own reading of the input, own local axes, own load
 resolution, file units), is kept as permanent tests:

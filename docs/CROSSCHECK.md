@@ -295,7 +295,7 @@ and raises `OracleError`.
 * **Axes**: PyNite's rule is Y-up with special cases for vertical and horizontal members. No
   coordinate permutation is used: the worker reads `member.T()` of the unrotated member, sets the
   `rotation` that brings its y axis onto benchfea's and re-reads the triad; the run fails unless all
-  triads match to 10⁻⁹. Proven on 16 directions / rolls / reference vectors with Z-up and Y-up models
+  triads match to 10⁻⁹. Tested on 16 directions / rolls / reference vectors with Z-up and Y-up models
   (`test_member_axes_reproduced_exactly`).
 * **Releases**: boolean releases for full releases; rotational springs about local y/z through the
   same parallel-member decomposition as OpenSees, with the member loads as exact equivalent nodal

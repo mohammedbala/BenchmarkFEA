@@ -283,8 +283,8 @@ Consequence with the present test suite (see the table in the report): a design 
 publishable when it uses, among others, torsional buckling (Eq. E4-1/E4-2: the Design Examples print only
 the elastic stress), r_ts computed from Eq. F2-7, web shear with C_v1 < 1 (Eq. G2-3), box sections
 (Table B4.1a Case 8, Table B4.1b Case 21), slender flanges in flexure (Eq. F3-2, F6-2…F6-4), the round
-HSS local-buckling equations (F8-2…F8-4), the deflection limits (Sec. L1/L2) or the engine's torsion
-screening rule.
+HSS local-buckling equations (F8-2…F8-4) or the engine's torsion screening rule. The deflection limits
+(Sec. L1/L2) are covered.
 
 ## 3. Problem library
 

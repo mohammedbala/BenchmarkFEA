@@ -40,11 +40,15 @@ are active):
 
 Quarantined as a whole (1):
 
-* `frame-support-settlement`: **the engine produces no results.** A statically determinate frame under a support
-  settlement moves as a rigid body with no forces; the engine's invariant check measures equilibrium residuals
-  relative to the forces present, which are round-off of zero, and refuses the solution ("invariant failed",
-  residuals of order 0.3). This is a limitation of the engine's invariant check found by this problem (reported;
-  no load was added to make it run).
+* `frame-support-settlement`: **all 12 displacement targets are reproduced, but the model cannot pass tiers C, D
+  and E.** A statically determinate frame under a support settlement moves as a rigid body with no forces; every
+  force of the solution is round-off of zero (1e-8 at most, in kN and mm), and the checks that compare forces
+  relative to the largest force of the model then compare one rounding error with another (tier C: the engine
+  and PyNite "differ" by 1.7 in the end moments and the OpenSees route fails its own equilibrium check; tier D:
+  station statics; tier E: member split). No error of the engine or of a foreign solver is shown by this. An
+  earlier build of the engine refused the model for the same reason inside its own invariants; a round-off floor
+  on their force scales removed that refusal (docs/THEORY.md 8.1). The verification tiers were not changed to let
+  the problem through, and no load was added to make the forces non-zero.
 
 Diagnoses with numbers: `quarantine.py`.
 
@@ -91,7 +95,7 @@ diagnosis (`quarantine.py`); nothing is loosened or dropped.
 | `cantilever-column-notional-load-vendor-printed` | 'V. Direct Analysis of a Column' | Cantilever column with axial load and a small lateral load: second-order moment and deflection - values printed by the vendor that do not reproduce | published | 2 | 2 | 8.7e-04 | 2.00 | quarantined |
 | `cantilever-column-p-delta` | 'V. Single Column P-Delta Analysis' | Cantilever column with axial and lateral load: second-order base moment | recomputed-from-published-statement | 5 | 0 | 3.0e-04 | 0.34 | active |
 | `cantilever-column-p-delta-vendor-printed` | 'V. Single Column P-Delta Analysis' | Cantilever column with axial and lateral load: second-order base moment - values printed by the vendor that do not reproduce | published | 1 | 1 | 6.4e-04 | 94.85 | quarantined |
-| `frame-support-settlement` | 'V. 2D Portal Reactions Sidesway 1' | Statically determinate frame: displacements caused by support settlements | recomputed-from-published-statement | 12 | - | - | - | quarantined (the engine refuses the model) |
+| `frame-support-settlement` | 'V. 2D Portal Reactions Sidesway 1' | Statically determinate frame: displacements caused by support settlements | recomputed-from-published-statement | 12 | 0 | 2.0e-04 | 0.67 | quarantined |
 | `pinned-column-buckling-factor` | 'V. Column Buckling Factor' | Pin-ended column: elastic buckling factor | recomputed-from-published-statement | 2 | 0 | 8.7e-05 | 0.61 | active |
 | `portal-fixed-uniform-load` | 'V. 2D Portal Reactions 2' | Fixed-base square portal frame with a uniform load on the beam | recomputed-from-published-statement | 5 | 0 | 9.0e-16 | 0.00 | active |
 | `portal-fixed-uniform-load-vendor-printed` | 'V. 2D Portal Reactions 2' | Fixed-base square portal frame with a uniform load on the beam - values printed by the vendor that do not reproduce | published | 1 | 1 | 8.1e-04 | 7.22 | quarantined |
