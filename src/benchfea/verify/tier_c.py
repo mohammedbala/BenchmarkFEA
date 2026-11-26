@@ -2,7 +2,7 @@
 ``benchfea.crosscheck``.
 
 A combination counts as cross-checked only if AT LEAST TWO foreign solvers represent it -- fidelity
-"exact", or "approximate" with a measured error estimate not above ``maxApproximation`` -- and agree
+"exact", or "approximate" with an error bound (from runs of the foreign solver alone) not above ``maxApproximation`` -- and agree
 with the engine and with each other within the tolerance plus the estimated errors of the results
 compared (``benchfea.crosscheck.cross_check``).  Otherwise the tier is not passed and the reason says
 how many solvers can represent the model and why the others cannot.  A model that is not cross-checked
@@ -24,8 +24,13 @@ members          engine's final active set (active members as truss members, sla
                  The solution of the one-sided problem is characterised by: equilibrium of that linear
                  model (foreign solvers), every active member carrying a force of its permitted sign,
                  and every slack member being strained in its forbidden sense (both evaluated here
-                 from the FOREIGN results).  This is exact, not an approximation; it is not available
-                 when a slack member carries member loads.
+                 from the FOREIGN results).  This is exact, not an approximation.  Member loads of a
+                 slack member (e.g. its self weight) go to its two end nodes as the reactions of the
+                 member held at both ends with its bending released there (docs/THEORY.md 13: "the
+                 reactions of a simply supported beam"; the axial component by the lever rule of a
+                 uniform bar).  They are computed here from the load definitions with the force-method
+                 routine of ``crosscheck.fef`` (no solver code) and given to the foreign solvers as
+                 nodal loads (``slack_member_loads``).
 
 Not reproduced: linear buckling (neither translator computes buckling factors).  A model whose
 reference solution contains buckling results therefore cannot pass tier C.
@@ -53,7 +58,7 @@ from .policy import POLICY
 from .record import TierResult
 
 __all__ = ["tier_c", "ForeignCache", "foreign_versions", "SOLVERS", "independent_notional_loads",
-           "independent_tau_b", "active_set_document"]
+           "independent_tau_b", "active_set_document", "slack_member_loads"]
 
 SOLVERS = ("opensees", "pynite")
 _DIST = {"opensees": "openseespy", "pynite": "PyNiteFEA"}
@@ -187,9 +192,41 @@ def independent_tau_b(model, cid: str, cres) -> dict:
     return out
 
 
+def slack_member_loads(model, cid: str, slack) -> dict:
+    """Nodal loads that stand for the member loads of the slack members of a combination:
+    ``{node: [Fx, Fy, Fz, Mx, My, Mz]}`` in internal units, at the level of the loads NOT multiplied by
+    alpha (the form of ``extra_nodal_loads``).
+
+    Rule (docs/THEORY.md 13): a slack member has no stiffness and hands its loads to its end nodes as
+    the reactions of a simply supported beam -- the member held at both ends of its flexible length with
+    both bending rotations released; a force along the axis is shared by the lever rule (uniform bar), a
+    point moment becomes a couple of transverse end forces.  The end reactions come from
+    ``crosscheck.fef.fixed_end_forces`` (force method; shares nothing with ``benchfea.solve``), the load
+    intensities from ``crosscheck.prepare``; a rigid end offset carries the end force to the node with
+    its moment ``offset x F``."""
+    from ..crosscheck.fef import fixed_end_forces
+    p = prepare(model, cid, extra_nodal_loads={})
+    out = {}
+    for mid in slack:
+        m = p.members[mid]
+        if not m.loaded:
+            continue
+        ei_y, ei_z = m.EIy or m.E * m.A ** 2 / 12.0, m.EIz or m.E * m.A ** 2 / 12.0   # statically determinate: any value
+        f = fixed_end_forces(m.L, ei_y, ei_z, None, None, m.points, m.dists, ky=(0.0, 0.0), kz=(0.0, 0.0))
+        for blk, nid, off in ((0, m.i, m.offset_i), (6, m.j, m.offset_j)):
+            F = -m.R.T @ f[blk:blk + 3]
+            M = -m.R.T @ f[blk + 3:blk + 6] + np.cross(off, F)
+            v = out.setdefault(nid, np.zeros(6))
+            v[:3] += F / p.alpha
+            v[3:] += M / p.alpha
+    return {nid: [float(x) for x in v] for nid, v in out.items() if np.any(v != 0.0)}
+
+
 def active_set_document(raw: dict, model, cres):
     """The linear model of the engine's final active set of one combination: active one-sided members
-    become truss members, slack ones are removed.  Returns ``(document, slack ids, problem or None)``."""
+    become truss members, slack ones are removed together with their member loads (which
+    :func:`slack_member_loads` turns into nodal loads).  Returns ``(document, slack ids, ids of the slack
+    members that carry member loads or None)``."""
     slack = [mid for mid, m in model.members.items() if m.type in ONE_SIDED and not cres.members[mid].active]
     doc = copy.deepcopy(raw)
     doc.pop("design", None)
@@ -211,9 +248,6 @@ def active_set_document(raw: dict, model, cres):
                     continue
             keep.append(ld)
         case["loads"] = keep
-    if loaded:
-        return None, slack, ("slack member(s) " + ", ".join(sorted(loaded)) + " carry member loads, which the "
-                             "engine hands to their end joints; the active-set substitute does not cover this")
     for mid, m in model.members.items():
         if m.type in ONE_SIDED:
             if mid in slack:
@@ -227,7 +261,7 @@ def active_set_document(raw: dict, model, cres):
         if not case["loads"]:
             # a load case must keep a load: a zero nodal load keeps the document valid
             case["loads"] = [{"type": "nodal", "node": next(iter(doc["nodes"])), "Fx": 0.0}]
-    return doc, slack, None
+    return doc, slack, (sorted(loaded) or None)
 
 
 def _complementarity(model, slack, result: ForeignResult) -> list:
@@ -328,21 +362,30 @@ def tier_c(raw: dict, model, results, *, cache: ForeignCache | None = None, time
             options["tau_b"] = {mid: float(v) for mid, v in cres.tau_b.items()}
         slack, blocked = [], False
         if one_sided:
-            doc, slack, why = active_set_document(raw, model, cres)
-            if why:
-                problems.append(why)
+            doc, slack, loaded_slack = active_set_document(raw, model, cres)
+            try:
+                c_model, c_hash = build_model(copy.deepcopy(doc)), document_hash(doc)
+            except ModelInvalid as e:
+                problems.append("the active-set substitute is not a valid model: "
+                                + "; ".join(p.message for p in e.problems[:2]))
                 blocked = True
-            else:
-                try:
-                    c_model, c_hash = build_model(copy.deepcopy(doc)), document_hash(doc)
-                except ModelInvalid as e:
-                    problems.append("the active-set substitute is not a valid model: "
-                                    + "; ".join(p.message for p in e.problems[:2]))
-                    blocked = True
-            info["substitutions"].append({
-                "what": "one-sided members", "slack": slack,
-                "how": "foreign solvers get the linear model of the engine's final active set; the sign conditions "
-                       "of every one-sided member are then evaluated from the foreign results"})
+            sub = {"what": "one-sided members", "slack": slack,
+                   "how": "foreign solvers get the linear model of the engine's final active set; the sign conditions "
+                          "of every one-sided member are then evaluated from the foreign results"}
+            if loaded_slack and not blocked:
+                # only the loads of this combination's slack members that act in this combination
+                extra = slack_member_loads(model, cid, loaded_slack)
+                merged = {nid: list(v) for nid, v in options.get("extra_nodal_loads", {}).items()}
+                for nid, v in extra.items():
+                    old = merged.get(nid, [0.0] * 6)
+                    merged[nid] = [float(a + b) for a, b in zip(old, v)]
+                if merged:
+                    options["extra_nodal_loads"] = merged
+                sub.update(slackMembersWithLoads=loaded_slack,
+                           slackMemberLoads="member loads of the slack members given to the foreign solvers as the "
+                                            "end reactions of a simply supported beam (docs/THEORY.md 13), computed "
+                                            "from the load definitions")
+            info["substitutions"].append(sub)
         if blocked:
             disagreements += [f"{cid}: {x}" for x in problems if "differ" in x]
             info.update(crossChecked=False, reasons=problems, eligible=[])
@@ -358,7 +401,8 @@ def tier_c(raw: dict, model, results, *, cache: ForeignCache | None = None, time
                              options={s: dict(options) for s in solvers})
         # decision: crosscheck's eligibility rule; agreement within the base tolerance plus the estimated
         # errors of the two results compared (``estimateSafety`` = 1.0: exactly crosscheck's rule).  The
-        # estimates are leading-order values of the error itself, not bounds -- docs/VERIFICATION.md
+        # estimates are bounds computed from three refinement levels of the foreign solver itself
+        # (crosscheck.runner.estimate_from_levels; docs/CROSSCHECK.md 1.3) -- never from the engine's result
         base, safety = pol["relative"], pol["estimateSafety"]
         reasons = [r for r in report.reasons if " differ: " not in r and not r.endswith("agree")
                    and "represent the model and agree" not in r] + problems

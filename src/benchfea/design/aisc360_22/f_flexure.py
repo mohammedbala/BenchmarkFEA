@@ -86,6 +86,11 @@ lateral displacement of the compression flange or against twist):
   (overhangs, a free end beyond a brace point) is ``notChecked`` unless both
   ``Cb`` and ``Lb`` are given.
 * a segment without moment is not checked (Eq. F1-1 is 0/0 there).
+* "zero" and the sign of a moment in these rules are judged with a scale: a moment whose magnitude
+  does not exceed ZERO_FORCE (1e-9, ``design/demands.py``) times the largest moment of the design member
+  in the combination is zero.  The analysis returns a moment that is exactly zero (a released end) as
+  a rounding error of either sign; without the scale such a number decided whether the moment
+  "changes sign" in a segment, and with it which segment was checked.
 
 Choices where the Specification leaves room (reported in each check):
 
@@ -115,6 +120,7 @@ import numpy as np
 
 from ..base import LENGTH, NONE, STRESS, TEXT, DesignContext, Demand, missing, not_checked, positive, \
     strength_check
+from ..demands import ZERO_FORCE
 from ..section import BOX, I_SHAPE, RECT_HSS, ROUND_HSS
 from . import b4_classification as b4
 
@@ -336,10 +342,14 @@ def ltb_segments(ctx: DesignContext, mo: Moments) -> list:
         """Station coordinate of the design-member position ``a`` (0 ... L); the stations span the member."""
         return x0 + min(max(a / L, 0.0), 1.0) * span
 
+    # a moment is zero when it is below ZERO_FORCE x the largest moment of the member in this combination
+    # (design/demands.py: rounding errors of the analysis must not decide which flange is in compression)
+    zero = ZERO_FORCE * mo.Mrx
+
     def make(a, b, note=""):
         """Segment [a, b] (design member coordinates) with its Cb, or blocked."""
         Cb, Mmax, MA, MB, MC, x_max = segment_cb(D, at(a), at(b))
-        if Mmax == 0.0:
+        if Mmax <= zero:
             return None
         free = (a <= 0.0 and ctx.end_free[0]) or (b >= L and ctx.end_free[1])
         kw = dict(a=a, b=b, Lb=b - a, Mr=Mmax, x=x_max - x0, note=note)
@@ -364,7 +374,7 @@ def ltb_segments(ctx: DesignContext, mo: Moments) -> list:
             seg = make(0.0, L)
             return [seg] if seg else []
         Mmax, x_max, _, _ = D.extremes(x0, float(D.x[-1]))
-        if Mmax == 0.0:
+        if Mmax <= 0.0:
             return []
         if given is not None:
             return [Segment(None, None, ctx.Lb, Mmax, x_max - x0, given, "Cb given")]
@@ -388,9 +398,9 @@ def ltb_segments(ctx: DesignContext, mo: Moments) -> list:
         for a, b in zip(cuts, cuts[1:]):
             _, _, lo, hi = D.extremes(at(a), at(b))
             lo, hi = (lo, hi) if sign > 0.0 else (-hi, -lo)         # as seen by this flange: > 0 = compression
-            if hi <= 0.0:
+            if hi <= zero:
                 continue                                            # this flange is never in compression here
-            if lo >= 0.0:
+            if lo >= -zero:
                 add(a, b)                                           # in compression throughout: braced at both ends
                 continue
             a2 = max(p for p in both if p <= a)

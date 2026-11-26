@@ -39,8 +39,5 @@
    "sign": "deflection in the direction of the lateral load (+X)"
   }
  ],
- "status": "quarantined",
- "quarantine": {
-  "diagnosis": "Tier B passes: both targets (the source's closed-form Eqs. e and g evaluated here) are reproduced to better than 1e-14. Tier C does not. Combination C: engine and OpenSeesPy differ by 9.17e-4 (rotation at b), allowed 9.15e-4. Combination T: engine and OpenSeesPy differ by 1.74e-3 (end moment at a), allowed 1.73e-3, and PyNite is not eligible (its estimated approximation error 5.44e-3 exceeds the limit 5e-3). The allowed difference is 1e-6 plus the estimated (leading-order, not bounding) discretisation error of the OpenSees run; with an exact engine the difference is expected to equal the estimate (docs/VERIFICATION.md, 'Second-order cross-checks'). The tolerance rule was not widened."
- }
+ "status": "active"
 }

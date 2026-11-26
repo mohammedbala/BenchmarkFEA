@@ -14,6 +14,11 @@ tier N  null space of an INDEPENDENTLY ASSEMBLED stiffness matrix.  ``independen
         modes) satisfies K phi = 0 on that matrix and violates no support or constraint; (3) these
         modes are linearly independent and, together with the count of the "distributed" modes, add up
         to ``nMechanisms``; (4) every node the diagnosis lists takes part in the independent null space.
+        A node that is LOADED in a degree of freedom without any stiffness (no member, or only truss
+        members for a rotation) is such a mode too: these DOFs are kept in the independent matrix (the
+        unloaded ones are not part of the solution, by the engine's documented rule), found there as
+        zero eigenvalues, and each DOF the diagnosis lists must be loaded according to the load
+        definitions.
 tier K  the same vectors on the ENGINE's own matrix (K phi = 0), and the engine's eigenvalue count
         recomputed with numpy from the engine's assembled matrix.
 tier C  evidence from the foreign solvers (OpenSeesPy, PyNite) under a PROBING LOAD built from the null
@@ -209,6 +214,13 @@ class IndependentSystem:
             elif all(t for _, t in attached[nid]) and nid not in masters:
                 ok[:3] = False
                 inactive[i:i + 6] = ok
+        # A LOADED degree of freedom without stiffness is not dropped: the engine refuses such a model
+        # ("no-stiffness" / "only-truss-members" mode of kind "node"), and the motion must then be found
+        # here as a zero eigenvalue.  Which DOFs are loaded comes from the load definitions, not from the
+        # diagnosis: the first combination (model order) that loads a DOF without stiffness.
+        loaded = _loaded_dofs(model, inactive)
+        self.loaded_inactive = inactive & loaded
+        inactive = inactive & ~loaded
         self.inactive = inactive
         keep = ~fixed[self.retained] & ~inactive[self.retained]
         self.free = np.flatnonzero(keep)
@@ -272,8 +284,45 @@ class IndependentSystem:
         return list(out.values())
 
 
+def _loaded_dofs(model, inactive) -> np.ndarray:
+    """Nodal DOFs (n,) that carry a nodal load in the first combination (model order) that loads one of
+    the DOFs in ``inactive``; all False when no combination does.  From the load definitions
+    (``crosscheck.prepare``: no solver code)."""
+    from ..crosscheck.prepare import prepare
+    for cid in model.combinations:
+        try:
+            mask = (prepare(model, cid, extra_nodal_loads={}).load != 0.0).ravel()
+        except Exception:                                    # a combination that cannot be prepared loads nothing here
+            continue
+        if (mask & inactive).any():
+            return mask
+    return np.zeros(len(inactive), bool)
+
+
 def independent_stiffness(model, exclude=()) -> IndependentSystem:
     return IndependentSystem(model, exclude)
+
+
+def loaded_dof_vectors(system: IndependentSystem, mode: dict):
+    """Unit vectors of a mode of kind "node" that the diagnosis describes only by the loaded DOFs of a
+    node without stiffness there (no direction, no axis): one vector per listed DOF, with the global
+    index.  Returns ``[(dof name, global index, vector)]`` or ``[]`` when the mode is not of that form."""
+    if mode.get("kind") != "node" or mode.get("direction") or mode.get("axis"):
+        return []
+    if mode.get("cause") not in ("no-stiffness", "only-truss-members"):
+        return []
+    nodes = mode.get("nodes", [])
+    if len(nodes) != 1 or not nodes[0].get("dofs"):
+        return []
+    i = 6 * system.idx[nodes[0]["node"]]
+    out = []
+    for name in nodes[0]["dofs"]:
+        if name not in DOFS:
+            return []
+        v = np.zeros(system.n)
+        v[i + DOFS.index(name)] = 1.0
+        out.append((name, i + DOFS.index(name), v))
+    return out
 
 
 # ====================================================================================== modes -> vectors
@@ -349,9 +398,28 @@ def tier_null_space(model, diagnosis: dict, exclude=()) -> TierResult:
     vectors, rows, distributed = [], [], 0
     for k, mode in enumerate(diagnosis["modes"]):
         row = {"mode": k, "kind": mode["kind"], "description": mode["description"]}
+        unit = loaded_dof_vectors(sysm, mode)
         if mode["kind"] == "distributed":
             distributed += int(mode.get("count", 1))
             row["check"] = "count and participating nodes only (no single vector is defined)"
+        elif unit:
+            # a node loaded where it has no stiffness: every listed DOF must be, by the independent rule,
+            # a loaded DOF without stiffness, and its unit motion a zero-energy motion
+            row["check"] = "each loaded DOF: no stiffness in the independent matrix, loaded by the load definitions"
+            worst = 0.0
+            for name, g, v in unit:
+                if not sysm.loaded_inactive[g]:
+                    failed.append(f"mode {k}: by the independent rule {mode['nodes'][0]['node']} {name} is not a "
+                                  "loaded degree of freedom without stiffness")
+                    continue
+                worst = max(worst, sysm.residual(v), sysm.admissible(v))
+                vectors.append(w * v / max(np.linalg.norm(w * v), 1e-300))
+            row["residual"] = worst
+            largest.append({"what": f"mode {k}: |K phi| / (|K| |phi|) of the loaded DOFs on the independent matrix",
+                            "value": worst, "tolerance": pol["nullResidual"]})
+            if worst > pol["nullResidual"]:
+                failed.append(f"mode {k}: a loaded DOF has stiffness or is restrained in the independent matrix "
+                              f"({worst:.2e})")
         else:
             v = mode_vector(sysm, mode)
             if v is None:
@@ -410,10 +478,23 @@ def tier_engine_matrix(model, diagnosis: dict, exclude=()) -> TierResult:
     thr = pol["singular"] if true_mechanism else float(model.analysis.pivot_tolerance)
     count = int((lam < thr).sum())
     failed, largest = [], []
-    if count != int(diagnosis["nMechanisms"]):
-        failed.append(f"the engine's matrix has {count} eigenvalue(s) below {thr:.1e}; the diagnosis says "
-                      f"{diagnosis['nMechanisms']}")
-    sysm = independent_stiffness(model, exclude)             # only for the geometry of the mode vectors
+    sysm = independent_stiffness(model, exclude)             # geometry of the mode vectors, loaded DOFs
+    # the engine leaves DOFs without stiffness out of its reduced matrix; the loaded ones among them are the
+    # mechanisms of a "no-stiffness" diagnosis: counted from the engine's own list of such DOFs and checked
+    # on its unreduced matrix (the row and column must be zero)
+    loaded_out = np.asarray(st.inactive, bool) & sysm.loaded_inactive
+    n_loaded = int(loaded_out.sum())
+    kmax = float(np.abs(K).max()) or 1.0
+    for g in np.flatnonzero(loaded_out):
+        res = float(np.abs(K[:, g]).max()) / kmax
+        largest.append({"what": f"loaded DOF {sysm.ids[g // 6]} {DOFS[g % 6]}: column of the engine's matrix / |K|",
+                        "value": res, "tolerance": pol["nullResidual"]})
+        if res > pol["nullResidual"]:
+            failed.append(f"{sysm.ids[g // 6]} {DOFS[g % 6]} has stiffness in the engine's matrix")
+    if count + n_loaded != int(diagnosis["nMechanisms"]):
+        failed.append(f"the engine's matrix has {count} eigenvalue(s) below {thr:.1e}"
+                      + (f" and {n_loaded} loaded DOF(s) without stiffness" if n_loaded else "")
+                      + f"; the diagnosis says {diagnosis['nMechanisms']}")
     absK = np.abs(Kr)
     for k, mode in enumerate(diagnosis["modes"]):
         v = mode_vector(sysm, mode)
@@ -432,7 +513,8 @@ def tier_engine_matrix(model, diagnosis: dict, exclude=()) -> TierResult:
             failed.append(f"mode {k}: K phi = {res:.2e} on the engine's matrix")
     passed = not failed
     return TierResult("K", True, passed,
-                      f"engine matrix: {count} eigenvalue(s) below {thr:.1e}; "
+                      f"engine matrix: {count} eigenvalue(s) below {thr:.1e}"
+                      + (f", {n_loaded} loaded DOF(s) without stiffness" if n_loaded else "") + "; "
                       + ("the described modes satisfy K phi = 0" if passed else "; ".join(failed[:3])),
                       largest[:6], {"singular": thr, "nullResidual": pol["nullResidual"]},
                       {"eigenvaluesBelowThreshold": [float(x) for x in lam[lam < thr][:20]], "failed": failed},

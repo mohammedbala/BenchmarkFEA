@@ -20,7 +20,8 @@ POLICY = {
                                           "(floor 1e-6), or the acceptance tolerance stated by the source"},
     # tier C: the rule of benchfea.crosscheck.cross_check, unchanged: agreement within ``relative`` plus the
     # estimated errors of the two results compared (estimateSafety = 1.0 reproduces that rule exactly; it is
-    # NOT raised to make a case pass -- see docs/VERIFICATION.md, "Second-order cross-checks")
+    # NOT raised to make a case pass).  The estimates are bounds from three refinement levels of the foreign
+    # solver itself -- docs/VERIFICATION.md, "Second-order cross-checks", docs/CROSSCHECK.md 1.3
     "C": {"relative": 1.0e-6, "maxApproximation": 5.0e-3, "requiredSolvers": 2, "estimateSafety": 1.0,
           "scale": "model-wide scales of benchfea.crosscheck.compare"},
     # tier D: the tolerances stored with every invariant by the solver, plus

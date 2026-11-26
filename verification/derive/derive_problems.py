@@ -362,25 +362,7 @@ for _b, _t in (("pinned", "pinned"), ("fixed", "free"), ("fixed", "pinned"), ("f
 # ============================================================================================ quarantine
 # Problems whose TARGETS are reproduced (tier A) but whose model fails another tier.  They stay in the
 # library, quarantined with the diagnosis, and are never counted as passed.
-_ESTIMATE_NOT_A_BOUND = (
-    "Tier A passes: every target (ODE oracle) is reproduced to better than 1e-10.  Tier C does not: the "
-    "largest difference between the engine and OpenSeesPy 3.8.0 (PDelta transformation, 16 elements per "
-    "member) is {diff} (rotation at a support), the allowed difference under the rule of "
-    "benchfea.crosscheck.cross_check -- 1e-6 plus the estimated discretisation error of the OpenSees run -- "
-    "is {allowed}.  The estimate is |fine - coarse| / (ratio^2 - 1), the LEADING-ORDER value of the OpenSees "
-    "error itself, not a bound: when the engine is exact the difference is expected to equal the estimate, "
-    "and whether it lands just below or just above is decided by the next term of the error expansion.  "
-    "Evidence that the difference is OpenSees's discretisation error and not an engine error: the ODE oracle "
-    "agrees with the engine to 1e-10, and the difference equals the estimate to {margin}.  The tolerance rule "
-    "was NOT widened to make this case pass (docs/VERIFICATION.md, 'Second-order cross-checks'; open "
-    "question for the project owner).{extra}")
-QUARANTINE = {
-    "beam-column-02": _ESTIMATE_NOT_A_BOUND.format(diff="8.010e-4", allowed="8.008e-4", margin="0.03 %", extra=""),
-    "beam-column-05": _ESTIMATE_NOT_A_BOUND.format(
-        diff="3.19e-3", allowed="3.15e-3", margin="1.3 %",
-        extra="  In addition PyNite's estimated error (1.1e-2) exceeds the 5e-3 limit for an eligible solver, so "
-              "only one foreign solver represents this model."),
-}
+QUARANTINE = {}
 
 
 # ============================================================================================ output

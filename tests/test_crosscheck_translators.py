@@ -470,11 +470,12 @@ def test_opensees_subdivision_convergence_is_second_order():
 
 @pytest.mark.skipif(not __import__("crosscheck_helpers").HAVE["pynite"], reason="PyNiteFEA is not installed")
 def test_pynite_subdivision_convergence_rates():
-    """Measured rates behind the error law of the PyNite route: with the consistent geometric stiffness
+    """Measured rates behind the error bound of the PyNite route: with the consistent geometric stiffness
     the displacements gain more than a factor 8 per halving of the sub-member length (from two
     sub-members on), but the horizontal reaction, which PyNite post-processes with axial forces
-    recomputed from the final displacements, only about a factor 2.  The estimate therefore uses a
-    first-order law (|fine - coarse|), which bounds the error of every quantity."""
+    recomputed from the final displacements, only about a factor 2.  The bound therefore assumes no
+    more than first order for the levels that are not run: it is the last level-to-level difference
+    (or 1/16 of the one before, if that is larger), whatever order the three levels show."""
     model, s, Lm, P, H = _beam_column()
     W = H + 0.5 * (1.0 + 3.0) * Lm
     runs = {n: solve("pynite", model, "L", subdivisions=n, estimate_errors=False) for n in (2, 4, 8)}
@@ -484,7 +485,9 @@ def test_pynite_subdivision_convergence_rates():
     assert 1.5 < shear[0] / shear[1] < 3.0 and 1.5 < shear[1] / shear[2] < 3.0
     r = solve("pynite", model, "L")
     ctl = r.info["convergence"]["subdivisions"]
-    assert ctl["order"] == 1 and ctl["estimatedError"] == pytest.approx(ctl["difference"])
+    d1, d2 = ctl["differences"]
+    assert ctl["levels"] == [2, 4, 8] and ctl["orders"] == [1.0, 4.0] and ctl["status"] == "asymptotic"
+    assert ctl["estimatedError"] == pytest.approx(max(d2, d1 / 16.0)) and d2 < d1
 
 
 @needs_both

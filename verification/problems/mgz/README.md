@@ -15,11 +15,11 @@ tolerances stated, and the other tiers that apply to the model did not disagree
 | | number |
 |---|---|
 | problems encoded | 46 |
-| active - every target within the tolerance policy, no tier disagreeing | 20 |
-| quarantined - with a written diagnosis in `problem.json` | 26 |
+| active - every target within the tolerance policy, no tier disagreeing | 22 |
+| quarantined - with a written diagnosis in `problem.json` | 24 |
 | examples of the book not encoded (not applicable, excluded, nothing to compare) | listed below |
 
-Of the 26 quarantined problems:
+Of the 24 quarantined problems:
 
 * 18 miss one or more targets only in the last printed digit(s) (differences of 6e-5 to 6e-3) because of
   rounding, truncation or a slip in the book's hand calculation; the evidence (equilibrium not satisfied by the
@@ -32,13 +32,11 @@ Of the 26 quarantined problems:
   approximation; no stated error bound".
 * 2 compare with second-order moments the book shows on figures, obtained by an incremental analysis whose
   scheme is not stated (Examples 9.5 and 9.6); differences of up to 6 %.
-* 2 reproduce their (closed-form) targets to 1e-14 but fail tier C on the model, in the way described in
-  docs/VERIFICATION.md under "Second-order cross-checks" (Examples 8.3 and 8.4).
 * 1 reproduces its targets, but the outcome depends on how a rounded input of the book is read (Example 4.15).
 * 1 misses two of eighteen stiffness coefficients in the last digit because the book prints the same coefficient
   as 17.381 and as 17.382 in two examples (Example 5.3).
 
-Largest differences (engine against the targets, see the index): among the 20 active problems the largest
+Largest differences (engine against the targets, see the index): among the 22 active problems the largest
 ratio of difference to tolerance is 0.83 and the largest relative difference 4.6e-3 (Example 2.1, a displacement
 printed as 0.72 mm, tolerance 6.9e-3). Among the quarantined problems the largest relative difference of a
 missed target is 6.1 % (Example 9.6, second-order moment at b) and the largest ratio of difference to tolerance
@@ -154,8 +152,8 @@ tolerance" above 1 means a target is missed).
 | `ex-5-8-grid` | Example 5.8 | pp. 116-119 | Grid (plane frame loaded normal to its plane): bending and torsion | 9 | 7 | 1.0e-03 | 7.00 | quarantined |
 | `ex-5-9-portal-axially-rigid` | Example 5.9 | pp. 119-120 | Portal frame, axial deformation neglected: vertical and horizontal load | 6 | 0 | 1.6e-03 | 0.81 | active |
 | `ex-7-10-cantilever-shear-deformation` | Example 7.10 | p. 206 | End-loaded cantilever of rectangular section with shear deformation | 2 | 0 | 2.5e-04 | 0.50 | active |
-| `ex-8-3-beam-column-end-moments` | Example 8.3, Equation f (the member of Example 9.3) | pp. 223-224 (data: p. 249) | Pin-ended beam-column with equal end moments: midheight deflection | 1 | 0 | 5.0e-15 | 0.00 | quarantined |
-| `ex-8-4-cantilever-beam-column` | Example 8.4, Equations e and g (the member of Example 9.4) | pp. 225-226 (data: p. 250) | Cantilever with axial and lateral end load: compression and tension | 2 | 0 | 4.7e-15 | 0.00 | quarantined |
+| `ex-8-3-beam-column-end-moments` | Example 8.3, Equation f (the member of Example 9.3) | pp. 223-224 (data: p. 249) | Pin-ended beam-column with equal end moments: midheight deflection | 1 | 0 | 5.0e-15 | 0.00 | active |
+| `ex-8-4-cantilever-beam-column` | Example 8.4, Equations e and g (the member of Example 9.4) | pp. 225-226 (data: p. 250) | Cantilever with axial and lateral end load: compression and tension | 2 | 0 | 4.7e-15 | 0.00 | active |
 | `ex-9-1-truss-critical-load` | Example 9.1, case 1 (alpha = 0), Equation d | p. 247 | Two-bar truss: elastic critical load of a bar restrained by a weak tie | 1 | 0 | 1.1e-10 | 0.00 | active |
 | `ex-9-3-column-pinned-critical-load` | Example 9.3, case 1 (alpha = 0): value 'from Example 8.3' | pp. 249-250 | Pin-ended column: elastic critical load | 1 | 0 | 1.5e-04 | 0.33 | active |
 | `ex-9-4-column-cantilever-critical-load` | Example 9.4, case 1 (alpha = 0) | p. 250 | Cantilever column: elastic critical load | 1 | 0 | 1.5e-04 | 0.33 | active |

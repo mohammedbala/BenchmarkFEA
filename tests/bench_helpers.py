@@ -8,18 +8,21 @@ import tempfile
 
 os.environ.setdefault("OMP_NUM_THREADS", "1")
 os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
+os.environ.setdefault("MKL_NUM_THREADS", "1")
 
 from benchfea.bench.tasks import build_case, make_task  # noqa: E402
 
 CACHE = tempfile.mkdtemp(prefix="benchfea-bench-tests-")
 atexit.register(shutil.rmtree, CACHE, True)
 
-#: name -> (family, curve ball, seed, difficulty)
+#: name -> (family, curve ball, seed, difficulty).  The curve balls are pairs of the TRAIN split for this
+#: family (the held-out combinations of benchfea/bench/splits.json follow a rule on names; when the rule or
+#: the applicability table changes, pick other train pairs here -- test_helper_cells_are_in_the_expected_split).
 CELLS = {
-    "change": ("continuous_beam", "release_added", 0, 2),                    # changes-analysis, train
-    "mechanism": ("continuous_beam", "release_mechanism", 0, 1),             # creates-mechanism, train
+    "change": ("continuous_beam", "support_fixed_to_pinned", 0, 2),          # changes-analysis, train
+    "mechanism": ("continuous_beam", "support_removed", 0, 1),               # creates-mechanism, train
     "design_only": ("continuous_beam", "design_bracing_points_changed", 0, 2),   # design-only: tier F not passed
-    "held_out_seed": ("continuous_beam", "release_mechanism", 4, 2),         # seed % 5 == 4
+    "held_out_seed": ("continuous_beam", "support_fixed_to_pinned", 4, 2),   # seed % 5 == 4
 }
 
 

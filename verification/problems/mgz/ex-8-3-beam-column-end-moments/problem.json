@@ -26,8 +26,5 @@
    "sign": "deflection toward +X = +local y of the vertical member (default orientation)"
   }
  ],
- "status": "quarantined",
- "quarantine": {
-  "diagnosis": "Tier B passes: the target (the source's closed-form Eq. f evaluated here) is reproduced to 5e-15. Tier C does not: the largest difference between the engine and OpenSeesPy (P-Delta transformation, subdivided member) is 3.44e-3 (rotation at node a), the allowed difference under the rule of benchfea.crosscheck.cross_check - 1e-6 plus the estimated discretisation error of the OpenSees run - is 3.40e-3. That estimate is the leading-order value of the OpenSees error, not a bound: when the engine is exact the difference is expected to equal the estimate, and whether it lands just below or just above is decided by the next term of the error expansion (docs/VERIFICATION.md, 'Second-order cross-checks'; the same situation as the tier-A problems derived/beam-column-*). The tolerance rule was not widened; a problem with a failing tier is not published as passed."
- }
+ "status": "active"
 }

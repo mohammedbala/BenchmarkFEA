@@ -23,13 +23,15 @@ fixed by making the first translation component that reaches the largest magnitu
 """
 from __future__ import annotations
 
+import math
+
 import numpy as np
 from scipy.linalg import eigh, lu_factor, lu_solve
 
 from ..results import BucklingResult
 from .beam import SpanLoads
 from .beamcolumn import BeamColumn, axial_state, consistent_geometric_stiffness
-from .element import build_element
+from .element import TRUSS_TYPES, build_element, section_flex
 from .nonlinear import _axial_after
 from .refine import piece_stations, refine, split_loads
 from .system import Structure
@@ -192,6 +194,38 @@ def _normalise(u: np.ndarray) -> np.ndarray:
     return u / (top if t[first] > 0.0 else -top)
 
 
+#: a lowest buckling factor within this fraction of a truss-type member's own Euler factor is reported as that
+#: member's own buckling (the exact own factor is never exceeded: the member mode is part of the spectrum)
+OWN_MODE_BAND = 0.01
+
+
+def truss_strut_warning(model, state, slack, lowest: float, factors) -> str:
+    """Warning text when the lowest buckling factor is the own flexural buckling of a truss-type member
+    (THEORY 10.6: a truss-type member is a pin-ended beam-column with the Iy, Iz of its section), else "".
+    Own Euler factor of a compressed truss-type member: pi^2 E I_min / (L^2 |N|), with the first-order axial
+    force N of the reference state and the stiffness factors of the combination."""
+    best = None
+    for mid, m in model.members.items():
+        if m.type not in TRUSS_TYPES or mid in slack:
+            continue
+        nmin = float(state.rec[mid].forces[:, 0].min())
+        if nmin >= 0.0:
+            continue
+        flex = section_flex(model, m, False, factors(mid))
+        if flex.bend_y <= 0.0 or flex.bend_z <= 0.0:
+            continue
+        pe = math.pi ** 2 / (max(flex.bend_y, flex.bend_z) * float(m.length) ** 2)
+        if best is None or pe / -nmin < best[0]:
+            best = (pe / -nmin, mid, pe, -nmin)
+    if best is None or lowest < (1.0 - OWN_MODE_BAND) * best[0]:
+        return ""
+    return (f"the lowest buckling factor ({lowest:.6g}) is the own flexural buckling of truss-type member "
+            f"{best[1]!r}: a truss-type member is analysed as a pin-ended strut with the Iy, Iz of its section "
+            f"(own Euler load pi^2 E I/L^2 = {best[2]:.6g} N, axial compression {best[3]:.6g} N, ratio "
+            f"{best[0]:.6g}).  If the section's Iy / Iz are placeholders, give the real values (or values large "
+            "enough to exclude member buckling, if only the buckling of the structure is wanted)")
+
+
 def buckling_analysis(nl, combination) -> BucklingResult:
     """Lowest ``analysis.buckling.modes`` positive buckling factors of ``combination`` and their modes."""
     model = nl.model
@@ -239,6 +273,11 @@ def buckling_analysis(nl, combination) -> BucklingResult:
     if model.constraints:
         warnings.append("rigid links / diaphragms are linear kinematic constraints: the geometric stiffness of the "
                         "forces they transmit is not included")
+    if level["pos"]:
+        w = truss_strut_warning(model, state, slack, float(level["pos"][0]),
+                                lambda mid: nl._factors(mid, combination, state.tau))
+        if w:
+            warnings.append(w)
     info = {
         "basis": "first-order reference state of the combination's factored loads (not multiplied by alpha); "
                  "consistent geometric stiffness of the member axial forces; flexural buckling only",

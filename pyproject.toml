@@ -33,3 +33,6 @@ where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = [
+    "slow: among the slowest tests of the suite (listed in tests/conftest.py). Contributors: pytest -m 'not slow' (about 2 minutes). CI and before a release: plain pytest, which runs everything.",
+]

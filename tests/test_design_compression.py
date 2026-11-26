@@ -114,12 +114,13 @@ def test_hand_e4_torsional_buckling_inelastic_and_elastic():
     assert FY / Fe <= 2.25                        # 1.1399 -> Eq. E3-2
     Fn = 0.658 ** (FY / Fe) * FY                  # 214.1 MPa
     assert 214.0 < Fn < 214.2
-    c = ec.torsional_buckling(_ctx(sec), Demand("U1", Pc=1.0e6))[0]
+    # E4 applies when the torsional unbraced length exceeds the lateral one: Lz = 6000 > Lx = Ly = 3000
+    c = ec.torsional_buckling(_ctx(sec, Lx=3000.0, Ly=3000.0), Demand("U1", Pc=1.0e6))[0]
     assert c.nominal == pytest.approx(Fn * 8000.0, rel=1e-13)        # Eq. E4-1
     assert c.clause == "AISC 360-22 E4, Eq. E4-1, E4-2; E3, Eq. E3-2; B4.1, Table B4.1a; B3.1 Eq. B3-1"
     assert c.details["Fe"][0] == pytest.approx(Fe, rel=1e-13) and c.inputs["G"][0] == G
     assert c.inputs["Cw"][:2] == (4.0e11, "length^6") and c.inputs["J"][:2] == (5.0e5, "length^4")
-    assert any("does not exceed" in n for n in c.notes)
+    assert any("Lz exceeds the lateral unbraced lengths Lx and Ly" in n for n in c.notes)
     # elastic branch: J = 5.0e4, Kz Lz = 1.0 * 12000:
     # Fe = [pi^2 * 2e5 * 4e11 / 1.44e8 + 77200 * 5e4] / 2e8 = [5.483e9 + 3.86e9] / 2e8 = 46.72 MPa
     Fe = (PI2 * E * 4.0e11 / 12000.0 ** 2 + G * 5.0e4) / 2.0e8
@@ -127,12 +128,15 @@ def test_hand_e4_torsional_buckling_inelastic_and_elastic():
     c = ec.torsional_buckling(_ctx(_stocky(J=5.0e4, Cw=4.0e11), Lz=12000.0), Demand("U1", Pc=1.0e5))[0]
     assert c.nominal == pytest.approx(0.877 * Fe * 8000.0, rel=1e-13) and "E3-3" in c.clause
     assert any("Lz exceeds" in n for n in c.notes)
+    # torsional EFFECTIVE length only (E3 User Note): Lz = Lx = Ly = 6000, Kz = 2 -> Lcz = 12000: same strength
+    c3 = ec.torsional_buckling(_ctx(_stocky(J=5.0e4, Cw=4.0e11), Kz=2.0), Demand("U1", Pc=1.0e5))[0]
+    assert c3.nominal == pytest.approx(c.nominal, rel=1e-13) and any("EFFECTIVE" in n for n in c3.notes)
     # Kz
     c2 = ec.torsional_buckling(_ctx(_stocky(J=5.0e4, Cw=4.0e11), Lz=24000.0, Kz=0.5), Demand("U1", Pc=1.0e5))[0]
     assert c2.nominal == pytest.approx(c.nominal, rel=1e-13)
     # closed section: Cw = 0 -> Fe = G J / (Ix + Iy); round tube J = 2 I -> Fe = G
     tube = DesignSection.round_hss(A=3000.0, r=70.0, ratio=30.0, J=2.0 * 3000.0 * 70.0 ** 2)
-    c = ec.torsional_buckling(_ctx(tube), Demand("U1", Pc=1.0))[0]
+    c = ec.torsional_buckling(_ctx(tube, Lx=3000.0, Ly=3000.0), Demand("U1", Pc=1.0))[0]
     assert c.details["Fe"][0] == pytest.approx(G, rel=1e-13) and any("Cw = 0" in n for n in c.notes)
 
 
@@ -291,7 +295,7 @@ def test_hand_e2_slenderness_is_advisory():
 def test_not_checked_cases_are_explicit():
     d = Demand("U", Pc=1.0e5)
     # no J / Cw: torsional buckling cannot be evaluated -> notChecked, and the member is not "passed"
-    res = design.check_member(_ctx(_stocky()), [d])
+    res = design.check_member(_ctx(_stocky(), Lz=9000.0), [d])
     tb = _by_name(res.checks)[TB]
     assert tb.status == "notChecked" and "J" in tb.reason and "Cw" in tb.reason and res.passed is False
     assert _by_name(res.checks)[FBX].status == "ok"
@@ -303,7 +307,7 @@ def test_not_checked_cases_are_explicit():
     assert ec.flexural_buckling_minor(_ctx(sec, Ly=6750.0), d)[0].status == "ok"
     # missing material data, missing G, out-of-scope shape
     assert ec.flexural_buckling_major(_ctx(_stocky(), E=None), d)[0].status == "notChecked"
-    c = ec.torsional_buckling(_ctx(_stocky(J=1.0, Cw=1.0), G=None), d)[0]
+    c = ec.torsional_buckling(_ctx(_stocky(J=1.0, Cw=1.0), G=None, Lz=9000.0), d)[0]
     assert c.status == "notChecked" and "G" in c.reason
     other = DesignSection.unsupported("channel: outside the scope", "C1", A=1000.0, Ix=1.0e6, Iy=1.0e5)
     checks = ec.check(_ctx(other), d)
@@ -350,9 +354,12 @@ def test_de_e1d_w14x90_flexural_buckling_e3():
     minor = _by_name(ec.check(_de_ctx("E.1D", sec, "LRFD", Lx, Ly, Lz), Demand("LRFD", Pc=i["Pu"])))[FBY]
     assert_printed(minor.details["Lcy/ry"][0], p["Lcy_over_ry"], "E.1D Lcy/ry")
     assert minor.ratio < lr.ratio                 # "x-x buckling controls"
-    # the example does not evaluate torsional buckling and lists no J, Cw: the engine reports it notChecked
+    # the example does not evaluate torsional buckling (and lists no J, Cw); neither does the engine: the
+    # torsional length does not exceed a lateral one (E4, first paragraph), and it says so
+    assert Lz <= Lx and Lz <= Ly
     res = design.check_member(_de_ctx("E.1D", sec, "LRFD", Lx, Ly, Lz), [Demand("LRFD", Pc=i["Pu"])])
-    assert _by_name(res.checks)[TB].status == "notChecked" and res.governing.name == FBX
+    assert TB not in _by_name(res.checks) and res.governing.name == FBX
+    assert "not evaluated" in _by_name(res.checks)[FBX].details["torsional buckling (E4)"][0]
 
 
 def test_de_e1c_w14x132_flexural_buckling_e3():

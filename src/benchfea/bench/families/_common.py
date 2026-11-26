@@ -434,14 +434,14 @@ class Builder:
         doc["sections"] = sections
         doc["members"] = {}
         for mid, m in self.members.items():
-            m = {k: (dict(v) if isinstance(v, dict) else v) for k, v in m.items()}
+            m = _copy(m)            # deep: a family may pass one dict for both end releases
             m["section"] = names[m["section"][1:]]
             doc["members"][mid] = m
         if self.constraints:
             doc["constraints"] = {k: dict(v, slaves=list(v["slaves"])) for k, v in self.constraints.items()}
-        doc["loadCases"] = {cid: {**{k: v for k, v in c.items() if k != "loads"},
-                                  "loads": [dict(x) for x in c["loads"]]} for cid, c in self.cases.items()}
-        doc["combinations"] = {cid: {**c, "factors": dict(c["factors"])} for cid, c in self.combinations.items()}
+        doc["loadCases"] = {cid: {**{k: _copy(v) for k, v in c.items() if k != "loads"},
+                                  "loads": [_copy(x) for x in c["loads"]]} for cid, c in self.cases.items()}
+        doc["combinations"] = {cid: _copy(c) for cid, c in self.combinations.items()}
         doc["analysis"] = _copy(self.analysis)
         if fast:
             doc["analysis"].pop("buckling", None)
@@ -472,6 +472,8 @@ class Builder:
 
 
 def _copy(x):
+    """A copy in which no two places share a mutable object (``copy.deepcopy`` would keep aliasing);
+    tuples become lists, as in JSON."""
     if isinstance(x, dict):
         return {k: _copy(v) for k, v in x.items()}
     if isinstance(x, (list, tuple)):

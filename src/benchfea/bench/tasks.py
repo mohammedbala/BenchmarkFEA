@@ -44,7 +44,8 @@ __all__ = ["TASK_TYPES", "MODES", "TASK_VERSION", "MAX_ATTEMPTS", "TaskUnavailab
 
 TASK_TYPES = ("predict", "diagnose", "repair", "design")
 MODES = ("tool-allowed", "no-solver")
-TASK_VERSION = "1"             # bump when a change alters any task or answer for the same case
+TASK_VERSION = "2"             # bump when a change alters any task or answer for the same case
+                               # ("2": the generator seed of a case depends on its split, see derived_seed)
 MAX_ATTEMPTS = 3               # seeds of the derivation chain tried before a case is unavailable
 QUANTITY_KINDS = ("displacement", "reaction", "memberEndForce", "memberMaxMoment", "bucklingFactor", "designRatio")
 DIRECTIONS = ("added", "removed", "increased", "decreased", "reversed", "changed")
@@ -70,13 +71,22 @@ class TaskUnavailable(Exception):
 
 
 # ============================================================================================ cases
-def derived_seed(family: str, seed: int, difficulty: int, attempt: int) -> int:
-    """Generator / curve-ball seed of attempt ``attempt`` of the instance ``(family, seed, difficulty)``.
-    Attempt 0 uses ``seed`` itself; attempt k > 0 uses the first 31 bits of
-    SHA-256("benchfea.bench|task-chain|<TASK_VERSION>|family|seed|difficulty|k")."""
-    if attempt == 0:
-        return int(seed)
-    return stable_seed("task-chain", TASK_VERSION, family, int(seed), int(difficulty), int(attempt)) >> 97
+def derived_seed(family: str, curve_ball: str, seed: int, difficulty: int, attempt: int) -> int:
+    """Generator / curve-ball seed of attempt ``attempt`` of the instance ``(family, curve_ball, seed,
+    difficulty)``: a 31-bit number whose
+
+    * upper 30 bits are the first 30 bits of
+      SHA-256("benchfea.bench|task-chain|<TASK_VERSION>|<split>|family|seed|difficulty|attempt"),
+    * lowest bit is the split of the instance: 1 for held-out, 0 for train
+      (``splits.split_of(family, curve_ball, seed)``, the only definition of the split).
+
+    The curve ball enters through the split only, so the instances of one split with the same
+    ``(family, seed, difficulty)`` share their base models, and a base model of the train split is
+    never generated from a seed that the held-out split uses, for any attempt (the seeds of the two
+    splits differ in the lowest bit).  The instance seed itself is never a generator seed."""
+    split = split_of(family, curve_ball, seed)
+    h = stable_seed("task-chain", TASK_VERSION, split, family, int(seed), int(difficulty), int(attempt)) >> 98
+    return (h << 1) | (1 if split == "held-out" else 0)
 
 
 def case_key(family: str, curve_ball: str, seed: int, difficulty: int) -> dict:
@@ -190,7 +200,7 @@ def build_case(family: str, curve_ball: str, seed: int, difficulty: int, *, cach
                       "reason": str(reason)[:600]})
 
     for k in range(MAX_ATTEMPTS):
-        gseed = derived_seed(family, seed, difficulty, k)
+        gseed = derived_seed(family, curve_ball, seed, difficulty, k)
         base = _base_model(family, gseed, difficulty, cache_dir, foreign_cache)
         if base["status"] != "ok":
             skip(k, gseed, "generate", base.get("category", "generation-failed"), base["reason"])

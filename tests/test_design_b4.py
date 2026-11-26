@@ -372,8 +372,10 @@ def test_registry_has_one_edition_and_refuses_any_other():
 
 
 def test_every_check_carries_the_full_record():
-    res = design.check_member(_ctx(), [Demand("U1", Pt=1.0e5, Pc=1.0e5, V=3.0e4)])
+    # Lz > Lx = Ly so that torsional buckling (E4) is one of the checks
+    res = design.check_member(_ctx(Lz=4000.0), [Demand("U1", Pt=1.0e5, Pc=1.0e5, V=3.0e4)])
     assert len(res.checks) == 8
+    assert len(design.check_member(_ctx(), [Demand("U1", Pt=1.0e5, Pc=1.0e5, V=3.0e4)]).checks) == 7
     for c in res.checks:
         assert c.name and c.clause.startswith("AISC 360-22") and c.status == "ok" and c.method == "LRFD"
         assert c.inputs and all(len(v) == 3 and isinstance(v[2], str) and v[2] for v in c.inputs.values())

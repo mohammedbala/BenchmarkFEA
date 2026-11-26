@@ -95,13 +95,27 @@ def station_statics(model, results, tol_linear: float, tol_iterated: float) -> d
             F = np.asarray(mr.forces, float)
             n = len(x)
             n_stations += n
-            if not mr.active:
+            second_m = second and mr.active
+            if not mr.active and not pm.loaded:
                 v = float(np.abs(F).max(initial=0.0) / scale.min()) if F.size else 0.0
                 v = max(v, float(np.abs(np.asarray(mr.end_forces, float)).max(initial=0.0) / scale.min()))
                 note(v, f"inactive member {mid}", "station forces")
                 if v > tol:
                     failed.append(f"{cid}: inactive member {mid} carries forces")
                 continue
+            if not mr.active:
+                # A slack one-sided member carries nothing but its own member loads, as a simply supported
+                # beam (docs/THEORY.md 13): its end forces must be the reactions of the member held at both
+                # ends with the bending released there (crosscheck.fef: force method, no solver code); the
+                # station forces then follow from first-order statics below, like those of any member.
+                from ..crosscheck.fef import fixed_end_forces
+                expect = fixed_end_forces(pm.L, pm.EIy or pm.E * pm.A ** 2 / 12.0, pm.EIz or pm.E * pm.A ** 2 / 12.0,
+                                          None, None, pm.points, pm.dists, ky=(0.0, 0.0), kz=(0.0, 0.0)) / alpha
+                v = float((np.abs(np.asarray(mr.end_forces, float) - expect) / np.r_[scale, scale]).max())
+                note(v, f"inactive member {mid}: end forces against the reactions of a simply supported beam", "end")
+                if v > tol:
+                    failed.append(f"{cid}: inactive member {mid}: its end forces differ from the reactions of a "
+                                  f"simply supported beam under its own loads by {v:.2e}")
             # ---- the ends of the stations are the end forces (CONVENTIONS 4)
             ef = np.asarray(mr.end_forces, float)
             d0 = float((np.abs(F[0] + ef[:6]) / scale).max())
@@ -118,7 +132,7 @@ def station_statics(model, results, tol_linear: float, tol_iterated: float) -> d
                      float(a) + float(x[0]), float(b) + float(x[0])) for w1, w2, a, b in pm.dists]
             U = np.asarray(mr.displacements, float)
             moments_ok = True
-            if second and any(abs(w1[0]) + abs(w2[0]) > 0.0 for w1, w2, _, _ in dsts):
+            if second_m and any(abs(w1[0]) + abs(w2[0]) > 0.0 for w1, w2, _, _ in dsts):
                 bound = sum(0.5 * (abs(w1[0]) + abs(w2[0])) * (b - a) for w1, w2, a, b in dsts) \
                     * alpha * 2.0 * float(np.abs(U[:, 1:3]).max(initial=0.0))
                 if bound / scale[3] > 0.1 * tol:
@@ -138,7 +152,7 @@ def station_statics(model, results, tol_linear: float, tol_iterated: float) -> d
                 Mv = F[0, 3:] + np.cross([float(x[0]) - xk, 0.0, 0.0], F[0, :3])
                 at = np.zeros(6)                               # the point loads AT this station (within eps)
                 lever_missing = False
-                if second:
+                if second_m:
                     d = alpha * (U[0, 1:3] - U[k, 1:3])              # (dv, dw) of r_0 - r_x
                     Mv += np.array([0.0, d[1] * F[0, 0], -d[0] * F[0, 0]])
                 for kind, vec, xs in pts:
@@ -148,7 +162,7 @@ def station_statics(model, results, tol_linear: float, tol_iterated: float) -> d
                         if kind == "force":
                             Fv -= vec
                             Mv -= np.cross([xs - xk, 0.0, 0.0], vec)
-                            if second and vec[0] != 0.0:
+                            if second_m and vec[0] != 0.0:
                                 ui = deflection_at(xs)
                                 if ui is None:
                                     lever_missing = True
@@ -162,7 +176,7 @@ def station_statics(model, results, tol_linear: float, tol_iterated: float) -> d
                     if T > 0.0:
                         Fv -= force
                         Mv -= np.cross([1.0, 0.0, 0.0], first)
-                        if second and (w1[0] != 0.0 or w2[0] != 0.0) and moments_ok:
+                        if second_m and (w1[0] != 0.0 or w2[0] != 0.0) and moments_ok:
                             # lever of the axial line load: trapezoid over the stations (negligible, see above)
                             idx = [j for j in range(n) if a - eps <= x[j] <= min(xk, b) + eps]
                             if len(idx) > 1:

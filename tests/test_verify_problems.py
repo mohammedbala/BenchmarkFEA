@@ -232,11 +232,16 @@ def test_library_of_derived_problems_and_its_quarantined_cases():
     lib = verify_library(DERIVED.parent, only=["derived/"])
     by = {r.id: r for r in lib.problems}
     assert lib.ok and len(by) >= 17
-    assert {k for k, r in by.items() if r.outcome == "quarantined"} == {"beam-column-02", "beam-column-05"}
-    for k in ("beam-column-02", "beam-column-05"):               # targets reproduced, tier C not: documented
+    assert {k for k, r in by.items() if r.outcome == "quarantined"} == set()
+    # the second-order beam-columns: targets reproduced (tier A) AND cross-checked within the error bound that
+    # tier C computes from three refinement levels of each foreign solver (docs/CROSSCHECK.md 1.3)
+    for k in ("beam-column-02", "beam-column-05", "beam-column-tension-05"):
         assert all(t.passed for t in by[k].targets) and by[k].model_record.tiers["A"].passed
-        assert by[k].model_record.tiers["C"].passed is False and "LEADING-ORDER" in by[k].quarantine["diagnosis"]
-    assert all(r.outcome == "passed" for k, r in by.items() if not k.startswith("beam-column-0"))
+        assert by[k].model_record.tiers["C"].passed is True and by[k].model_record.status == "verified"
+    # at 0.8 of the Euler load the OpenSees bound (9.5e-3) is above the eligibility limit: not cross-checked
+    assert by["beam-column-08"].outcome == "passed"
+    assert by["beam-column-08"].model_record.quarantine["category"] == "not-representable"
+    assert all(r.outcome == "passed" for r in by.values())
     assert max(r.largest_relative for r in by.values()) < 1e-7
     d = lib.to_dict()
     json.dumps(d)

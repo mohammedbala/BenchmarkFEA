@@ -1,77 +1,255 @@
 {
  "format": "benchfea-splits",
- "formatVersion": "1.0.0",
- "description": "Train / held-out split. An instance (family, curveBall, seed) is held out when the pair is listed in heldOutCombinations or seed % modulus is in heldOutResidues. See benchfea.bench.splits and docs/BENCHMARK.md.",
+ "formatVersion": "1.1.0",
+ "description": "Train / held-out split. An instance (family, curveBall, seed) is held out when the pair is listed in heldOutCombinations or seed % modulus is in heldOutResidues. heldOutCombinations is the result of the rule in heldOutSelection. servedCombinations is measured by a dataset build (pairs with at least one verified instance) and must be refreshed after every rebuild. See benchfea.bench.splits and docs/BENCHMARK.md section 7.",
  "seedRule": {
   "modulus": 5,
   "heldOutResidues": [
    4
   ]
  },
+ "heldOutSelection": {
+  "rule": "Per family, among the curve balls listed in 'applicable', the 'perFamily' with the smallest SHA-256 (hex) of the UTF-8 text 'benchfea.bench|held-out-pair|<family>|<curveBall>' (benchfea.bench.splits.select_held_out). Verification outcomes play no part.",
+  "perFamily": 2,
+  "applicableSource": "docs/CURVEBALLS.md section 5 (applicability measured on the models listed there): the cells that are not '-' and not 'I' (invalid-model) alone.",
+  "applicable": {
+   "continuous_beam": [
+    "release_added",
+    "release_removed",
+    "release_mechanism",
+    "design_unbraced_length_changed",
+    "design_bracing_points_changed",
+    "design_lb_full_where_braced",
+    "design_lb_short_where_unbraced",
+    "support_fixed_to_pinned",
+    "support_pinned_to_fixed",
+    "support_roller_direction",
+    "support_spring_stiffness",
+    "support_removed",
+    "member_rolled_90",
+    "section_lighter",
+    "section_heavier",
+    "units_relabelled",
+    "load_sign_flipped",
+    "load_direction_changed",
+    "load_moved"
+   ],
+   "portal_frame": [
+    "offset_added",
+    "offset_removed",
+    "offset_sign_reversed",
+    "offset_wrong_axis",
+    "release_added",
+    "release_removed",
+    "release_mechanism",
+    "release_pinned_frame",
+    "design_unbraced_length_changed",
+    "design_k_changed",
+    "design_bracing_points_changed",
+    "design_lb_full_where_braced",
+    "support_fixed_to_pinned",
+    "support_pinned_to_fixed",
+    "support_spring_stiffness",
+    "support_removed",
+    "member_rolled_90",
+    "section_lighter",
+    "section_heavier",
+    "sections_swapped",
+    "units_relabelled",
+    "load_sign_flipped",
+    "load_direction_changed",
+    "load_moved",
+    "second_order_off"
+   ],
+   "multistorey_2d": [
+    "offset_added",
+    "release_added",
+    "release_removed",
+    "release_mechanism",
+    "release_pinned_frame",
+    "design_unbraced_length_changed",
+    "design_k_changed",
+    "design_bracing_points_changed",
+    "design_lb_full_where_braced",
+    "support_fixed_to_pinned",
+    "support_pinned_to_fixed",
+    "support_removed",
+    "member_rolled_90",
+    "section_lighter",
+    "section_heavier",
+    "sections_swapped",
+    "units_relabelled",
+    "load_sign_flipped",
+    "load_direction_changed",
+    "load_moved"
+   ],
+   "multistorey_3d": [
+    "constraint_added",
+    "offset_added",
+    "release_added",
+    "release_mechanism",
+    "release_pinned_frame",
+    "design_unbraced_length_changed",
+    "design_k_changed",
+    "design_bracing_points_changed",
+    "design_lb_full_where_braced",
+    "support_fixed_to_pinned",
+    "support_removed",
+    "member_rolled_90",
+    "section_lighter",
+    "section_heavier",
+    "sections_swapped",
+    "units_relabelled",
+    "load_sign_flipped",
+    "load_direction_changed",
+    "load_moved"
+   ],
+   "braced_frame": [
+    "release_removed",
+    "release_mechanism",
+    "design_unbraced_length_changed",
+    "design_k_changed",
+    "design_lb_full_where_braced",
+    "support_removed",
+    "member_rolled_90",
+    "section_lighter",
+    "section_heavier",
+    "sections_swapped",
+    "units_relabelled",
+    "load_sign_flipped",
+    "load_direction_changed",
+    "load_moved"
+   ],
+   "pipe_rack": [
+    "constraint_added",
+    "release_added",
+    "release_removed",
+    "release_mechanism",
+    "release_pinned_frame",
+    "design_unbraced_length_changed",
+    "design_k_changed",
+    "design_bracing_points_changed",
+    "design_lb_full_where_braced",
+    "support_fixed_to_pinned",
+    "support_removed",
+    "member_rolled_90",
+    "section_lighter",
+    "section_heavier",
+    "sections_swapped",
+    "units_relabelled",
+    "load_sign_flipped",
+    "load_direction_changed",
+    "load_moved"
+   ],
+   "stair_frame": [
+    "offset_added",
+    "release_removed",
+    "release_mechanism",
+    "design_unbraced_length_changed",
+    "design_k_changed",
+    "design_lb_full_where_braced",
+    "design_lb_short_where_unbraced",
+    "support_pinned_to_fixed",
+    "support_roller_direction",
+    "support_removed",
+    "member_rolled_90",
+    "section_lighter",
+    "section_heavier",
+    "sections_swapped",
+    "units_relabelled",
+    "load_sign_flipped",
+    "load_direction_changed",
+    "load_moved"
+   ],
+   "diaphragm_frame": [
+    "constraint_removed",
+    "constraint_slaves_dropped",
+    "constraint_wrong_master",
+    "constraint_made_flexible",
+    "release_added",
+    "release_mechanism",
+    "release_pinned_frame",
+    "design_unbraced_length_changed",
+    "design_k_changed",
+    "design_bracing_points_changed",
+    "design_lb_full_where_braced",
+    "support_fixed_to_pinned",
+    "support_removed",
+    "member_rolled_90",
+    "section_lighter",
+    "section_heavier",
+    "sections_swapped",
+    "units_relabelled",
+    "load_sign_flipped",
+    "load_direction_changed",
+    "load_moved"
+   ]
+  }
+ },
  "heldOutCombinations": [
   [
    "continuous_beam",
-   "support_spring_stiffness"
+   "release_mechanism"
   ],
   [
    "continuous_beam",
-   "release_removed"
+   "release_added"
   ],
   [
    "portal_frame",
-   "offset_sign_reversed"
-  ],
-  [
-   "portal_frame",
-   "support_pinned_to_fixed"
-  ],
-  [
-   "multistorey_2d",
-   "release_pinned_frame"
-  ],
-  [
-   "multistorey_2d",
    "sections_swapped"
   ],
   [
-   "multistorey_3d",
-   "constraint_added"
-  ],
-  [
-   "multistorey_3d",
-   "member_rolled_90"
-  ],
-  [
-   "braced_frame",
-   "load_direction_changed"
-  ],
-  [
-   "braced_frame",
-   "release_removed"
-  ],
-  [
-   "pipe_rack",
-   "offset_added"
-  ],
-  [
-   "pipe_rack",
-   "second_order_off"
-  ],
-  [
-   "stair_frame",
+   "portal_frame",
    "release_pinned_frame"
   ],
   [
-   "stair_frame",
+   "multistorey_2d",
+   "design_unbraced_length_changed"
+  ],
+  [
+   "multistorey_2d",
+   "load_moved"
+  ],
+  [
+   "multistorey_3d",
    "section_heavier"
   ],
   [
-   "diaphragm_frame",
-   "constraint_slaves_dropped"
+   "multistorey_3d",
+   "support_fixed_to_pinned"
+  ],
+  [
+   "braced_frame",
+   "load_moved"
+  ],
+  [
+   "braced_frame",
+   "design_k_changed"
+  ],
+  [
+   "pipe_rack",
+   "member_rolled_90"
+  ],
+  [
+   "pipe_rack",
+   "load_moved"
+  ],
+  [
+   "stair_frame",
+   "support_roller_direction"
+  ],
+  [
+   "stair_frame",
+   "release_removed"
   ],
   [
    "diaphragm_frame",
-   "units_relabelled"
+   "design_lb_full_where_braced"
+  ],
+  [
+   "diaphragm_frame",
+   "load_direction_changed"
   ]
  ],
  "servedCombinations": [

@@ -38,9 +38,6 @@
    "sign": "magnitude in the source; the load acts along +X, deflection +X"
   }
  ],
- "status": "quarantined",
- "quarantine": {
-  "diagnosis": "Both targets are reproduced within the source's tolerance, and the engine agrees with the ODE oracle on this model (tier A, 1e-6 along the member). Tier C does not pass: engine and OpenSeesPy differ by 1.52e-3 in the rotation of the top (allowed 1.51e-3). Tier C allows a difference of 1e-6 plus the ESTIMATED discretisation error of the foreign solver (OpenSeesPy with a linearised P-Delta transformation and a finite number of elements per member), which is an estimate and not a bound (docs/VERIFICATION.md, section 7); here the difference to OpenSeesPy exceeds the estimate by less than 1 %. The engine's result is the exact solution of the second-order member equations (it is the ODE oracle's), so the disagreement lies in the foreign solver's discretisation; but under the rule that nothing is published when a tier disagrees, this axial load level is quarantined. The levels below it, and all levels of the model with shear deformation (which the foreign solvers cannot represent, so that tier C does not apply), are active."
- },
+ "status": "active",
  "limitsNote": "Section properties are calibrated on the source's own P = 0 values (the source gives none): the problem verifies the second-order amplification, not section properties."
 }

@@ -105,18 +105,20 @@ the report):
 ### Tier C — two independent solvers
 
 `benchfea.crosscheck` translates the model to OpenSeesPy and to PyNite and keeps a fidelity record per
-feature (`exact` / `approximate` with a measured error estimate / `unsupported`). A combination is
-cross-checked only if **at least two** foreign solvers represent it — exactly, or by a converged
-approximation whose estimated error is at most `maxApproximation` — and they agree with the engine and
-with each other within `relative` plus the estimated errors of the two results compared. This is the rule
-of `benchfea.crosscheck.cross_check`, unchanged.
+feature (`exact` / `approximate` with an error bound computed from runs of the foreign solver alone /
+`unsupported`). A combination is cross-checked only if **at least two** foreign solvers represent it —
+exactly, or by a converged approximation whose estimated error is at most `maxApproximation` — and they
+agree with the engine and with each other within `relative` plus the estimated errors of the two results
+compared. This is the rule of `benchfea.crosscheck.cross_check`; the numbers of the policy are unchanged.
 
 If fewer than two solvers can represent the model the tier reads "not passed (only N solver(s) can
 represent: reasons)", category `not-representable`. **Such a model is not publishable as verified**, even
 when tier A passes. With the solvers available this concerns in particular: shear deformation (PyNite has
 none; OpenSees only first order), partial axial / shear / torsion releases (PyNite), rigid offsets in a
-second-order analysis, second-order analyses whose foreign discretisation error estimate exceeds the
-limit, and **linear buckling** (neither translator computes buckling factors).
+second-order analysis, **rigid links and diaphragms in a second-order analysis** (PyNite's stiff-member
+emulation solves the rigid-body problem, the engine and OpenSees the linear constraint: CROSSCHECK.md
+3.5), second-order analyses whose foreign discretisation error bound exceeds the limit, and **linear
+buckling** (neither translator computes buckling factors).
 
 Substitutions (each use is written into the record under `substitutions`; none is silent). They concern
 quantities the engine derives from its own solution and that a foreign solver cannot recompute; in each
@@ -131,7 +133,13 @@ case the foreign model is the same mathematical problem:
   active set (active members as truss members, slack members removed); then, from the **foreign**
   results, every active member must carry a force of its permitted sign and every slack member must be
   strained in its forbidden sense. These conditions characterise the solution of the one-sided problem
-  exactly. Not available when a slack member carries member loads (the tier is then not passed).
+  exactly. Member loads of a slack member (its self weight, for example) reach its end nodes as the
+  reactions of a simply supported beam (THEORY 13); they are computed here from the load definitions
+  with the force-method routine of `crosscheck.fef` (transverse forces and the axial component by the
+  lever rule, a point moment as a couple, carried over a rigid offset with its moment) and given to the
+  foreign solvers as nodal loads (`tier_c.slack_member_loads`; recorded as `slackMembersWithLoads`).
+  Tier D checks the same rule on the engine's own results: the end forces of a loaded slack member
+  must be those reactions, and its station forces must follow from them by statics.
 
 What is *not* done: a model with constraints or offsets is never cross-checked through a different
 structure (for example with the constraints replaced by members). That comparison exists, but as an
@@ -142,18 +150,25 @@ equivalence check of tier E with a convergence series, not as a foreign solve.
 largest difference is recorded under tier C. It is extra evidence only: it is not one of the two
 open-source solvers the tier requires and it never changes the status.
 
-#### Second-order cross-checks: the estimate is not a bound
+#### Second-order cross-checks: the foreign error bound
 
-Both foreign routes approximate the beam-column problem (CROSSCHECK.md 3.4); their error estimate comes
-from two discretisation levels and is the *leading-order value of the error itself*
-(OpenSees: |fine − coarse| / (ratio² − 1)). When the engine is exact, the difference engine − OpenSees is
-therefore expected to *equal* the estimate, and whether it lands just below or just above the allowed
-`relative + estimate` is decided by the next term of the expansion. Measured: the library problem
-`derived/beam-column-02` (engine = ODE oracle to 5·10⁻¹¹) differs from OpenSees by 8.010·10⁻⁴ against an
-allowed 8.008·10⁻⁴ and is quarantined. The rule has **not** been widened to make such cases pass
-(`estimateSafety = 1.0`); whether a bound factor on the estimates, or a comparison with the extrapolated
-foreign result, should replace it is an open question for the project owner. Until then a second-order
-model can fail tier C for this reason alone; the record then shows the difference next to the estimate.
+Both foreign routes discretise the beam-column problem (CROSSCHECK.md 3.4). The allowed difference
+between two results is `relative` plus the error bounds of the two; the engine's bound is zero. The
+bound of a foreign solver comes from **three refinement levels of that solver** and nothing else
+(CROSSCHECK.md 1.3): the last level-to-level difference, enlarged when the observed contraction is
+worse than first order or better than the method can have, and *no estimate* — the solver is then not
+eligible — when the levels do not contract. `estimateSafety` stays 1.0: the bound is used as it is.
+
+This replaces the leading-order Richardson estimate, which equalled the error itself when the engine
+was exact and understated it when a first-order term was present; correct models then missed tier C by
+less than 1 % up to a factor 2 (`derived/beam-column-02`: 8.010·10⁻⁴ against an allowed 8.008·10⁻⁴).
+The cause of the first-order term, the acceptance table (estimate ≥ true error against the ODE oracle
+and the tableau solver on 30 models; est/true = 3 for OpenSees) and the test that an engine result
+falsified by 10⁻³ is still rejected are in CROSSCHECK.md 1.3 and 3.4.
+
+What the allowed difference means for a verified second-order record: agreement with OpenSees within
+about three times the OpenSees discretisation error at 32 elements per member (10⁻⁵…10⁻³), and with
+PyNite within its bound (10⁻⁶…10⁻³). The record lists both bounds next to the differences found.
 
 ### Tier D — invariants
 
@@ -226,7 +241,12 @@ combinations (the engine's rigid constraints carry no geometric stiffness, a sti
 stiffness series compares the combination results, not buckling factors; `memberSplit` cuts at most 40
 members and leaves truss-type members alone (an added joint on a pin-ended member is a mechanism), as
 well as loaded members when the model uses notional loads or a computed τ_b (those rules are defined per
-analysis member).
+analysis member). The cut is made at an interior result station that is neither at a point load nor
+closer than 10⁻³ of the member length to a point load or to the end of a partial line load: a cut next
+to a load position leaves a sliver between the new joint and the load, and the stiffness contrast of
+that sliver makes the *substitute* ill-conditioned (measured: a point load 10⁻⁵ L beside the cut is
+refused as "almost a mechanism" — Ziemian frame 2). A member without such a station is skipped with
+that reason. The comparison tolerance is not affected.
 
 ### Tier F — design checks
 
@@ -345,7 +365,14 @@ Not verifiable (always `quarantined`, category `not-verifiable`, with the diagno
   solved).
 
 The independent matrix uses the engine's documented rule for DOFs that are not part of the solution
-(free DOFs of memberless nodes, rotations of nodes joined only by truss-type members), re-implemented.
+(free DOFs of memberless nodes, rotations of nodes joined only by truss-type members), re-implemented —
+with one exception: such a DOF that is **loaded** stays in the matrix. A load on a degree of freedom
+without stiffness is what the engine refuses with a `no-stiffness` / `only-truss-members` mode of kind
+"node", and the motion must then be found independently: as a zero eigenvalue (tier N; the loaded DOFs
+come from the load definitions of the first combination that loads one, not from the diagnosis, and
+every DOF the diagnosis lists must be among them), as a zero row of the engine's unreduced matrix
+counted with its eigenvalues (tier K), and by the foreign solvers, which are given the loaded DOF free
+and must fail (tier C; the translators hold only the *unloaded* DOFs without stiffness).
 
 ## 5. Tolerances (one policy)
 
@@ -356,7 +383,7 @@ The independent matrix uses the engine's documented rule for DOFs that are not p
 | A, oracle vs engine | 10⁻⁶ | largest value of the same kind (translation, rotation, force, moment) along the member line; the oracle is accurate to about 10⁻⁸ |
 | A, targets derived here | relative 10⁻⁶ (absolute for a zero target) | the target |
 | B, published targets | see below | the target |
-| C | 10⁻⁶ + estimated errors of the two results compared; a solver is eligible up to an estimated error of 5·10⁻³ | model-wide scales of `crosscheck.compare` |
+| C | 10⁻⁶ + error bounds of the two results compared (CROSSCHECK.md 1.3); a solver is eligible up to a bound of 5·10⁻³ | model-wide scales of `crosscheck.compare` |
 | D | the tolerance stored with each invariant; superposition and reciprocity 10⁻⁹; station statics 10⁻⁹ (linear) / 10⁻⁶ (iterated); station integration 10⁻⁶ | station checks: largest station force / moment / member displacement of the combination |
 | E | bitwise / 10⁻⁸ / 10⁻⁶ / 10⁻⁵ as in the table of tier E | model-wide scales |
 | diagnosis | eigenvalue ≤ 10⁻⁹ counts as zero; Kφ residual ≤ 2·10⁻⁶ (the record gives directions to 6 decimals) | unit-diagonal matrix; \|K\|\|φ\| |
@@ -393,11 +420,16 @@ measured two orders of magnitude slower in this project's environment.
   and the parallel-member decomposition used by both translators are shared code (verified against the
   ODE oracle, CROSSCHECK.md 5): an error there would be common to both foreign routes.
 * Models with shear deformation, partial axial / shear / torsion releases, linear buckling results, rigid
-  offsets in second order, or one-sided members whose slack members carry member loads cannot pass
-  tier C and are not publishable as verified. Buckling factors are verified only through registered
-  tier-A problems.
-* Second-order models can fail tier C although the engine is right (section 2, "the estimate is not a
-  bound").
+  offsets in second order, or rigid links / diaphragms in second order cannot pass tier C and are not
+  publishable as verified. Buckling factors are verified only through registered tier-A problems.
+* Second order with rigid links or diaphragms: the engine's constraint is a linear kinematic relation;
+  a rigid body transmitting forces has a further second-order term (CROSSCHECK.md 3.5; 7.6 % on bank
+  model S08). The pipeline does not decide between the two statements: such a combination is not
+  cross-checked and its reference is not publishable as verified.
+* The foreign error bound of tier C assumes that the refinement sequence keeps contracting at least like
+  a first-order method beyond the finest level run; the acceptance table of CROSSCHECK.md 1.3 is the
+  evidence, on the kinds of model listed there. A second-order model whose members are close to their
+  buckling load has a bound above 5·10⁻³ for OpenSees and is then not cross-checked.
 * Tier F credits an item when a check citing it reproduced a printed value; it does not prove that every
   item of that check was exercised by the example (a classification case used on the way to a reproduced
   strength is credited). The hand-calculation side (a) is identified by the naming convention

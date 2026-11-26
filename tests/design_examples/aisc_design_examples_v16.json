@@ -509,6 +509,27 @@
       },
       "notes": []
     },
+    "G.8B": {
+      "title": "Built-up girder with transverse stiffeners: web shear buckling coefficient Cv2 of the second panel",
+      "pages": "G-23 to G-24 (PDF 259-260)",
+      "inputs": {
+        "Fy": 50,
+        "E": 29000,
+        "a": 90.0,
+        "h": 33.0,
+        "kv": 5.67,
+        "h_tw": 106
+      },
+      "printed": {
+        "kv": 5.67,
+        "Cv2_limit_1.37": 78.6,
+        "Cv2": 0.442
+      },
+      "notes": [
+        "Only the coefficient of Eq. G2-11 is reproduced: the example goes on with the tension-field strength of Eq. G2-7, which the engine does not implement.",
+        "kv = 5.67 and h/tw = 106 are the rounded values the example carries into Eq. G2-11; kv is also recomputed from a and h (Eq. G2-5)."
+      ]
+    },
     "F.3B": {
       "title": "W-shape with noncompact flanges, major-axis bending (W21x48): classification only",
       "pages": "F-24 to F-25 (PDF 186-187)",

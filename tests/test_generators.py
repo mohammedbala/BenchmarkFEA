@@ -210,6 +210,127 @@ def test_output_is_pinned(case):
     assert hashlib.sha256(gen(*case).json().encode("utf-8")).hexdigest() == GOLDEN[case]
 
 
+# ------------------------------------------------------------------- plain tree, invalid draws
+def _shared_containers(value, path="", seen=None):
+    """Paths of lists / dicts of a document that are reachable by an earlier path too."""
+    seen = {} if seen is None else seen
+    out = []
+    if isinstance(value, (dict, list)):
+        if id(value) in seen:
+            return [(seen[id(value)], path)]
+        seen[id(value)] = path
+        for k, v in (value.items() if isinstance(value, dict) else enumerate(value)):
+            out += _shared_containers(v, f"{path}/{k}", seen)
+    return out
+
+
+def _only_json_types(value):
+    if isinstance(value, dict):
+        return all(type(k) is str and _only_json_types(v) for k, v in value.items())
+    if isinstance(value, list):
+        return all(_only_json_types(v) for v in value)
+    return value is None or type(value) in (str, int, float, bool)
+
+
+def test_shared_container_detector_finds_an_alias():
+    rel = {"rz": True}
+    assert _shared_containers({"m": {"releases": {"i": rel, "j": rel}}}) == [("/m/releases/i", "/m/releases/j")]
+    assert _shared_containers({"m": {"releases": {"i": dict(rel), "j": dict(rel)}}}) == []
+
+
+@pytest.mark.parametrize("case", CASES, ids=case_id)
+def test_document_is_a_plain_tree_without_shared_sub_objects(case):
+    """No list / dict of the document is reachable by two paths (one dict used for both end releases of
+    a member would make an in-place edit of one end edit the other), and the document is exactly what
+    its JSON text says: only JSON types, a JSON round trip gives an equal document."""
+    doc = gen(*case).document
+    assert _shared_containers(doc) == []
+    assert _only_json_types(doc)                                  # no tuple, no numpy scalar
+    assert json.loads(json.dumps(doc)) == doc
+    assert json.dumps(json.loads(json.dumps(doc))) == json.dumps(doc)      # key order and number types too
+
+
+def test_both_end_releases_of_a_member_are_separate_objects():
+    """The case of the defect: a family that passes ONE dict for both ends of a member (the semi-rigid
+    eaves of a flat portal frame, the pinned beams of the frames)."""
+    found = 0
+    for seed in range(8):
+        doc = generate("portal_frame", seed, 2, features={"semiRigid": True}).document
+        assert _shared_containers(doc) == []
+        for m in doc["members"].values():
+            r = m.get("releases", {})
+            if "i" in r and "j" in r and r["i"] == r["j"]:
+                found += 1
+                assert r["i"] is not r["j"]
+                r["i"]["probe"] = 1                               # an edit of one end ...
+                assert "probe" not in r["j"]                      # ... leaves the other alone
+        if found:
+            break
+    assert found, "no member with equal releases at both ends in the sample"
+
+
+@pytest.mark.parametrize("seed", [860926023, 1128349967, 1668778454])
+def test_seeds_that_used_to_raise_model_invalid(seed):
+    """These three seeds drew a single-storey frame, for which the family wrote a design group "beams"
+    without members (schema.minItems) and ``generate`` raised ``ModelInvalid``."""
+    g = generate("multistorey_2d", seed, 2)
+    assert not [p for p in validate(g.document) if p.severity == "error"]
+    build_model(g.document)
+    assert all(v["members"] for v in g.document["design"]["groups"].values())
+    used = {m["section"] for m in g.document["members"].values()}
+    assert used == set(g.document["sections"])                    # no section that no member uses
+    if g.metadata["parameters"]["storeys"] == 1:
+        assert set(g.document["design"]["groups"]) == {"columns", "roofBeams"}
+
+
+@pytest.mark.parametrize("family", ALL_FAMILIES)
+def test_no_family_writes_an_empty_design_group(family):
+    """Structure only (no analysis): the first draws of every family and level, before sizing."""
+    from benchfea.bench.generate import GENERATOR_VERSION
+    for level in levels(family):
+        for seed in range(12):
+            draw = Draw(stable_seed(GENERATOR_VERSION, family, seed, level, 0))
+            units, vertical = draw.choice(sorted(UNIT_SYSTEMS)), draw.choice(("Y", "Z"))
+            doc = FAMILIES[family].build(draw, level, units, vertical, {}).render()
+            where = (family, level, seed)
+            assert not [p for p in validate(doc) if p.severity == "error"], where
+            design = doc["design"]
+            assert all(v["members"] for v in design.get("groups", {}).values()), where
+            assert all(v["members"] for v in design.get("members", {}).values()), where
+            assert {m["section"] for m in doc["members"].values()} <= set(doc["sections"]), where
+            assert _shared_containers(doc) == [], where
+
+
+def test_an_invalid_draw_is_a_rejected_attempt(monkeypatch):
+    """Whatever a family writes: a document that validation refuses is never returned and never raised as
+    ``ModelInvalid``; the draw is dropped with the validation codes as the reason, the next one is tried."""
+    family = FAMILIES["continuous_beam"]
+    real, calls = family.build, []
+
+    def broken_first(draw, level, unit_system, vertical, features):
+        builder = real(draw, level, unit_system, vertical, features)
+        calls.append(builder)
+        if len(calls) <= 2:                                       # the first two draws are spoilt
+            builder.design_group("ghosts", [], role="beam")
+        return builder
+
+    monkeypatch.setattr(family, "build", broken_first)
+    g = generate("continuous_beam", 0, 1)
+    assert g.metadata["attempt"] >= 2 and "ghosts" not in g.document["design"]["groups"]
+    spoilt = [r for r in g.metadata["rejected"] if "invalid document" in r]
+    assert len(spoilt) == 2 and all("schema.minItems at /design/groups/ghosts/members" in r for r in spoilt)
+
+    def always_broken(draw, level, unit_system, vertical, features):
+        builder = real(draw, level, unit_system, vertical, features)
+        builder.design_group("ghosts", [], role="beam")
+        return builder
+
+    monkeypatch.setattr(family, "build", always_broken)
+    with pytest.raises(GenerationFailed) as e:
+        generate("continuous_beam", 0, 1, max_attempts=4)
+    assert len(e.value.reasons) == 4 and all("invalid document" in r for r in e.value.reasons)
+
+
 def test_different_seeds_and_levels_give_different_models():
     texts = {gen(*c).json() for c in CASES if c[0] == "continuous_beam"}
     assert len(texts) == len([c for c in CASES if c[0] == "continuous_beam"])

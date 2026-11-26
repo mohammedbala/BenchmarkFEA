@@ -73,7 +73,7 @@ def test_check_env():
 
     from gymnasium.utils.env_checker import check_env
     env = gymnasium.make(E.ENV_ID, cache_dir=CACHE, max_steps=6, families=("continuous_beam",),
-                         curve_balls=("release_added", "release_mechanism"), difficulties=(2,), seed_range=2)
+                         curve_balls=("support_fixed_to_pinned", "support_removed"), difficulties=(2,), seed_range=2)
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
         check_env(env.unwrapped)
@@ -83,7 +83,7 @@ def test_check_env():
 
 
 def test_reset_without_options_draws_a_task_of_the_split():
-    env = make(families=("continuous_beam",), curve_balls=("release_added", "release_mechanism"), difficulties=(2,),
+    env = make(families=("continuous_beam",), curve_balls=("support_fixed_to_pinned", "support_removed"), difficulties=(2,),
                seed_range=2)
     seen = set()
     for seed in range(6):
@@ -127,7 +127,7 @@ def transcript(env, seed, opts):
 
 
 def test_two_environments_with_the_same_seed_give_identical_transcripts():
-    restrict = dict(families=("continuous_beam",), curve_balls=("release_added", "release_mechanism"),
+    restrict = dict(families=("continuous_beam",), curve_balls=("support_fixed_to_pinned", "support_removed"),
                     difficulties=(2,), seed_range=2)
     a = transcript(make(**restrict), 11, None)
     b = transcript(make(**restrict), 11, None)                    # a second environment, nothing shared in memory
@@ -309,7 +309,7 @@ def test_truncation_on_the_step_budget():
     env.reset(seed=0, options=options("change", task_type="diagnose"))
     env.step(call("inspect"))
     env.step(call("inspect"))
-    obs, reward, terminated, truncated, info = env.step(call("submit", answer={"category": "releases"}))
+    obs, reward, terminated, truncated, info = env.step(call("submit", answer={"category": "supports"}))
     assert terminated and not truncated and reward == pytest.approx(S.DIAGNOSE_WEIGHTS["category"])
 
 
@@ -382,7 +382,7 @@ def test_held_out_instances_are_refused_unless_the_environment_is_built_for_them
     assert info["split"] == "held-out"
     # a held-out COMBINATION is refused by the train environment whatever the seed
     hf, hc = splits.load_splits()["heldOutCombinations"][0]
-    assert not splits.is_held_out(hf, "release_mechanism", 0) and splits.is_held_out(hf, hc, 0)
+    assert not splits.is_held_out(hf, "support_removed", 0) and splits.is_held_out(hf, hc, 0)
     for opts in ({"family": hf, "curve_ball": hc, "instance_seed": 0}, {"family": hf, "curve_ball": hc}):
         with pytest.raises(ValueError, match="held-out"):
             train.reset(seed=0, options=opts)
@@ -390,7 +390,7 @@ def test_held_out_instances_are_refused_unless_the_environment_is_built_for_them
     with pytest.raises(ValueError, match="train"):
         held.reset(seed=0, options=options("change"))
     # random draws stay inside the split
-    restrict = dict(families=("continuous_beam",), curve_balls=("release_added", "release_mechanism"),
+    restrict = dict(families=("continuous_beam",), curve_balls=("support_fixed_to_pinned", "support_removed"),
                     difficulties=(2,), seed_range=5)
     for env, want in ((make(**restrict), False), (make(split="held-out", **restrict), True)):
         for s in range(3):

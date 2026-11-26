@@ -145,24 +145,6 @@ QUARANTINE = {
         "horizontal equilibrium requires R_xc = -R_xd; the printed pair 760.0 and -760.2 cannot both be right, and the "
         "engine's 760.12 lies between them. The exact solution of the source's printed equations is -1.68347, "
         "-0.05183, -0.84473 mm." + _CONFIRMED,
-    "ex-8-3-beam-column-end-moments":
-        "Tier B passes: the target (the source's closed-form Eq. f evaluated here) is reproduced to 5e-15. Tier C does "
-        "not: the largest difference between the engine and OpenSeesPy (P-Delta transformation, subdivided member) is "
-        "3.44e-3 (rotation at node a), the allowed difference under the rule of benchfea.crosscheck.cross_check - 1e-6 "
-        "plus the estimated discretisation error of the OpenSees run - is 3.40e-3. That estimate is the leading-order "
-        "value of the OpenSees error, not a bound: when the engine is exact the difference is expected to equal the "
-        "estimate, and whether it lands just below or just above is decided by the next term of the error expansion "
-        "(docs/VERIFICATION.md, 'Second-order cross-checks'; the same situation as the tier-A problems "
-        "derived/beam-column-*). The tolerance rule was not widened; a problem with a failing tier is not published "
-        "as passed.",
-    "ex-8-4-cantilever-beam-column":
-        "Tier B passes: both targets (the source's closed-form Eqs. e and g evaluated here) are reproduced to better "
-        "than 1e-14. Tier C does not. Combination C: engine and OpenSeesPy differ by 9.17e-4 (rotation at b), allowed "
-        "9.15e-4. Combination T: engine and OpenSeesPy differ by 1.74e-3 (end moment at a), allowed 1.73e-3, and PyNite "
-        "is not eligible (its estimated approximation error 5.44e-3 exceeds the limit 5e-3). The allowed difference is "
-        "1e-6 plus the estimated (leading-order, not bounding) discretisation error of the OpenSees run; with an exact "
-        "engine the difference is expected to equal the estimate (docs/VERIFICATION.md, 'Second-order cross-checks'). "
-        "The tolerance rule was not widened.",
     "ex-9-5-frame-critical-load":
         "Source value is a discretised approximation; no stated error bound. Engine (exact stability functions): "
         "6609.41 kN; printed 6630 kN (one element per member with the polynomial geometric stiffness of the source's "

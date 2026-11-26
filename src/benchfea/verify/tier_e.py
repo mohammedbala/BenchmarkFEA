@@ -51,6 +51,7 @@ MAX_LEVELS = 8
 STEP_TARGET = 1.0e-6                # a series ends when a step is below this with the order in range
 ROUND_OFF = 1.0e-10                 # a series whose steps are below this has converged to round-off
 MAX_SPLIT = 40                      # members cut by the split check (largest models: a spread selection)
+MIN_PIECE = 1.0e-3                  # a cut keeps this fraction of the member length clear of load positions
 
 
 # ====================================================================================== helpers
@@ -269,21 +270,39 @@ def split_document(raw: dict, model, members=None):
     if members is not None:
         todo = [m for m in todo if m in members]
     n_st = model.analysis.result_stations
-    point_x = {}
+    # positions the cut must keep clear of: point loads (a load AT the new joint is a different statement
+    # of the load) and the ends of partial line loads.  A cut that lands NEXT to such a position leaves a
+    # piece of the member that is shorter than MIN_PIECE x its length between the cut and the load; the
+    # engine divides a member at its load positions, and the stiffness contrast of that sliver makes the
+    # split model ill-conditioned (measured: a point load 1e-5 L from the cut is refused as "almost a
+    # mechanism").  That is a property of the substitute, not of the model, so such a station is not used.
+    point_x, edge_x = {}, {}
     for case in raw.get("loadCases", {}).values():
         for ld in case.get("loads", []):
-            if ld["type"] == "memberPoint" and ld["member"] in model.members:
-                L = _flen(model, model.members[ld["member"]].length)
+            if ld.get("member") not in model.members:
+                continue
+            L = _flen(model, model.members[ld["member"]].length)
+            if ld["type"] == "memberPoint":
                 point_x.setdefault(ld["member"], []).append(_load_span(model, ld, L))
+            elif ld["type"] == "memberDistributed":
+                edge_x.setdefault(ld["member"], []).extend(x for x in _load_span(model, ld, L)
+                                                           if 1e-9 * L < x < L * (1.0 - 1e-9))
     cuts = {}
     for mid in todo:
         m = model.members[mid]
         L = _flen(model, m.length)
         order = sorted(range(1, n_st - 1), key=lambda k: abs(k / (n_st - 1) - 0.37))
-        k = next((k for k in order
-                  if all(abs(L * k / (n_st - 1) - x) > 1e-9 * L for x in point_x.get(mid, []))), None)
+
+        def clear(k):
+            x = L * k / (n_st - 1)
+            if any(abs(x - xp) < MIN_PIECE * L for xp in point_x.get(mid, [])):
+                return False
+            # the end of a line load exactly at the cut is fine (the load is divided there); next to it is not
+            return all(abs(x - xe) <= 1e-9 * L or abs(x - xe) >= MIN_PIECE * L for xe in edge_x.get(mid, []))
+        k = next((k for k in order if clear(k)), None)
         if k is None:
-            skipped[mid] = "every interior result station carries a point load"
+            skipped[mid] = ("every interior result station is at, or closer than "
+                            f"{MIN_PIECE:g} x the member length to, a point load or the end of a line load")
             continue
         frac = k / (n_st - 1)
         xs = L * frac

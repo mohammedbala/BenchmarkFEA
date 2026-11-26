@@ -9,8 +9,19 @@ The split is defined by the committed file ``splits.json`` next to this module a
   the seed -- an agent trained on the train split has not seen that curve ball on that family;
 * held-out seeds: for every other pair, the seeds with ``seed % 5 == 4`` are held out.
 
+Which pairs are held-out combinations is not a choice made pair by pair: ``select_held_out`` applies
+a rule that looks at nothing but names (docs/BENCHMARK.md section 7).  Per family, among the curve
+balls that the applicability table (docs/CURVEBALLS.md section 5, copied into ``splits.json`` as
+``heldOutSelection.applicable``) lists with an effect class other than ``invalid-model`` alone, the
+``perFamily`` = 2 with the smallest SHA-256 of the text ``benchfea.bench|held-out-pair|<family>|<curve
+ball>`` are held out.  Whether a pair ends up with verified instances plays no part.
+
+The split also decides the base models: ``tasks.derived_seed`` puts the split into the generator seed
+(the lowest bit is 1 for held-out, 0 for train), so the two splits never generate from the same seed.
+
 ``seed`` is the seed of the task instance as requested (the id of the instance); the derivation
-chain that replaces a quarantined instance (``tasks.derived_seed``) does not change the split.
+chain that replaces a quarantined instance (``tasks.derived_seed``) does not change the split: the
+split is a function of ``(family, curve_ball, seed)`` alone and ``is_held_out`` is its only definition.
 
     from benchfea.bench.splits import is_held_out, split_of, combinations
     is_held_out("portal_frame", "release_added", 9)      # True  (9 % 5 == 4)
@@ -24,11 +35,13 @@ explicitly; it then usually has no verified instance and the request is refused 
 """
 from __future__ import annotations
 
+import hashlib
 import json
 from functools import lru_cache
 from pathlib import Path
 
-__all__ = ["is_held_out", "split_of", "combinations", "load_splits", "SPLITS", "SPLITS_FILE", "seeds"]
+__all__ = ["is_held_out", "split_of", "combinations", "load_splits", "SPLITS", "SPLITS_FILE", "seeds",
+           "held_out_rank", "select_held_out"]
 
 SPLITS = ("train", "held-out")
 SPLITS_FILE = Path(__file__).with_name("splits.json")
@@ -40,6 +53,22 @@ def load_splits() -> dict:
     d = json.loads(SPLITS_FILE.read_text(encoding="utf-8"))
     d["_heldOut"] = frozenset((f, c) for f, c in d["heldOutCombinations"])
     return d
+
+
+def held_out_rank(family: str, curve_ball: str) -> str:
+    """Sort key of the held-out selection: SHA-256 (hex) of ``benchfea.bench|held-out-pair|family|curve_ball``."""
+    return hashlib.sha256(f"benchfea.bench|held-out-pair|{family}|{curve_ball}".encode("utf-8")).hexdigest()
+
+
+def select_held_out(applicable: dict, per_family: int = 2) -> list:
+    """The held-out combinations given ``applicable`` = {family: [curve balls eligible for that family]}:
+    per family (in the order of ``applicable``) the ``per_family`` curve balls of smallest
+    :func:`held_out_rank`.  ``splits.json`` must equal this for its own ``heldOutSelection`` (tested)."""
+    out = []
+    for family, names in applicable.items():
+        ranked = sorted(set(names), key=lambda c: held_out_rank(family, c))
+        out += [[family, c] for c in ranked[:per_family]]
+    return out
 
 
 def is_held_out(family: str, curve_ball: str, seed: int) -> bool:

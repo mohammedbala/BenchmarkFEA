@@ -341,6 +341,70 @@ A failed check makes `analyze` raise `ModelRefused`
 flagged. `superposition_check` and `reciprocity_check` (Maxwell–Betti:
 `δ_ab = δ_ba` for unit loads) are available to tests and to `verify`.
 
+### 8.1 Round-off floor of the force scales
+
+Every force of a solution is evaluated as a sum of products stiffness ×
+displacement (minus fixed-end forces). When the true forces vanish — a
+statically determinate structure under a support settlement moves as a rigid
+body — the computed "forces" are the rounding errors of those sums, and a
+residual divided by them is a ratio of two rounding errors. The quantity that
+keeps a meaning is the size of the terms summed,
+
+    S_f = max over the force rows of (|K| |u|),
+    S_m = max( max over the moment rows of (|K| |u|),  S_f × model size ),
+    S_e = |u|ᵀ |K| |u|                                   (work check),
+
+with K the assembled member stiffness (the tangent stiffness in second
+order). A sum of n products evaluated in floating point is in error by at
+most about n ε Σ|terms| (ε = 2.2e-16; each product and each addition is
+rounded once); a row of an element stiffness has n = 12 terms.
+`ROUND_OFF = 16 ε = 3.6e-15` is taken. A residual is accepted when
+
+    residual ≤ tolerance × (force scale of the check)   or   residual ≤ ROUND_OFF × S,
+
+i.e. the reported value is `residual / max(force scale, ROUND_OFF × S / tolerance)`.
+The floor never reduces a scale, so no check is looser than before wherever
+the forces of the check exceed `ROUND_OFF × S / tolerance` (3.6e-9 S with the
+default tolerance 1e-6). *Measured* on the model bank (27 + 8 + 3 models of
+`tests/independent`, `examples/`, `verification/problems/`, valid fixtures;
+218 models, 2885 residual ratios): 11 ratios changed, all of them in the
+rigid-body settlement frame (`verification/problems/staad/frame-support-settlement`,
+before 7e-4 … 1.0, after 9e-12 … 3.5e-8); every other ratio is bit-for-bit
+the old one; the loaded case closest to the floor has a force scale 7.4 times
+the floor (an "axially rigid" frame with A = 1e8 mm²). The largest rounding
+error observed in the settlement frame is 0.6 ε S.
+
+### 8.2 Superposition check
+
+For every combination the factored sum of the separately solved cases is
+compared with the combination solved directly, array by array: nodal
+displacements; reaction forces; reaction moments; and per member the station
+forces (N, Vy, Vz), the station moments (T, My, Mz) and the station
+displacements. Forces and moments are separate arrays because their units
+differ (in N, mm a moment array would otherwise hide every force). The value
+of the check is the largest `max|sum − direct| / scale` over the arrays, with
+`scale = max|direct|` of the array for displacements and
+
+    scale = max( max|direct| of the array,  ROUND_OFF × S / tolerance )
+
+for force arrays, where S is the stiffness × displacement scale of that array
+— for a member `max(|k| |u_ends| + |fixed-end forces|)` over its 12 end DOFs
+in local axes (moments: at least force scale × member length), for the
+reactions S_f, S_m of 8.1 — summed over the direct solution and |factor| ×
+each case. A member that carries no force in a combination while its nodes
+move (or whose case forces cancel) has "forces" that are rounding errors in
+both results; before this scale the check divided one by the other (values
+0.6 … 2.3 against a tolerance of 1e-9). With the tolerance 1e-9 of tier D an
+array is measured against its own size as soon as its forces exceed 3.6e-6 S;
+below that, a difference is accepted only up to `ROUND_OFF × S`, the rounding
+bound of the two evaluations compared. *Measured* (268 models: the bank of 8.1
+plus two generated models per family and level, 17 805 arrays): 554 arrays
+are measured against the floor, the largest difference among them is 5e-17 S;
+3 old failures (all of the round-off kind), no new failure, largest new value
+1.6e-11. Tests corrupt a result and show that a wrong moment of a loaded
+member is caught at the same size as before (relative 3e-9 caught, 3e-10 not)
+and that a spurious moment of 1e-12 S in a force-free member is caught.
+
 ## 9. Hooks for nonlinear analysis
 
 `ANALYSIS_TYPES[type](analysis, combination)` solves one combination;
@@ -506,12 +570,41 @@ connection the axial force acts with an eccentricity equal to the slip, and
 the moment this produces depends on how the connection is built (which side
 carries the guide), which the model does not say.
 
-**Truss-type members** are the piece with both bending rotations released at
-the original member ends and no torsional stiffness. They are therefore
-pin-ended beam-columns: a transverse load on a compressed truss member is
+**Truss-type members** (`truss`, `tensionOnly`, `compressionOnly`) are the
+piece with both bending rotations released at the original member ends and no
+torsional stiffness. They are therefore pin-ended beam-columns with the
+`Iy`, `Iz` of their section: a transverse load on a compressed truss member is
 amplified, and its own flexural buckling is part of the analysis. The twist of
 the internal nodes of a subdivided truss member is not a degree of freedom of
 the theory (no torque can reach it) and is held.
+
+Consequences, intended and to be known when modelling:
+
+* In a first-order analysis the bending stiffness of a truss-type member
+  affects only the deflection of its own axis under its member loads; a
+  placeholder `Iy`, `Iz` is harmless there.
+* In a second-order or buckling analysis `Iy`, `Iz` are physical data. The
+  own Euler load of the member is `π² E I_min / L²` (pin-ended, L = flexible
+  length, stiffness reduction included). A linear buckling analysis returns
+  the member's own factor `π² E I_min / (L² |N|)` when that is the lowest
+  mode — with a placeholder `I = 1 mm⁴` this is a factor of order 1e-4, which
+  is the correct answer for the model as given and not the buckling factor of
+  the truss. A second-order analysis refuses a member beyond its own Euler
+  load (`stability.beyond-critical-load`).
+* The engine says so: when the lowest buckling factor is within 1 % of the
+  own Euler factor of a compressed truss-type member, the buckling result
+  carries a warning naming the member, its Euler load and its axial force
+  (`buckling.truss_strut_warning`); the refusal of a second-order
+  combination carries the same sentence. Results are not changed.
+* To study the buckling of a truss as a system of bars only, give the bars an
+  `I` large enough that their own factors lie above the modes of interest
+  (the exact value then has no influence: in
+  `verification/problems/mgz/ex-9-1-truss-critical-load` the factor is the
+  same for `I` between 1e8 and 1e12 mm⁴).
+* The input schema requires positive `Iy`, `Iz` for a `properties` section, so
+  "no I" cannot occur; whether a given `I` is realistic cannot be decided by
+  the engine (a flat-bar tie has a very small one), which is why there is a
+  warning at the point where it governs and no validation rule.
 
 ### 10.7 Rigid end offsets
 
@@ -673,6 +766,30 @@ flips one member at a time (the one with the largest wrong force). A second
 cycle, or `analysis.maxIterations`, is refused (`solve.active-set-cycling`)
 naming the members that keep changing.
 
+**A trial set is not the structure.** In a trial set a tension-only member can
+still be active while it carries compression (the first trial has every
+member active). It cannot carry that force, so the second-order equilibrium
+of the trial set — in particular its stability — says nothing about the
+structure: slender tension-only diagonals in compression exceed their own
+Euler load, or make the tangent stiffness of the trial set indefinite, long
+before the structure with the diagonals that can work is near its critical
+load. When the second-order solution of a trial set does not exist and the
+first-order solution of the same set has one-sided members with the wrong
+sign of force, the set is updated from those first-order violations and the
+iteration continues (recorded in `solver.activeSet.history` as a note). The
+combination is refused as `stability.beyond-critical-load` only for a set
+whose first-order state has no wrong-signed member — an admissible set that is
+unstable. The accepted result is always a converged second-order solution
+whose own strains satisfy the rule above. *Verified*
+(`tests/test_solve_roundoff_scales.py`): `examples/05_braced_frame.json`,
+gravity combination in second order (formerly refused with "buckling factor
+0.38"; linear buckling factor 7.65): agreement with the tableau reference of
+`tests/independent` on the same active set to 2e-12, with the sign conditions
+of all six diagonals evaluated from the reference's own results; tier C
+(OpenSeesPy 1.3e-6 against its estimate 4.8e-6, PyNite within its estimate).
+An enumeration of the 27 sets with at most one working diagonal per storey
+finds no other admissible set.
+
 **Slack members and stability.** If the converged set leaves a mechanism, the
 combination is refused (`stability.slack-mechanism`, with the mechanism
 diagnosis of section 7 and the slack members). The same refusal applies when
@@ -724,7 +841,9 @@ Evaluated on the subdivided model with the terms of the theory:
 | member equilibrium on the deformed axis | end moments + end shears × length + load moments − `∫ N v′ dx` for every piece, the integral from the recovered deflection (`N (v_j − v_i)` for constant N, Gauss quadrature otherwise) |
 | work = strain energy | `uᵀ K_T u` = (equivalent nodal loads + reactions)·u |
 
-Tolerances as in section 8. *Verified:* in
+Tolerances and the round-off floor of the force scales as in section 8 (8.1,
+with K the tangent stiffness and u including the internal nodes; the check on
+the deformed axis uses the moment floor). *Verified:* in
 `test_invariants_of_a_second_order_solution_are_evaluated_with_the_second_order_terms`
 the moments of loads and reactions on the undeformed geometry differ by
 exactly the couples of the member axial forces.

@@ -169,7 +169,7 @@ def test_repair_compares_physical_values_whatever_the_units_of_the_submission():
     from benchfea.units import UnitSystem
     public, answers = task("change", "repair")
     base = answers["reference"]["intendedModel"]
-    target = {"force": "N", "length": "mm"} if base["units"] != {"force": "N", "length": "mm"} else {"force": "kN", "length": "m"}
+    target = {"force": "N", "length": "mm"} if base["units"]["length"] != "mm" else {"force": "kN", "length": "m"}
     converted = convert_document(copy.deepcopy(base), UnitSystem.from_dict(target))
     assert converted["units"] == target and converted["nodes"] != base["nodes"]
     out = S.score_answer(public, answers, {"model": converted})

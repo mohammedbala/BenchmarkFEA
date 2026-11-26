@@ -22,7 +22,7 @@ value and the program's value, and lists the program input. The page title and a
 
 The problems are written by `build_problems.py` (helpers in `../vendor_common.py`).
 
-## Result: 24 problems (19 statements): 16 active, 8 quarantined
+## Result: 24 problems (19 statements): 18 active, 6 quarantined
 
 Active: every recomputed target is reproduced to 1e-6 or better and the page's printed values at their printed
 precision.
@@ -38,11 +38,8 @@ are active):
 | `cantilever-column-p-delta-vendor-printed` | 736.72 kip in | 737.194 | one-step approximation M = H L + P x (first-order deflection) |
 | `cantilever-column-notional-load-vendor-printed` | 61.37 kip in, 1.145 in | 61.380, 1.1460 | rounding in the page's evaluation of the closed form |
 
-Quarantined as a whole (3):
+Quarantined as a whole (1):
 
-* `beam-column-uniform-load`, `cantilever-column-notional-load`: all targets reproduced, engine = ODE oracle;
-  tier C does not pass (the difference to OpenSeesPy exceeds, by less than 1 %, the tolerance derived from the
-  estimated discretisation error of the foreign solver).
 * `frame-support-settlement`: **the engine produces no results.** A statically determinate frame under a support
   settlement moves as a rigid body with no forces; the engine's invariant check measures equilibrium residuals
   relative to the forces present, which are round-off of zero, and refuses the solution ("invariant failed",
@@ -87,10 +84,10 @@ diagnosis (`quarantine.py`); nothing is loosened or dropped.
 | problem | source location | what it verifies | basis | targets | missed | largest rel. difference | largest difference / tolerance | status |
 |---|---|---|---|---|---|---|---|---|
 | `axially-loaded-column` | 'V. Axially Loaded Column' | Bar held at both ends with two axial loads: support reactions | recomputed-from-published-statement | 6 | 0 | 1.9e-16 | 0.00 | active |
-| `beam-column-uniform-load` | 'V. Direct Analysis of a Beam' | Simply supported beam-column with uniform load: second-order moment and deflection | recomputed-from-published-statement | 4 | 0 | 1.1e-04 | 0.19 | quarantined |
+| `beam-column-uniform-load` | 'V. Direct Analysis of a Beam' | Simply supported beam-column with uniform load: second-order moment and deflection | recomputed-from-published-statement | 4 | 0 | 1.1e-04 | 0.19 | active |
 | `beam-partial-trapezoidal-load` | 'V. Deflection and Reactions in a Beam' | Pinned-fixed beam with a linearly varying load on part of the span | recomputed-from-published-statement | 9 | 0 | 1.8e-02 | 0.80 | active |
 | `bent-cantilever-with-prop` | 'V. Support Reactions for a Simple Frame' | Bent cantilever with an intermediate lateral support: support reactions | recomputed-from-published-statement | 5 | 0 | 1.6e-14 | 0.00 | active |
-| `cantilever-column-notional-load` | 'V. Direct Analysis of a Column' | Cantilever column with axial load and a small lateral load: second-order moment and deflection | recomputed-from-published-statement | 4 | 0 | 3.2e-11 | 0.00 | quarantined |
+| `cantilever-column-notional-load` | 'V. Direct Analysis of a Column' | Cantilever column with axial load and a small lateral load: second-order moment and deflection | recomputed-from-published-statement | 4 | 0 | 3.2e-11 | 0.00 | active |
 | `cantilever-column-notional-load-vendor-printed` | 'V. Direct Analysis of a Column' | Cantilever column with axial load and a small lateral load: second-order moment and deflection - values printed by the vendor that do not reproduce | published | 2 | 2 | 8.7e-04 | 2.00 | quarantined |
 | `cantilever-column-p-delta` | 'V. Single Column P-Delta Analysis' | Cantilever column with axial and lateral load: second-order base moment | recomputed-from-published-statement | 5 | 0 | 3.0e-04 | 0.34 | active |
 | `cantilever-column-p-delta-vendor-printed` | 'V. Single Column P-Delta Analysis' | Cantilever column with axial and lateral load: second-order base moment - values printed by the vendor that do not reproduce | published | 1 | 1 | 6.4e-04 | 94.85 | quarantined |

@@ -43,12 +43,18 @@ How a case is made (deterministic for `(family, curve ball, seed, difficulty)`):
 | `design-only` | analysis results **and design results** of the curve-balled model |
 | `invalid-model` | none exists: the model is refused by validation, the pipeline has nothing to verify; never served |
 
-**Derivation chain.** Attempt 0 uses `g = seed`. If the model cannot be generated, the curve ball
-does not apply, or the reference is not verified, the attempt is **skipped and logged** and the
-next attempt uses `g_k` = the first 31 bits of
-`SHA-256("benchfea.bench|task-chain|<TASK_VERSION>|family|seed|difficulty|k")`, `k = 1, 2`
-(`tasks.derived_seed`; at most `MAX_ATTEMPTS = 3`). The chain does not depend on the curve ball, so
-the base models of a `(family, seed, difficulty)` are shared by every curve ball. When no attempt
+**Derivation chain.** The generator seed of attempt `k = 0, 1, 2` is a 31-bit number
+(`tasks.derived_seed(family, curve_ball, seed, difficulty, k)`; at most `MAX_ATTEMPTS = 3`):
+
+* its upper 30 bits are the first 30 bits of
+  `SHA-256("benchfea.bench|task-chain|<TASK_VERSION>|<split>|family|seed|difficulty|k")`;
+* its lowest bit is the split of the instance (section 7): 1 for held-out, 0 for train.
+
+If the model cannot be generated, the curve ball does not apply, or the reference is not verified,
+the attempt is **skipped and logged** and the next one is tried. The curve ball enters the chain
+through the split only, so the instances of one split with the same `(family, seed, difficulty)`
+share their base models, and the two splits never generate from the same seed. The instance seed is
+never itself a generator seed. When no attempt
 is left the case is `unavailable` and nothing is served for it. No tolerance is changed and no
 quarantined reference is used; a skip entry reads
 `{"attempt", "generatorSeed", "stage": "generate" | "curve-ball" | "verify", "category", "reason"}`.
@@ -355,9 +361,40 @@ Defined by the committed file `src/benchfea/bench/splits.json` and one rule
 * **held-out seeds** — for every other pair, the seeds with `seed % 5 == 4`.
 
 `seed` is the seed of the instance as requested; the derivation chain of section 1 does not move an
-instance to the other split. `servedCombinations` in the file lists the pairs for which the dataset
-build produced a verified case (121 pairs, 16 of them held-out
-combinations); the environment draws from it.
+instance to the other split. `is_held_out` is the only definition of the split; everything else
+(the dataset directories, the environment, the generator seeds) calls it.
+
+**How the held-out combinations are selected.** By a rule that looks at names only
+(`splits.select_held_out`; the test suite checks that `splits.json` equals its result):
+
+1. *Candidates of a family*: the curve balls whose cell for that family in the applicability table
+   of [CURVEBALLS.md](CURVEBALLS.md) section 5 is not `-`, except cells that are `I`
+   (`invalid-model`) alone — such a pair is never served, by the definition of section 1. The
+   candidates are stored in `splits.json` (`heldOutSelection.applicable`).
+2. *Order*: ascending SHA-256 (hexadecimal) of the UTF-8 text
+   `benchfea.bench|held-out-pair|<family>|<curve ball>`.
+3. *Selection*: the first two candidates of every family.
+
+Whether a pair has verified instances plays no part, so a held-out combination can turn out to have
+none; it is then simply not served (it is not replaced by another pair). When the applicability
+table changes, the rule is applied again; nothing else changes the list.
+An earlier list was partly chosen after it was known which pairs had verified instances (three
+pairs had been replaced by served ones); the rule above replaces that list.
+
+| family | held-out curve balls |
+|---|---|
+| `continuous_beam` | `release_mechanism`, `release_added` |
+| `portal_frame` | `sections_swapped`, `release_pinned_frame` |
+| `multistorey_2d` | `design_unbraced_length_changed`, `load_moved` |
+| `multistorey_3d` | `section_heavier`, `support_fixed_to_pinned` |
+| `braced_frame` | `load_moved`, `design_k_changed` |
+| `pipe_rack` | `member_rolled_90`, `load_moved` |
+| `stair_frame` | `support_roller_direction`, `release_removed` |
+| `diaphragm_frame` | `design_lb_full_where_braced`, `load_direction_changed` |
+
+`servedCombinations` in the file lists the pairs for which a dataset build produced a verified case;
+the environment draws from it. It is a measurement and has to be refreshed by every rebuild of the
+dataset (section 8).
 
 **Policy.** `BenchFEAEnv(split="train")` — the default — refuses a held-out instance: `reset`
 raises `ValueError` when the options name one, and the random draw never produces one. Held-out
@@ -366,17 +403,29 @@ refuses train instances. Train on `train`; report on `held-out`; do not tune on 
 The split is by construction, not by secrecy: the generators are in the repository, so anyone can
 generate held-out instances — the policy relies on using the environment as documented.
 
-**What the split does not separate.** The base model of an instance depends on
-`(family, seed, difficulty)` only, not on the curve ball (section 1). A held-out *combination* asked
-for with a train seed (`seed % 5 != 4`) is therefore built on the same base model as the train tasks
-of that family, seed and difficulty: the curve ball on that family is unseen, the intended model is
-not. In the dataset of section 8 this concerns 34 of the 286 held-out tasks (12 instances with seed
-0: 12 diagnose, 12 predict, 10 repair tasks); for the 10 repair tasks the reference answer — the
-intended model — is also the reference answer of train repair tasks. The curve-balled models
-themselves never occur in both splits (checked on the dataset: no perturbed model hash is shared).
-Report held-out results on the held-out seeds separately when this matters.
+**Base models are not shared between the splits.** The generator seed of every attempt carries the
+split in its lowest bit (section 1), so a base model of the train split and one of the held-out
+split are never generated from the same `(family, seed, difficulty)` input — also not for a held-out
+*combination* asked for with a train seed, whose base models used to be those of the train tasks of
+the same family, seed and difficulty. What is checked, and how:
+
+* *seeds* — for every planned cell of the dataset and every attempt of the chain, the sets of
+  `(family, difficulty, generator seed)` of the two splits are disjoint (test suite, no analysis);
+* *documents* — two different seeds could still give the same document. The test suite generates
+  the base models of the planned cells of the cheap families (all attempts) and compares SHA-256
+  hashes between the splits; `BENCHFEA_SPLIT_FULL=1` extends this to every planned cell (about an
+  hour). A rebuilt dataset should be checked once more on what was actually built (base and
+  curve-balled model hashes per split).
+
+The split separates instances, not knowledge: families, curve balls and the generator are the same
+code for both splits.
 
 ## 8. Dataset
+
+> The dataset under `data/` and the numbers of this section are those of the last build, made with
+> task version 1: before the generator seed carried the split and before the held-out combinations
+> were selected by the rule of section 7. They do not describe the present split definition until
+> the dataset is rebuilt (and `servedCombinations` refreshed).
 
 ```
 benchfea bench make-dataset --out data --seeds 0,1,4 --workers 4 --cache /tmp/benchfea-cache

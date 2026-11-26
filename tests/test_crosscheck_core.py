@@ -138,8 +138,8 @@ def test_opensees_translation_choices():
     m2 = _model(combos={"U": {"factors": {"D": 1.0}, "analysisType": "secondOrder"}}, analysis={"alpha": 1.0})
     t = ops_tr.translate(m2, "U")
     assert {c[1] for c in t.job["model"] if c[0] == "geomTransf"} == {"PDelta"}
-    assert t.controls["subdivisions"] == {"coarse": 8, "fine": 16, "order": 2}
-    assert len([c for c in t.job["model"] if c[0] == "element"]) == 3 * 16
+    assert t.controls["subdivisions"] == {"levels": [8, 16, 32], "fine": 32, "orders": [1.0, 2.0]}
+    assert len([c for c in t.job["model"] if c[0] == "element"]) == 3 * 32
     assert t.fidelity.items["secondOrder"].level == APPROXIMATE and t.fidelity.estimated_error is None
 
 

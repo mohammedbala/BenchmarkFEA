@@ -354,7 +354,8 @@ def test_h1_interaction_does_not_depend_on_the_number_of_stations(n):
     x, f = _uniform_load_stations(n, L, w, N)
     res = design.check_member(ctx, [Demand("U", Pc=-N, extra={"x": x, "forces": f})])
     c = _by_name(res.checks)
-    Pc = min(c[k].capacity for k in (ec.NAME_FB["x"], ec.NAME_FB["y"], ec.NAME_TB))
+    assert ec.NAME_TB not in c                                # Lz = Lx = Ly: E4 does not apply
+    Pc = min(c[k].capacity for k in (ec.NAME_FB["x"], ec.NAME_FB["y"]))
     Mcx = 0.9 * FY * 1.2e6                                    # Lb = 0: yielding, Eq. F2-1
     Mmax = w * L * L / 8.0                                    # 180e6 N mm
     expected = 600.0e3 / Pc + 8.0 / 9.0 * Mmax / Mcx

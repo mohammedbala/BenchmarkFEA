@@ -226,10 +226,16 @@ def prepare(model: Model, combination_id: str, tau_b: dict | None = None,
         else:
             dofs = []
         if dofs:
-            inactive[nid] = dofs
-            if np.any(load[k, dofs] != 0.0):
+            # a LOADED degree of freedom without stiffness is not held: no equilibrium state exists (benchfea
+            # refuses such a model), and a foreign solver that is given the free, loaded DOF must fail too
+            hit = [d for d in dofs if load[k, d] != 0.0]
+            if hit:
                 issues.append(("loads.nodal", UNSUPPORTED,
-                               f"load on a degree of freedom of node {nid!r} that has no stiffness"))
+                               f"load on a degree of freedom of node {nid!r} that has no stiffness (the degree "
+                               "of freedom is left free: no equilibrium state exists)"))
+            dofs = [d for d in dofs if d not in hit]
+        if dofs:
+            inactive[nid] = dofs
 
     return Prepared(model, combination_id, second, alpha, bool(an.shear_deformation), ids,
                     np.array([nd.xyz for nd in model.nodes.values()], float), fixed, spring, prescribed, load,

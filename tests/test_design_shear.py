@@ -289,6 +289,20 @@ def test_de_g6_w21x48_minor_axis_shear():
     assert (out["LRFD"].factor, out["ASD"].factor) == (0.90, 1.67)
 
 
+def test_de_g8b_second_panel_cv2_by_eq_g2_11():
+    """Example G.8B (G-23..G-24, PDF 259-260), second panel of the built-up girder: kv = 5 + 5/(a/h)^2 = 5.67
+    (Eq. G2-5, a = 90.0, h = 33.0), 1.37 sqrt(kv E/Fy) = 78.6 < h/tw = 106, so Cv2 = 1.51 kv E/((h/tw)^2 Fy)
+    = 0.442 (Eq. G2-11).  The engine's function for Eq. G2-9 to G2-11 is called with the numbers the example
+    carries; the example's strength (tension field, Eq. G2-7) is outside the engine and is not reproduced."""
+    x = example("G.8B")
+    i, p = x["inputs"], x["printed"]
+    assert_printed(5.0 + 5.0 / (i["a"] / i["h"]) ** 2, p["kv"], "G.8B kv (Eq. G2-5)")
+    assert_printed(1.37 * math.sqrt(i["kv"] * i["E"] / i["Fy"]), p["Cv2_limit_1.37"], "G.8B 1.37 sqrt(kv E/Fy)")
+    value, eq = gs.cv2(i["h_tw"], i["kv"], i["E"], i["Fy"])
+    assert eq == "G2-11"
+    assert_printed(value, p["Cv2"], "G.8B Cv2 (Eq. G2-11)")
+
+
 # ============================================================================== results -> Lv -> G5
 def test_round_member_shear_from_results_uses_resultant_and_lv():
     data = {

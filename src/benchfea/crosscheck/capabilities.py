@@ -64,7 +64,8 @@ FORMULATION = {
         "package": "openseespy", "runnable": True,
         "element": "elasticBeamColumn: prismatic Euler-Bernoulli; ElasticTimoshenkoBeam: with shear deformation",
         "geometricStiffness": "geomTransf PDelta: chord-rotation ('string') term N/L on the end translations only; "
-                              "no P-delta within an element; axial force iterated by Newton",
+                              "no P-delta within an element; N = the axial force of element end j WITHOUT the "
+                              "axial part of an element load (measured); axial force iterated by Newton",
         "constraints": "rigidLink('beam'), rigidDiaphragm, equalDOF enforced exactly by the Transformation "
                        "handler (retained node must not itself be constrained)",
         "licence": "see site-packages/openseespy/LICENSE.md (optional dependency, never vendored)",
@@ -73,7 +74,9 @@ FORMULATION = {
         "package": "PyNiteFEA", "runnable": True,
         "element": "prismatic Euler-Bernoulli 12x12, releases by static condensation",
         "geometricStiffness": "consistent (cubic) geometric stiffness in both bending planes plus an axial term and "
-                              "a torsional term; one solve with first-order axial forces (no iteration)",
+                              "a torsional term; analyze_PDelta is one solve with first-order axial forces.  The "
+                              "worker removes the two extra terms through the section properties and iterates the "
+                              "axial forces with PyNite's own member matrices and solver",
         "constraints": "none (no rigid links, diaphragms or offsets)",
         "licence": "MIT",
     },
@@ -97,7 +100,8 @@ CAPABILITIES = {
         "elementFormulation": _e("exact", "elasticBeamColumn (A, E, G, J, Iy, Iz)"),
         "shearDeformation": _e("exact", "ElasticTimoshenkoBeam (E, G, A, J, Iy, Iz, Avy, Avz), first order only"),
         "localAxes": _e("exact", "vecxz = benchfea local z; y = vecxz x x, z = x x y"),
-        "trussMembers": _e("exact", "elasticBeamColumn with bending and torsion stiffness x 1e-15"),
+        "trussMembers": _e("exact", "elasticBeamColumn with bending and torsion stiffness x 1e-15; second order "
+                                    "with an axial member load: a subdivided pin-ended beam-column (approximate)"),
         "rigidOffsets": _e("exact", "-jntOffset on Euler-Bernoulli elements; explicit node + rigidLink('beam') for "
                                     "ElasticTimoshenkoBeam, which mishandles -jntOffset; second order: "
                                     "approximate without estimate"),
@@ -108,7 +112,8 @@ CAPABILITIES = {
                                                  "(fef.bending_split)"),
         "releasesPartialOther": _e("exact", "zeroLength spring between duplicate nodes; rigid directions by "
                                             "equalDOF when the member axes are global, else penalty (approximate)"),
-        "rigidLink": _e("exact", "rigidLink('beam') + constraints('Transformation')"),
+        "rigidLink": _e("exact", "rigidLink('beam') + constraints('Transformation'); second order: a linear "
+                                 "kinematic relation, as in benchfea (no geometric effect of the transmitted forces)"),
         "rigidDiaphragm": _e("exact", "rigidDiaphragm + constraints('Transformation'); slaves must lie in the "
                                       "master's plane"),
         "supportSprings": _e("exact", "zeroLength to a fixed twin node"),
@@ -124,7 +129,8 @@ CAPABILITIES = {
         "loadMemberLinearlyVarying": _e("exact", "OpenSees 3.8 ignores the end intensities in 3D: equivalent nodal "
                                                  "loads from exact fixed-end forces (fef)"),
         "selfWeight": _e("exact", "uniform line load computed by the translator"),
-        "secondOrder": _e("approximate", "PDelta transformation with member subdivision (O(1/n^2)), Newton"),
+        "secondOrder": _e("approximate", "PDelta transformation with member subdivision, Newton; axial member "
+                                         "loads at the nodes (O(1/n^2)); error bounded from three subdivision levels"),
         "secondOrderWithShearDeformation": _e("unsupported", "ElasticTimoshenkoBeam ignores the geometric "
                                                              "nonlinearity of the transformation"),
         "geometricStiffness": _e("approximate", "chord-rotation term only (see FORMULATION)"),
@@ -139,15 +145,17 @@ CAPABILITIES = {
         "elementFormulation": _e("exact", "add_member with add_section(A, Iy, Iz, J)"),
         "shearDeformation": _e("unsupported", "no shear area input; transverse shear deformation not considered"),
         "localAxes": _e("exact", "rotation from PyNite's own triad (Y-up rule), verified per member in the worker"),
-        "trussMembers": _e("exact", "moments released at both ends, torsion at end j"),
+        "trussMembers": _e("exact", "moments released at both ends, torsion at end j; second order with an axial "
+                                    "member load: subdivided like a frame member (approximate)"),
         "rigidOffsets": _e("approximate", "stiff member; measured optimum multiplier about 1e4 (round-off beyond)"),
         "releasesFull": _e("exact", "def_releases (boolean, any of the 12 end DOFs); second order: approximate "
                                     "(geometric stiffness condensed separately)"),
         "releasesPartialRotational": _e("exact", "parallel members (fef.bending_split) with equivalent nodal loads"),
         "releasesPartialOther": _e("unsupported", "releases are boolean"),
-        "rigidLink": _e("approximate", "stiff member master -> slave"),
+        "rigidLink": _e("approximate", "stiff member master -> slave; second order: unsupported (the stiff member "
+                                       "carries geometric stiffness that the linear constraint does not have)"),
         "rigidDiaphragm": _e("approximate", "stiff members with out-of-plane releases at the slave; coplanar "
-                                            "slaves only"),
+                                            "slaves only; second order: unsupported (as rigidLink)"),
         "supportSprings": _e("exact", "def_support_spring"),
         "prescribedDisplacements": _e("exact", "def_node_disp"),
         "loadNodal": _e("exact", "add_node_load"),
@@ -160,11 +168,14 @@ CAPABILITIES = {
                                                  "gives wrong results for varying loads; the translator never "
                                                  "relies on it)"),
         "selfWeight": _e("exact", "uniform line load computed by the translator"),
-        "secondOrder": _e("approximate", "analyze_PDelta with explicit sub-members"),
+        "secondOrder": _e("approximate", "analyze_PDelta with explicit sub-members, then the axial forces iterated "
+                                         "to convergence; error bounded from three subdivision levels"),
         "secondOrderWithShearDeformation": _e("unsupported", "no shear deformation"),
-        "geometricStiffness": _e("approximate", "consistent cubic Kg + axial term (EA + N)/L + torsional term"),
-        "axialForceIteration": _e("approximate", "none: Kg from first-order axial forces, single solve; effect "
-                                                 "estimated from the run"),
+        "geometricStiffness": _e("approximate", "consistent cubic Kg; PyNite's axial term (EA + N)/L and torsional "
+                                                "term N (Iy + Iz)/A are removed through A' and J' (residual measured)"),
+        "axialForceIteration": _e("approximate", "PyNite itself: none; the worker repeats PyNite's second solution "
+                                                 "step with the current axial forces until the displacements stop "
+                                                 "changing (last change recorded)"),
         "linearBuckling": _e("unsupported", "no buckling eigen-analysis", "documentation"),
         "tensionCompressionOnly": _e("unsupported", "PyNite has tension/compression-only members, but the "
                                                     "translator does not use them", "source"),

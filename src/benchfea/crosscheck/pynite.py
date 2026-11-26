@@ -61,7 +61,7 @@ FORCES = ("FX", "FY", "FZ", "MX", "MY", "MZ")
 LOCAL = ("Fx", "Fy", "Fz")
 LOCAL_M = ("Mx", "My", "Mz")
 
-__all__ = ["translate", "execute", "finalise", "SOLVER", "N_ITERATION_SAFETY"]
+__all__ = ["translate", "execute", "finalise", "SOLVER"]
 
 
 def _stub_inertia(r: float) -> float:
@@ -341,7 +341,7 @@ def translate(model, combination: str, *, subdivisions: int | None = None, stiff
                         "ends: PyNite would connect it to the member (benchfea does not)")
 
     job = {"solver": SOLVER, "model": head + cmds, "orient": orient, "secondOrder": p.second_order,
-           "nodes": list(xyz), "members": all_names}
+           "nodes": list(xyz), "members": all_names, "tolerance": 1e-10, "maxIterations": 50, "size": size}
     options = {"subdivisions": n_sub, "stiffness": stiff}
 
     def mapper(raw):
@@ -372,52 +372,32 @@ def _map(p: Prepared, members_out, fid, raw, options) -> ForeignResult:
         info["secondOrder"] = dict(raw.get("secondOrderInfo") or {})
         info["secondOrder"]["strain"] = max(abs(float(end_forces[mid][6])) * p.alpha / (m.E * m.A)
                                             for mid, m in p.members.items())
-        # external work F^T u of the analysed (alpha-times) loads: nodal loads plus the member loads
-        # through their equivalent end loads (fixed-end forces of the unreleased member)
-        W = float(np.sum(p.load * U))
-        for mid, m in p.members.items():
-            if m.loaded:
-                fe = fixed_end_forces(m.L, m.EIy, m.EIz, None, None, m.points, m.dists)
-                for blk, nid, off in ((0, m.i, m.offset_i), (6, m.j, m.offset_j)):
-                    un = U[p.index(nid)]
-                    u_end = un[:3] + np.cross(un[3:], off)
-                    W -= float(fe[blk:blk + 3] @ (m.R @ u_end) + fe[blk + 3:blk + 6] @ (m.R @ un[3:]))
-        info["secondOrder"]["externalWork"] = W
     return ForeignResult(SOLVER, p.combination, True, fid, U / p.alpha, reactions / p.alpha, end_forces, "", info)
 
 
-N_ITERATION_SAFETY = 3.0
-
-
 def finalise(res: ForeignResult) -> None:
-    """Second-order runs: add the two formulation-error estimates that come from the run itself.
+    """Second-order runs: record what the worker measured about the formulation differences it removed.
 
-    * PyNite builds Kg from the FIRST-ORDER axial forces N1 and does not iterate.  With u the P-Delta
-      solution, K_T u = F and K_T symmetric, a change dKg of the geometric stiffness changes the
-      compliance by  F^T du = -u^T dKg u  (first order).  dKg is linear in the change of the axial
-      forces dN = N(final displacements) - N1, and u^T kg u of a member piece for a unit axial force is
-      (chord rotation)^2 x length in the string form, so
-          |F^T du| / |F^T u|  =  | sum dN_m (chord rotation_m)^2 L_m | / | F^T u |
-      estimates the relative effect on the load-weighted displacement.  It is multiplied by
-      ``N_ITERATION_SAFETY`` and recorded as the estimated error (an estimate of a global measure,
-      not a bound for every result).
-    * PyNite's Kg has an axial term that changes the axial stiffness from EA/L to (EA + N)/L: relative
-      effect at most ``max |N| / EA``.
-    """
+    ``execute`` iterates the axial forces with PyNite's own assembly and removes the axial and the
+    torsional term of PyNite's geometric stiffness through the section properties (see there).  Left
+    over, and recorded as estimated errors: the last relative change of the displacements in the
+    iteration, the residual of the two removed terms with the converged strains (both of the order
+    of the iteration tolerance), and the effect of PyNite's own force recovery, which takes the axial
+    force in the geometric stiffness as N (1 - strain)."""
     so = res.info.get("secondOrder")
     if not so:
         return
-    work = abs(so.get("externalWork") or 0.0)
-    if work > 0.0:
-        err = N_ITERATION_SAFETY * abs(so["geometricWorkChange"]) / work
-    else:
-        err = None
     res.fidelity.add("secondOrder.axialForceIteration", APPROXIMATE,
-                     "Kg from first-order axial forces, not iterated (first-order sensitivity estimate of the "
-                     "compliance, x3)", error=err)
-    res.fidelity.add("secondOrder.axialTermInKg", APPROXIMATE,
-                     "axial stiffness (EA + N)/L in PyNite's geometric stiffness (estimate: max |N|/EA)",
-                     error=so["strain"])
+                     "axial forces iterated to convergence by repeating PyNite's second solution step "
+                     "(estimate: the last relative change of the displacements)", error=so.get("iterationChange"))
+    res.fidelity.add("secondOrder.geometricStiffnessTerms", APPROXIMATE,
+                     "PyNite's axial term (EA + N)/L and torsional term N (Iy + Iz)/A in the geometric stiffness, "
+                     "removed through the section properties A' and J' (estimate: the measured residual)",
+                     error=so.get("formulationResidual"))
+    res.fidelity.add("secondOrder.postProcessing", APPROXIMATE,
+                     "PyNite recovers member forces and reactions with P = strain x E A' = N (1 - strain) in the "
+                     "geometric stiffness (estimate: kg(N - P) d of every member and its sum per node, relative "
+                     "to the force and moment scales)", error=so.get("postProcessing"))
 
 
 # ====================================================================================== worker
@@ -467,20 +447,150 @@ def execute(job: dict) -> dict:
                 geom[s.name] = float(perp @ perp) / float(s.L())
         return disp, rxn, f, axes, axial, geom
 
+    def strain(mem):
+        d = mem.d(combo)
+        return float(d[6, 0] - d[0, 0]) / float(mem.L())
+
     out = {"ok": True, "version": getattr(Pynite, "__version__", None)}
     try:
         if job["secondOrder"]:
+            from Pynite import Analysis
+            from scipy.sparse.linalg import spsolve
+
+            from scipy.sparse import coo_matrix
+
+            # PyNite's analyze_PDelta is ONE solve with the geometric stiffness of the first-order axial
+            # forces, and its member geometric stiffness kg(P) contains two terms that the theory of
+            # benchfea does not have (source of PyNite 3.2.1, Member3D.kg; measured in
+            # tests/test_crosscheck_measured.py): an axial term that turns E A / L into (E A + P) / L and a
+            # torsional term that turns G J / L into (G J + P (Iy + Iz) / A) / L.  PyNite also takes P from
+            # the axial strain as strain x E A, which is the axial force only without the axial term.
+            # None of this is estimated here; it is REMOVED, with PyNite's own member matrices and solver:
+            #   * the axial force of a member is N = strain x E A (A = the given area);
+            #   * section of every member (each has its own):  A' = A - N / E          =>  E A' + N = E A
+            #                                                  J' = J - N (Iy + Iz) / (A' G)
+            #                                                                          =>  G J' + N Ip / A' = G J
+            #   * K = Ke (with A', J') + sum of PyNite's member matrices Kg(N), assembled here by node
+            #     number exactly as FEModel3D.Kg does; solve; repeat until the displacements stop changing.
+            # At convergence PyNite's tangent stiffness is the cubic element with the consistent geometric
+            # stiffness of the CURRENT axial forces: a discretisation of the same beam-column problem.
+            # PyNite's own post-processing (member forces, reactions) still uses P = strain x E A' = N (1 -
+            # strain); the effect, kg(N - P) d per member, is computed below and reported as an estimate.
             model.analyze_linear(check_stability=False)
             d1, _, _, _, n1, _ = collect()
+            own = set(job["members"])
+            base = {nm: (float(model.members[nm].section.A), float(model.members[nm].section.J)) for nm in own}
+
+            def axial(mem, nm):
+                return strain(mem) * float(mem.material.E) * base[nm][0]
+
+            def compensate():
+                for nm, (a0, j0) in base.items():
+                    mem = model.members[nm]
+                    sec, mat = mem.section, mem.material
+                    n_now = axial(mem, nm)
+                    sec.A = a0 - n_now / float(mat.E)
+                    sec.J = j0 - n_now * (float(sec.Iy) + float(sec.Iz)) / (float(sec.A) * float(mat.G))
+
+            def geometric():
+                size = len(model.nodes) * 6
+                rows, cols, data = [], [], []
+                for nm, phys in model.members.items():
+                    if not phys.active[combo]:
+                        continue
+                    for sub in phys.sub_members.values():
+                        if nm in own:
+                            force = axial(sub, nm)
+                        else:                       # stiff emulation member: PyNite's own rule
+                            d = sub.d(combo)
+                            force = float(sub.material.E) * float(sub.section.A) / float(sub.L()) * float(d[6, 0] - d[0, 0])
+                        kg = np.asarray(sub.Kg(force), float)
+                        idx = np.r_[sub.i_node.ID * 6 + np.arange(6), sub.j_node.ID * 6 + np.arange(6)]
+                        rows += list(np.repeat(idx, 12))
+                        cols += list(np.tile(idx, 12))
+                        data += list(kg.ravel())
+                return coo_matrix((data, (rows, cols)), shape=(size, size)).tocsr()
+
+            compensate()
             model.analyze_PDelta(check_stability=False)
+            D1i, D2i, D2 = Analysis._partition_D(model)
+            FER1, _ = Analysis._partition(model, model.FER(combo), D1i, D2i)
+            P1, _ = Analysis._partition(model, model.P(combo), D1i, D2i)
+            names = list(job["nodes"])
+            last = np.array([[float(getattr(model.nodes[nm], d)[combo]) for d in DOFS] for nm in names])
+            change, iterations = math.inf, 0
+            tol, limit = float(job.get("tolerance", 1e-10)), int(job.get("maxIterations", 50))
+            while change > tol:
+                if iterations >= limit:
+                    return {"ok": False, "error": f"PyNite: the iteration on the axial forces did not converge in "
+                                                  f"{limit} steps (last relative change {change:.2e})"}
+                compensate()
+                K = model.Ke(combo, False, False, True).tocsr() + geometric()
+                K11, K12, _, _ = Analysis._partition(model, K, D1i, D2i)
+                D1 = spsolve(K11.tocsr(), np.asarray(P1 - FER1 - K12.tocsr() @ D2).ravel())
+                Analysis._store_displacements(model, np.asarray(D1).reshape(-1, 1), D2, D1i, D2i,
+                                              model.load_combos[combo])
+                now = np.array([[float(getattr(model.nodes[nm], d)[combo]) for d in DOFS] for nm in names])
+                scale_t = float(np.abs(now[:, :3]).max()) or 1.0
+                scale_r = float(np.abs(now[:, 3:]).max()) or 1.0
+                previous, change = change, max(float(np.abs(now[:, :3] - last[:, :3]).max()) / scale_t,
+                                               float(np.abs(now[:, 3:] - last[:, 3:]).max()) / scale_r)
+                last = now
+                iterations += 1
+                if change >= previous and change < 1e-6:
+                    break                           # stagnation at the round-off of the solve: recorded below
+            Analysis._calc_reactions(model, False, None)
+            model.solution = "P-Delta"
+            # what is left: (a) of the two removed terms with the converged strains; (b) of PyNite's
+            # post-processing with P = strain x E A' instead of N: kg(N - P) d per member, summed per node
+            # for the reactions, relative to the force / moment scales of crosscheck.compare
+            # (residuals relative to the stiffness of the whole piece: parallel members between the same two
+            # nodes -- names "<piece>p<k>" -- are one piece of a benchfea member)
+            residual, corr, node_corr = 0.0, [], {}
+            piece = {}
+            for nm, (a0, j0) in base.items():
+                key = nm[:nm.rindex("p")]
+                old = piece.get(key, (0.0, 0.0))
+                piece[key] = (max(old[0], a0), max(old[1], j0))
+            for nm, (a0, j0) in base.items():
+                mem = model.members[nm]
+                sec, mat = mem.section, mem.material
+                a_ref, j_ref = piece[nm[:nm.rindex("p")]]
+                n_now = axial(mem, nm)
+                residual = max(residual, abs(float(sec.A) * float(mat.E) + n_now - a0 * float(mat.E))
+                               / (a_ref * float(mat.E)))
+                if j_ref > 0.0:
+                    gj = float(mat.G) * float(sec.J) + n_now * (float(sec.Iy) + float(sec.Iz)) / float(sec.A)
+                    residual = max(residual, abs(gj - float(mat.G) * j0) / (float(mat.G) * j_ref))
+                for sub in mem.sub_members.values():
+                    n_sub = axial(sub, nm)
+                    p_int = strain(sub) * float(mat.E) * float(sec.A)
+                    df = np.asarray(sub.kg(n_sub - p_int), float) @ np.asarray(sub.d(combo), float).ravel()
+                    corr.append(df)
+                    T = np.asarray(sub.T(), float)
+                    dg = T.T @ df
+                    for node, part in ((sub.i_node.name, dg[:6]), (sub.j_node.name, dg[6:])):
+                        node_corr[node] = node_corr.get(node, np.zeros(6)) + part
             disp, rxn, f, axes, n2, g2 = collect()
             u1 = np.array([v[:3] for v in d1.values()])
             u2 = np.array([v[:3] for v in disp.values()])
             nmax = max((abs(v) for v in n2.values()), default=0.0) or 1.0
+            ends = np.array(list(f.values()), float).reshape(-1, 12)
+            rx = np.array(list(rxn.values()), float).reshape(-1, 6)
+            fcol, mcol = [0, 1, 2, 6, 7, 8], [3, 4, 5, 9, 10, 11]
+            s_f = max(float(np.abs(ends[:, fcol]).max()), float(np.abs(rx[:, :3]).max()), 1e-300)
+            s_m = max(float(np.abs(ends[:, mcol]).max()), float(np.abs(rx[:, 3:]).max()),
+                      1e-3 * s_f * float(job.get("size", 0.0)), 1e-300)
+            post = 0.0
+            for df in corr:
+                post = max(post, float(np.abs(df[fcol]).max()) / s_f, float(np.abs(df[mcol]).max()) / s_m)
+            for dg in node_corr.values():
+                post = max(post, float(np.abs(dg[:3]).max()) / s_f, float(np.abs(dg[3:]).max()) / s_m)
             out["secondOrderInfo"] = {
+                "iterations": iterations, "iterationChange": float(change), "formulationResidual": float(residual),
+                "postProcessing": float(post),
                 "delta": max((abs(n2[k] - n1.get(k, 0.0)) for k in n2), default=0.0) / nmax,
-                "kappa": float(np.abs(u2 - u1).max() / (np.abs(u2).max() or 1.0)),
-                "geometricWorkChange": float(sum((n2[k] - n1.get(k, 0.0)) * g2[k] for k in n2))}
+                "kappa": float(np.abs(u2 - u1).max() / (np.abs(u2).max() or 1.0))}
         else:
             model.analyze_linear(check_stability=False)
             disp, rxn, f, axes, _, _ = collect()

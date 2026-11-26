@@ -301,8 +301,12 @@ class NonlinearSolver:
             state = (mesh, rloads, dict(Ns), dict(tau))
             bad = sorted({owner[pid] for pid, e in elems.items() if isinstance(e, BeamColumn) and not e.stable})
             if bad:
+                struts = [mid for mid in bad if model.members[mid].type in TRUSS_TYPES]
                 raise _Critical("member(s) " + ", ".join(bad) + " exceed their own elastic critical load between "
-                                "their end connections", *state[:2], state, it)
+                                "their end connections"
+                                + ("; truss-type member(s) " + ", ".join(struts) + " are pin-ended struts with the "
+                                   "Iy, Iz of their section (THEORY 10.6): check that these are real values"
+                                   if struts else ""), *state[:2], state, it)
             st = Structure(rmodel, elems)
             Km = st.assemble()
             K = Km.copy()
@@ -431,6 +435,14 @@ class NonlinearSolver:
         msg = (f"combination {combination.id!r}: the load exceeds the elastic critical load ({crit.what}); "
                f"buckling factor ~ {factor} (the largest multiple of {basis} at which the stiffness is still "
                "positive definite; a value below 1 means the loads are beyond the critical level)")
+        if lam is not None and crit.iteration <= 1:
+            # is it the own buckling of a truss-type member (a pin-ended strut with its section's I)?
+            from .buckling import truss_strut_warning
+            first = self.first_order(combination, self.loads(combination, True)[0], slack)
+            note = truss_strut_warning(self.model, first, slack, lam,
+                                       lambda mid: self._factors(mid, combination, first.tau))
+            if note:
+                msg += "; " + note
         raise CombinationRefused([Problem(
             pointer("combinations", combination.id), msg,
             "Reduce the loads, stiffen or brace the structure; run a buckling analysis (analysis.buckling) of "
@@ -475,6 +487,33 @@ class NonlinearSolver:
             self._refuse_critical(combination, crit, slack)
             raise                                            # pragma: no cover
 
+    def trial(self, combination, loads, slack, second: bool):
+        """One trial active set -> (state or None, violations, note).
+
+        A trial set is not yet the answer: in it a tension-only member can still be active with a
+        compressive force (the first trial has every member active).  Such a member cannot carry that
+        force, so the second-order equilibrium of the trial set -- in particular its stability, which the
+        compressed one-sided members can destroy by exceeding their own Euler load -- says nothing about
+        the structure.  When the second-order solution of a trial set does not exist (beyond the critical
+        load of THAT set) and the first-order solution of the same set has one-sided members with the
+        wrong sign of force, the set is updated from those first-order violations and the iteration goes
+        on (state = None).  The combination is refused as beyond its critical load only for a set whose
+        first-order state has no such member, i.e. a set that is admissible and still unstable."""
+        if not second:
+            state = self.first_order(combination, loads, slack)
+            return state, self.violations(state, slack), ""
+        try:
+            state = self.second_order(combination, loads, slack)
+        except _Critical as crit:
+            viol = self.violations(self.first_order(combination, loads, slack), slack)
+            if viol:
+                return None, viol, ("no second-order solution of this trial set (" + crit.what + "); it has "
+                                    "one-sided members with the wrong sign of force, so the set is updated from "
+                                    "its first-order forces")
+            self._refuse_critical(combination, crit, slack)
+            raise                                            # pragma: no cover
+        return state, self.violations(state, slack), ""
+
     def violations(self, state: _State, slack) -> dict:
         """One-sided members whose state contradicts their mean axial force: {member: |force|}."""
         model = self.model
@@ -504,7 +543,10 @@ class NonlinearSolver:
         while True:
             it += 1
             try:
-                state = self.inner(combination, loads, slack, second)
+                if one_sided:
+                    state, viol, note = self.trial(combination, loads, slack, second)
+                else:
+                    state, viol, note = self.inner(combination, loads, slack, second), {}, ""
             except ModelUnstable as e:
                 if not slack:
                     raise
@@ -522,8 +564,8 @@ class NonlinearSolver:
                              "The structure relies on members that do not work under this loading; add members "
                              "that can take the opposite force or change the member type.", code=SLACK_MECHANISM)]
                     + list(e.problems), diagnosis=diag, info={"slack": sorted(slack)}) from None
-            viol = self.violations(state, slack) if one_sided else {}
-            trail.append({"iteration": it, "slack": sorted(slack), "violations": sorted(viol)})
+            trail.append({"iteration": it, "slack": sorted(slack), "violations": sorted(viol),
+                          **({"note": note} if note else {})})
             if not viol:
                 break
             flip = set(viol) if mode == "all" else {max(sorted(viol), key=lambda k: viol[k])}

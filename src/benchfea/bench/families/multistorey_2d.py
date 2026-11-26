@@ -53,7 +53,11 @@ def build(draw, level: int, unit_system: str, vertical: str, features: dict) -> 
     lower = B.group("columnLower" if split else "column", "column", 5)
     upper = B.group("columnUpper", "column", 4) if split else lower
     half = (ns + 1) // 2
-    gb, gr = B.group("beam", "beam", 8), B.group("roofBeam", "beam", 7)
+    # a single-storey frame has roof beams only: no floor-beam sizing group (it would be a section
+    # that no member uses and a design group without members, which the schema refuses)
+    gb = B.group("beam", "beam", 8) if ns >= 2 else None
+    gr = B.group("roofBeam", "beam", 7)
+    gb = gb or gr
     columns, beams = {lower: [], upper: []}, {gb: [], gr: []}
     for i in range(nb + 1):
         for k in range(ns):
@@ -113,8 +117,9 @@ def build(draw, level: int, unit_system: str, vertical: str, features: dict) -> 
         if ids:
             B.design_group(g + "s", ids, role="column", Kx=kx)
     for g, ids in beams.items():
-        B.design_group(g + "s", ids, role="beam", bracing=dict(bracing[1]),
-                       deflectionLimits=[{"spanRatio": 300, "direction": "y", "combinations": [sls[0]]}])
+        if ids:
+            B.design_group(g + "s", ids, role="beam", bracing=dict(bracing[1]),
+                           deflectionLimits=[{"spanRatio": 300, "direction": "y", "combinations": [sls[0]]}])
     B.parameters = {
         "buckling": buckling,
         "plane": plane, "bays": nb, "storeys": ns, "gridLines": xs, "levels": vs,

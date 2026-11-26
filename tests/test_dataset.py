@@ -78,10 +78,10 @@ def test_build_writes_only_verified_tasks_and_logs_the_rest(built):
     assert m["format"] == "benchfea-dataset" and "It does not mean reviewed" in m["meaning"]
     c = m["counts"]
     assert c["cells"] == 4 and c["cellsVerified"] == 3
-    # change: predict, diagnose, repair; the two mechanism cells: diagnose, repair; design-only: nothing
-    assert c["tasks"] == 7 == len(m["tasks"]) and c["byTaskType"] == {"diagnose": 3, "predict": 1, "repair": 3}
-    assert c["bySplit"] == {"held-out": 2, "train": 5} and "design" not in c["byTaskType"]
-    assert sum(c["byMode"].values()) == 7 and set(c["byMode"]) <= set(T.MODES)
+    # the two change cells: predict, diagnose, repair; the mechanism cell: diagnose, repair; design-only: nothing
+    assert c["tasks"] == 8 == len(m["tasks"]) and c["byTaskType"] == {"diagnose": 3, "predict": 2, "repair": 3}
+    assert c["bySplit"] == {"held-out": 3, "train": 5} and "design" not in c["byTaskType"]
+    assert sum(c["byMode"].values()) == 8 and set(c["byMode"]) <= set(T.MODES)
     for t in m["tasks"]:
         task_file = root / "tasks" / t["file"]
         sub = dataset.SPLIT_DIRS[t["split"]]
@@ -109,12 +109,13 @@ def test_build_writes_only_verified_tasks_and_logs_the_rest(built):
     assert all(e["outcome"] == "cell not served" and e["reason"] for e in attempts)
     assert any(e["category"] == "not-covered" for e in attempts)
     not_served = {(e["curveBall"], e["taskType"]) for e in log if e["what"] == "task type"}
-    assert not_served == {("release_added", "design"), ("release_mechanism", "predict"), ("release_mechanism", "design")}
+    assert not_served == {("support_fixed_to_pinned", "design"), ("support_removed", "predict"), ("support_removed", "design")}
     pair = m["cellsByFamilyAndCurveBall"]["continuous_beam|design_bracing_points_changed"]
     assert pair["verified"] == 0 and pair["cells"] == 1 and sum(pair["reasons"].values()) == 1
-    assert m["cellsByFamily"]["continuous_beam"] == {"cells": 4, "verified": 3, "tasks": 7,
+    assert m["cellsByFamily"]["continuous_beam"] == {"cells": 4, "verified": 3, "tasks": 8,
                                                      "notVerified": pair["reasons"]}
-    assert m["cellsByCurveBall"]["release_mechanism"]["verified"] == 2
+    assert m["cellsByCurveBall"]["support_removed"]["verified"] == 1
+    assert m["cellsByCurveBall"]["support_fixed_to_pinned"]["verified"] == 2
 
 
 def test_build_is_deterministic_resumable_and_parallel(built, tmp_path):
@@ -156,7 +157,7 @@ def test_environment_can_serve_the_stored_dataset(built):
                                            "task_type": info["task_type"], "mode": info["mode"]})
         assert o == obs and i == info and live.hidden_answers() == stored.hidden_answers()
     assert len(seen) >= 3
-    obs, info = stored.reset(seed=0, options={"task_type": "repair", "curve_ball": "release_mechanism"})
+    obs, info = stored.reset(seed=0, options={"task_type": "repair", "curve_ball": "support_removed"})
     assert info["task_type"] == "repair"
     held = BenchFEAEnv(dataset_dir=root, split="held-out")
     obs, info = held.reset(seed=0)
@@ -164,7 +165,7 @@ def test_environment_can_serve_the_stored_dataset(built):
     with pytest.raises(TaskUnavailable):
         stored.reset(seed=0, options={"family": "pipe_rack"})
     with pytest.raises(ValueError, match="held-out"):
-        stored.reset(seed=0, options={"family": "continuous_beam", "curve_ball": "release_mechanism", "instance_seed": 4})
+        stored.reset(seed=0, options={"family": "continuous_beam", "curve_ball": "support_removed", "instance_seed": 4})
 
     def oracle(observation, info):
         from benchfea.bench.scoring import reference_answer
@@ -204,14 +205,14 @@ def test_cli_score(built, tmp_path, capsys):
 
 def test_cli_bench_make_dataset_and_run_agent(tmp_path, capsys):
     assert main(["bench", "make-dataset", "--out", str(tmp_path), "--seeds", "0", "--families", "continuous_beam",
-                 "--curve-balls", "release_mechanism", "--cache", CACHE, "--quiet"]) == 0
-    assert "2 verified task(s) from 1 of 1 cell(s)" in capsys.readouterr().out
-    assert json.loads((tmp_path / "tasks" / "manifest.json").read_text())["counts"]["tasks"] == 2
+                 "--curve-balls", "support_removed", "--cache", CACHE, "--quiet"]) == 0
+    assert "3 verified task(s) from 1 of 1 cell(s)" in capsys.readouterr().out
+    assert json.loads((tmp_path / "tasks" / "manifest.json").read_text())["counts"]["tasks"] == 3
     assert main(["bench", "make-dataset", "--families", "castle"]) == 2
     assert main(["bench"]) == 2
     pytest.importorskip("gymnasium")
     agents = ROOT / "examples" / "agents"
-    common = ["--family", "continuous_beam", "--curve-ball", "release_mechanism", "--difficulty", "1", "--cache", CACHE,
+    common = ["--family", "continuous_beam", "--curve-ball", "support_removed", "--difficulty", "1", "--cache", CACHE,
               "--json"]
     capsys.readouterr()
     assert main(["bench", "run-agent", str(agents / "oracle_agent.py"), "--episodes", "2", "--seed", "0"] + common) == 0
@@ -220,7 +221,10 @@ def test_cli_bench_make_dataset_and_run_agent(tmp_path, capsys):
     assert main(["bench", "run-agent", str(agents / "random_agent.py")] + common) == 0
     assert json.loads(capsys.readouterr().out)["meanReward"] < 0.5
     assert main(["bench", "run-agent", str(agents / "missing.py")]) == 2
-    assert main(["bench", "run-agent", str(agents / "oracle_agent.py"), "--task-type", "predict"] + common) == 8
+    # a curve ball that always gives a mechanism has no predict task (a held-out pair of this family)
+    always_mechanism = [("release_mechanism" if a == "support_removed" else a) for a in common]
+    assert main(["bench", "run-agent", str(agents / "oracle_agent.py"), "--task-type", "predict", "--split", "held-out"]
+                + always_mechanism) == 8
     capsys.readouterr()
 
 

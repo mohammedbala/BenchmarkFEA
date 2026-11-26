@@ -8,22 +8,7 @@ a model, a target or a tolerance.  The numbers quoted were measured with ../chec
 verification/derive/vendor_reference.py.
 """
 
-_TIER_C = (
-    "All targets are reproduced (the reference values of the ODE oracle to 1e-6, the page's printed values at their "
-    "printed precision), and the engine agrees with the ODE oracle on this model (tier A). Tier C does not pass: "
-    "{found}. Tier C allows a difference of 1e-6 plus the ESTIMATED discretisation error of the foreign solver "
-    "(OpenSeesPy with a linearised P-Delta transformation and a finite number of elements per member), which is an "
-    "estimate and not a bound (docs/VERIFICATION.md, section 7); here the difference exceeds it by less than 1 %. The "
-    "engine's result is the exact solution of the second-order member equations, so the disagreement lies in the "
-    "foreign solver's discretisation; but under the rule that nothing is published when a tier disagrees, the problem "
-    "is quarantined.")
-
 QUARANTINE = {
-    "beam-column-uniform-load": _TIER_C.format(found="engine and OpenSeesPy differ by 9.89e-4 in the rotation at the "
-                                               "pinned end (allowed 9.88e-4)"),
-    "cantilever-column-notional-load": _TIER_C.format(found="in the second-order combination engine and OpenSeesPy "
-                                                      "differ by 1.26e-3 in the rotation of the top (allowed "
-                                                      "1.26e-3; exceeded in the next digit)"),
     "frame-support-settlement":
         "The engine produces no results: it refuses both combinations with 'invariant failed' (global force "
         "equilibrium 4.0e-1, global moment equilibrium 3.2e-1, joint equilibrium 3.9e-1 against the tolerance 1e-6). "

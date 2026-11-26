@@ -14,12 +14,29 @@ from benchfea.solve import analyze
 
 
 # ------------------------------------------------------------------------------------------- cases
-def test_derived_seed_chain_is_deterministic_and_starts_at_the_seed():
-    assert T.derived_seed("portal_frame", 7, 2, 0) == 7
-    chain = [T.derived_seed("portal_frame", 7, 2, k) for k in range(1, 4)]
-    assert chain == [T.derived_seed("portal_frame", 7, 2, k) for k in range(1, 4)]
-    assert len(set(chain)) == 3 and all(0 <= s < 2 ** 31 for s in chain)
-    assert T.derived_seed("portal_frame", 8, 2, 1) != chain[0] and T.derived_seed("stair_frame", 7, 2, 1) != chain[0]
+def test_derived_seed_chain_is_deterministic_and_carries_the_split():
+    import hashlib
+
+    from benchfea.bench import splits
+    held = tuple(splits.load_splits()["heldOutCombinations"][0])
+    train = next((f, c) for f, c in splits.combinations("train") if f == held[0])
+    chain = [T.derived_seed(*train, 7, 2, k) for k in range(4)]
+    assert chain == [T.derived_seed(*train, 7, 2, k) for k in range(4)]
+    assert len(set(chain)) == 4 and all(0 <= s < 2 ** 31 for s in chain)
+    assert 7 not in chain                                         # the instance seed is never the generator seed
+    # the documented formula: 30 bits of SHA-256 of the text, then the split bit
+    text = f"benchfea.bench|task-chain|{T.TASK_VERSION}|train|{train[0]}|7|2|1"
+    assert chain[1] == (int.from_bytes(hashlib.sha256(text.encode()).digest()[:16], "big") >> 98) << 1
+    assert T.derived_seed(*train, 8, 2, 1) != chain[1] and T.derived_seed(*train, 7, 3, 1) != chain[1]
+    # the curve ball enters through the split only: train pairs of a family share the chain ...
+    other = [p for p in splits.combinations("train") if p[0] == train[0] and p != train][0]
+    assert [T.derived_seed(*other, 7, 2, k) for k in range(4)] == chain
+    # ... a held-out combination with the same instance seed has its own, and so does a held-out seed
+    for k in range(4):
+        assert T.derived_seed(*train, 7, 2, k) % 2 == 0 and T.derived_seed(*train, 9, 2, k) % 2 == 1
+        assert T.derived_seed(*held, 7, 2, k) % 2 == 1 and T.derived_seed(*held, 7, 2, k) != chain[k]
+    # held-out pair and train pair agree on a held-out seed (same split, same base models)
+    assert T.derived_seed(*held, 9, 2, 0) == T.derived_seed(*train, 9, 2, 0)
 
 
 def test_case_is_verified_and_the_record_is_the_difference():
@@ -63,8 +80,8 @@ def test_design_only_case_is_quarantined_not_served():
     assert c["status"] == "unavailable" and "perturbed" not in c
     assert len(c["skips"]) == T.MAX_ATTEMPTS
     assert [s["attempt"] for s in c["skips"]] == list(range(T.MAX_ATTEMPTS))
-    assert c["skips"][0]["generatorSeed"] == CELLS["design_only"][2]
-    assert c["skips"][1]["generatorSeed"] == T.derived_seed("continuous_beam", 0, 2, 1)
+    assert [s["generatorSeed"] for s in c["skips"]] == [T.derived_seed(*CELLS["design_only"], k)
+                                                         for k in range(T.MAX_ATTEMPTS)]
     covered = [s for s in c["skips"] if s["stage"] == "verify"]
     assert covered and all(s["category"] in ("not-covered", "disagreement", "not-representable") for s in covered)
     assert any(s["category"] == "not-covered" and "tier F" in s["reason"] for s in covered)
@@ -178,8 +195,9 @@ def test_diagnose_task_gives_the_intended_design_in_words_not_the_file():
     assert public["intendedDesign"] == T.describe(c["base"]["document"]) and public["intendedDesign"] in public["statement"]
     assert json.dumps(c["base"]["document"]) not in json.dumps(public)
     ref = answers["reference"]
-    assert ref["category"] == "releases" and ref["direction"] == "added" and ref["mechanism"] is None
-    assert ref["entities"] == c["record"]["entities"] and ref["entities"]["members"]
+    assert ref["category"] == c["record"]["category"] == "supports" and ref["direction"] == "changed"
+    assert ref["mechanism"] is None
+    assert ref["entities"] == c["record"]["entities"] and ref["entities"]["supports"]
     for word in list(T.CATEGORY_TEXT) + list(T.DIRECTIONS):
         assert word in public["statement"]
     _, m = task("mechanism", "diagnose")

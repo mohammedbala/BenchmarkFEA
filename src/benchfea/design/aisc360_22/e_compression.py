@@ -28,12 +28,25 @@ Choices where the Specification leaves room (all reported in the check):
   0.05 % there).  Flexural buckling uses the Lc/r form (the primary one);
   torsional buckling, which has no Lc/r, uses Fy/Fe.  A note is added when the
   two tests disagree.
-* E4 scope.  The Specification applies E4 to doubly symmetric members "when the
-  torsional unbraced length exceeds the lateral unbraced length" without
-  saying which lateral length.  The torsional mode is evaluated ALWAYS (it is a
-  buckling mode of the member whatever the lengths are, so this can only
-  lower Pn); the check states whether Lz exceeds Lx or Ly.  Closed sections
-  (HSS, box) use Cw = 0 in Eq. E4-2 (lower bound of Fe).
+* E4 scope.  E4, first paragraph (p. 16.1-41): "This section applies to singly symmetric and
+  unsymmetric members, certain doubly symmetric members, such as cruciform or built-up members, and
+  doubly symmetric members when the torsional unbraced length exceeds the lateral unbraced length,
+  all without slender elements."  (E7, p. 16.1-48, takes Fn "in accordance with Section E3 or E4", so
+  the same scope holds with slender elements.)  For the doubly symmetric shapes of this module the
+  torsional mode is therefore NOT a limit state when the torsional unbraced length does not exceed
+  the lateral unbraced length, and no E4 check is produced then (:func:`e4_scope`); the flexural
+  buckling checks say so in their details.  Where the text does not decide, E4 is still evaluated
+  (which can only lower Pn):
+  - Lx differs from Ly and Lz exceeds only one of them (the text does not say which lateral length);
+  - the unbraced lengths do not call for E4 but the effective lengths do (User Note of E3, p. 16.1-40:
+    "When the torsional effective length is larger than the lateral effective length, Section E4 may
+    control"), i.e. Kz Lz exceeds Kx Lx or Ky Ly;
+  - built-up I-shapes and box sections ("certain doubly symmetric members, such as cruciform or
+    built-up members": the text does not say which built-up members);
+  - a length or K factor is not available.
+  So E4 is skipped only for a rolled I-shape, a rectangular HSS or a round HSS with Lz <= Lx, Lz <= Ly,
+  Kz Lz <= Kx Lx and Kz Lz <= Ky Ly.  Closed sections (HSS, box) use Cw = 0 in Eq. E4-2 (lower bound
+  of Fe).
 * E7.1 c2: the values of Table E7.1 (1.31, 1.38, 1.49) are used, not the
   unrounded Eq. E7-4.  With the rounded c2, Eq. E7-3 can return slightly more
   than b just above the limit of Eq. E7-2; be is then taken as b.
@@ -51,7 +64,7 @@ import math
 
 from ..base import AREA, FORCE, LENGTH, NONE, STRESS, TEXT, DesignContext, Demand, limit_check, missing, \
     not_checked, positive, strength_check
-from ..section import I_SHAPE, ROUND_HSS
+from ..section import BOX, I_SHAPE, RECT_HSS, ROLLED, ROUND_HSS
 from . import b4_classification as b4
 
 PHI_C, OMEGA_C = 0.90, 1.67                 # E1
@@ -227,6 +240,9 @@ def _flexural(ctx: DesignContext, demand: Demand, axis: str) -> list:
     details = {f"Lc{axis} = K{axis} L{axis} (E2)": (Lc, LENGTH), f"Lc{axis}/r{axis}": (slender, NONE),
                "4.71 sqrt(E/Fy)": (4.71 * math.sqrt(ctx.E / ctx.Fy), NONE),
                "Fe equation": ("E3-4", TEXT), "Fn equation": (eq, TEXT)}
+    evaluated, scope = e4_scope(ctx)
+    if not evaluated:
+        details["torsional buckling (E4)"] = ("not evaluated: " + scope, TEXT)
     return [_strength(ctx, cls, name, f"E3, Eq. {eq}, E3-4; E2", Fn, Fe, demand, inputs, details, notes)]
 
 
@@ -238,10 +254,49 @@ def flexural_buckling_minor(ctx: DesignContext, demand: Demand) -> list:
     return _flexural(ctx, demand, "y")
 
 
+#: relative margin of "exceeds" between two given lengths (lengths derived from brace fractions of the
+#: same member can differ in the last digits)
+LENGTH_MARGIN = 1.0e-9
+
+
+def e4_scope(ctx: DesignContext) -> tuple[bool, str]:
+    """Whether Section E4 (torsional buckling) is evaluated for this doubly symmetric member -> (evaluated,
+    reason).  AISC 360-22 E4, first paragraph, p. 16.1-41: the section applies to "doubly symmetric members
+    when the torsional unbraced length exceeds the lateral unbraced length" (and to "certain doubly symmetric
+    members, such as cruciform or built-up members").  It is skipped only where that sentence, and the User
+    Note of E3 (p. 16.1-40, effective lengths), leave no doubt; see the module docstring, "E4 scope"."""
+    sec = ctx.section
+    if sec.shape not in (I_SHAPE, RECT_HSS, BOX, ROUND_HSS):
+        return True, "not one of the doubly symmetric shapes of this module (E4 applies to every other member)"
+    if (sec.shape == I_SHAPE and sec.fabrication != ROLLED) or sec.shape == BOX:
+        return True, ("built-up section: E4 names 'certain doubly symmetric members, such as cruciform or "
+                      "built-up members' without saying which, so torsional buckling is evaluated")
+    L = {n: getattr(ctx, n) for n in ("Lx", "Ly", "Lz", "Kx", "Ky", "Kz")}
+    if any(not positive(v) for v in L.values()):
+        return True, "an unbraced length or K factor is not available, so the scope of E4 cannot be decided"
+    m = 1.0 + LENGTH_MARGIN
+    if L["Lz"] > min(L["Lx"], L["Ly"]) * m:
+        both = L["Lz"] > max(L["Lx"], L["Ly"]) * m
+        return True, ("the torsional unbraced length Lz exceeds the lateral unbraced length"
+                      + ("s Lx and Ly" if both else " (the smaller of Lx, Ly; E4 does not say which lateral "
+                         "length is meant, so torsional buckling is evaluated)") + ": E4 applies")
+    if L["Kz"] * L["Lz"] > min(L["Kx"] * L["Lx"], L["Ky"] * L["Ly"]) * m:
+        return True, ("the torsional unbraced length does not exceed the lateral unbraced lengths, but the "
+                      "torsional EFFECTIVE length Kz Lz exceeds a lateral effective length (User Note of E3: "
+                      "'Section E4 may control'), so torsional buckling is evaluated")
+    return False, ("AISC 360-22 E4 (p. 16.1-41) applies to doubly symmetric members when the torsional unbraced "
+                   "length exceeds the lateral unbraced length; here Lz <= Lx, Lz <= Ly and Kz Lz <= Kx Lx, "
+                   "Kz Lz <= Ky Ly, so torsional buckling is not a limit state of this member")
+
+
 def torsional_buckling(ctx: DesignContext, demand: Demand) -> list:
-    """E4(a) (E7 with slender elements): torsional buckling of a doubly symmetric member, Eq. E4-2."""
+    """E4(a) (E7 with slender elements): torsional buckling of a doubly symmetric member, Eq. E4-2.
+    No check when E4 does not apply (:func:`e4_scope`)."""
     name, base = NAME_TB, "AISC 360-22 E4"
     kw = dict(demand=demand.Pc, combination=demand.combination, x=demand.x_Pc)
+    evaluated, scope = e4_scope(ctx)
+    if not evaluated:
+        return []
     cls, reason = _prerequisites(ctx)
     if reason:
         return [not_checked(name, base, reason, ctx, **kw)]
@@ -262,11 +317,7 @@ def torsional_buckling(ctx: DesignContext, demand: Demand) -> list:
     inelastic = branch_by_stress(ctx.Fy, Fe)
     Fn = nominal_stress(ctx.Fy, Fe, inelastic)                      # Eq. E3-2 / E3-3 with Fe of E4
     eq = "E3-2" if inelastic else "E3-3"
-    laterals = [v for v in (ctx.Lx, ctx.Ly) if v is not None]
-    exceeds = bool(laterals) and ctx.Lz > min(laterals)
-    notes = ["torsional buckling is evaluated whatever the unbraced lengths are; AISC 360-22 E4 requires it "
-             "for doubly symmetric members when the torsional unbraced length exceeds the lateral unbraced "
-             f"length (here Lz {'exceeds' if exceeds else 'does not exceed'} the smaller of Lx, Ly)"]
+    notes = ["scope of E4: " + scope]
     if sec.shape != I_SHAPE:
         notes.append("closed section: Cw = 0 in Eq. E4-2 (lower bound of Fe)")
     inputs = {**ctx.inputs("Lz", "Kz", "G"), **sec.inputs("J", "Cw", "Ix", "Iy")}

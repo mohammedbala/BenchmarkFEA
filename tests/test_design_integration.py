@@ -180,7 +180,7 @@ def test_simple_beam_analysed_and_checked():
                                        "secondOrder": False, "converged": True, "stiffnessReduction": False,
                                        "notionalLoad": False, "alpha": 1.0, "directAnalysisSettings": False}
     # every check of every strength combination is in the result and in the document
-    assert set(beam.by_combination) == {"ULS"} and len(beam.by_combination["ULS"]) >= 12
+    assert set(beam.by_combination) == {"ULS"} and len(beam.by_combination["ULS"]) >= 11
     doc = out.to_document(m)
     text = json.dumps(doc)
     assert "NaN" not in text and "Infinity" not in text
@@ -283,6 +283,9 @@ def test_design_variables_change_capacities_but_never_analysis_results():
         r = solve.analyze(m)
         _bitwise_equal(base, r)                                             # the analysis did not notice
         checks = _by_name(design.check(m, r).members["col"].checks)
+        if name == "Kz":                # Lz = Lx = Ly: E4 is in scope only through the torsional effective length
+            assert changed not in base_checks and checks[changed].status == "ok"
+            continue
         assert checks[changed].capacity != base_checks[changed].capacity, name
         # ... and the demands of the checks are the same numbers
         assert checks[changed].demand == base_checks[changed].demand, name

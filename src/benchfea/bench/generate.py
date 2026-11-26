@@ -23,7 +23,10 @@ How a model is made (deterministic for a given ``(family, seed, difficulty)`` an
    design ratio is above ``RATIO_MAX``, at least ``RATIO_BAND_FRACTION`` of the design members have their governing
    ratio inside ``RATIO_BAND``, the stability check passed, the second-order amplification is at
    most ``AMPLIFICATION_MAX`` and the MEASURED difficulty level equals the requested one; otherwise
-   attempt k + 1 (at most ``max_attempts``).
+   attempt k + 1 (at most ``max_attempts``).  A draw for which the family writes a document that
+   validation refuses is dropped in the same way (the reason, with the validation codes, is kept in
+   ``metadata["rejected"]``): ``generate`` never raises ``ModelInvalid``.
+6. the returned document is a plain tree: no list or dict is reachable by two paths.
 
 The acceptance rules are the same for every family and are never relaxed for a model; a family /
 level that cannot be produced raises :class:`GenerationFailed` with the reasons of every attempt.
@@ -43,6 +46,7 @@ from .difficulty import difficulty as measure_difficulty
 from .difficulty import feature_flags
 from .families import FAMILIES
 from .families._common import UNIT_SYSTEMS, Draw, GenerationRejected, catalogue_size, stable_seed
+from .families._common import _copy as _plain
 
 __all__ = ["generate", "Generated", "GenerationFailed", "families", "levels", "tier_c_expected",
            "RATIO_LOW", "RATIO_HIGH", "RATIO_MAX", "BUCKLING_MIN", "AMPLIFICATION_MAX", "RATIO_BAND",
@@ -370,8 +374,17 @@ def generate(family: str, seed: int, difficulty: int, *, units: str | None = Non
             if measured["amplification"] is not None and measured["amplification"] > AMPLIFICATION_MAX:
                 raise GenerationRejected(f"second-order amplification {measured['amplification']:.2f} above "
                                          f"{AMPLIFICATION_MAX}")
+        except ModelInvalid as exc:
+            # the family wrote a document that validation refuses: a defect of the family for this
+            # draw, never a model -- the draw is dropped like any other and the reason is kept
+            where = "; ".join(f"{p.code} at {p.path or '/'}" for p in exc.problems[:3])
+            rejected = f"invalid document (generator defect for this draw): {where}"
         except GenerationRejected as exc:
-            reasons.append(f"attempt {attempt}: {exc}")
+            rejected = str(exc)
+        else:
+            rejected = None
+        if rejected is not None:
+            reasons.append(f"attempt {attempt}: {rejected}")
             if os.environ.get("BENCHFEA_GENERATE_TRACE"):
                 print(f"[generate {family} seed {seed} level {difficulty}] {reasons[-1]}", file=sys.stderr, flush=True)
             continue
@@ -397,6 +410,8 @@ def generate(family: str, seed: int, difficulty: int, *, units: str | None = Non
             "invariantsPassed": all(c.invariants.passed for c in results.combinations.values()),
             "tierC_expected": tier_c_expected(doc, flags),
         }
-        return Generated(doc, metadata)
+        # no two places of the returned document share a list or dict (an in-place edit of one end
+        # release, load, ... must never edit another)
+        return Generated(_plain(doc), metadata)
     raise GenerationFailed(f"no acceptable {family!r} model for seed {seed}, difficulty {difficulty} "
                            f"in {max_attempts} attempts", reasons)

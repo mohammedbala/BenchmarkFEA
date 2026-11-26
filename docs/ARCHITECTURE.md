@@ -492,8 +492,14 @@ Limits of this part (for LIMITS.md):
 * Compression with brace points: Lc = K × longest segment, with the maximum
   compression of the member (conservative when the force varies).
 * E3 branch by Lc/r (E4 by Fy/Fe); Table E7.1 c2 (rounded) with be ≤ b;
-  Eq. E7-7 capped at Ag; D/t ≥ 0.45E/Fy `notChecked`; torsional buckling always
-  evaluated (Cw = 0 for closed sections).
+  Eq. E7-7 capped at Ag; D/t ≥ 0.45E/Fy `notChecked`; torsional buckling (E4)
+  evaluated where E4's first paragraph calls for it or leaves it open — not
+  for a rolled I-shape or an HSS whose torsional unbraced and effective lengths
+  do not exceed the lateral ones (`e_compression.e4_scope`; Cw = 0 for closed
+  sections).
+* A station force below 1e-9 of the member's force scale is zero for the design
+  (`design/demands.py`, `ZERO_FORCE`): rounding errors of the analysis do not
+  decide signs or "is there a force".
 * G5: resultant shear; Eq. G5-2a not credited when the shear never vanishes
   along the member (L_v undefined). G6: 2 × Eq. G6-1 for the two flanges.
   No interaction between shear directions.

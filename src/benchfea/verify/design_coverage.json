@@ -12,7 +12,7 @@
   }
  ],
  "rule": "an item is covered when it has at least one (a) test and at least one (b) entry of level 'strength' (a printed nominal / available strength, measured value or limit of a check that cites the item) or 'function' (the engine's function for that equation reproduces the printed value); (b) entries of level 'detail' only (an intermediate value) = partial",
- "comparedValuesNotAttributedToACheck": 102,
+ "comparedValuesNotAttributedToACheck": 105,
  "items": {
   "Eq. B3-1": {
    "a": [

@@ -192,7 +192,8 @@ def test_round_section_uses_the_resultant_moment_once():
 
 def test_interaction_is_not_checked_when_a_strength_is_missing():
     # torsional buckling cannot be evaluated without Cw -> Pc is not available -> interaction notChecked
-    c, = hc.interaction(_ctx(_sec(Cw=None)), _d(Pc=1.0e5, Mrx=1.0e8))
+    # (Lz = 9000 > Lx = Ly = 6000, so that E4 applies)
+    c, = hc.interaction(_ctx(_sec(Cw=None), Lz=9000.0), _d(Pc=1.0e5, Mrx=1.0e8))
     assert c.status == "notChecked" and "torsional buckling" in c.reason and c.demand is None
     # flexure not available (noncompact web -> F4 not implemented)
     c, = hc.interaction(_ctx(_sec(web_ratio=100.0)), _d(Pt=1.0e5, Mrx=1.0e8))
@@ -201,7 +202,7 @@ def test_interaction_is_not_checked_when_a_strength_is_missing():
     c, = hc.interaction(_ctx(_sec(Zy=None)), _d(Pt=1.0e5, Mrx=1.0e8))
     assert c.status == "ok" and c.inputs["Mcy"][2].startswith("not needed")
     # the member can then not be reported as passing
-    res = design.check_member(_ctx(_sec(Cw=None)), [_d(Pc=1.0e5, Mrx=1.0e8)])
+    res = design.check_member(_ctx(_sec(Cw=None), Lz=9000.0), [_d(Pc=1.0e5, Mrx=1.0e8)])
     assert res.passed is False and res.status == "incomplete" and any(HC in s for s in res.not_checked)
 
 
