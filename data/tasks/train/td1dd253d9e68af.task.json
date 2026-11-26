@@ -1,0 +1,85 @@
+{
+ "format": "benchfea-task",
+ "formatVersion": "1.0.0",
+ "id": "td1dd253d9e68af",
+ "taskType": "repair",
+ "mode": "tool-allowed",
+ "family": "portal_frame",
+ "difficulty": 3,
+ "split": "train",
+ "quantities": [
+  {
+   "kind": "displacement",
+   "combination": "ULS2",
+   "node": "N2",
+   "component": "ux",
+   "unit": "in",
+   "id": "q1",
+   "text": "translation ux of node N2 in combination ULS2 [in], global axes"
+  },
+  {
+   "kind": "displacement",
+   "combination": "ULS4",
+   "node": "N4",
+   "component": "ux",
+   "unit": "in",
+   "id": "q2",
+   "text": "translation ux of node N4 in combination ULS4 [in], global axes"
+  },
+  {
+   "kind": "reaction",
+   "combination": "ULS6",
+   "node": "N5",
+   "component": "Mz",
+   "unit": "kip*in",
+   "id": "q3",
+   "text": "reaction moment Mz at node N5 in combination ULS6 [kip*in], global axes, acting on the structure"
+  },
+  {
+   "kind": "reaction",
+   "combination": "ULS3",
+   "node": "N1",
+   "component": "Mz",
+   "unit": "kip*in",
+   "id": "q4",
+   "text": "reaction moment Mz at node N1 in combination ULS3 [kip*in], global axes, acting on the structure"
+  },
+  {
+   "kind": "memberEndForce",
+   "combination": "ULS3",
+   "member": "R2",
+   "end": "i",
+   "component": "Fx",
+   "unit": "kip",
+   "id": "q5",
+   "text": "end force Fx at end i of member R2 in combination ULS3 [kip], member local axes, acting on the member (docs/CONVENTIONS.md)"
+  },
+  {
+   "kind": "memberMaxMoment",
+   "combination": "ULS3",
+   "member": "C1",
+   "component": "Mz",
+   "unit": "kip*in",
+   "id": "q6",
+   "text": "largest absolute bending moment Mz along member C1 in combination ULS3 [kip*in] (a non-negative number; local axes)"
+  }
+ ],
+ "criteria": {
+  "stable": "the submitted model is accepted by the validator and analysed by the engine",
+  "verified": "the reference of the submitted model passes the verification pipeline (benchfea verify: every applicable tier)",
+  "quantities": "each named quantity of the submitted model is within 2% of its value in the intended design (partial credit up to 10%)",
+  "design": "not a criterion of this task: the design results of the intended model are not verified (tier F), so nothing is scored on them"
+ },
+ "intendedDesign": "Units: force kip, length in (every number below is in these units: moments in force x length, line loads in force / length, moduli and stresses in force / length^2, unit weights in force / length^3, rotational springs in force x length / rad).\nFormat version: 1.0.0.\nConventions: vertical axis Y.\nNodes (5), coordinates:\n  N1 at (0, 0, 0)\n  N2 at (0, 252, 0)\n  N3 at (354, 318, 0)\n  N4 at (708, 252, 0)\n  N5 at (708, 0, 0)\nSupports (a degree of freedom not listed is free):\n  node N1: type pinned, degrees of freedom (rx fixed, ry fixed, rz (spring 320000))\n  node N5: type pinned, degrees of freedom (rx fixed, ry fixed, rz (spring 320000))\n  node N2: degrees of freedom (uz fixed, rx fixed, ry fixed)\n  node N3: degrees of freedom (uz fixed, rx fixed, ry fixed)\n  node N4: degrees of freedom (uz fixed, rx fixed, ry fixed)\nMaterials:\n  steel: description structural steel (nominal properties), E 29000, G 11200, Fy 50, Fu 65, unit weight 0.000284\nCross-sections:\n  I-14x14x0.75x0.45: type I, d 14, bf 14, tf 0.75, tw 0.45, r 0.7\n  I-22x8.5x0.7x0.45: type I, d 22, bf 8.5, tf 0.7, tw 0.45, r 0.8\nMembers (4); a member end without a stated release is rigidly connected, a member without stated offsets runs from node to node:\n  C1: from node N1 to node N2, section I-14x14x0.75x0.45, material steel\n  C2: from node N5 to node N4, section I-14x14x0.75x0.45, material steel\n  R1: from node N2 to node N3, section I-22x8.5x0.7x0.45, material steel; releases (start node (rz (spring 1100000)))\n  R2: from node N3 to node N4, section I-22x8.5x0.7x0.45, material steel; releases (end node (rz (spring 1100000)))\nRigid links and diaphragms: none.\nLoad cases:\n  D (dead load and self weight):\n    load 1: self weight\n    load 2: member distributed, member R1, direction Y, intensity at start -0.055\n    load 3: member distributed, member R2, direction Y, intensity at start -0.055\n  L (roof live load):\n    load 1: member distributed, member R1, direction Y, intensity at start -0.055, projected yes\n    load 2: member distributed, member R2, direction Y, intensity at start -0.055, projected yes\n  W (wind):\n    load 1: member distributed, member C1, direction X, intensity at start 0.045\n    load 2: member distributed, member C2, direction X, intensity at start 0.025\nLoad combinations:\n  ULS1 = 1.2 x D + 1.6 x L; analysis type secondOrder\n  SLS1 = 1 x D + 1 x L; purpose serviceability\n  ULS2 = 1.2 x D + 0.5 x L + 1 x W; analysis type secondOrder\n  ULS3 = 0.9 x D + 1 x W; analysis type secondOrder\n  ULS4 = 1.4 x D; analysis type secondOrder\n  SLS2 = 1 x D + 0.6 x W; purpose serviceability\n  ULS5 = 1.2 x D + 0.5 x L + -1 x W; analysis type secondOrder\n  ULS6 = 0.9 x D + -1 x W; analysis type secondOrder\nAnalysis settings: shear deformation no.\nDesign data (AISC 360-22 member checks):\n  defaults: method LRFD\n  groups:\n    columns: members [C1, C2], role column, Kx 1.0, bracing (minor-axis buckling braced at [0.5], torsional buckling braced at [0.5])\n    rafters: members [R1, R2], role beam, bracing (top flange braced at [0.5], bottom flange braced at [0.5]), deflection limits [(span /  240, direction y, combinations [SLS1])]",
+ "answerFormat": {
+  "model": "the complete repaired model document (in the environment: omit it to submit the working copy)"
+ },
+ "statement": "TASK (repair): the model file below was derived from the intended design described here, but something in it was changed in a way that matters. Repair the model.\nStructure: portal frame. Mode tool-allowed: you may run the analysis tool (run_analysis) and read its results.\nSign conventions, axes and units are those of docs/CONVENTIONS.md; every number you give is in the units of the model file.\n\nINTENDED DESIGN:\nUnits: force kip, length in (every number below is in these units: moments in force x length, line loads in force / length, moduli and stresses in force / length^2, unit weights in force / length^3, rotational springs in force x length / rad).\nFormat version: 1.0.0.\nConventions: vertical axis Y.\nNodes (5), coordinates:\n  N1 at (0, 0, 0)\n  N2 at (0, 252, 0)\n  N3 at (354, 318, 0)\n  N4 at (708, 252, 0)\n  N5 at (708, 0, 0)\nSupports (a degree of freedom not listed is free):\n  node N1: type pinned, degrees of freedom (rx fixed, ry fixed, rz (spring 320000))\n  node N5: type pinned, degrees of freedom (rx fixed, ry fixed, rz (spring 320000))\n  node N2: degrees of freedom (uz fixed, rx fixed, ry fixed)\n  node N3: degrees of freedom (uz fixed, rx fixed, ry fixed)\n  node N4: degrees of freedom (uz fixed, rx fixed, ry fixed)\nMaterials:\n  steel: description structural steel (nominal properties), E 29000, G 11200, Fy 50, Fu 65, unit weight 0.000284\nCross-sections:\n  I-14x14x0.75x0.45: type I, d 14, bf 14, tf 0.75, tw 0.45, r 0.7\n  I-22x8.5x0.7x0.45: type I, d 22, bf 8.5, tf 0.7, tw 0.45, r 0.8\nMembers (4); a member end without a stated release is rigidly connected, a member without stated offsets runs from node to node:\n  C1: from node N1 to node N2, section I-14x14x0.75x0.45, material steel\n  C2: from node N5 to node N4, section I-14x14x0.75x0.45, material steel\n  R1: from node N2 to node N3, section I-22x8.5x0.7x0.45, material steel; releases (start node (rz (spring 1100000)))\n  R2: from node N3 to node N4, section I-22x8.5x0.7x0.45, material steel; releases (end node (rz (spring 1100000)))\nRigid links and diaphragms: none.\nLoad cases:\n  D (dead load and self weight):\n    load 1: self weight\n    load 2: member distributed, member R1, direction Y, intensity at start -0.055\n    load 3: member distributed, member R2, direction Y, intensity at start -0.055\n  L (roof live load):\n    load 1: member distributed, member R1, direction Y, intensity at start -0.055, projected yes\n    load 2: member distributed, member R2, direction Y, intensity at start -0.055, projected yes\n  W (wind):\n    load 1: member distributed, member C1, direction X, intensity at start 0.045\n    load 2: member distributed, member C2, direction X, intensity at start 0.025\nLoad combinations:\n  ULS1 = 1.2 x D + 1.6 x L; analysis type secondOrder\n  SLS1 = 1 x D + 1 x L; purpose serviceability\n  ULS2 = 1.2 x D + 0.5 x L + 1 x W; analysis type secondOrder\n  ULS3 = 0.9 x D + 1 x W; analysis type secondOrder\n  ULS4 = 1.4 x D; analysis type secondOrder\n  SLS2 = 1 x D + 0.6 x W; purpose serviceability\n  ULS5 = 1.2 x D + 0.5 x L + -1 x W; analysis type secondOrder\n  ULS6 = 0.9 x D + -1 x W; analysis type secondOrder\nAnalysis settings: shear deformation no.\nDesign data (AISC 360-22 member checks):\n  defaults: method LRFD\n  groups:\n    columns: members [C1, C2], role column, Kx 1.0, bracing (minor-axis buckling braced at [0.5], torsional buckling braced at [0.5])\n    rafters: members [R1, R2], role beam, bracing (top flange braced at [0.5], bottom flange braced at [0.5]), deflection limits [(span /  240, direction y, combinations [SLS1])]\n\nCriteria:\n  stable: the submitted model is accepted by the validator and analysed by the engine\n  verified: the reference of the submitted model passes the verification pipeline (benchfea verify: every applicable tier)\n  quantities: each named quantity of the submitted model is within 2% of its value in the intended design (partial credit up to 10%)\n  design: not a criterion of this task: the design results of the intended model are not verified (tier F), so nothing is scored on them\nNamed quantities (their values in the intended design are not given; they are compared physically, whatever units your model declares):\n  q1: translation ux of node N2 in combination ULS2 [in], global axes\n  q2: translation ux of node N4 in combination ULS4 [in], global axes\n  q3: reaction moment Mz at node N5 in combination ULS6 [kip*in], global axes, acting on the structure\n  q4: reaction moment Mz at node N1 in combination ULS3 [kip*in], global axes, acting on the structure\n  q5: end force Fx at end i of member R2 in combination ULS3 [kip], member local axes, acting on the member (docs/CONVENTIONS.md)\n  q6: largest absolute bending moment Mz along member C1 in combination ULS3 [kip*in] (a non-negative number; local axes)\n\nSubmit your answer as JSON of this form:\n{\n \"model\": {\n  \"formatVersion\": \"...\",\n  \"...\": \"...\"\n }\n}",
+ "verification": {
+  "status": "verified",
+  "scope": "analysis results of the intended design",
+  "meaning": "'verified' means only: the reference solution passed every tier listed as applicable in this record, at the tolerances stated in it. It does not mean reviewed, approved or certified by anyone.",
+  "policy": "docs/VERIFICATION.md; the tiers passed and the tolerances are in the answers file and in the info returned when the episode ends"
+ },
+ "modelFile": "td1dd253d9e68af.model.json"
+}

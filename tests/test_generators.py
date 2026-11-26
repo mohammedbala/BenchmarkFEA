@@ -64,7 +64,7 @@ GOLDEN = {
     ('multistorey_3d', 3, 0): "92c52b2d06664a5f00f5096320e60272f8ce85682306c0c428177a3d4b542292",
     ('pipe_rack', 3, 0): "e69e5a2fef1e6a2365746a0239961bdd0e89173d9670f4f71a88c7a548283302",
     ('diaphragm_frame', 3, 2): "af308084d6a77d3544c4d988a39ad863d97fbe57e501c7e22e3c5b45fb39bd79",
-    ('diaphragm_frame', 5, 0): "3e40c74c0ab5e76a8bc88cf0ec05d64308fb3e8046613f8af40db89d2933d46f",
+    ('diaphragm_frame', 5, 0): "350411dc60a828aa0117fee38b06c8a749ff24e9b035a69ca030dc09585ea7cc",
 }
 
 

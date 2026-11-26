@@ -62,10 +62,13 @@ def plan(seeds=(0, 1, 4), families=None, curve_balls=None) -> list:
     return out
 
 
-def _write(path: Path, data) -> None:
+def _write(path: Path, data, *, compact: bool = False) -> None:
+    """``compact``: one line without spaces (model and answers files: they are read by programs, and
+    indented they are most of the size of the dataset)."""
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_name(path.name + f".{os.getpid()}.tmp")
-    tmp.write_text(json.dumps(data, indent=1) + "\n", encoding="utf-8")
+    text = json.dumps(data, separators=(",", ":")) if compact else json.dumps(data, indent=1)
+    tmp.write_text(text + "\n", encoding="utf-8")
     os.replace(tmp, path)
 
 
@@ -93,6 +96,7 @@ def _cell(args) -> dict:
     if case["status"] == "verified":
         row["effectClass"] = case["effectClass"]
         row["tiersPassed"] = case["verification"]["tiersPassed"]
+        row["analysisOrder"] = analysis_order(case["perturbed"]["document"])
         sub = SPLIT_DIRS[row["split"]]
         for tt in task_types:
             mode = mode_for(case["key"], tt)
@@ -109,11 +113,19 @@ def _cell(args) -> dict:
             model = public.pop("model")
             public["modelFile"] = f"{tid}.model.json"
             _write(Path(root) / "tasks" / sub / f"{tid}.task.json", public)
-            _write(Path(root) / "tasks" / sub / f"{tid}.model.json", model)
-            _write(Path(root) / "answers" / sub / f"{tid}.answers.json", answers)
+            _write(Path(root) / "tasks" / sub / f"{tid}.model.json", model, compact=True)
+            _write(Path(root) / "answers" / sub / f"{tid}.answers.json", answers, compact=True)
             row["tasks"].append({"id": tid, "taskType": tt, "mode": mode})
     row["seconds"] = round(time.perf_counter() - t0, 1)
     return row
+
+
+def analysis_order(document: dict) -> str:
+    """"second-order" when any combination of the input file asks for a second-order analysis (its own
+    ``analysisType`` or the default ``analysis.type``), else "first-order"."""
+    default = (document.get("analysis") or {}).get("type", "firstOrder")
+    kinds = {(c or {}).get("analysisType", default) for c in (document.get("combinations") or {}).values()}
+    return "second-order" if "secondOrder" in kinds else "first-order"
 
 
 def _count(rows, key) -> dict:
@@ -168,7 +180,7 @@ def _manifest(rows: list) -> dict:
         for t in r["tasks"]:
             tasks.append({"id": t["id"], "split": r["split"], "taskType": t["taskType"], "mode": t["mode"],
                           "family": r["family"], "difficulty": r["difficulty"], "effectClass": r["effectClass"],
-                          "tiersPassed": r["tiersPassed"],
+                          "analysisOrder": r["analysisOrder"], "tiersPassed": r["tiersPassed"],
                           "file": f"{SPLIT_DIRS[r['split']]}/{t['id']}.task.json"})
         cell = {k: r[k] for k in ("family", "curveBall", "seed", "difficulty", "split")}
         for s in r.get("skips", []):
@@ -212,6 +224,7 @@ def _manifest(rows: list) -> dict:
                    "byFamily": _count(tasks, lambda t: t["family"]),
                    "byDifficulty": _count(tasks, lambda t: t["difficulty"]),
                    "byEffectClass": _count(tasks, lambda t: t["effectClass"]),
+                   "byAnalysisOrder": _count(tasks, lambda t: t["analysisOrder"]),
                    "bySplitAndTaskType": _count(tasks, lambda t: f"{t['split']}|{t['taskType']}")},
         "cellsByFamily": by(rows, lambda r: r["family"]),
         "cellsByCurveBall": by(rows, lambda r: r["curveBall"]),
@@ -220,7 +233,7 @@ def _manifest(rows: list) -> dict:
                                      lambda x: f"{x[0]}: {x[1]}"),
         "tasks": tasks,
         "cells": [{k: r.get(k) for k in ("family", "curveBall", "seed", "difficulty", "split", "status",
-                                         "effectClass")} | {"tasks": [t["id"] for t in r["tasks"]]} for r in rows],
+                                         "effectClass", "analysisOrder")} | {"tasks": [t["id"] for t in r["tasks"]]} for r in rows],
         "quarantineLog": quarantine,
     }
 

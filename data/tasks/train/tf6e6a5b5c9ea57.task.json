@@ -1,0 +1,86 @@
+{
+ "format": "benchfea-task",
+ "formatVersion": "1.0.0",
+ "id": "tf6e6a5b5c9ea57",
+ "taskType": "predict",
+ "mode": "no-solver",
+ "family": "continuous_beam",
+ "difficulty": 2,
+ "split": "train",
+ "quantities": [
+  {
+   "kind": "displacement",
+   "combination": "ULS1",
+   "node": "N2",
+   "component": "uz",
+   "unit": "ft",
+   "id": "q1",
+   "text": "translation uz of node N2 in combination ULS1 [ft], global axes"
+  },
+  {
+   "kind": "reaction",
+   "combination": "SLS1",
+   "node": "N1",
+   "component": "My",
+   "unit": "kN*ft",
+   "id": "q2",
+   "text": "reaction moment My at node N1 in combination SLS1 [kN*ft], global axes, acting on the structure"
+  },
+  {
+   "kind": "memberEndForce",
+   "combination": "ULS2",
+   "member": "B2",
+   "end": "i",
+   "component": "Mz",
+   "unit": "kN*ft",
+   "id": "q3",
+   "text": "end force Mz at end i of member B2 in combination ULS2 [kN*ft], member local axes, acting on the member (docs/CONVENTIONS.md)"
+  },
+  {
+   "kind": "memberMaxMoment",
+   "combination": "SLS2",
+   "member": "B3",
+   "component": "Mz",
+   "unit": "kN*ft",
+   "id": "q4",
+   "text": "largest absolute bending moment Mz along member B3 in combination SLS2 [kN*ft] (a non-negative number; local axes)"
+  },
+  {
+   "kind": "memberEndForce",
+   "combination": "SLS2",
+   "member": "B1",
+   "end": "i",
+   "component": "Mz",
+   "unit": "kN*ft",
+   "id": "q5",
+   "text": "end force Mz at end i of member B1 in combination SLS2 [kN*ft], member local axes, acting on the member (docs/CONVENTIONS.md)"
+  },
+  {
+   "kind": "memberMaxMoment",
+   "combination": "ULS3",
+   "member": "B2",
+   "component": "Mz",
+   "unit": "kN*ft",
+   "id": "q6",
+   "text": "largest absolute bending moment Mz along member B2 in combination ULS3 [kN*ft] (a non-negative number; local axes)"
+  }
+ ],
+ "answerFormat": {
+  "values": {
+   "q1": "number",
+   "q2": "number",
+   "q3": "number",
+   "q4": "number",
+   "q5": "number",
+   "q6": "number"
+  }
+ },
+ "statement": "TASK (predict): give the named results of the model in the file below, exactly as it is given.\nStructure: continuous beam. Mode no-solver: the analysis tool is disabled; inspect the file and reason from it.\nSign conventions, axes and units are those of docs/CONVENTIONS.md; every number you give is in the units of the model file.\n\nQuantities:\n  q1: translation uz of node N2 in combination ULS1 [ft], global axes\n  q2: reaction moment My at node N1 in combination SLS1 [kN*ft], global axes, acting on the structure\n  q3: end force Mz at end i of member B2 in combination ULS2 [kN*ft], member local axes, acting on the member (docs/CONVENTIONS.md)\n  q4: largest absolute bending moment Mz along member B3 in combination SLS2 [kN*ft] (a non-negative number; local axes)\n  q5: end force Mz at end i of member B1 in combination SLS2 [kN*ft], member local axes, acting on the member (docs/CONVENTIONS.md)\n  q6: largest absolute bending moment Mz along member B2 in combination ULS3 [kN*ft] (a non-negative number; local axes)\n\nSubmit your answer as JSON of this form:\n{\n \"values\": {\n  \"q1\": 0.0,\n  \"q2\": 0.0,\n  \"q3\": 0.0,\n  \"q4\": 0.0,\n  \"q5\": 0.0,\n  \"q6\": 0.0\n }\n}",
+ "verification": {
+  "status": "verified",
+  "scope": "analysis results of the given model",
+  "meaning": "'verified' means only: the reference solution passed every tier listed as applicable in this record, at the tolerances stated in it. It does not mean reviewed, approved or certified by anyone.",
+  "policy": "docs/VERIFICATION.md; the tiers passed and the tolerances are in the answers file and in the info returned when the episode ends"
+ },
+ "modelFile": "tf6e6a5b5c9ea57.model.json"
+}

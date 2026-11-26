@@ -23,7 +23,8 @@ benchfea design   examples/01_simple_beam.json -o beam.design.json
 `tests/test_examples.py` recomputes them, checks that the tables quote them, and checks the
 closed-form results that exist (statics, the beam deflection formula, the rigid-body motion of the
 diaphragm). The numbers are what the engine computes for these files; they are not taken from any
-publication.
+publication. `expected.json`, the "Key results" and "Design summary" tables and the YAML twin are
+written by `python3 tools/build_examples.py` (`--check` tells whether they are up to date).
 
 More models of the same kinds, in any number, come from the generators:
 `benchfea generate --list` (docs/DIFFICULTY.md).

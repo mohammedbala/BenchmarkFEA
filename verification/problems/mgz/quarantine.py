@@ -162,10 +162,9 @@ QUARANTINE = {
         "971.5, 907.8 and 280.3 kN m - the engine's values within 0.03 % - so the difference of 4 % lies in the source's "
         "solution process (an incremental scheme without equilibrium iteration underestimates the displacements of a "
         "softening structure; the source discusses this drift in its Section 12.2) or in its geometry updating, which "
-        "cannot be determined from the example. Separately, tier C does not pass on this model: PyNite is not eligible "
-        "(estimated approximation error 4.1e-2 above the limit 5e-3) and the difference to OpenSeesPy, 5.85e-4 (rotation "
-        "at a), exceeds the allowed 5.84e-4 (1e-6 plus the estimated OpenSees discretisation error, which is not a "
-        "bound). Read off a figure; approximate method in the source.",
+        "cannot be determined from the example. The other tiers that apply pass on this model (tier C: largest difference "
+        "to OpenSeesPy 1.5e-4 against an allowed 4.4e-4, to PyNite 2.1e-5 against 3.2e-5; tiers D and E); the problem "
+        "is quarantined for its published targets only. Read off a figure; approximate method in the source.",
     "ex-9-6-portal-second-order":
         "All three targets missed: engine -550.62, 9098.77, -2664.06 in-kips; figure labels of the source 519, 9078, "
         "2661 in-kips (6.1 %, 0.23 %, 0.12 %). The source's values come from an incremental analysis (two elements per "
@@ -174,10 +173,9 @@ QUARANTINE = {
         "elements per column, one per girder segment), solved here to equilibrium, give 550.6, 9098.6 and 2664.5 "
         "in-kips - the engine's values within 0.02 %. The first-order moments of the same example (316, 8708, 2044) and "
         "its critical load factor (2.20) are reproduced (problems ex-9-6-portal-first-order and "
-        "ex-9-6-portal-critical-load). Separately, tier C does not pass on this model: the difference to OpenSeesPy, "
-        "7.42e-4 (displacement of d), exceeds the allowed 7.40e-4, and the difference to PyNite, 2.06e-3 (rotation at "
-        "e), the allowed 9.07e-4 (allowed = 1e-6 plus the estimated discretisation error of the foreign run, which is "
-        "not a bound). Read off a figure; approximate method in the source.",
+        "ex-9-6-portal-critical-load). The other tiers that apply pass on this model (tier C: largest difference to "
+        "OpenSeesPy 1.9e-4 against an allowed 5.6e-4, to PyNite 1.9e-5 against 3.8e-5; tiers D and E); the problem is "
+        "quarantined for its published targets only. Read off a figure; approximate method in the source.",
     "ex-9-8-column-braced-critical-load":
         "Source value is a discretised approximation; no stated error bound. Engine (exact stability functions): "
         "214.05 kips = pi^2 EI/L^2 with L = 156 in (buckling in two half waves, as the source's text states for a "

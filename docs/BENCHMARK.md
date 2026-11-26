@@ -414,18 +414,13 @@ the same family, seed and difficulty. What is checked, and how:
 * *documents* — two different seeds could still give the same document. The test suite generates
   the base models of the planned cells of the cheap families (all attempts) and compares SHA-256
   hashes between the splits; `BENCHFEA_SPLIT_FULL=1` extends this to every planned cell (about an
-  hour). A rebuilt dataset should be checked once more on what was actually built (base and
-  curve-balled model hashes per split).
+  hour). On the dataset as built, `tools/audit_dataset.py` compares the hashes of the base
+  models and of the curve-balled models between the splits; a shared one is a finding (section 8).
 
 The split separates instances, not knowledge: families, curve balls and the generator are the same
 code for both splits.
 
 ## 8. Dataset
-
-> The dataset under `data/` and the numbers of this section are those of the last build, made with
-> task version 1: before the generator seed carried the split and before the held-out combinations
-> were selected by the rule of section 7. They do not describe the present split definition until
-> the dataset is rebuilt (and `servedCombinations` refreshed).
 
 ```
 benchfea bench make-dataset --out data --seeds 0,1,4 --workers 4 --cache /tmp/benchfea-cache
@@ -450,84 +445,51 @@ change record with its entities and direction, the mechanism diagnosis, the inte
 repair) with the SHA-256 of the full results document; the full document is reproduced by
 `benchfea run` on the model file. The verification record is stored without the per-check details.
 
-**The dataset in this repository** (benchfea bench make-dataset --out data --seeds 0,4 --workers 4 --cache <dir> --clean; [data/DATA_CARD.md](../data/DATA_CARD.md)):
+**The dataset in this repository** ([data/DATA_CARD.md](../data/DATA_CARD.md)). Every number
+below stands between `generated` markers and is written by `python3 tools/build_dataset_docs.py`
+from `data/tasks/manifest.json` and `data/CHECKS.json`; the test suite runs its `--check`.
 
-**534 verified tasks** from 192 verified cells of 528 (every family × every curve ball × seeds 0 and 4).
+<!-- generated:headline -->
+<!-- /generated:headline -->
 
-| split | tasks | predict | diagnose | repair | design |
-|---|---|---|---|---|---|
-| train | 248 | 77 | 89 | 80 | 2 |
-| held-out | 286 | 89 | 103 | 94 | 0 |
+<!-- generated:build -->
+<!-- /generated:build -->
 
-By mode: `no-solver` 258, `tool-allowed` 276. By difficulty level: level 1: 67, level 2: 127, level 3: 194, level 4: 100, level 5: 46. By effect class: `changes-analysis` 490, `creates-mechanism` 44.
+<!-- generated:composition -->
+<!-- /generated:composition -->
 
-Cells by family (a cell is verified when one attempt of its chain gave a verified reference; the last column counts the cells that were not, by stage and category of their last attempt):
+Cells by family (a cell is verified when one attempt of its chain gave a verified reference):
 
-| family | cells | verified | tasks | not verified: stage:category of the last attempt |
-|---|---|---|---|---|
-| `braced_frame` | 66 | 19 | 50 | curve-ball:not-applicable 34, verify:disagreement 9, verify:not-covered 4 |
-| `continuous_beam` | 66 | 28 | 83 | curve-ball:not-applicable 33, verify:not-covered 5 |
-| `diaphragm_frame` | 66 | 36 | 104 | curve-ball:not-applicable 16, verify:not-covered 8, verify:disagreement 4, verify:refused 2 |
-| `multistorey_2d` | 66 | 15 | 37 | curve-ball:not-applicable 22, verify:disagreement 18, generate:generator-error 9, verify:not-covered 2 |
-| `multistorey_3d` | 66 | 19 | 52 | curve-ball:not-applicable 23, verify:disagreement 19, verify:not-covered 4, verify:not-representable 1 |
-| `pipe_rack` | 66 | 18 | 44 | curve-ball:not-applicable 26, verify:disagreement 21, verify:not-covered 1 |
-| `portal_frame` | 66 | 27 | 78 | curve-ball:not-applicable 24, verify:disagreement 9, verify:not-covered 6 |
-| `stair_frame` | 66 | 30 | 86 | curve-ball:not-applicable 28, verify:not-covered 7, verify:disagreement 1 |
+<!-- generated:families -->
+<!-- /generated:families -->
 
 Cells by curve ball:
 
-| curve ball | cells | verified | tasks | not verified |
-|---|---|---|---|---|
-| `constraint_added` | 16 | 1 | 3 | curve-ball:not-applicable 12, verify:disagreement 3 |
-| `constraint_made_flexible` | 16 | 2 | 6 | curve-ball:not-applicable 13, generate:generator-error 1 |
-| `constraint_removed` | 16 | 0 | 0 | curve-ball:not-applicable 14, verify:disagreement 2 |
-| `constraint_slaves_dropped` | 16 | 2 | 5 | curve-ball:not-applicable 13, generate:generator-error 1 |
-| `constraint_wrong_master` | 16 | 0 | 0 | curve-ball:not-applicable 14, verify:disagreement 2 |
-| `constraint_wrong_slave` | 16 | 0 | 0 | curve-ball:not-applicable 14, verify:refused 2 |
-| `design_bracing_points_changed` | 16 | 0 | 0 | curve-ball:not-applicable 6, verify:not-covered 5, verify:disagreement 5 |
-| `design_k_changed` | 16 | 0 | 0 | verify:not-covered 12, curve-ball:not-applicable 2, verify:disagreement 2 |
-| `design_lb_full_where_braced` | 16 | 0 | 0 | verify:not-covered 8, curve-ball:not-applicable 4, verify:disagreement 3, generate:generator-error 1 |
-| `design_lb_short_where_unbraced` | 16 | 0 | 0 | curve-ball:not-applicable 14, verify:not-covered 2 |
-| `design_unbraced_length_changed` | 16 | 0 | 0 | verify:not-covered 10, verify:disagreement 5, generate:generator-error 1 |
-| `load_direction_changed` | 16 | 15 | 45 | verify:disagreement 1 |
-| `load_moved` | 16 | 9 | 27 | verify:disagreement 7 |
-| `load_sign_flipped` | 16 | 12 | 36 | verify:disagreement 4 |
-| `member_rolled_90` | 16 | 15 | 46 | verify:disagreement 1 |
-| `offset_added` | 16 | 12 | 34 | curve-ball:not-applicable 3, verify:not-representable 1 |
-| `offset_removed` | 16 | 1 | 3 | curve-ball:not-applicable 15 |
-| `offset_sign_reversed` | 16 | 1 | 3 | curve-ball:not-applicable 14, generate:generator-error 1 |
-| `offset_wrong_axis` | 16 | 1 | 3 | curve-ball:not-applicable 15 |
-| `release_added` | 16 | 8 | 24 | verify:disagreement 6, curve-ball:not-applicable 2 |
-| `release_mechanism` | 16 | 16 | 29 | - |
-| `release_pinned_frame` | 16 | 8 | 20 | curve-ball:not-applicable 4, verify:disagreement 4 |
-| `release_removed` | 16 | 8 | 24 | curve-ball:not-applicable 5, verify:disagreement 2, generate:generator-error 1 |
-| `second_order_off` | 16 | 5 | 10 | curve-ball:not-applicable 10, generate:generator-error 1 |
-| `section_heavier` | 16 | 12 | 35 | verify:disagreement 4 |
-| `section_lighter` | 16 | 9 | 26 | verify:disagreement 7 |
-| `sections_swapped` | 16 | 13 | 39 | curve-ball:not-applicable 2, verify:disagreement 1 |
-| `support_fixed_to_pinned` | 16 | 7 | 21 | verify:disagreement 6, curve-ball:not-applicable 3 |
-| `support_pinned_to_fixed` | 16 | 8 | 24 | curve-ball:not-applicable 5, verify:disagreement 2, generate:generator-error 1 |
-| `support_removed` | 16 | 13 | 29 | verify:disagreement 2, generate:generator-error 1 |
-| `support_roller_direction` | 16 | 1 | 3 | curve-ball:not-applicable 15 |
-| `support_spring_stiffness` | 16 | 4 | 12 | curve-ball:not-applicable 7, verify:disagreement 5 |
-| `units_relabelled` | 16 | 9 | 27 | verify:disagreement 7 |
+<!-- generated:curve-balls -->
+<!-- /generated:curve-balls -->
 
-Quarantine log (1286 entries in `data/tasks/manifest.json`): attempts skipped, by stage and category — curve-ball:not-applicable 631, verify:disagreement 278, verify:not-covered 105, generate:generator-error 24, verify:not-representable 8, verify:refused 6. `curve-ball:not-applicable` is not a quarantine: the curve ball does not fit the model (docs/CURVEBALLS.md section 5). Task types not served on verified cells: design 26 (the curve-balled model is a mechanism...), design 161 (the design results of the given model are not verified (with the design results, tier F)...), design 3 (the reference design is not verified...), predict 26 (the curve-balled model is a mechanism...), repair 5 (the curve ball moves no significant result of the intended design beyond the zero-credit e...), repair 13 (the reference of the intended model is not verified...).
+Quarantine log (`quarantineLog` in the manifest):
 
-Checked after the build, through the normal scoring path (repairs and designs re-solved through
-the verification pipeline): the answer built from the hidden reference (`scoring.reference_answer`)
-scores 1.0 on all 534 tasks, and the model as given, submitted as a "repair", scores 0 on all 174
-repair tasks. The test suite repeats this for every predict, diagnose and design task and for a
-sample of the repair tasks, and rebuilds one task from its key.
+<!-- generated:quarantine -->
+<!-- /generated:quarantine -->
 
-Extra evidence, run after the build with means that are not the pipeline that produced the
-references: `python3 tools/audit_dataset.py data` — the split of every task re-evaluated from
-`splits.json`, every stable model solved again by the engine and by the independent tableau solver
-of `tests/independent` (166 models, 823 combinations, all first order: largest relative difference
-5.6·10⁻¹²), the number of mechanisms of every unstable model (26) from the null space of the
-tableau, right and wrong answers through the scorer for every predict and diagnose task, and a
-probe of the first observation of 25 tasks for anything of the change record. It found nothing on
-this dataset. It is a computation, not a review.
+Checks run after the build. The first puts every task through the normal scoring path; the second
+uses means that are not the pipeline that produced the references (the split re-evaluated from
+`splits.json`, base and curve-balled model hashes per split, every stable model solved again by the
+engine and by the independent tableau solver of `tests/independent`, the number of mechanisms of
+every unstable model from the null space of the tableau, right and wrong answers through the
+scorer, a probe of the first observation for anything of the change record). The test suite repeats
+the scoring for every predict, diagnose and design task and for a sample of the repair tasks, and
+rebuilds one task from its key.
+
+<!-- generated:checks -->
+<!-- /generated:checks -->
+
+Gaps of this build (curve balls with no or few tasks and why, design results, second order,
+held-out combinations without a verified instance):
+
+<!-- generated:gaps -->
+<!-- /generated:gaps -->
 
 ## 9. Limits
 
@@ -536,43 +498,23 @@ this dataset. It is a computation, not a review.
   engine, the ODE oracle and the translators to the two foreign solvers come from one project and
   share the fixed-end-force code; an error common to all routes would not be detected. Nobody has
   reviewed, approved or certified any task or reference.
-* **Design results are almost never a verified reference.** Tier F requires, for every limit state
-  a model uses, a hand calculation and a reproduced value of the AISC Design Examples in the test
-  suite. Most generated models use limit states without full coverage (measured most often: Eq.
-  F2-7, Eq. E4-1 / E4-2, Section H3 and the engine's torsion screening rule, Table B4.1a Case 8 /
-  B4.1b Case 21). Consequences, all visible in the quarantine log: the five design-only curve balls
-  (`design_*`) are not served at all; a `designRatio` quantity, a design criterion in a repair task
-  and a design task exist only on the few models whose design results did verify (in this dataset:
-  5 instances, all continuous beams — 2 design tasks, 5 predict tasks with a design ratio, 4 repair
-  tasks with the design criterion); the governing design ratio is otherwise never asked for. The code paths are tested with a test device that counts every item as covered
-  (`tests/bench_helpers.py`), which says nothing about any design value.
-* **Second-order models are mostly quarantined.** Tier C compares the engine (exact stability
-  functions) with foreign solvers whose error estimate is a leading-order value, not a bound
-  (VERIFICATION.md, "Second-order cross-checks"); the difference often lands just above the allowed
-  one and the case is quarantined as a `disagreement` (in this dataset: 261 of the 278 attempts
-  skipped with category `disagreement` are tier-C differences of this kind, in the families with
-  second-order combinations). Nothing was loosened. Of the cells whose last attempt was not
-  "curve ball not applicable", 15 of 44 are served for `multistorey_2d`, 19 of 43 for
-  `multistorey_3d`, 18 of 40 for `pipe_rack` and 19 of 32 for `braced_frame`, against 28 of 33 for
-  `continuous_beam` and 30 of 38 for `stair_frame`: the served tasks lean towards first-order
-  models.
-* **Other quarantines seen in this build** (each left as it is, with its diagnosis in the log):
-  the superposition check of tier D not passed (5 attempts): 1.58e-9 against 1.0e-9 once
-  (`multistorey_2d`) and 0.64 to 2.33 four times (`stair_frame`, `support_removed`). Diagnosis of the
-  latter (audit): the check takes its ratio array by array, and the column whose support was removed
-  carries no force in a combination without self weight, so the ratio is one of two round-off numbers
-  (1.0e-9 N against 4.6e-10 N where the largest member force is 1e7 N); the combination and the sum of
-  its load cases agree to 6e-12 in displacements and reactions. A defect of the check on the
-  conservative side: the attempts stay quarantined and the check was not changed; a mechanism made of a loaded node without members
-  is not confirmed by the diagnosis tiers (12 attempts, `diaphragm_frame`, `constraint_removed` /
-  `constraint_wrong_master`: never served); models that fewer than
-  two foreign solvers can represent (8 attempts: second order with rigid offsets, a node lying on a
-  member's axis). Two attempts (`continuous_beam`) that an earlier build of this dataset logged as a tier-A
-  disagreement are not one: a regular result station one ulp away from a point load gives three stations
-  at one point, and the comparison took the limit from the wrong side for the third; the comparison was
-  corrected (it accepts either limit there, and tier D requires that the stations of the point show
-  both), the analysis of that model verifies, and the two cells are now logged as `not-covered` (tier F). The generator raised an error for three `multistorey_2d` level-2 seeds of the
-  chain (an empty design group; 24 attempts): logged as `generator-error`, the next seed is used.
+* **Design results are rarely a verified reference.** Tier F requires, for every limit state a
+  model uses, a hand calculation and a reproduced strength of the AISC Design Examples in the test
+  suite (`src/benchfea/verify/design_coverage.json` lists the items with and without it). A model
+  that uses one item without it has no verified design results: no design-only curve ball, no
+  `designRatio` quantity, no design criterion in a repair task and no design task on it. How many
+  there are in the dataset is in section 8 ("Design results"). The code paths are tested with a
+  test device that counts every item as covered (`tests/bench_helpers.py`), which says nothing
+  about any design value.
+* **Second-order models are served only where two foreign solvers give an eligible error bound.**
+  Tier C compares the engine (exact stability functions) with OpenSeesPy and PyNite, allowing each
+  foreign result the error bound computed from three of its own refinement levels
+  ([CROSSCHECK.md](CROSSCHECK.md) 1.3). Second order together with rigid offsets, rigid links or
+  diaphragms, or shear deformation, and members close to buckling, leave fewer than two eligible
+  solvers; those models are quarantined as `not-representable`, not served. The share of
+  second-order tasks is in section 8.
+* **Every quarantine is left as it is**, with its reason in the log; the counts by stage, category
+  and tier are in section 8. Nothing was loosened to admit a case.
 * **No buckling factors.** A model that asks for a buckling analysis cannot pass tier C (no foreign
   solver reproduces it), so `bucklingFactor` is never asked for.
 * **`invalid-model` curve balls are not served** (the model is refused by validation; there is no

@@ -10,14 +10,17 @@ What it checks, and with what:
 
 split        every task lies in the split that ``src/benchfea/bench/splits.json`` assigns to its
              (family, curve ball, seed) -- the rule is re-evaluated here from the file, not through
-             ``benchfea.bench.splits``; no curve-balled model occurs in both splits; base models that
-             underlie tasks of both splits are counted and reported (a stated limit of the split).
+             ``benchfea.bench.splits``; no curve-balled model and no base model (the model before
+             the curve ball, by the hash in the change record) occurs in both splits.
 change       the change record applied to nothing: the model file hashes to ``perturbedHash``.
 references   every distinct STABLE model is solved again by the engine and every reference value of
              its predict tasks is recomputed; the same model is solved by the independent tableau
              solver of ``tests/independent`` (a different method: no stiffness matrix; section
              properties from ``benchfea.sections``) and compared with the engine on node displacements,
-             reactions, end forces and station values, every combination.
+             reactions, end forces and station values, every combination.  A difference in a
+             first-order combination is a finding.  For a second-order combination the tableau takes
+             the axial force piecewise constant along a member (its documented limit), so the
+             difference is reported separately and is not a finding.
 mechanisms   every distinct UNSTABLE model: the number of independent mechanisms of the reference
              diagnosis against the tableau (null space of its matrix + the degrees of freedom it finds
              without any stiffness at nodes that carry frame members).
@@ -27,7 +30,8 @@ scoring      the answer built from the hidden reference scores 1.0, a wrong one 
 leaks        the first observation and info of the environment for a sample of tasks contain neither
              the name of the curve ball, nor the target of the change, nor a hash of the record.
 
-Exit code 0 when nothing is found, 1 otherwise.  This is an audit by computation; it does not say that
+Without ``--limit`` the summary is also stored under the key ``audit`` of ``<root>/CHECKS.json`` with
+the SHA-256 of the manifest it belongs to.  Exit code 0 when nothing is found, 1 otherwise.  This is an audit by computation; it does not say that
 anybody reviewed, approved or certified a task.
 """
 from __future__ import annotations
@@ -47,6 +51,7 @@ os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "tests" / "independent"))
+sys.path.insert(0, str(ROOT / "tools"))
 
 TABLEAU_TOLERANCE = 1.0e-8          # engine against the independent tableau solver (first order; round-off)
 SINGULAR = 1.0e-9                   # singular value of the equilibrated tableau counted as zero
@@ -77,7 +82,7 @@ def audit_stable(model_path: str, tasks: list) -> dict:
     from benchfea.bench.tasks import extract
     from benchfea.solve import analyze
     out = {"model": model_path, "findings": [], "combinations": 0, "tableauWorst": 0.0, "secondOrder": 0,
-           "referenceWorst": 0.0, "quantities": 0}
+           "referenceWorst": 0.0, "quantities": 0, "tableauWorstSecondOrder": 0.0}
     raw = json.loads(Path(model_path).read_text(encoding="utf-8"))
     doc, model = explicit_sections(raw)
     results = analyze(model, strict=True)
@@ -107,8 +112,11 @@ def audit_stable(model_path: str, tasks: list) -> dict:
             continue
         worst = max(v for k, v in diff.items() if not k.startswith("_"))
         out["combinations"] += 1
+        if second:
+            out["tableauWorstSecondOrder"] = max(out["tableauWorstSecondOrder"], float(worst))
+            continue
         out["tableauWorst"] = max(out["tableauWorst"], float(worst))
-        if worst > TABLEAU_TOLERANCE and not second:
+        if worst > TABLEAU_TOLERANCE:
             out["findings"].append(f"combination {cid}: engine and tableau differ by {worst:.2e}")
     return out
 
@@ -180,6 +188,8 @@ def main(argv=None) -> int:
     if both:
         findings.append(f"{len(both)} curve-balled model(s) occur in both splits")
     shared = [t for v in by_base.values() if len(v) == 2 for t in v["held-out"]]
+    if shared:
+        findings.append(f"{len(shared)} held-out task(s) are built on a base model that train tasks use as well")
     summary["split"] = {"curveBalledModelsInBothSplits": len(both),
                         "heldOutTasksOnABaseModelOfTheTrainSplit": len(shared),
                         "ofThoseByTaskType": dict(collections.Counter(t["taskType"] for t in shared)),
@@ -195,17 +205,19 @@ def main(argv=None) -> int:
         else:
             stable.setdefault(h, (mp, []))[1].append((task, ans))
     items = list(stable.values())[:limit]
-    worst_tab = worst_ref = 0.0
+    worst_tab = worst_ref = worst_second = 0.0
     n_comb = n_q = n_second = 0
     for k, (mp, tl) in enumerate(items):
         r = audit_stable(mp, tl)
         findings += [f"{Path(mp).name}: {f}" for f in r["findings"]]
         worst_tab, worst_ref = max(worst_tab, r["tableauWorst"]), max(worst_ref, r["referenceWorst"])
+        worst_second = max(worst_second, r["tableauWorstSecondOrder"])
         n_comb, n_q, n_second = n_comb + r["combinations"], n_q + r["quantities"], n_second + r["secondOrder"]
         if (k + 1) % 20 == 0:
             print(f"  {k + 1} / {len(items)} stable models", flush=True)
     summary["stableModels"] = {"models": len(items), "combinationsComparedWithTheTableau": n_comb,
                                "ofThoseSecondOrder": n_second, "largestDifferenceEngineTableau": worst_tab,
+                               "largestDifferenceEngineTableauSecondOrder": worst_second,
                                "predictQuantitiesRecomputed": n_q, "largestDifferenceReferenceFreshSolve": worst_ref}
     mech = list(unstable.values())[:limit]
     agree = 0
@@ -261,6 +273,9 @@ def main(argv=None) -> int:
     print(json.dumps(summary, indent=1))
     if "--json" in argv:
         Path(argv[argv.index("--json") + 1]).write_text(json.dumps(summary, indent=1), encoding="utf-8")
+    if limit is None:
+        from check_dataset_scores import update_checks
+        update_checks(root, "audit", dict(summary))
     return 1 if findings else 0
 
 

@@ -1,0 +1,85 @@
+{
+ "format": "benchfea-task",
+ "formatVersion": "1.0.0",
+ "id": "t7db6ee73480a46",
+ "taskType": "repair",
+ "mode": "tool-allowed",
+ "family": "continuous_beam",
+ "difficulty": 2,
+ "split": "held-out",
+ "quantities": [
+  {
+   "kind": "displacement",
+   "combination": "ULS1",
+   "node": "H3",
+   "component": "uy",
+   "unit": "mm",
+   "id": "q1",
+   "text": "translation uy of node H3 in combination ULS1 [mm], global axes"
+  },
+  {
+   "kind": "displacement",
+   "combination": "ULS2",
+   "node": "N2",
+   "component": "rz",
+   "unit": "rad",
+   "id": "q2",
+   "text": "rotation rz of node N2 in combination ULS2 [rad], global axes"
+  },
+  {
+   "kind": "reaction",
+   "combination": "ULS1",
+   "node": "N2",
+   "component": "Fy",
+   "unit": "kN",
+   "id": "q3",
+   "text": "reaction force Fy at node N2 in combination ULS1 [kN], global axes, acting on the structure"
+  },
+  {
+   "kind": "reaction",
+   "combination": "SLS1",
+   "node": "N3",
+   "component": "Fy",
+   "unit": "kN",
+   "id": "q4",
+   "text": "reaction force Fy at node N3 in combination SLS1 [kN], global axes, acting on the structure"
+  },
+  {
+   "kind": "memberEndForce",
+   "combination": "SLS1",
+   "member": "B2",
+   "end": "j",
+   "component": "Mz",
+   "unit": "kN*mm",
+   "id": "q5",
+   "text": "end force Mz at end j of member B2 in combination SLS1 [kN*mm], member local axes, acting on the member (docs/CONVENTIONS.md)"
+  },
+  {
+   "kind": "memberMaxMoment",
+   "combination": "ULS1",
+   "member": "B3b",
+   "component": "Mz",
+   "unit": "kN*mm",
+   "id": "q6",
+   "text": "largest absolute bending moment Mz along member B3b in combination ULS1 [kN*mm] (a non-negative number; local axes)"
+  }
+ ],
+ "criteria": {
+  "stable": "the submitted model is accepted by the validator and analysed by the engine",
+  "verified": "the reference of the submitted model passes the verification pipeline (benchfea verify: every applicable tier)",
+  "quantities": "each named quantity of the submitted model is within 2% of its value in the intended design (partial credit up to 10%)",
+  "design": "not a criterion of this task: the design results of the intended model are not verified (tier F), so nothing is scored on them"
+ },
+ "intendedDesign": "Units: force kN, length mm (every number below is in these units: moments in force x length, line loads in force / length, moduli and stresses in force / length^2, unit weights in force / length^3, rotational springs in force x length / rad).\nFormat version: 1.0.0.\nConventions: vertical axis Y.\nNodes (5), coordinates:\n  N1 at (0, 0, 0)\n  N2 at (9500, 0, 0)\n  N3 at (19000, 0, 0)\n  N4 at (28500, 0, 0)\n  H3 at (21500, 0, 0)\nSupports (a degree of freedom not listed is free):\n  node N1: type fixed\n  node N2: degrees of freedom (uy fixed, uz fixed, rx fixed, ry fixed)\n  node N3: degrees of freedom (uy fixed, uz fixed, rx fixed, ry fixed)\n  node N4: degrees of freedom (uy fixed, uz fixed, rx fixed, ry fixed, rz fixed)\n  node H3: degrees of freedom (uz fixed, rx fixed, ry fixed)\nMaterials:\n  steel: description structural steel (nominal properties), E 200, G 77, Fy 0.345, Fu 0.45, unit weight 7.7e-08\nCross-sections:\n  I-450x200x14x9: type I, d 450, bf 200, tf 14, tw 9, r 18\nMembers (4); a member end without a stated release is rigidly connected, a member without stated offsets runs from node to node:\n  B1: from node N1 to node N2, section I-450x200x14x9, material steel\n  B2: from node N2 to node N3, section I-450x200x14x9, material steel\n  B3a: from node N3 to node H3, section I-450x200x14x9, material steel\n  B3b: from node H3 to node N4, section I-450x200x14x9, material steel; releases (start node (rz yes))\nRigid links and diaphragms: none.\nLoad cases:\n  D (dead load and self weight):\n    load 1: self weight\n    load 2: member distributed, member B1, direction Y, intensity at start -0.017\n    load 3: member distributed, member B2, direction Y, intensity at start -0.017\n    load 4: member distributed, member B3a, direction Y, intensity at start -0.017\n    load 5: member distributed, member B3b, direction Y, intensity at start -0.017\n  L1 (live load on spans 1, 3, ...):\n    load 1: member distributed, member B1, direction Y, intensity at start -0.0185\n    load 2: member distributed, member B3a, direction Y, intensity at start -0.0185\n    load 3: member distributed, member B3b, direction Y, intensity at start -0.0185\n    load 4: member distributed, member B1, direction Y, intensity at start -0.011, intensity at end 0, start 0.5, end 1\n  L2 (live load on spans 2, 4, ...):\n    load 1: member distributed, member B2, direction Y, intensity at start -0.0185\nLoad combinations:\n  ULS1 = 1.2 x D + 1.6 x L1 + 1.6 x L2\n  SLS1 = 1 x D + 1 x L1 + 1 x L2; purpose serviceability\n  ULS2 = 1.4 x D\nAnalysis settings: shear deformation no.\nDesign data (AISC 360-22 member checks):\n  defaults: method LRFD\n  groups:\n    beams: members [B1, B2, B3], role beam, bracing (top flange braced at [0.3333, 0.6667], bottom flange braced at [0.3333, 0.6667]), deflection limits [(span /  240, direction y, combinations [SLS1])]\n  members:\n    B3: members [B3a, B3b]",
+ "answerFormat": {
+  "model": "the complete repaired model document (in the environment: omit it to submit the working copy)"
+ },
+ "statement": "TASK (repair): the model file below was derived from the intended design described here, but something in it was changed in a way that matters. Repair the model.\nStructure: continuous beam. Mode tool-allowed: you may run the analysis tool (run_analysis) and read its results.\nSign conventions, axes and units are those of docs/CONVENTIONS.md; every number you give is in the units of the model file.\n\nINTENDED DESIGN:\nUnits: force kN, length mm (every number below is in these units: moments in force x length, line loads in force / length, moduli and stresses in force / length^2, unit weights in force / length^3, rotational springs in force x length / rad).\nFormat version: 1.0.0.\nConventions: vertical axis Y.\nNodes (5), coordinates:\n  N1 at (0, 0, 0)\n  N2 at (9500, 0, 0)\n  N3 at (19000, 0, 0)\n  N4 at (28500, 0, 0)\n  H3 at (21500, 0, 0)\nSupports (a degree of freedom not listed is free):\n  node N1: type fixed\n  node N2: degrees of freedom (uy fixed, uz fixed, rx fixed, ry fixed)\n  node N3: degrees of freedom (uy fixed, uz fixed, rx fixed, ry fixed)\n  node N4: degrees of freedom (uy fixed, uz fixed, rx fixed, ry fixed, rz fixed)\n  node H3: degrees of freedom (uz fixed, rx fixed, ry fixed)\nMaterials:\n  steel: description structural steel (nominal properties), E 200, G 77, Fy 0.345, Fu 0.45, unit weight 7.7e-08\nCross-sections:\n  I-450x200x14x9: type I, d 450, bf 200, tf 14, tw 9, r 18\nMembers (4); a member end without a stated release is rigidly connected, a member without stated offsets runs from node to node:\n  B1: from node N1 to node N2, section I-450x200x14x9, material steel\n  B2: from node N2 to node N3, section I-450x200x14x9, material steel\n  B3a: from node N3 to node H3, section I-450x200x14x9, material steel\n  B3b: from node H3 to node N4, section I-450x200x14x9, material steel; releases (start node (rz yes))\nRigid links and diaphragms: none.\nLoad cases:\n  D (dead load and self weight):\n    load 1: self weight\n    load 2: member distributed, member B1, direction Y, intensity at start -0.017\n    load 3: member distributed, member B2, direction Y, intensity at start -0.017\n    load 4: member distributed, member B3a, direction Y, intensity at start -0.017\n    load 5: member distributed, member B3b, direction Y, intensity at start -0.017\n  L1 (live load on spans 1, 3, ...):\n    load 1: member distributed, member B1, direction Y, intensity at start -0.0185\n    load 2: member distributed, member B3a, direction Y, intensity at start -0.0185\n    load 3: member distributed, member B3b, direction Y, intensity at start -0.0185\n    load 4: member distributed, member B1, direction Y, intensity at start -0.011, intensity at end 0, start 0.5, end 1\n  L2 (live load on spans 2, 4, ...):\n    load 1: member distributed, member B2, direction Y, intensity at start -0.0185\nLoad combinations:\n  ULS1 = 1.2 x D + 1.6 x L1 + 1.6 x L2\n  SLS1 = 1 x D + 1 x L1 + 1 x L2; purpose serviceability\n  ULS2 = 1.4 x D\nAnalysis settings: shear deformation no.\nDesign data (AISC 360-22 member checks):\n  defaults: method LRFD\n  groups:\n    beams: members [B1, B2, B3], role beam, bracing (top flange braced at [0.3333, 0.6667], bottom flange braced at [0.3333, 0.6667]), deflection limits [(span /  240, direction y, combinations [SLS1])]\n  members:\n    B3: members [B3a, B3b]\n\nCriteria:\n  stable: the submitted model is accepted by the validator and analysed by the engine\n  verified: the reference of the submitted model passes the verification pipeline (benchfea verify: every applicable tier)\n  quantities: each named quantity of the submitted model is within 2% of its value in the intended design (partial credit up to 10%)\n  design: not a criterion of this task: the design results of the intended model are not verified (tier F), so nothing is scored on them\nNamed quantities (their values in the intended design are not given; they are compared physically, whatever units your model declares):\n  q1: translation uy of node H3 in combination ULS1 [mm], global axes\n  q2: rotation rz of node N2 in combination ULS2 [rad], global axes\n  q3: reaction force Fy at node N2 in combination ULS1 [kN], global axes, acting on the structure\n  q4: reaction force Fy at node N3 in combination SLS1 [kN], global axes, acting on the structure\n  q5: end force Mz at end j of member B2 in combination SLS1 [kN*mm], member local axes, acting on the member (docs/CONVENTIONS.md)\n  q6: largest absolute bending moment Mz along member B3b in combination ULS1 [kN*mm] (a non-negative number; local axes)\n\nSubmit your answer as JSON of this form:\n{\n \"model\": {\n  \"formatVersion\": \"...\",\n  \"...\": \"...\"\n }\n}",
+ "verification": {
+  "status": "verified",
+  "scope": "analysis results of the intended design",
+  "meaning": "'verified' means only: the reference solution passed every tier listed as applicable in this record, at the tolerances stated in it. It does not mean reviewed, approved or certified by anyone.",
+  "policy": "docs/VERIFICATION.md; the tiers passed and the tolerances are in the answers file and in the info returned when the episode ends"
+ },
+ "modelFile": "t7db6ee73480a46.model.json"
+}

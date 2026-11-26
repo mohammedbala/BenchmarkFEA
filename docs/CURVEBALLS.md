@@ -209,7 +209,7 @@ A cell lists the effect classes obtained on the models of the family: **A** = ch
 | `release_pinned_frame` | - | A | M A | A | - | A | - | A |
 | `design_unbraced_length_changed` | D | D | D | D | D | D | D | D |
 | `design_k_changed` | - | D | D | D | D | D | D | D |
-| `design_bracing_points_changed` | D | D | D | D | - | D | - | D |
+| `design_bracing_points_changed` | D | D | - | D | - | D | - | D |
 | `design_lb_full_where_braced` | D | D | D | D | D | D | D | D |
 | `design_lb_short_where_unbraced` | D | - | - | - | - | - | D | - |
 | `support_fixed_to_pinned` | A | A | A | A | - | A | - | A |
@@ -227,11 +227,11 @@ A cell lists the effect classes obtained on the models of the family: **A** = ch
 | `load_moved` | A | A | A | A | A | A | A | A |
 | `second_order_off` | - | A | - | - | - | - | - | - |
 
-250 of 462 (model, curve ball) pairs were applicable. Every curve ball is applicable to at least one family.
+249 of 462 (model, curve ball) pairs were applicable. Every curve ball is applicable to at least one family.
 
 ### Verification runs of the examples
 
-The perturbed model of each of the 36 examples of section 6 was put through `benchfea.verify.verify_model` (all tiers, analysis results or mechanism diagnosis): 3 `quarantined`, 1 `refused`, 32 `verified`. The outcome is stated with each example; `verified` means only that the reference passed the tiers listed, at the tolerances of docs/VERIFICATION.md. A `quarantined` example shows a perturbed model whose reference is not publishable as it stands.
+The perturbed model of each of the 36 examples of section 6 was put through `benchfea.verify.verify_model` (all tiers, analysis results or mechanism diagnosis): 1 `quarantined`, 1 `refused`, 34 `verified`. The outcome is stated with each example; `verified` means only that the reference passed the tiers listed, at the tolerances of docs/VERIFICATION.md. A `quarantined` example shows a perturbed model whose reference is not publishable as it stands.
 
 For the 5 design-only examples the run was repeated with the design results (tier F): 5 `quarantined`. Tier F is about the design checks a model uses, not about the curve ball: the BASE models of these examples, verified with their design results in the same way, gave 5 `quarantined` (categories: not-covered). As long as a limit state used by a model lacks full tier-F coverage, neither the base nor the perturbed design results of that model are publishable as verified; the analysis results of the design-only examples (identical to those of the base model) are covered by the analysis run above.
 
@@ -254,7 +254,7 @@ Example (actual run, seed 0) on `generate("diaphragm_frame", seed=1, difficulty=
   * `/constraints/floor1` removed (was `{"type": "rigidDiaphragm", "master": "CM1", "slaves": ["A1.1", "A2 ...`)
 * Effect class **creates-mechanism**: the base model is analysed, the perturbed one is refused as a mechanism (2 mechanism(s)). Reference = the diagnosis; first mode: *node CM1 is loaded in ux, ry, where it has no stiffness: no member connects to it* (kind `node`, cause `no-stiffness`).
 * Expected verification route: diagnosis tiers N, K, C, E of benchfea.verify (docs/VERIFICATION.md section 4): null space of an independently assembled stiffness, engine matrix, two foreign solvers under a probing load, invariance of the diagnosis; NOT expected to pass: the diagnosis reports a loaded node without any member (cause no-stiffness), and the diagnosis tiers have been measured not to confirm this kind of mechanism (docs/CURVEBALLS.md section 4) -- the pipeline quarantines it.
-* Verification run on this perturbed model (`benchfea verify`, mechanism diagnosis): `quarantined` (category `disagreement`; tiers passed: E; not passed: N, K, C) -- tier N: independent stiffness: 0 zero-stiffness motion(s) (diagnosis: 2); 0 described mode(s) tested for K phi = 0: NOT confirmed: the independent matrix has 0 eigenvalue(s) below 1.0e-09; the diagnosis says 2 mechanism(s); mode 0: node(s) CM1 do not move in the independent null space; the modes ... **This reference must not be published.**
+* Verification run on this perturbed model (`benchfea verify`, mechanism diagnosis): `verified` -- passed tiers N, K, C, E, which are all the tiers that apply (meaning and tolerances: docs/VERIFICATION.md).
 
 #### `constraint_added` -- rigid link / diaphragm added
 
@@ -291,7 +291,7 @@ Example (actual run, seed 0) on `generate("diaphragm_frame", seed=1, difficulty=
   * `/constraints/floor1/slaves`: `["A1.1", "A2.1", "B1.1", "B2.1", "C1.1", "C2.1"]` -> `["A1.1", "A2.1", "B1.1", "C1.1", "C2.1"]`
 * Analysis change (largest, relative to the base peak of its kind): **16.9 %** -- member force at `BYB1.1`, combination `ULS3`.
 * Combination `ULS3`, before -> after: largest displacement of a member axis 146.8 mm -> 146.8 mm; largest reaction force 123.7 kN -> 123.7 kN; largest member bending moment 7.879e+04 kN·mm -> 7.879e+04 kN·mm.
-* Design: status conditional -> fail; largest ratio 0.897 (`BXA1.1`) -> 1.23 (`BYB1.1`); largest change of a governing ratio: design member `BYB1.1` 0.727 -> 1.23 (68.9 %); pass / fail changed for: `BYB1.1`.
+* Design: status conditional -> fail; largest ratio 0.897 (`BXA1.1`) -> 1.23 (`BYB1.1`); largest change of a governing ratio: design member `BYB1.1` 0.697 -> 1.23 (76.2 %); pass / fail changed for: `BYB1.1`.
 * Materiality criterion met: `analysisChange`.
 * Expected verification route: benchfea verify: every applicable tier; tier C (two independent solvers) is expected to be able to follow the perturbed model.
 * Verification run on this perturbed model (`benchfea verify`, analysis results): `verified` -- passed tiers C, D, E, which are all the tiers that apply (meaning and tolerances: docs/VERIFICATION.md).
@@ -329,7 +329,7 @@ Example (actual run, seed 0) on `generate("diaphragm_frame", seed=1, difficulty=
   * `/constraints/floor1/slaves`: `["A1.1", "A2.1", "B1.1", "B2.1", "C1.1", "C2.1"]` -> `["A1.1", "A2.1", "B2.1", "C1.1", "C2.1"]`
 * Effect class **creates-mechanism**: the base model is analysed, the perturbed one is refused as a mechanism (2 mechanism(s)). Reference = the diagnosis; first mode: *node CM1 is loaded in ux, ry, where it has no stiffness: no member connects to it* (kind `node`, cause `no-stiffness`).
 * Expected verification route: diagnosis tiers N, K, C, E of benchfea.verify (docs/VERIFICATION.md section 4): null space of an independently assembled stiffness, engine matrix, two foreign solvers under a probing load, invariance of the diagnosis; NOT expected to pass: the diagnosis reports a loaded node without any member (cause no-stiffness), and the diagnosis tiers have been measured not to confirm this kind of mechanism (docs/CURVEBALLS.md section 4) -- the pipeline quarantines it.
-* Verification run on this perturbed model (`benchfea verify`, mechanism diagnosis): `quarantined` (category `disagreement`; tiers passed: E; not passed: N, K, C) -- tier N: independent stiffness: 0 zero-stiffness motion(s) (diagnosis: 2); 0 described mode(s) tested for K phi = 0: NOT confirmed: the independent matrix has 0 eigenvalue(s) below 1.0e-09; the diagnosis says 2 mechanism(s); mode 0: node(s) CM1 do not move in the independent null space; the modes ... **This reference must not be published.**
+* Verification run on this perturbed model (`benchfea verify`, mechanism diagnosis): `verified` -- passed tiers N, K, C, E, which are all the tiers that apply (meaning and tolerances: docs/VERIFICATION.md).
 
 #### `constraint_made_flexible` -- rigid constraint replaced by flexible members
 
@@ -352,7 +352,7 @@ Example (actual run, seed 0) on `generate("diaphragm_frame", seed=1, difficulty=
   * ... and 1 more change(s) of the same kind
 * Analysis change (largest, relative to the base peak of its kind): **23.5 %** -- member force at `BXA1.1`, combination `ULS3`.
 * Combination `ULS3`, before -> after: largest displacement of a member axis 146.8 mm -> 154.8 mm; largest reaction force 123.7 kN -> 130.8 kN; largest member bending moment 7.879e+04 kN·mm -> 8.054e+04 kN·mm.
-* Design: status conditional -> fail; largest ratio 0.897 (`BXA1.1`) -> 2.07 (`floor1-flex-2`); largest change of a governing ratio: design member `BYB1.1` 0.727 -> 0.638 (12.2 %).
+* Design: status conditional -> fail; largest ratio 0.897 (`BXA1.1`) -> 2.07 (`floor1-flex-2`); largest change of a governing ratio: design member `CA2.1` 0.556 -> 0.503 (9.6 %).
 * Materiality criterion met: `analysisChange`.
 * Expected verification route: benchfea verify: every applicable tier; tier C (two independent solvers) is expected to be able to follow the perturbed model.
 * Verification run on this perturbed model (`benchfea verify`, analysis results): `verified` -- passed tiers C, D, E, which are all the tiers that apply (meaning and tolerances: docs/VERIFICATION.md).
@@ -379,7 +379,7 @@ Example (actual run, seed 0) on `generate("portal_frame", seed=1, difficulty=1)`
 * Expected verification route: benchfea verify: every applicable tier; tier C (two independent solvers) is expected to be able to follow the perturbed model.
 * Verification run on this perturbed model (`benchfea verify`, analysis results): `verified` -- passed tiers C, D, E, which are all the tiers that apply (meaning and tolerances: docs/VERIFICATION.md).
 
-Refused where it does not matter, e.g. on `generate("braced_frame", seed=1, difficulty=2)`: *none of the 10 target(s) tried has a material effect of class changes-analysis: member BA2, end j (half the depth of CB2): below the materiality threshold: analysis change 2.728%, design ratio change 49.067% (does not count for this curve ball); member CA2, end i (half the depth of BA1): below the materiality threshold: analysis change 0.133%, design ratio change 8.525% (does not count for this curve ball); membe ...*
+Refused where it does not matter, e.g. on `generate("braced_frame", seed=1, difficulty=2)`: *none of the 10 target(s) tried has a material effect of class changes-analysis: member BA2, end j (half the depth of CB2): below the materiality threshold: analysis change 3.130%, design ratio change 24.444% (does not count for this curve ball); member CA2, end i (half the depth of BA1): below the materiality threshold: analysis change 0.110%, design ratio change 7.217% (does not count for this curve ball); membe ...*
 
 #### `offset_removed` -- rigid end offset removed
 
@@ -467,7 +467,7 @@ Example (actual run, seed 0) on `generate("continuous_beam", seed=1, difficulty=
 * Expected verification route: benchfea verify: every applicable tier; tier C (two independent solvers) is expected to be able to follow the perturbed model.
 * Verification run on this perturbed model (`benchfea verify`, analysis results): `verified` -- passed tiers A, C, D, E, which are all the tiers that apply (meaning and tolerances: docs/VERIFICATION.md).
 
-Refused where it does not matter, e.g. on `generate("braced_frame", seed=1, difficulty=2)`: *none of the 12 target(s) tried has a material effect of class changes-analysis: member BA1, end j: below the materiality threshold: analysis change 0.000%, design ratio change 0.000% (does not count for this curve ball); member BA1, end i: below the materiality threshold: analysis change 0.000%, design ratio change 0.000% (does not count for this curve ball); member CA2, end i: below the materiality threshold: an ...*
+Refused where it does not matter, e.g. on `generate("braced_frame", seed=1, difficulty=2)`: *none of the 12 target(s) tried has a material effect of class changes-analysis: member BA1, end j: effect class 'design-only' is not changes-analysis; member BA1, end i: effect class 'design-only' is not changes-analysis; member CA2, end i: below the materiality threshold: analysis change 0.406%, design ratio change 1.428% (does not count for this curve ball); member BA2, end i: below the materiality threshold: a ...*
 
 #### `release_removed` -- release removed (connection made rigid)
 
@@ -580,7 +580,7 @@ Example (actual run, seed 0) on `generate("portal_frame", seed=1, difficulty=1)`
 * Materiality criterion met: `designRatioChange`.
 * Expected verification route: benchfea verify: every applicable tier; tier C (two independent solvers) is expected to be able to follow the perturbed model; design results: tier F (--design).
 * Verification run on this perturbed model (`benchfea verify`, analysis results): `verified` -- passed tiers C, D, E, which are all the tiers that apply (meaning and tolerances: docs/VERIFICATION.md).
-* The same with the design results (`--design`, tier F): `quarantined` (category `not-covered`; not passed: F) -- tier F: NOT publishable: 3 clause item(s) without full coverage, 0 used check(s) notChecked / refused: Eq. E4-1: Design Examples reproduce only an intermediate value (b partial: E.2, E.3) -- used by 4 check(s), e.g. member C1, combination ULS1: compression: torsional buckling; Eq. E4-2: Design E ...
+* The same with the design results (`--design`, tier F): `quarantined` (category `not-covered`; not passed: F) -- tier F: NOT publishable: 1 clause item(s) without full coverage, 0 used check(s) notChecked / refused: Eq. F2-7: no Design Examples reproduction (b) -- used by 4 check(s), e.g. member C1, combination ULS1: flexure, major axis: lateral-torsional buckling
 * 3 target(s) were tried and dropped before this one, e.g. *Ky 1 -> 0.5 at design member C2 (built-in default 1)* -- below the materiality threshold: analysis change 0.000%, design ratio change 0.000%.
 
 Refused where it does not matter, e.g. on `generate("continuous_beam", seed=1, difficulty=1)`: *none of the 4 target(s) tried has a material effect of class design-only: Kx 1 -> 2 at design member B1 (built-in default 1): below the materiality threshold: analysis change 0.000%, design ratio change 0.000%; Ky 1 -> 2 at design member B1 (built-in default 1): below the materiality threshold: analysis change 0.000%, design ratio change 0.000%; Kx 1 -> 0.5 at design member B1 (built-in default 1): below the mate ...*
@@ -696,7 +696,7 @@ Example (actual run, seed 0) on `generate("continuous_beam", seed=1, difficulty=
 * Expected verification route: benchfea verify: every applicable tier; tier C (two independent solvers) is expected to be able to follow the perturbed model.
 * Verification run on this perturbed model (`benchfea verify`, analysis results): `verified` -- passed tiers A, C, D, E, which are all the tiers that apply (meaning and tolerances: docs/VERIFICATION.md).
 
-Refused where it does not matter, e.g. on `generate("braced_frame", seed=1, difficulty=2)`: *none of the 2 target(s) tried has a material effect of class changes-analysis: support B0: rotation(s) rz fixed: below the materiality threshold: analysis change 1.213%, design ratio change 1.214% (does not count for this curve ball); support A0: rotation(s) rz fixed: below the materiality threshold: analysis change 1.257%, design ratio change 1.248% (does not count for this curve ball)*
+Refused where it does not matter, e.g. on `generate("braced_frame", seed=1, difficulty=2)`: *none of the 2 target(s) tried has a material effect of class changes-analysis: support B0: rotation(s) rz fixed: below the materiality threshold: analysis change 1.226%, design ratio change 1.219% (does not count for this curve ball); support A0: rotation(s) rz fixed: below the materiality threshold: analysis change 1.289%, design ratio change 1.258% (does not count for this curve ball)*
 
 #### `support_roller_direction` -- roller turned to another direction
 
@@ -976,7 +976,7 @@ Example (actual run, seed 0) on `generate("portal_frame", seed=1, difficulty=3)`
 * Expected verification route: benchfea verify: every applicable tier; tier C (two independent solvers) is expected to be able to follow the perturbed model.
 * Verification run on this perturbed model (`benchfea verify`, analysis results): `verified` -- passed tiers C, D, E, which are all the tiers that apply (meaning and tolerances: docs/VERIFICATION.md).
 
-Refused where it does not matter, e.g. on `generate("multistorey_2d", seed=1, difficulty=3)`: *none of the 1 target(s) tried has a material effect of class changes-analysis: 3 second-order combination(s) made first order: ULS1, ULS2, ULS3: below the materiality threshold: analysis change 4.369%, design ratio change 96.179% (does not count for this curve ball)*
+Refused where it does not matter, e.g. on `generate("multistorey_2d", seed=1, difficulty=3)`: *none of the 1 target(s) tried has a material effect of class changes-analysis: 3 second-order combination(s) made first order: ULS1, ULS2, ULS3: below the materiality threshold: analysis change 4.338%, design ratio change 1.326% (does not count for this curve ball)*
 
 ## 7. Limits
 

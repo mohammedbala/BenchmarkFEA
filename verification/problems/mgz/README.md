@@ -229,5 +229,6 @@ tolerance" above 1 means a target is missed).
 6. **Example 9.7**: are the two wall supports pinned (rotation free)? Excluded until answered.
 7. **Example 13.3**: the figure shows the joint moments as curved arrows, the load vector as +2 x 10^3 kN mm;
    the load vector was followed (counter-clockwise).
-8. **Examples 8.3 and 8.4** fail tier C for the reason already recorded for the tier-A beam-column problems
-   (the estimated OpenSees discretisation error is not a bound).
+8. **Examples 8.3 and 8.4** used to fail tier C because the estimated discretisation error of the foreign
+   solvers was not a bound. With the bound from three refinement levels (docs/CROSSCHECK.md) they pass, and
+   so do the models of Examples 9.5 and 9.6 (second order), which stay quarantined for their published targets.

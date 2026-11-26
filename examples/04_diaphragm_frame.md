@@ -44,7 +44,7 @@ reference values from any publication.
 | SLS-X: base shear along X taken by columns CD + CC (line z = 180) | -11.14 | kip |
 | ULS2: axial force in column CB (compression negative) | -18.09 | kip |
 | design: governing ratio, column CB | 0.866 | - |
-| design: governing ratio, beam BX2 | 0.4688 | - |
+| design: governing ratio, beam BX2 | 0.4438 | - |
 
 The two frame lines along X do not move equally (the floor rotates about Y), and the line nearer to
 the load takes the larger share of the base shear. The test checks that every floor node moves
@@ -60,7 +60,7 @@ add up to the applied 20 kip.
 | CC | conditional | 0.861 | ULS3 | combined flexure and compression |
 | CD | conditional | 0.849 | ULS3 | combined flexure and compression |
 | BX1 | conditional | 0.435 | ULS1 | flexure, major axis: yielding |
-| BX2 | conditional | 0.469 | ULS2 | combined flexure and compression |
+| BX2 | conditional | 0.444 | ULS2 | flexure, major axis: yielding |
 | BZ1 | conditional | 0.201 | ULS3 | flexure, major axis: yielding |
 | BZ2 | conditional | 0.219 | ULS3 | flexure, major axis: yielding |
 

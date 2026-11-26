@@ -1,0 +1,87 @@
+{
+ "format": "benchfea-task",
+ "formatVersion": "1.0.0",
+ "id": "t20b2d3e80cbc94",
+ "taskType": "predict",
+ "mode": "no-solver",
+ "family": "multistorey_2d",
+ "difficulty": 3,
+ "split": "held-out",
+ "quantities": [
+  {
+   "kind": "displacement",
+   "combination": "ULS5",
+   "node": "B3",
+   "component": "ry",
+   "unit": "rad",
+   "id": "q1",
+   "text": "rotation ry of node B3 in combination ULS5 [rad], global axes"
+  },
+  {
+   "kind": "displacement",
+   "combination": "SLS2",
+   "node": "B1",
+   "component": "ry",
+   "unit": "rad",
+   "id": "q2",
+   "text": "rotation ry of node B1 in combination SLS2 [rad], global axes"
+  },
+  {
+   "kind": "memberEndForce",
+   "combination": "SLS2",
+   "member": "CB2",
+   "end": "j",
+   "component": "Mz",
+   "unit": "kip*in",
+   "id": "q3",
+   "text": "end force Mz at end j of member CB2 in combination SLS2 [kip*in], member local axes, acting on the member (docs/CONVENTIONS.md)"
+  },
+  {
+   "kind": "memberMaxMoment",
+   "combination": "ULS2",
+   "member": "CB2",
+   "component": "Mz",
+   "unit": "kip*in",
+   "id": "q4",
+   "text": "largest absolute bending moment Mz along member CB2 in combination ULS2 [kip*in] (a non-negative number; local axes)"
+  },
+  {
+   "kind": "memberEndForce",
+   "combination": "SLS2",
+   "member": "BA1",
+   "end": "i",
+   "component": "Fx",
+   "unit": "kip",
+   "id": "q5",
+   "text": "end force Fx at end i of member BA1 in combination SLS2 [kip], member local axes, acting on the member (docs/CONVENTIONS.md)"
+  },
+  {
+   "kind": "memberEndForce",
+   "combination": "ULS4",
+   "member": "BA2",
+   "end": "i",
+   "component": "Fx",
+   "unit": "kip",
+   "id": "q6",
+   "text": "end force Fx at end i of member BA2 in combination ULS4 [kip], member local axes, acting on the member (docs/CONVENTIONS.md)"
+  }
+ ],
+ "answerFormat": {
+  "values": {
+   "q1": "number",
+   "q2": "number",
+   "q3": "number",
+   "q4": "number",
+   "q5": "number",
+   "q6": "number"
+  }
+ },
+ "statement": "TASK (predict): give the named results of the model in the file below, exactly as it is given.\nStructure: multistorey 2d. Mode no-solver: the analysis tool is disabled; inspect the file and reason from it.\nSign conventions, axes and units are those of docs/CONVENTIONS.md; every number you give is in the units of the model file.\n\nQuantities:\n  q1: rotation ry of node B3 in combination ULS5 [rad], global axes\n  q2: rotation ry of node B1 in combination SLS2 [rad], global axes\n  q3: end force Mz at end j of member CB2 in combination SLS2 [kip*in], member local axes, acting on the member (docs/CONVENTIONS.md)\n  q4: largest absolute bending moment Mz along member CB2 in combination ULS2 [kip*in] (a non-negative number; local axes)\n  q5: end force Fx at end i of member BA1 in combination SLS2 [kip], member local axes, acting on the member (docs/CONVENTIONS.md)\n  q6: end force Fx at end i of member BA2 in combination ULS4 [kip], member local axes, acting on the member (docs/CONVENTIONS.md)\n\nSubmit your answer as JSON of this form:\n{\n \"values\": {\n  \"q1\": 0.0,\n  \"q2\": 0.0,\n  \"q3\": 0.0,\n  \"q4\": 0.0,\n  \"q5\": 0.0,\n  \"q6\": 0.0\n }\n}",
+ "verification": {
+  "status": "verified",
+  "scope": "analysis results of the given model",
+  "meaning": "'verified' means only: the reference solution passed every tier listed as applicable in this record, at the tolerances stated in it. It does not mean reviewed, approved or certified by anyone.",
+  "policy": "docs/VERIFICATION.md; the tiers passed and the tolerances are in the answers file and in the info returned when the episode ends"
+ },
+ "modelFile": "t20b2d3e80cbc94.model.json"
+}

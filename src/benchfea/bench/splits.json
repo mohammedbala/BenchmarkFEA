@@ -69,7 +69,6 @@
     "release_pinned_frame",
     "design_unbraced_length_changed",
     "design_k_changed",
-    "design_bracing_points_changed",
     "design_lb_full_where_braced",
     "support_fixed_to_pinned",
     "support_pinned_to_fixed",
